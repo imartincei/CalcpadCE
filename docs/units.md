@@ -120,8 +120,8 @@ CalcpadCE includes a large collection of predefined units as follows:
 - Power: hp, hpE, hpS.
 
 Angle units are accepted by trigonometric functions, and they override all other settings.
-Inverse trigonometric functions return unitless values by default.
-If you want them to return the result in the current units, you have to define a variable: *ReturnAngleUnits* = 1.
+Inverse trigonometric functions and `phase` return the result in the current angle units by default.
+To return unitless values instead, turn off **Return Angle Units** in the [Settings](new-settings.md#math) or define a variable: *ReturnAngleUnits* = 0.
 
 Literals that follow numbers immediately are parsed as units, e.g. "2 m". Standalone literals can be either units or variables, e.g. "N\*m". The rules for parsing are as follows: If a literal has not been defined as a variable, it is parsed as a unit.
 Otherwise, it is parsed as a variable, even if a unit with the same name exists.

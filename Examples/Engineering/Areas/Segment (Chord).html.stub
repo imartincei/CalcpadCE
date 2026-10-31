@@ -85,9 +85,8 @@
     2 · 1
    </span>
    <span class="b1">)</span>
-   = 180
+   = 180°
   </span>
-  °
  </p>
  <p>Area</p>
  <p>
@@ -101,7 +100,7 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    −
    <b>sin</b>
@@ -115,14 +114,14 @@
    = 0.5 ·
    <span class="b1">(</span>
    <span class="dvc">
-    3.14 · 180
+    3.14 · 180°
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    −
    <b>sin</b>
-   ( 180 )
+   ( 180° )
    <span class="b1">)</span>
    · 1
    <sup>2</sup>
@@ -142,14 +141,14 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    =
    <span class="dvc">
-    3.14 · 1 · 180
+    3.14 · 1 · 180°
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    = 3.14
   </span>

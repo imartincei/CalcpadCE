@@ -10,30 +10,98 @@ using PdfSharp.Pdf.IO;
 namespace Calcpad.Server.Services
 {
     /// <summary>
-    /// Font resolver that maps any font request to embedded Segoe WP fonts from PdfSharp.WPFonts.
+    /// Font resolver that maps text to embedded Segoe WP and, when the host provides one,
+    /// to a CJK-capable TrueType face so Chinese titles are not drawn as missing glyphs.
     /// Required for PDFsharp on Linux where system fonts aren't auto-discovered.
     /// </summary>
     internal class EmbeddedFontResolver : IFontResolver
     {
         private const string Regular = "SegoeWP";
         private const string Bold = "SegoeWP-Bold";
+        private const string CjkRegular = "CalcpadCjk";
+        private const string CjkBold = "CalcpadCjkBold";
+
+        /// <summary>Family name callers use to ask for the CJK face, if one was found.</summary>
+        internal const string CjkFamily = "CalcpadCjkFamily";
 
         private static readonly Assembly _wpFontsAssembly =
             Assembly.Load("PdfSharp.WPFonts");
 
+        private static readonly byte[]? _cjkRegular = LoadSystemCjk(bold: false);
+        private static readonly byte[]? _cjkBold = LoadSystemCjk(bold: true) ?? _cjkRegular;
+
+        internal static bool HasCjk => _cjkRegular is not null;
+
         public FontResolverInfo? ResolveTypeface(string familyName, bool isBold, bool isItalic)
         {
+            if (familyName == CjkFamily && HasCjk)
+                return new FontResolverInfo(isBold && _cjkBold is not null ? CjkBold : CjkRegular);
             return new FontResolverInfo(isBold ? Bold : Regular);
         }
 
         public byte[]? GetFont(string faceName)
         {
+            if (faceName == CjkRegular) return _cjkRegular;
+            if (faceName == CjkBold) return _cjkBold;
+
             var resourceName = $"PdfSharp.WPFonts.Fonts.{faceName}.ttf";
             using var stream = _wpFontsAssembly.GetManifestResourceStream(resourceName);
             if (stream == null) return null;
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
             return ms.ToArray();
+        }
+
+        /// <summary>
+        /// First plain TrueType (not a .ttc collection, not CFF-flavoured OpenType) among the
+        /// usual CJK faces. PDFsharp 6 cannot parse collections or CFF outlines, and a face it
+        /// cannot parse would fail every page, so unsupported files are skipped here.
+        /// </summary>
+        private static byte[]? LoadSystemCjk(bool bold)
+        {
+            foreach (var path in CjkFontCandidates(bold))
+            {
+                try
+                {
+                    if (!File.Exists(path)) continue;
+                    var bytes = File.ReadAllBytes(path);
+                    if (!IsPlainTrueType(bytes)) continue;
+                    return bytes;
+                }
+                catch
+                {
+                }
+            }
+            return null;
+        }
+
+        private static bool IsPlainTrueType(byte[] bytes)
+        {
+            if (bytes.Length < 12) return false;
+            var tag = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+            return tag is 0x00010000 or 0x74727565; // 0x74727565 == "true"
+        }
+
+        private static IEnumerable<string> CjkFontCandidates(bool bold)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                var fonts = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
+                yield return Path.Combine(fonts, bold ? "Dengb.ttf" : "Deng.ttf");
+                yield return Path.Combine(fonts, bold ? "msyhbd.ttf" : "msyh.ttf");
+                yield return Path.Combine(fonts, bold ? "simheib.ttf" : "simhei.ttf");
+                yield return Path.Combine(fonts, "Deng.ttf");
+                yield return Path.Combine(fonts, "msyh.ttf");
+                yield return Path.Combine(fonts, "simhei.ttf");
+                yield return Path.Combine(fonts, "simsun.ttf");
+            }
+            else
+            {
+                yield return "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf";
+                yield return "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttf";
+                yield return "/usr/share/fonts/truetype/wqy/wqy-microhei.ttf";
+                yield return "/usr/share/fonts/truetype/arphic/uming.ttf";
+            }
         }
     }
 
@@ -92,22 +160,23 @@ namespace Calcpad.Server.Services
             _config = config;
         }
 
-        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null)
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new PdfSettingsDto();
 
             // Step 1: Generate basic PDF with PuppeteerSharp
-            var basicPdf = await GenerateBasicPdfAsync(html, options).ConfigureAwait(false);
+            var basicPdf = await GenerateBasicPdfAsync(html, options, cancellationToken).ConfigureAwait(false);
 
             // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
             return EnhancePdf(basicPdf, options);
         }
 
-        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options)
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options, CancellationToken cancellationToken)
         {
             var browser = await GetOrCreateBrowserAsync().ConfigureAwait(false);
 
-            await _pageLock.WaitAsync().ConfigureAwait(false);
+            // A superseded live preview leaves the queue here instead of rendering unseen.
+            await _pageLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             IPage page;
             try
             {
@@ -203,6 +272,7 @@ namespace Calcpad.Server.Services
                 }").ConfigureAwait(false);
 
                 await WaitForAsyncContentAsync(page).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var pdfOptions = new PuppeteerSharp.PdfOptions
                 {
@@ -672,9 +742,6 @@ namespace Calcpad.Server.Services
 
         private void DrawHeader(XGraphics gfx, double width, HeaderFooterContext ctx, bool drawLine, PdfSettingsDto options)
         {
-            var font = new XFont("Helvetica", 10);
-            var boldFont = new XFont("Helvetica", 12, XFontStyleEx.Bold);
-            var smallFont = new XFont("Helvetica", 8);
             var darkBrush = XBrushes.Black;
             var lightGrayBrush = new XSolidBrush(XColor.FromArgb(128, 128, 128));
 
@@ -687,8 +754,9 @@ namespace Calcpad.Server.Services
                 gfx.DrawLine(ctx.LinePen, margin, lineY, width - margin, lineY);
 
             // Document title (top-left, bold)
-            if (!string.IsNullOrEmpty(options.DocumentTitle))
+            if ((options.ShowTitle ?? PdfSettingsDefaults.ShowTitle) && !string.IsNullOrEmpty(options.DocumentTitle))
             {
+                var boldFont = TextFont(options.DocumentTitle, 12, XFontStyleEx.Bold);
                 gfx.DrawString(options.DocumentTitle, boldFont, darkBrush,
                     new XPoint(margin, headerY + 12));
             }
@@ -698,10 +766,31 @@ namespace Calcpad.Server.Services
             {
                 var timestampFormat = string.IsNullOrEmpty(options.DateTimeFormat) ? "g" : options.DateTimeFormat;
                 var timestamp = DateTime.Now.ToString(timestampFormat);
+                var smallFont = TextFont(timestamp, 8);
                 var timestampSize = gfx.MeasureString(timestamp, smallFont);
                 gfx.DrawString(timestamp, smallFont, lightGrayBrush,
                     new XPoint(width - margin - timestampSize.Width, headerY + 12));
             }
+        }
+
+        /// <summary>
+        /// Picks the CJK face for text the Latin-only embedded font cannot draw; every other
+        /// string keeps the existing Helvetica/Segoe WP mapping.
+        /// </summary>
+        private static XFont TextFont(string text, double size, XFontStyleEx style = XFontStyleEx.Regular)
+        {
+            var family = NeedsCjk(text) && EmbeddedFontResolver.HasCjk
+                ? EmbeddedFontResolver.CjkFamily
+                : "Helvetica";
+            return new XFont(family, size, style);
+        }
+
+        private static bool NeedsCjk(string text)
+        {
+            foreach (var c in text)
+                if (c is >= '\u2E80' and <= '\u9FFF' or >= '\uF900' and <= '\uFAFF' or >= '\uFF00' and <= '\uFFEF')
+                    return true;
+            return false;
         }
 
         private void DrawFooter(XGraphics gfx, double width, double height,

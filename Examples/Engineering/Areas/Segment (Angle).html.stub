@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Area and arc length of a circular segment from radius and central angle. -->
- <h3>Area and Arch Length of Circular Segment</h3>
+ <h1>Area and Arch Length of Circular Segment</h1>
  <div style="max-width:120mm;">
   <img alt="segment-angle.png" class="side" src="Images/math/area/segment-angle.png" style="height:70pt;"/>
  </div>

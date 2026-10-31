@@ -350,6 +350,15 @@ namespace Calcpad.Core
         internal static MathParserException CrossProductVectorDimensions() =>
             new(Messages.Cross_product_is_definedonly_for_vectors_with_2_and_3_elements, "CPD-5510", K.Values);
 
+        internal static MathParserException ComplexNumberInRealMode() =>
+            new ComplexInRealModeException(Messages.Complex_numbers_are_not_supported_outside_of_complex_mode);
+
+        internal static MathParserException ComplexVariableInRealMode(string name) =>
+            new ComplexInRealModeException(string.Format(Messages.Complex_variable_0_is_not_supported_outside_of_complex_mode, name));
+
+        internal static MathParserException ComplexFunctionInRealMode(string name) =>
+            new ComplexInRealModeException(string.Format(Messages.Function_0_with_complex_values_is_not_supported_outside_of_complex_mode, name));
+
         internal static MathParserException FunctionOnlyRealMode(string name) =>
             new(string.Format(Messages.Function_0_is_not_defined_in_complex_mode, name), "CPD-5511", K.Values);
 

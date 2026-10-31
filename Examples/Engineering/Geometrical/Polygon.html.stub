@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of an arbitrary polygon from a list of vertex coordinates: signed area, centroid and second moments of area via the shoelace formulas. -->
- <h3>Geometrical properties of arbitrary polygon</h3>
+ <h1>Geometrical properties of arbitrary polygon</h1>
  <h4>Point coordinates</h4>
  <p>
   <span class="eq">
@@ -98,7 +98,7 @@
   Angle of first principal axis -
   <span class="eq">
    <var>α</var>
-   = 3954.23°
+   = 69.01°
   </span>
  </p>
  <h4>Drawing</h4>
@@ -133,14 +133,14 @@
   <circle cx="0" cy="-3.22" fill="red" r="0.05">
   </circle>
   <text x="0.1" y="-3.32">6 (0,4.2)</text>
-  <line style="stroke:green; stroke-width:0.02; stroke-opacity:0.5; stroke-dasharray:0.2,0.1,0.05,0.1" x1="-1.69" x2="5.84" y1="-0.38" y2="0.38">
+  <line style="stroke:green; stroke-width:0.02; stroke-opacity:0.5; stroke-dasharray:0.2,0.1,0.05,0.1" x1="0.72" x2="3.43" y1="3.53" y2="-3.53">
   </line>
-  <text x="-1.59" y="-0.48">1</text>
-  <text x="5.94" y="0.28">1</text>
-  <line style="stroke:green; stroke-width:0.02; stroke-opacity:0.5; stroke-dasharray:0.2,0.1,0.05,0.1" x1="1.69" x2="2.46" y1="3.77" y2="-3.77">
+  <text x="0.82" y="3.43">1</text>
+  <text x="3.53" y="-3.63">1</text>
+  <line style="stroke:green; stroke-width:0.02; stroke-opacity:0.5; stroke-dasharray:0.2,0.1,0.05,0.1" x1="5.61" x2="-1.46" y1="1.36" y2="-1.36">
   </line>
-  <text x="1.79" y="3.67">2</text>
-  <text x="2.56" y="-3.87">2</text>
+  <text x="5.71" y="1.26">2</text>
+  <text x="-1.36" y="-1.46">2</text>
   <circle cx="2.07" cy="0" fill="red" r="0.05">
   </circle>
   <text x="2.17" y="-0.1">C (2.07,0.98)</text>

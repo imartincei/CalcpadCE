@@ -167,6 +167,8 @@ A render with line anchors (`includeLineAnchors`, on by default for anything but
 
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
+Metadata footer comments (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) are stripped from the returned HTML.
+
 ---
 
 ### Unwrapped output
@@ -279,7 +281,8 @@ interface PdfOptions {
   // Header and footer content. An empty/omitted value simply leaves that slot blank.
   headerFooterLines?: string; // Separator lines drawn: "both" | "header" | "footer" | "none" (default: "both")
   lineColor?: string;        // Separator line color, "#rrggbb" (default: "#b3b3b3")
-  documentTitle?: string;    // Header, left, bold
+  documentTitle?: string;    // Header, left, bold (the client sends the file's Info title)
+  showTitle?: boolean;       // Whether documentTitle is drawn (default: true)
   showPageNumbers?: boolean; // "Page n of m", footer right (default: true)
   showDate?: boolean;        // Timestamp, header right (default: true)
   dateTimeFormat?: string;   // .NET format string for the timestamp (empty uses "g")
@@ -587,11 +590,12 @@ interface LintDiagnostic {
 | CPD-3413 | Semantic | Invalid #settings JSON |
 | CPD-3414 | Semantic | Invalid PDF settings in a metadata comment |
 | CPD-3415 | Semantic | Invalid #UI format |
-| CPD-3416 | Semantic | 'uiOverrides' metadata comment not on the first line |
+| CPD-3416 | Semantic | 'uiOverrides' metadata comment not at the end of the file |
 | CPD-3417 | Semantic | Duplicate 'uiOverrides' metadata comment |
 | CPD-3418 | Semantic | 'uiOverrides' sharing a comment with another key |
 | CPD-3419 | Semantic | Deprecated stored input value |
 | CPD-3420 | Semantic | Deprecated #input keyword |
+| CPD-3421 | Semantic | 'fileInfo' metadata comment not on the last line |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
 | **Core runtime and check pass (CPD-5xxx)** |||
@@ -686,6 +690,7 @@ interface LintDiagnostic {
 | CPD-5534 | Values | Matrix is ill-conditioned |
 | CPD-5535 | Values | PCG solver failed to converge |
 | CPD-5536 | Values | SVD failed to converge |
+| CPD-5537 | Values | Complex value outside of complex mode |
 | CPD-5601 | Values | Cannot evaluate the function for the solver variable |
 | CPD-5602 | Values | Function not defined for the solver variable |
 | CPD-5603 | Values | Solver limits out of range |

@@ -10,11 +10,12 @@
         "label": "main",
         "title": "CalcpadCE",
         "width": 1400,
-        "height": 900,
-        "minWidth": 800,
-        "minHeight": 600,
+        "height": 700,
+        "minWidth": 256,
+        "minHeight": 128,
         "center": true,
         "resizable": true,
+        "decorations": false,
         "visible": true,
         "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection,IsolateSandboxedIframes"
       }

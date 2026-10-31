@@ -81,11 +81,12 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-3413"] = "Invalid #settings JSON",
             ["CPD-3414"] = "Invalid PDF settings in a metadata comment",
             ["CPD-3415"] = "Invalid #UI format",
-            ["CPD-3416"] = "'uiOverrides' metadata comment not on the first line",
+            ["CPD-3416"] = "'uiOverrides' metadata comment not at the end of the file",
             ["CPD-3417"] = "Duplicate 'uiOverrides' metadata comment",
             ["CPD-3418"] = "'uiOverrides' sharing a comment with another key",
             ["CPD-3419"] = "Deprecated stored input value",
             ["CPD-3420"] = "Deprecated #input keyword",
+            ["CPD-3421"] = "'fileInfo' metadata comment not on the last line",
 
             // Stage 3: Format (CPD-36xx)
             ["CPD-3601"] = "Invalid format specifier",
@@ -182,6 +183,7 @@ namespace Calcpad.Highlighter.Linter.Constants
             ["CPD-5534"] = "Matrix is ill-conditioned",
             ["CPD-5535"] = "PCG solver failed to converge",
             ["CPD-5536"] = "SVD failed to converge",
+            ["CPD-5537"] = "Complex value outside of complex mode",
             ["CPD-5601"] = "Cannot evaluate the function for the solver variable",
             ["CPD-5602"] = "Function not defined for the solver variable",
             ["CPD-5603"] = "Solver limits out of range",

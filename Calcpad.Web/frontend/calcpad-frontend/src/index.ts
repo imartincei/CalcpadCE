@@ -119,6 +119,8 @@ export {
     SEMANTIC_TOKEN_TYPES,
     TOKEN_TYPE_MAP,
     mapTokenTypeToIndex,
+    SEMANTIC_TOKEN_MODIFIERS,
+    getTokenModifiers,
 } from './services/highlight';
 
 // --- Base64 Truncation -------------------------------------------------------
@@ -163,6 +165,10 @@ export type { PreviewLimitNotice } from './services/preview-limits';
 export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor';
 export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
 
+// --- Print Preview -------------------------------------------------------------
+export { pdfViewerHtml, pdfPreviewErrorHtml } from './services/pdf-viewer';
+export type { PdfViewerOptions } from './services/pdf-viewer';
+
 // --- Plot Extraction + ZIP ---------------------------------------------------
 export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
@@ -170,6 +176,17 @@ export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
 export { UiPauseStore, hasPauseSteps } from './services/ui-pause';
+export {
+    FILE_INFO_KEY, FILE_INFO_FIELDS, findFileInfoBlock, readFileInfo, sanitizeFileInfoPatch,
+    planFileInfoEdit, writeFileInfo, stampFileInfo, planFileInfoStamp, fileStem,
+    stampFileInfoText, patchFileInfoText, savedSinceReview, onlyReviewChanged, pdfDocumentTitle,
+} from './services/file-info';
+export type { FileInfo, FileInfoStamp } from './services/file-info';
+export {
+    UI_OVERRIDES_KEY, METADATA_ANCHOR, METADATA_HIDDEN_TEXT, findMetadataFooter, findMetadataFooterSpan, findMetadataHiddenSpan, findStrayUiOverrides, planMetadataFooter,
+    applyLineEdits, toRangeEdits, keepSelectionOutOfSpan,
+} from './services/metadata-footer';
+export type { LineEdit, RangeEdit, MetadataFooter, FooterChanges, LinePosition } from './services/metadata-footer';
 export {
     isCompiledPath,
     inlineImageSources,
@@ -191,7 +208,7 @@ export type { UiOverrides, UiValueChange, UiControl, UiOverrideRow } from './ser
 
 // --- Message Bridge (base class) --------------------------------------------
 export { BaseMessageBridge, variantRender } from './services/message-bridge/base';
-export type { ExportRequest, VariantRender } from './services/message-bridge/base';
+export type { ExportRequest, VariantRender, DraftForm } from './services/message-bridge/base';
 
 // --- Headings / TOC ----------------------------------------------------------
 export type { TocHeading } from './services/headings';
@@ -231,8 +248,8 @@ export {
     formatFunctionCompletion,
     formatVariableCompletion,
     getVariableTypeAt,
-    formatCustomUnitCompletion,
     formatBuiltinSnippetCompletion,
+    isCompletableBuiltin,
 } from './text/completion-format';
 export {
     INDENT_INCREASE_PATTERNS,

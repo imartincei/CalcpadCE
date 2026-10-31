@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Reference for the built-in CSS classes ($ref$, $ok$, $err$, $warn$, $note$) and how to define custom classes for highlighting design-check results inline. -->
- <h3>CSS Classes in CalcpadCE</h3>
+ <h1>CSS Classes in CalcpadCE</h1>
  <p class="ref">[ref (No)]</p>
  <p>
   Design checks:

@@ -8,6 +8,31 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
+if (args is [var focusDesktop, "notify-focus", var title])
+{
+    var desktopHandle = Native.CreateDesktop(focusDesktop, IntPtr.Zero, IntPtr.Zero, 0, Native.GENERIC_ALL, IntPtr.Zero);
+    if (desktopHandle == IntPtr.Zero) throw new Win32Exception();
+    try
+    {
+        IntPtr target = IntPtr.Zero;
+        Native.EnumDesktopWindows(desktopHandle, (window, _) =>
+        {
+            var caption = new StringBuilder(512);
+            Native.GetWindowText(window, caption, caption.Capacity);
+            if (caption.ToString() != title) return true;
+            target = window;
+            return false;
+        }, IntPtr.Zero);
+        if (target == IntPtr.Zero) throw new InvalidOperationException($"Window '{title}' not found");
+        Native.PostMessage(target, 0x0008, IntPtr.Zero, IntPtr.Zero);
+        Native.PostMessage(target, 0x0086, IntPtr.Zero, IntPtr.Zero);
+        Native.PostMessage(target, 0x0086, new IntPtr(1), IntPtr.Zero);
+        Native.PostMessage(target, 0x0007, IntPtr.Zero, IntPtr.Zero);
+        return 0;
+    }
+    finally { Native.CloseDesktop(desktopHandle); }
+}
+
 int sep = Array.IndexOf(args, "--");
 if (args.Length < 4 || sep < 2 || sep == args.Length - 1)
 {
@@ -64,6 +89,8 @@ static string Quote(string a)
 
 static class Native
 {
+    public delegate bool EnumWindowsProc(IntPtr window, IntPtr parameter);
+
     public const uint GENERIC_ALL = 0x10000000;
     public const uint CREATE_NO_WINDOW = 0x08000000;
     public const int STARTF_USESTDHANDLES = 0x100;
@@ -81,6 +108,10 @@ static class Native
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateDesktop(string lpszDesktop, IntPtr lpszDevice, IntPtr pDevmode, int dwFlags, uint dwDesiredAccess, IntPtr lpsa);
+    [DllImport("user32.dll")] public static extern bool CloseDesktop(IntPtr desktop);
+    [DllImport("user32.dll")] public static extern bool EnumDesktopWindows(IntPtr desktop, EnumWindowsProc callback, IntPtr parameter);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetWindowText(IntPtr window, StringBuilder text, int count);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern bool PostMessage(IntPtr window, uint message, IntPtr wparam, IntPtr lparam);
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool CreateProcess(string? app, StringBuilder cmd, IntPtr pa, IntPtr ta, bool inherit, uint flags, IntPtr env, string? cwd, ref STARTUPINFO si, out PROCESS_INFORMATION pi);
     [DllImport("kernel32.dll", SetLastError = true)]

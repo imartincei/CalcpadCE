@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a quarter circle: area, centroid offsets, second moments of area and radii of gyration. -->
- <h3>Geometrical Properties of Quarter Circle</h3>
+ <h1>Geometrical Properties of Quarter Circle</h1>
  <div style="max-width:120mm">
   <img alt="quarter-circle.png" class="side" src="Images/mechanics/sections/quarter-circle.png" style="height:120pt;"/>
  </div>
@@ -269,9 +269,8 @@
     -0.0165
    </span>
    <span class="b1">)</span>
-   = 45
+   = 45°
   </span>
-  <sup>о</sup>
  </p>
  <p>Polar moment of area</p>
  <p>

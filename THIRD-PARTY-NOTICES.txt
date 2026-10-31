@@ -64,28 +64,55 @@ Licence files ship alongside the fonts.
   `Calcpad.Web/backend/UiAssets/` have had their upstream banners stripped by
   the minifier, so MIT's copyright and permission notice cannot travel inside
   the copy. Their licence texts are therefore reproduced below.
+- **core-js** 3.50.0 — MIT. Compiled into pdf.js's legacy build
+  (`pdf.min.mjs`, `pdf.worker.min.mjs`), which the PDF preview ships in the
+  web app, the desktop app and the VS Code extension. It has no package of its
+  own in either tree, so its licence is reproduced here:
+
+  ```
+  Copyright (c) 2013–2025 Denis Pushkarev (zloirock.ru)
+  Copyright (c) 2025–2026 CoreJS Company (core-js.io)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  ```
 
 ---
 
 ## Components by licence
 
-531 components across 29 declared licences. Generated
+516 components across 29 declared licences. Generated
 from `corpus/inventory.csv`; regenerate with `tools/license-scan/generate-notices.sh`.
 
 | Licence | Components |
 |---|---:|
-| MIT | 193 |
 | MIT OR Apache-2.0 | 179 |
+| MIT | 178 |
 | Apache-2.0 OR MIT | 54 |
 | Undeclared | 23 |
 | Unicode-3.0 | 18 |
 | MIT/Apache-2.0 | 13 |
 | MPL-2.0 | 5 |
 | Unlicense OR MIT | 5 |
-| BSD-2-Clause | 4 |
+| Apache-2.0 | 4 |
 | BSD-3-Clause | 4 |
 | MIT OR Apache-2.0 OR Zlib | 4 |
-| Apache-2.0 | 3 |
+| BSD-2-Clause | 3 |
 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | 2 |
 | Apache-2.0/MIT | 2 |
 | BSD-2-Clause OR Apache-2.0 OR MIT | 2 |
@@ -103,204 +130,6 @@ from `corpus/inventory.csv`; regenerate with `tools/license-scan/generate-notice
 | BSD-3-Clause/MIT | 1 |
 | CC0-1.0 OR MIT-0 OR Apache-2.0 | 1 |
 | MIT OR Zlib OR Apache-2.0 | 1 |
-
-### MIT
-
-| Component | Version | Ecosystem | Source / note |
-|---|---|---|---|
-| @babel/helper-string-parser | 7.29.7 | npm | https://babel.dev/docs/en/next/babel-helper-string-parser |
-| @babel/helper-string-parser | 7.27.1 | npm | https://babel.dev/docs/en/next/babel-helper-string-parser |
-| @babel/helper-validator-identifier | 7.29.7 | npm | https://github.com/babel/babel.git |
-| @babel/helper-validator-identifier | 7.28.5 | npm | https://github.com/babel/babel.git |
-| @babel/parser | 7.29.7 | npm | https://babel.dev/docs/en/next/babel-parser |
-| @babel/parser | 7.28.4 | npm | https://babel.dev/docs/en/next/babel-parser |
-| @babel/types | 7.29.7 | npm | https://babel.dev/docs/en/next/babel-types |
-| @babel/types | 7.28.4 | npm | https://babel.dev/docs/en/next/babel-types |
-| @jridgewell/gen-mapping | 0.3.13 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/gen-mapping |
-| @jridgewell/resolve-uri | 3.1.2 | npm | https://github.com/jridgewell/resolve-uri |
-| @jridgewell/source-map | 0.3.11 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/source-map |
-| @jridgewell/sourcemap-codec | 1.5.5 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec |
-| @jridgewell/trace-mapping | 0.3.31 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/trace-mapping |
-| @vue/compiler-core | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-core#readme |
-| @vue/compiler-core | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-core#readme |
-| @vue/compiler-dom | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-dom#readme |
-| @vue/compiler-dom | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-dom#readme |
-| @vue/compiler-sfc | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-sfc#readme |
-| @vue/compiler-sfc | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-sfc#readme |
-| @vue/compiler-ssr | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-ssr#readme |
-| @vue/compiler-ssr | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-ssr#readme |
-| @vue/reactivity | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/reactivity#readme |
-| @vue/reactivity | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/reactivity#readme |
-| @vue/runtime-core | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-core#readme |
-| @vue/runtime-core | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-core#readme |
-| @vue/runtime-dom | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-dom#readme |
-| @vue/runtime-dom | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-dom#readme |
-| @vue/server-renderer | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/server-renderer#readme |
-| @vue/server-renderer | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/server-renderer#readme |
-| @vue/shared | 3.5.39 | npm | https://github.com/vuejs/core/tree/main/packages/shared#readme |
-| @vue/shared | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/shared#readme |
-| acorn | 8.15.0 | npm | https://github.com/acornjs/acorn |
-| atk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| atk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| bincode | 1.3.3 | cargo | https://github.com/servo/bincode |
-| bitvec | 1.1.1 | cargo | https://github.com/bitvecto-rs/bitvec |
-| buffer-from | 1.1.2 | npm | LinusU/buffer-from |
-| byte-unit | 5.2.5 | cargo | https://github.com/magiclen/byte-unit |
-| bytecheck | 0.6.12 | cargo | https://github.com/djkoloski/bytecheck |
-| bytecheck_derive | 0.6.12 | cargo | https://github.com/djkoloski/bytecheck |
-| bytes | 1.12.0 | cargo | https://github.com/tokio-rs/bytes |
-| cairo-rs | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| cairo-sys-rs | 0.18.2 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| cargo_metadata | 0.19.2 | cargo | https://github.com/oli-obk/cargo_metadata |
-| cfb | 0.7.3 | cargo | https://github.com/mdsteele/rust-cfb |
-| commander | 2.20.3 | npm | https://github.com/tj/commander.js.git |
-| csstype | 3.2.3 | npm | https://github.com/frenic/csstype |
-| csstype | 3.1.3 | npm | https://github.com/frenic/csstype |
-| darling | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
-| darling_core | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
-| darling_macro | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
-| derive_more | 2.1.1 | cargo | https://github.com/JelteF/derive_more |
-| derive_more-impl | 2.1.1 | cargo | https://github.com/JelteF/derive_more |
-| dlopen2 | 0.8.2 | cargo | https://github.com/OpenByteDev/dlopen2 |
-| dlopen2_derive | 0.4.3 | cargo | https://github.com/OpenByteDev/dlopen2 |
-| DocumentFormat.OpenXml | 3.3.0 | nuget | https://github.com/dotnet/Open-XML-SDK |
-| DocumentFormat.OpenXml.Framework | 3.3.0 | nuget | https://github.com/dotnet/Open-XML-SDK |
-| dom_query | 0.27.0 | cargo | https://github.com/niklak/dom_query |
-| endi | 1.1.1 | cargo | https://github.com/zeenix/endi |
-| estree-walker | 2.0.2 | npm | https://github.com/Rich-Harris/estree-walker |
-| fax | 0.2.7 | cargo | https://github.com/pdf-rs/fax |
-| fern | 0.7.1 | cargo | https://github.com/daboross/fern |
-| funty | 2.0.0 | cargo | https://github.com/myrrlyn/funty |
-| gdk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gdk-pixbuf | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| gdk-pixbuf-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| gdk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gdkwayland-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gdkx11 | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gdkx11-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| generic-array | 0.14.7 | cargo | https://github.com/fizyk20/generic-array.git |
-| gio | 0.18.4 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| gio-sys | 0.18.1 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| glib | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| glib-macros | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| glib-sys | 0.18.1 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| gobject-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| gtk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gtk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| gtk3-macros | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
-| HtmlAgilityPack | 1.12.4 | nuget | http://html-agility-pack.net/ |
-| ico | 0.5.0 | cargo | https://github.com/mdsteele/rust-ico |
-| infer | 0.19.0 | cargo | https://github.com/bojand/infer |
-| is-docker | 0.2.0 | cargo | https://github.com/TheLarkInn/is-docker |
-| is-wsl | 0.4.0 | cargo | https://github.com/TheLarkInn/is-wsl |
-| javascriptcore-rs | 1.1.2 | cargo | https://github.com/tauri-apps/javascriptcore-rs |
-| javascriptcore-rs-sys | 1.1.1 | cargo | https://github.com/tauri-apps/javascriptcore-rs |
-| jspreadsheet-ce | 5.0.4 | npm | https://github.com/jspreadsheet/ce |
-| jsuites | 5.13.5 | npm | https://github.com/jsuites/jsuites |
-| magic-string | 0.30.21 | npm | git+https://github.com/Rich-Harris/magic-string.git |
-| magic-string | 0.30.19 | npm | https://github.com/rich-harris/magic-string.git |
-| memoffset | 0.9.1 | cargo | https://github.com/Gilnaa/memoffset |
-| Microsoft.AspNetCore.App.Runtime.linux-arm64 | 10.0.12 | nuget | https://asp.net/ |
-| Microsoft.AspNetCore.App.Runtime.linux-x64 | 10.0.12 | nuget | https://asp.net/ |
-| Microsoft.AspNetCore.App.Runtime.win-x64 | 10.0.12 | nuget | https://asp.net/ |
-| Microsoft.AspNetCore.OpenApi | 10.0.0 | nuget | https://asp.net/ |
-| Microsoft.Extensions.ApiDescription.Server | 10.0.0 | nuget | https://asp.net/ |
-| Microsoft.NETCore.App.Host.linux-arm64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.NETCore.App.Host.linux-x64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.NETCore.App.Host.win-x64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.NETCore.App.Runtime.linux-arm64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.NETCore.App.Runtime.linux-x64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.NETCore.App.Runtime.win-x64 | 10.0.12 | nuget | https://dot.net/ |
-| Microsoft.OpenApi | 2.9.0 | nuget | https://github.com/Microsoft/OpenAPI.NET |
-| mio | 1.2.1 | cargo | https://github.com/tokio-rs/mio |
-| monaco-editor | 0.52.2 | npm | https://github.com/microsoft/monaco-editor |
-| nanoid | 3.3.18 | npm | ai/nanoid |
-| new_debug_unreachable | 1.0.6 | cargo | https://github.com/mbrubeck/rust-debug-unreachable |
-| nix | 0.31.3 | cargo | https://github.com/nix-rust/nix |
-| nom | 8.0.0 | cargo | https://github.com/rust-bakery/nom |
-| open | 5.3.6 | cargo | https://github.com/Byron/open-rs |
-| os_info | 3.15.0 | cargo | https://github.com/stanislav-tkach/os_info |
-| os_pipe | 1.2.3 | cargo | https://github.com/oconnor663/os_pipe.rs |
-| pango | 0.18.3 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| pango-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
-| PDFsharp | 6.2.0 | nuget | https://docs.pdfsharp.net/ |
-| phf | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
-| phf_generator | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
-| phf_macros | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
-| phf_shared | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
-| plist | 1.10.0 | cargo | https://github.com/ebarnard/rust-plist/ |
-| postcss | 8.5.26 | npm | https://postcss.org/ |
-| precomputed-hash | 0.1.1 | cargo | https://github.com/emilio/precomputed-hash |
-| ptr_meta | 0.1.4 | cargo | https://github.com/djkoloski/ptr_meta |
-| ptr_meta_derive | 0.1.4 | cargo | https://github.com/djkoloski/ptr_meta |
-| PuppeteerSharp | 21.1.1 | nuget | https://github.com/hardkoded/puppeteer-sharp |
-| quick-xml | 0.39.4 | cargo | https://github.com/tafia/quick-xml |
-| quick-xml | 0.41.0 | cargo | https://github.com/tafia/quick-xml |
-| radium | 0.7.0 | cargo | https://github.com/bitvecto-rs/radium |
-| rend | 0.4.2 | cargo | https://github.com/djkoloski/rend |
-| rfd | 0.16.0 | cargo | https://github.com/PolyMeilex/rfd |
-| rkyv | 0.7.46 | cargo | https://github.com/rkyv/rkyv |
-| rkyv_derive | 0.7.46 | cargo | https://github.com/rkyv/rkyv |
-| rust_decimal | 1.42.1 | cargo | https://github.com/paupino/rust-decimal |
-| schemars | 0.8.22 | cargo | https://github.com/GREsau/schemars |
-| schemars | 0.9.0 | cargo | https://github.com/GREsau/schemars |
-| schemars | 1.2.1 | cargo | https://github.com/GREsau/schemars |
-| schemars_derive | 0.8.22 | cargo | https://github.com/GREsau/schemars |
-| seahash | 4.1.0 | cargo | https://gitlab.redox-os.org/redox-os/seahash |
-| simd-adler32 | 0.3.9 | cargo | https://github.com/mcountryman/simd-adler32 |
-| SkiaSharp | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.Linux | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.macOS | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
-| SkiaSharp.NativeAssets.Win32 | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
-| slab | 0.4.12 | cargo | https://github.com/tokio-rs/slab |
-| soup3 | 0.5.0 | cargo | https://gitlab.gnome.org/World/Rust/soup3-rs |
-| soup3-sys | 0.5.0 | cargo | https://gitlab.gnome.org/World/Rust/soup3-rs |
-| source-map-support | 0.5.21 | npm | https://github.com/evanw/node-source-map-support |
-| strsim | 0.11.1 | cargo | https://github.com/rapidfuzz/strsim-rs |
-| Swashbuckle.AspNetCore | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
-| synstructure | 0.13.2 | cargo | https://github.com/mystor/synstructure |
-| System.IO.Packaging | 10.0.0 | nuget | https://dot.net/ |
-| System.IO.Packaging | 8.0.1 | nuget | https://dot.net/ |
-| System.Security.Cryptography.Pkcs | 8.0.1 | nuget | https://dot.net/ |
-| tap | 1.0.1 | cargo | https://github.com/myrrlyn/tap |
-| tiff | 0.11.3 | cargo | https://github.com/image-rs/image-tiff |
-| tokio | 1.52.3 | cargo | https://github.com/tokio-rs/tokio |
-| tokio-macros | 2.7.0 | cargo | https://github.com/tokio-rs/tokio |
-| tracing | 0.1.44 | cargo | https://github.com/tokio-rs/tracing |
-| tracing-attributes | 0.1.31 | cargo | https://github.com/tokio-rs/tracing |
-| tracing-core | 0.1.36 | cargo | https://github.com/tokio-rs/tracing |
-| tree_magic_mini | 3.2.2 | cargo | https://github.com/mbrubeck/tree_magic/ |
-| urlpattern | 0.3.0 | cargo | https://github.com/denoland/rust-urlpattern |
-| utf8-width | 0.1.9 | cargo | https://github.com/magiclen/utf8-width |
-| vue | 3.5.39 | npm | https://vuejs.org/ |
-| vue | 3.5.21 | npm | https://github.com/vuejs/core/tree/main/packages/vue#readme |
-| wayland-backend | 0.3.15 | cargo | https://github.com/smithay/wayland-rs |
-| wayland-client | 0.31.14 | cargo | https://github.com/smithay/wayland-rs |
-| wayland-protocols | 0.32.13 | cargo | https://github.com/smithay/wayland-rs |
-| wayland-protocols-wlr | 0.3.12 | cargo | https://github.com/smithay/wayland-rs |
-| wayland-scanner | 0.31.10 | cargo | https://github.com/smithay/wayland-rs |
-| wayland-sys | 0.31.11 | cargo | https://github.com/smithay/wayland-rs |
-| WebDriverBiDi | 0.0.43 | nuget | — |
-| webkit2gtk | 2.0.2 | cargo | https://github.com/tauri-apps/webkit2gtk-rs |
-| webkit2gtk-sys | 2.0.2 | cargo | https://github.com/tauri-apps/webkit2gtk-rs |
-| webview2-com | 0.38.2 | cargo | https://github.com/wravery/webview2-rs |
-| webview2-com-macros | 0.8.1 | cargo | https://github.com/wravery/webview2-rs |
-| webview2-com-sys | 0.38.2 | cargo | https://github.com/wravery/webview2-rs |
-| winnow | 0.5.40 | cargo | https://github.com/winnow-rs/winnow |
-| winnow | 1.0.3 | cargo | https://github.com/winnow-rs/winnow |
-| wyz | 0.5.1 | cargo | https://github.com/myrrlyn/wyz |
-| x11 | 2.21.0 | cargo | https://github.com/AltF02/x11-rs.git |
-| x11-dl | 2.21.0 | cargo | https://github.com/AltF02/x11-rs.git |
-| zbus | 5.16.0 | cargo | https://github.com/z-galaxy/zbus/ |
-| zbus_macros | 5.16.0 | cargo | https://github.com/z-galaxy/zbus/ |
-| zbus_names | 4.3.2 | cargo | https://github.com/z-galaxy/zbus/ |
-| zmij | 1.0.21 | cargo | https://github.com/dtolnay/zmij |
-| zvariant | 5.12.0 | cargo | https://github.com/z-galaxy/zbus/ |
-| zvariant_derive | 5.12.0 | cargo | https://github.com/z-galaxy/zbus/ |
-| zvariant_utils | 3.4.0 | cargo | https://github.com/z-galaxy/zbus/ |
 
 ### MIT OR Apache-2.0
 
@@ -486,6 +315,189 @@ from `corpus/inventory.csv`; regenerate with `tools/license-scan/generate-notice
 | x11rb | 0.13.2 | cargo | https://github.com/psychon/x11rb |
 | x11rb-protocol | 0.13.2 | cargo | https://github.com/psychon/x11rb |
 
+### MIT
+
+| Component | Version | Ecosystem | Source / note |
+|---|---|---|---|
+| @babel/helper-string-parser | 7.29.7 | npm | https://babel.dev/docs/en/next/babel-helper-string-parser |
+| @babel/helper-validator-identifier | 7.29.7 | npm | https://github.com/babel/babel.git |
+| @babel/parser | 7.29.9 | npm | https://babel.dev/docs/en/next/babel-parser |
+| @babel/types | 7.29.8 | npm | https://babel.dev/docs/en/next/babel-types |
+| @jridgewell/gen-mapping | 0.3.13 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/gen-mapping |
+| @jridgewell/resolve-uri | 3.1.2 | npm | https://github.com/jridgewell/resolve-uri |
+| @jridgewell/source-map | 0.3.11 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/source-map |
+| @jridgewell/sourcemap-codec | 1.6.0 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec |
+| @jridgewell/sourcemap-codec | 1.5.5 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec |
+| @jridgewell/trace-mapping | 0.3.31 | npm | https://github.com/jridgewell/sourcemaps/tree/main/packages/trace-mapping |
+| @vue/compiler-core | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-core#readme |
+| @vue/compiler-dom | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-dom#readme |
+| @vue/compiler-sfc | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-sfc#readme |
+| @vue/compiler-ssr | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/compiler-ssr#readme |
+| @vue/reactivity | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/reactivity#readme |
+| @vue/runtime-core | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-core#readme |
+| @vue/runtime-dom | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/runtime-dom#readme |
+| @vue/server-renderer | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/server-renderer#readme |
+| @vue/shared | 3.5.44 | npm | https://github.com/vuejs/core/tree/main/packages/shared#readme |
+| acorn | 8.15.0 | npm | https://github.com/acornjs/acorn |
+| atk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| atk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| bincode | 1.3.3 | cargo | https://github.com/servo/bincode |
+| bitvec | 1.1.1 | cargo | https://github.com/bitvecto-rs/bitvec |
+| buffer-from | 1.1.2 | npm | LinusU/buffer-from |
+| byte-unit | 5.2.5 | cargo | https://github.com/magiclen/byte-unit |
+| bytecheck | 0.6.12 | cargo | https://github.com/djkoloski/bytecheck |
+| bytecheck_derive | 0.6.12 | cargo | https://github.com/djkoloski/bytecheck |
+| bytes | 1.12.0 | cargo | https://github.com/tokio-rs/bytes |
+| cairo-rs | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| cairo-sys-rs | 0.18.2 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| cargo_metadata | 0.19.2 | cargo | https://github.com/oli-obk/cargo_metadata |
+| cfb | 0.7.3 | cargo | https://github.com/mdsteele/rust-cfb |
+| commander | 2.20.3 | npm | https://github.com/tj/commander.js.git |
+| csstype | 3.2.3 | npm | https://github.com/frenic/csstype |
+| darling | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
+| darling_core | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
+| darling_macro | 0.23.0 | cargo | https://github.com/TedDriggs/darling |
+| derive_more | 2.1.1 | cargo | https://github.com/JelteF/derive_more |
+| derive_more-impl | 2.1.1 | cargo | https://github.com/JelteF/derive_more |
+| dlopen2 | 0.8.2 | cargo | https://github.com/OpenByteDev/dlopen2 |
+| dlopen2_derive | 0.4.3 | cargo | https://github.com/OpenByteDev/dlopen2 |
+| DocumentFormat.OpenXml | 3.3.0 | nuget | https://github.com/dotnet/Open-XML-SDK |
+| DocumentFormat.OpenXml.Framework | 3.3.0 | nuget | https://github.com/dotnet/Open-XML-SDK |
+| dom_query | 0.27.0 | cargo | https://github.com/niklak/dom_query |
+| endi | 1.1.1 | cargo | https://github.com/zeenix/endi |
+| estree-walker | 2.0.2 | npm | https://github.com/Rich-Harris/estree-walker |
+| fax | 0.2.7 | cargo | https://github.com/pdf-rs/fax |
+| fern | 0.7.1 | cargo | https://github.com/daboross/fern |
+| funty | 2.0.0 | cargo | https://github.com/myrrlyn/funty |
+| gdk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gdk-pixbuf | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| gdk-pixbuf-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| gdk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gdkwayland-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gdkx11 | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gdkx11-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| generic-array | 0.14.7 | cargo | https://github.com/fizyk20/generic-array.git |
+| gio | 0.18.4 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| gio-sys | 0.18.1 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| glib | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| glib-macros | 0.18.5 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| glib-sys | 0.18.1 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| gobject-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| gtk | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gtk-sys | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| gtk3-macros | 0.18.2 | cargo | https://github.com/gtk-rs/gtk3-rs |
+| HtmlAgilityPack | 1.12.4 | nuget | http://html-agility-pack.net/ |
+| ico | 0.5.0 | cargo | https://github.com/mdsteele/rust-ico |
+| infer | 0.19.0 | cargo | https://github.com/bojand/infer |
+| is-docker | 0.2.0 | cargo | https://github.com/TheLarkInn/is-docker |
+| is-wsl | 0.4.0 | cargo | https://github.com/TheLarkInn/is-wsl |
+| javascriptcore-rs | 1.1.2 | cargo | https://github.com/tauri-apps/javascriptcore-rs |
+| javascriptcore-rs-sys | 1.1.1 | cargo | https://github.com/tauri-apps/javascriptcore-rs |
+| jspreadsheet-ce | 5.0.4 | npm | https://github.com/jspreadsheet/ce |
+| jsuites | 5.13.5 | npm | https://github.com/jsuites/jsuites |
+| magic-string | 0.30.21 | npm | git+https://github.com/Rich-Harris/magic-string.git |
+| memoffset | 0.9.1 | cargo | https://github.com/Gilnaa/memoffset |
+| Microsoft.AspNetCore.App.Runtime.linux-arm64 | 10.0.13 | nuget | https://asp.net/ |
+| Microsoft.AspNetCore.App.Runtime.linux-x64 | 10.0.13 | nuget | https://asp.net/ |
+| Microsoft.AspNetCore.App.Runtime.win-x64 | 10.0.13 | nuget | https://asp.net/ |
+| Microsoft.AspNetCore.OpenApi | 10.0.0 | nuget | https://asp.net/ |
+| Microsoft.Extensions.ApiDescription.Server | 10.0.0 | nuget | https://asp.net/ |
+| Microsoft.NETCore.App.Host.linux-arm64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.NETCore.App.Host.linux-x64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.NETCore.App.Host.win-x64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.NETCore.App.Runtime.linux-arm64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.NETCore.App.Runtime.linux-x64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.NETCore.App.Runtime.win-x64 | 10.0.13 | nuget | https://dot.net/ |
+| Microsoft.OpenApi | 2.9.0 | nuget | https://github.com/Microsoft/OpenAPI.NET |
+| mio | 1.2.1 | cargo | https://github.com/tokio-rs/mio |
+| monaco-editor | 0.52.2 | npm | https://github.com/microsoft/monaco-editor |
+| nanoid | 3.3.20 | npm | ai/nanoid |
+| new_debug_unreachable | 1.0.6 | cargo | https://github.com/mbrubeck/rust-debug-unreachable |
+| nix | 0.31.3 | cargo | https://github.com/nix-rust/nix |
+| nom | 8.0.0 | cargo | https://github.com/rust-bakery/nom |
+| open | 5.3.6 | cargo | https://github.com/Byron/open-rs |
+| os_info | 3.15.0 | cargo | https://github.com/stanislav-tkach/os_info |
+| os_pipe | 1.2.3 | cargo | https://github.com/oconnor663/os_pipe.rs |
+| pango | 0.18.3 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| pango-sys | 0.18.0 | cargo | https://github.com/gtk-rs/gtk-rs-core |
+| PDFsharp | 6.2.0 | nuget | https://docs.pdfsharp.net/ |
+| phf | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
+| phf_generator | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
+| phf_macros | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
+| phf_shared | 0.13.1 | cargo | https://github.com/rust-phf/rust-phf |
+| plist | 1.10.0 | cargo | https://github.com/ebarnard/rust-plist/ |
+| postcss | 8.5.30 | npm | https://postcss.org/ |
+| precomputed-hash | 0.1.1 | cargo | https://github.com/emilio/precomputed-hash |
+| ptr_meta | 0.1.4 | cargo | https://github.com/djkoloski/ptr_meta |
+| ptr_meta_derive | 0.1.4 | cargo | https://github.com/djkoloski/ptr_meta |
+| PuppeteerSharp | 21.1.1 | nuget | https://github.com/hardkoded/puppeteer-sharp |
+| quick-xml | 0.39.4 | cargo | https://github.com/tafia/quick-xml |
+| quick-xml | 0.41.0 | cargo | https://github.com/tafia/quick-xml |
+| radium | 0.7.0 | cargo | https://github.com/bitvecto-rs/radium |
+| rend | 0.4.2 | cargo | https://github.com/djkoloski/rend |
+| rfd | 0.16.0 | cargo | https://github.com/PolyMeilex/rfd |
+| rkyv | 0.7.46 | cargo | https://github.com/rkyv/rkyv |
+| rkyv_derive | 0.7.46 | cargo | https://github.com/rkyv/rkyv |
+| rust_decimal | 1.42.1 | cargo | https://github.com/paupino/rust-decimal |
+| schemars | 0.8.22 | cargo | https://github.com/GREsau/schemars |
+| schemars | 0.9.0 | cargo | https://github.com/GREsau/schemars |
+| schemars | 1.2.1 | cargo | https://github.com/GREsau/schemars |
+| schemars_derive | 0.8.22 | cargo | https://github.com/GREsau/schemars |
+| seahash | 4.1.0 | cargo | https://gitlab.redox-os.org/redox-os/seahash |
+| simd-adler32 | 0.3.9 | cargo | https://github.com/mcountryman/simd-adler32 |
+| SkiaSharp | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
+| SkiaSharp.NativeAssets.Linux | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
+| SkiaSharp.NativeAssets.macOS | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
+| SkiaSharp.NativeAssets.Win32 | 3.119.1 | nuget | https://go.microsoft.com/fwlink/?linkid=868515 |
+| slab | 0.4.12 | cargo | https://github.com/tokio-rs/slab |
+| soup3 | 0.5.0 | cargo | https://gitlab.gnome.org/World/Rust/soup3-rs |
+| soup3-sys | 0.5.0 | cargo | https://gitlab.gnome.org/World/Rust/soup3-rs |
+| source-map-support | 0.5.21 | npm | https://github.com/evanw/node-source-map-support |
+| strsim | 0.11.1 | cargo | https://github.com/rapidfuzz/strsim-rs |
+| Swashbuckle.AspNetCore | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
+| Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
+| Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
+| Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | https://github.com/domaindrivendev/Swashbuckle.AspNetCore |
+| synstructure | 0.13.2 | cargo | https://github.com/mystor/synstructure |
+| System.IO.Packaging | 10.0.0 | nuget | https://dot.net/ |
+| System.IO.Packaging | 8.0.1 | nuget | https://dot.net/ |
+| System.Security.Cryptography.Pkcs | 10.0.13 | nuget | https://dot.net/ |
+| tap | 1.0.1 | cargo | https://github.com/myrrlyn/tap |
+| tiff | 0.11.3 | cargo | https://github.com/image-rs/image-tiff |
+| tokio | 1.52.3 | cargo | https://github.com/tokio-rs/tokio |
+| tokio-macros | 2.7.0 | cargo | https://github.com/tokio-rs/tokio |
+| tracing | 0.1.44 | cargo | https://github.com/tokio-rs/tracing |
+| tracing-attributes | 0.1.31 | cargo | https://github.com/tokio-rs/tracing |
+| tracing-core | 0.1.36 | cargo | https://github.com/tokio-rs/tracing |
+| tree_magic_mini | 3.2.2 | cargo | https://github.com/mbrubeck/tree_magic/ |
+| urlpattern | 0.3.0 | cargo | https://github.com/denoland/rust-urlpattern |
+| utf8-width | 0.1.9 | cargo | https://github.com/magiclen/utf8-width |
+| vue | 3.5.44 | npm | https://vuejs.org/ |
+| wayland-backend | 0.3.15 | cargo | https://github.com/smithay/wayland-rs |
+| wayland-client | 0.31.14 | cargo | https://github.com/smithay/wayland-rs |
+| wayland-protocols | 0.32.13 | cargo | https://github.com/smithay/wayland-rs |
+| wayland-protocols-wlr | 0.3.12 | cargo | https://github.com/smithay/wayland-rs |
+| wayland-scanner | 0.31.10 | cargo | https://github.com/smithay/wayland-rs |
+| wayland-sys | 0.31.11 | cargo | https://github.com/smithay/wayland-rs |
+| WebDriverBiDi | 0.0.43 | nuget | — |
+| webkit2gtk | 2.0.2 | cargo | https://github.com/tauri-apps/webkit2gtk-rs |
+| webkit2gtk-sys | 2.0.2 | cargo | https://github.com/tauri-apps/webkit2gtk-rs |
+| webview2-com | 0.38.2 | cargo | https://github.com/wravery/webview2-rs |
+| webview2-com-macros | 0.8.1 | cargo | https://github.com/wravery/webview2-rs |
+| webview2-com-sys | 0.38.2 | cargo | https://github.com/wravery/webview2-rs |
+| winnow | 0.5.40 | cargo | https://github.com/winnow-rs/winnow |
+| winnow | 1.0.3 | cargo | https://github.com/winnow-rs/winnow |
+| wyz | 0.5.1 | cargo | https://github.com/myrrlyn/wyz |
+| x11 | 2.21.0 | cargo | https://github.com/AltF02/x11-rs.git |
+| x11-dl | 2.21.0 | cargo | https://github.com/AltF02/x11-rs.git |
+| zbus | 5.16.0 | cargo | https://github.com/z-galaxy/zbus/ |
+| zbus_macros | 5.16.0 | cargo | https://github.com/z-galaxy/zbus/ |
+| zbus_names | 4.3.2 | cargo | https://github.com/z-galaxy/zbus/ |
+| zmij | 1.0.21 | cargo | https://github.com/dtolnay/zmij |
+| zvariant | 5.12.0 | cargo | https://github.com/z-galaxy/zbus/ |
+| zvariant_derive | 5.12.0 | cargo | https://github.com/z-galaxy/zbus/ |
+| zvariant_utils | 3.4.0 | cargo | https://github.com/z-galaxy/zbus/ |
+
 ### Apache-2.0 OR MIT
 
 | Component | Version | Ecosystem | Source / note |
@@ -638,14 +650,14 @@ licence file beside them are covered under Fonts above; those marked
 | memchr | 2.8.2 | cargo | https://github.com/BurntSushi/memchr |
 | winapi-util | 0.1.11 | cargo | https://github.com/BurntSushi/winapi-util |
 
-### BSD-2-Clause
+### Apache-2.0
 
 | Component | Version | Ecosystem | Source / note |
 |---|---|---|---|
-| entities | 7.0.1 | npm | https://github.com/fb55/entities.git |
-| entities | 4.5.0 | npm | git://github.com/fb55/entities.git |
-| Markdig.Signed | 0.43.0 | nuget | https://github.com/xoofx/markdig |
-| terser | 5.46.0 | npm | https://terser.org |
+| borsh-derive | 1.7.0 | cargo | https://github.com/near/borsh-rs |
+| gethostname | 1.1.0 | cargo | https://codeberg.org/swsnr/gethostname.rs.git |
+| pdfjs-dist | 6.4.299 | npm | https://mozilla.github.io/pdf.js/ |
+| tao | 0.35.3 | cargo | https://github.com/tauri-apps/tao |
 
 ### BSD-3-Clause
 
@@ -654,7 +666,7 @@ licence file beside them are covered under Fonts above; those marked
 | alloc-no-stdlib | 2.0.4 | cargo | https://github.com/dropbox/rust-alloc-no-stdlib |
 | alloc-stdlib | 0.2.4 | cargo | https://github.com/dropbox/rust-alloc-no-stdlib |
 | source-map | 0.6.1 | npm | https://github.com/mozilla/source-map |
-| source-map-js | 1.2.1 | npm | https://github.com/7rulnik/source-map-js |
+| source-map-js | 1.2.2 | npm | https://github.com/7rulnik/source-map-js |
 
 ### MIT OR Apache-2.0 OR Zlib
 
@@ -665,13 +677,13 @@ licence file beside them are covered under Fonts above; those marked
 | zune-core | 0.5.1 | cargo | https://github.com/etemesi254/zune-image |
 | zune-jpeg | 0.5.15 | cargo | https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg |
 
-### Apache-2.0
+### BSD-2-Clause
 
 | Component | Version | Ecosystem | Source / note |
 |---|---|---|---|
-| borsh-derive | 1.7.0 | cargo | https://github.com/near/borsh-rs |
-| gethostname | 1.1.0 | cargo | https://codeberg.org/swsnr/gethostname.rs.git |
-| tao | 0.35.3 | cargo | https://github.com/tauri-apps/tao |
+| entities | 7.0.1 | npm | https://github.com/fb55/entities.git |
+| Markdig.Signed | 0.43.0 | nuget | https://github.com/xoofx/markdig |
+| terser | 5.46.0 | npm | https://terser.org |
 
 ### Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
 
@@ -788,7 +800,7 @@ licence file beside them are covered under Fonts above; those marked
 
 ## Licence texts
 
-81 distinct licence texts, covering 507 components. Each body
+81 distinct licence texts, covering 492 components. Each body
 appears once; the copyright notices from every component sharing it are listed
 above it. Texts are reproduced verbatim from the packages as shipped, or for
 packages that ship none, from the project's own repository as recorded below.
@@ -1612,7 +1624,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Licence text 4 — 60 components
+### Licence text 4 — 61 components
 
 Components using this text:
 
@@ -1631,6 +1643,7 @@ Components using this text:
   - libc 0.2.186
   - miniz_oxide 0.8.9
   - num-conv 0.2.2
+  - pdfjs-dist 6.4.299
   - pin-project-lite 0.2.17
   - proc-macro2 1.0.106
   - quote 1.0.46
@@ -1856,7 +1869,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
 END OF TERMS AND CONDITIONS
 
-### Licence text 5 — 47 components
+### Licence text 5 — 46 components
 
 Components using this text:
 
@@ -1864,7 +1877,6 @@ Components using this text:
   - atk-sys 0.18.2
   - cairo-rs 0.18.5
   - cairo-sys-rs 0.18.2
-  - csstype 3.1.3
   - csstype 3.2.3
   - dbus 0.9.12
   - deranged 0.5.8
@@ -1945,28 +1957,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Licence text 6 — 32 components
+### Licence text 6 — 22 components
 
 Components using this text:
 
-  - @vue/compiler-core 3.5.21
-  - @vue/compiler-core 3.5.39
-  - @vue/compiler-dom 3.5.21
-  - @vue/compiler-dom 3.5.39
-  - @vue/compiler-sfc 3.5.21
-  - @vue/compiler-sfc 3.5.39
-  - @vue/compiler-ssr 3.5.21
-  - @vue/compiler-ssr 3.5.39
-  - @vue/reactivity 3.5.21
-  - @vue/reactivity 3.5.39
-  - @vue/runtime-core 3.5.21
-  - @vue/runtime-core 3.5.39
-  - @vue/runtime-dom 3.5.21
-  - @vue/runtime-dom 3.5.39
-  - @vue/server-renderer 3.5.21
-  - @vue/server-renderer 3.5.39
-  - @vue/shared 3.5.21
-  - @vue/shared 3.5.39
+  - @vue/compiler-core 3.5.44
+  - @vue/compiler-dom 3.5.44
+  - @vue/compiler-sfc 3.5.44
+  - @vue/compiler-ssr 3.5.44
+  - @vue/reactivity 3.5.44
+  - @vue/runtime-core 3.5.44
+  - @vue/runtime-dom 3.5.44
+  - @vue/server-renderer 3.5.44
+  - @vue/shared 3.5.44
   - aho-corasick 1.1.4
   - base64 0.22.1
   - byteorder 1.5.0
@@ -1977,8 +1980,7 @@ Components using this text:
   - quick-xml 0.39.4
   - quick-xml 0.41.0
   - same-file 1.0.6
-  - vue 3.5.21
-  - vue 3.5.39
+  - vue 3.5.44
   - walkdir 2.5.0
   - winapi-util 0.1.11
 
@@ -2505,12 +2507,12 @@ ICU 1.8.1 to ICU 57.1 © 1995-2016 International Business Machines Corporation a
 
 Components using this text:
 
-  - @babel/parser 7.28.4
-  - @babel/parser 7.29.7
+  - @babel/parser 7.29.9
   - @jridgewell/gen-mapping 0.3.13
   - @jridgewell/resolve-uri 3.1.2
   - @jridgewell/source-map 0.3.11
   - @jridgewell/sourcemap-codec 1.5.5
+  - @jridgewell/sourcemap-codec 1.6.0
   - @jridgewell/trace-mapping 0.3.31
   - brotli 8.0.4
   - keyboard-types 0.7.0
@@ -2556,7 +2558,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-### Licence text 13 — 17 components
+### Licence text 13 — 16 components
 
 Components using this text:
 
@@ -2568,7 +2570,6 @@ Components using this text:
   - dtor-proc-macro 0.0.6
   - estree-walker 2.0.2
   - fern 0.7.1
-  - magic-string 0.30.19
   - magic-string 0.30.21
   - ptr_meta 0.1.4
   - ptr_meta_derive 0.1.4
@@ -2597,23 +2598,22 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Licence text 14 — 13 components
+### Licence text 14 — 12 components
 
 Components using this text:
 
-  - Microsoft.AspNetCore.App.Runtime.linux-arm64 10.0.12
-  - Microsoft.AspNetCore.App.Runtime.linux-x64 10.0.12
-  - Microsoft.AspNetCore.App.Runtime.win-x64 10.0.12
+  - Microsoft.AspNetCore.App.Runtime.linux-arm64 10.0.13
+  - Microsoft.AspNetCore.App.Runtime.linux-x64 10.0.13
+  - Microsoft.AspNetCore.App.Runtime.win-x64 10.0.13
   - Microsoft.Extensions.ApiDescription.Server 10.0.0
-  - Microsoft.NETCore.App.Host.linux-arm64 10.0.12
-  - Microsoft.NETCore.App.Host.linux-x64 10.0.12
-  - Microsoft.NETCore.App.Host.win-x64 10.0.12
-  - Microsoft.NETCore.App.Runtime.linux-arm64 10.0.12
-  - Microsoft.NETCore.App.Runtime.linux-x64 10.0.12
-  - Microsoft.NETCore.App.Runtime.win-x64 10.0.12
+  - Microsoft.NETCore.App.Host.linux-arm64 10.0.13
+  - Microsoft.NETCore.App.Host.linux-x64 10.0.13
+  - Microsoft.NETCore.App.Host.win-x64 10.0.13
+  - Microsoft.NETCore.App.Runtime.linux-arm64 10.0.13
+  - Microsoft.NETCore.App.Runtime.linux-x64 10.0.13
+  - Microsoft.NETCore.App.Runtime.win-x64 10.0.13
   - System.IO.Packaging 10.0.0
   - System.IO.Packaging 8.0.1
-  - System.Security.Cryptography.Pkcs 8.0.1
 
 Copyright notices:
 
@@ -2645,18 +2645,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Licence text 15 — 8 components
+### Licence text 15 — 9 components
 
 Components using this text:
 
-  - Microsoft.NETCore.App.Host.linux-arm64 10.0.12
-  - Microsoft.NETCore.App.Host.linux-x64 10.0.12
-  - Microsoft.NETCore.App.Host.win-x64 10.0.12
-  - Microsoft.NETCore.App.Runtime.linux-arm64 10.0.12
-  - Microsoft.NETCore.App.Runtime.linux-x64 10.0.12
-  - Microsoft.NETCore.App.Runtime.win-x64 10.0.12
+  - Microsoft.NETCore.App.Host.linux-arm64 10.0.13
+  - Microsoft.NETCore.App.Host.linux-x64 10.0.13
+  - Microsoft.NETCore.App.Host.win-x64 10.0.13
+  - Microsoft.NETCore.App.Runtime.linux-arm64 10.0.13
+  - Microsoft.NETCore.App.Runtime.linux-x64 10.0.13
+  - Microsoft.NETCore.App.Runtime.win-x64 10.0.13
   - System.IO.Packaging 10.0.0
   - System.IO.Packaging 8.0.1
+  - System.Security.Cryptography.Pkcs 10.0.13
 
 Copyright notices:
 
@@ -4188,46 +4189,6 @@ For more information, please refer to <http://unlicense.org/>
 
 Components using this text:
 
-  - @babel/helper-string-parser 7.27.1
-  - @babel/helper-string-parser 7.29.7
-  - @babel/helper-validator-identifier 7.28.5
-  - @babel/helper-validator-identifier 7.29.7
-  - @babel/types 7.28.4
-  - @babel/types 7.29.7
-
-Copyright notices:
-
-Copyright (c) 2014-present Sebastian McKenzie and other contributors
-
-Licence text:
-
-MIT License
-
-Copyright (c) 2014-present Sebastian McKenzie and other contributors
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-### Licence text 18 — 6 components
-
-Components using this text:
-
   - SkiaSharp 3.119.1
   - SkiaSharp.NativeAssets.Linux 3.119.1
   - SkiaSharp.NativeAssets.macOS 3.119.1
@@ -4266,7 +4227,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Licence text 19 — 6 components
+### Licence text 18 — 6 components
 
 Components using this text:
 
@@ -4283,7 +4244,7 @@ This project is dual-licensed under the Unlicense and MIT licenses.
 
 You may use this code under the terms of either license.
 
-### Licence text 20 — 6 components
+### Licence text 19 — 6 components
 
 Components using this text:
 
@@ -4318,16 +4279,16 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 3. This notice may not be removed or altered from any source distribution.
 
-### Licence text 21 — 6 components
+### Licence text 20 — 6 components
 
 Components using this text:
 
-  - nanoid 3.3.18
+  - nanoid 3.3.20
   - phf 0.13.1
   - phf_generator 0.13.1
   - phf_macros 0.13.1
   - phf_shared 0.13.1
-  - postcss 8.5.26
+  - postcss 8.5.30
 
 Copyright notices:
 
@@ -4358,7 +4319,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Licence text 22 — 5 components
+### Licence text 21 — 5 components
 
 Components using this text:
 
@@ -4572,13 +4533,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-### Licence text 23 — 4 components
+### Licence text 22 — 4 components
 
 Components using this text:
 
-  - Microsoft.AspNetCore.App.Runtime.linux-arm64 10.0.12
-  - Microsoft.AspNetCore.App.Runtime.linux-x64 10.0.12
-  - Microsoft.AspNetCore.App.Runtime.win-x64 10.0.12
+  - Microsoft.AspNetCore.App.Runtime.linux-arm64 10.0.13
+  - Microsoft.AspNetCore.App.Runtime.linux-x64 10.0.13
+  - Microsoft.AspNetCore.App.Runtime.win-x64 10.0.13
   - Microsoft.AspNetCore.OpenApi 10.0.0
 
 Copyright notices:
@@ -5729,7 +5690,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-### Licence text 24 — 4 components
+### Licence text 23 — 4 components
 
 Components using this text:
 
@@ -5757,7 +5718,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### Licence text 25 — 4 components
+### Licence text 24 — 4 components
 
 Components using this text:
 
@@ -5969,6 +5930,43 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+### Licence text 25 — 3 components
+
+Components using this text:
+
+  - @babel/helper-string-parser 7.29.7
+  - @babel/helper-validator-identifier 7.29.7
+  - @babel/types 7.29.8
+
+Copyright notices:
+
+Copyright (c) 2014-present Sebastian McKenzie and other contributors
+
+Licence text:
+
+MIT License
+
+Copyright (c) 2014-present Sebastian McKenzie and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ### Licence text 26 — 3 components
 
@@ -8782,9 +8780,464 @@ mozzconf.h is distributed under the MPL 1.1/GPL 2.0/LGPL 2.1 tri-license.
 
 Components using this text:
 
+  - cssparser 0.36.0
+  - cssparser-macros 0.6.1
+  - dtoa-short 0.3.5
+
+Licence text:
+
+Mozilla Public License Version 2.0
+==================================
+
+1. Definitions
+--------------
+
+1.1. "Contributor"
+    means each individual or legal entity that creates, contributes to
+    the creation of, or owns Covered Software.
+
+1.2. "Contributor Version"
+    means the combination of the Contributions of others (if any) used
+    by a Contributor and that particular Contributor's Contribution.
+
+1.3. "Contribution"
+    means Covered Software of a particular Contributor.
+
+1.4. "Covered Software"
+    means Source Code Form to which the initial Contributor has attached
+    the notice in Exhibit A, the Executable Form of such Source Code
+    Form, and Modifications of such Source Code Form, in each case
+    including portions thereof.
+
+1.5. "Incompatible With Secondary Licenses"
+    means
+
+    (a) that the initial Contributor has attached the notice described
+        in Exhibit B to the Covered Software; or
+
+    (b) that the Covered Software was made available under the terms of
+        version 1.1 or earlier of the License, but not also under the
+        terms of a Secondary License.
+
+1.6. "Executable Form"
+    means any form of the work other than Source Code Form.
+
+1.7. "Larger Work"
+    means a work that combines Covered Software with other material, in 
+    a separate file or files, that is not Covered Software.
+
+1.8. "License"
+    means this document.
+
+1.9. "Licensable"
+    means having the right to grant, to the maximum extent possible,
+    whether at the time of the initial grant or subsequently, any and
+    all of the rights conveyed by this License.
+
+1.10. "Modifications"
+    means any of the following:
+
+    (a) any file in Source Code Form that results from an addition to,
+        deletion from, or modification of the contents of Covered
+        Software; or
+
+    (b) any new file in Source Code Form that contains any Covered
+        Software.
+
+1.11. "Patent Claims" of a Contributor
+    means any patent claim(s), including without limitation, method,
+    process, and apparatus claims, in any patent Licensable by such
+    Contributor that would be infringed, but for the grant of the
+    License, by the making, using, selling, offering for sale, having
+    made, import, or transfer of either its Contributions or its
+    Contributor Version.
+
+1.12. "Secondary License"
+    means either the GNU General Public License, Version 2.0, the GNU
+    Lesser General Public License, Version 2.1, the GNU Affero General
+    Public License, Version 3.0, or any later versions of those
+    licenses.
+
+1.13. "Source Code Form"
+    means the form of the work preferred for making modifications.
+
+1.14. "You" (or "Your")
+    means an individual or a legal entity exercising rights under this
+    License. For legal entities, "You" includes any entity that
+    controls, is controlled by, or is under common control with You. For
+    purposes of this definition, "control" means (a) the power, direct
+    or indirect, to cause the direction or management of such entity,
+    whether by contract or otherwise, or (b) ownership of more than
+    fifty percent (50%) of the outstanding shares or beneficial
+    ownership of such entity.
+
+2. License Grants and Conditions
+--------------------------------
+
+2.1. Grants
+
+Each Contributor hereby grants You a world-wide, royalty-free,
+non-exclusive license:
+
+(a) under intellectual property rights (other than patent or trademark)
+    Licensable by such Contributor to use, reproduce, make available,
+    modify, display, perform, distribute, and otherwise exploit its
+    Contributions, either on an unmodified basis, with Modifications, or
+    as part of a Larger Work; and
+
+(b) under Patent Claims of such Contributor to make, use, sell, offer
+    for sale, have made, import, and otherwise transfer either its
+    Contributions or its Contributor Version.
+
+2.2. Effective Date
+
+The licenses granted in Section 2.1 with respect to any Contribution
+become effective for each Contribution on the date the Contributor first
+distributes such Contribution.
+
+2.3. Limitations on Grant Scope
+
+The licenses granted in this Section 2 are the only rights granted under
+this License. No additional rights or licenses will be implied from the
+distribution or licensing of Covered Software under this License.
+Notwithstanding Section 2.1(b) above, no patent license is granted by a
+Contributor:
+
+(a) for any code that a Contributor has removed from Covered Software;
+    or
+
+(b) for infringements caused by: (i) Your and any other third party's
+    modifications of Covered Software, or (ii) the combination of its
+    Contributions with other software (except as part of its Contributor
+    Version); or
+
+(c) under Patent Claims infringed by Covered Software in the absence of
+    its Contributions.
+
+This License does not grant any rights in the trademarks, service marks,
+or logos of any Contributor (except as may be necessary to comply with
+the notice requirements in Section 3.4).
+
+2.4. Subsequent Licenses
+
+No Contributor makes additional grants as a result of Your choice to
+distribute the Covered Software under a subsequent version of this
+License (see Section 10.2) or under the terms of a Secondary License (if
+permitted under the terms of Section 3.3).
+
+2.5. Representation
+
+Each Contributor represents that the Contributor believes its
+Contributions are its original creation(s) or it has sufficient rights
+to grant the rights to its Contributions conveyed by this License.
+
+2.6. Fair Use
+
+This License is not intended to limit any rights You have under
+applicable copyright doctrines of fair use, fair dealing, or other
+equivalents.
+
+2.7. Conditions
+
+Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted
+in Section 2.1.
+
+3. Responsibilities
+-------------------
+
+3.1. Distribution of Source Form
+
+All distribution of Covered Software in Source Code Form, including any
+Modifications that You create or to which You contribute, must be under
+the terms of this License. You must inform recipients that the Source
+Code Form of the Covered Software is governed by the terms of this
+License, and how they can obtain a copy of this License. You may not
+attempt to alter or restrict the recipients' rights in the Source Code
+Form.
+
+3.2. Distribution of Executable Form
+
+If You distribute Covered Software in Executable Form then:
+
+(a) such Covered Software must also be made available in Source Code
+    Form, as described in Section 3.1, and You must inform recipients of
+    the Executable Form how they can obtain a copy of such Source Code
+    Form by reasonable means in a timely manner, at a charge no more
+    than the cost of distribution to the recipient; and
+
+(b) You may distribute such Executable Form under the terms of this
+    License, or sublicense it under different terms, provided that the
+    license for the Executable Form does not attempt to limit or alter
+    the recipients' rights in the Source Code Form under this License.
+
+3.3. Distribution of a Larger Work
+
+You may create and distribute a Larger Work under terms of Your choice,
+provided that You also comply with the requirements of this License for
+the Covered Software. If the Larger Work is a combination of Covered
+Software with a work governed by one or more Secondary Licenses, and the
+Covered Software is not Incompatible With Secondary Licenses, this
+License permits You to additionally distribute such Covered Software
+under the terms of such Secondary License(s), so that the recipient of
+the Larger Work may, at their option, further distribute the Covered
+Software under the terms of either this License or such Secondary
+License(s).
+
+3.4. Notices
+
+You may not remove or alter the substance of any license notices
+(including copyright notices, patent notices, disclaimers of warranty,
+or limitations of liability) contained within the Source Code Form of
+the Covered Software, except that You may alter any license notices to
+the extent required to remedy known factual inaccuracies.
+
+3.5. Application of Additional Terms
+
+You may choose to offer, and to charge a fee for, warranty, support,
+indemnity or liability obligations to one or more recipients of Covered
+Software. However, You may do so only on Your own behalf, and not on
+behalf of any Contributor. You must make it absolutely clear that any
+such warranty, support, indemnity, or liability obligation is offered by
+You alone, and You hereby agree to indemnify every Contributor for any
+liability incurred by such Contributor as a result of warranty, support,
+indemnity or liability terms You offer. You may include additional
+disclaimers of warranty and limitations of liability specific to any
+jurisdiction.
+
+4. Inability to Comply Due to Statute or Regulation
+---------------------------------------------------
+
+If it is impossible for You to comply with any of the terms of this
+License with respect to some or all of the Covered Software due to
+statute, judicial order, or regulation then You must: (a) comply with
+the terms of this License to the maximum extent possible; and (b)
+describe the limitations and the code they affect. Such description must
+be placed in a text file included with all distributions of the Covered
+Software under this License. Except to the extent prohibited by statute
+or regulation, such description must be sufficiently detailed for a
+recipient of ordinary skill to be able to understand it.
+
+5. Termination
+--------------
+
+5.1. The rights granted under this License will terminate automatically
+if You fail to comply with any of its terms. However, if You become
+compliant, then the rights granted under this License from a particular
+Contributor are reinstated (a) provisionally, unless and until such
+Contributor explicitly and finally terminates Your grants, and (b) on an
+ongoing basis, if such Contributor fails to notify You of the
+non-compliance by some reasonable means prior to 60 days after You have
+come back into compliance. Moreover, Your grants from a particular
+Contributor are reinstated on an ongoing basis if such Contributor
+notifies You of the non-compliance by some reasonable means, this is the
+first time You have received notice of non-compliance with this License
+from such Contributor, and You become compliant prior to 30 days after
+Your receipt of the notice.
+
+5.2. If You initiate litigation against any entity by asserting a patent
+infringement claim (excluding declaratory judgment actions,
+counter-claims, and cross-claims) alleging that a Contributor Version
+directly or indirectly infringes any patent, then the rights granted to
+You by any and all Contributors for the Covered Software under Section
+2.1 of this License shall terminate.
+
+5.3. In the event of termination under Sections 5.1 or 5.2 above, all
+end user license agreements (excluding distributors and resellers) which
+have been validly granted by You or Your distributors under this License
+prior to termination shall survive termination.
+
+************************************************************************
+*                                                                      *
+*  6. Disclaimer of Warranty                                           *
+*  -------------------------                                           *
+*                                                                      *
+*  Covered Software is provided under this License on an "as is"       *
+*  basis, without warranty of any kind, either expressed, implied, or  *
+*  statutory, including, without limitation, warranties that the       *
+*  Covered Software is free of defects, merchantable, fit for a        *
+*  particular purpose or non-infringing. The entire risk as to the     *
+*  quality and performance of the Covered Software is with You.        *
+*  Should any Covered Software prove defective in any respect, You     *
+*  (not any Contributor) assume the cost of any necessary servicing,   *
+*  repair, or correction. This disclaimer of warranty constitutes an   *
+*  essential part of this License. No use of any Covered Software is   *
+*  authorized under this License except under this disclaimer.         *
+*                                                                      *
+************************************************************************
+
+************************************************************************
+*                                                                      *
+*  7. Limitation of Liability                                          *
+*  --------------------------                                          *
+*                                                                      *
+*  Under no circumstances and under no legal theory, whether tort      *
+*  (including negligence), contract, or otherwise, shall any           *
+*  Contributor, or anyone who distributes Covered Software as          *
+*  permitted above, be liable to You for any direct, indirect,         *
+*  special, incidental, or consequential damages of any character      *
+*  including, without limitation, damages for lost profits, loss of    *
+*  goodwill, work stoppage, computer failure or malfunction, or any    *
+*  and all other commercial damages or losses, even if such party      *
+*  shall have been informed of the possibility of such damages. This   *
+*  limitation of liability shall not apply to liability for death or   *
+*  personal injury resulting from such party's negligence to the       *
+*  extent applicable law prohibits such limitation. Some               *
+*  jurisdictions do not allow the exclusion or limitation of           *
+*  incidental or consequential damages, so this exclusion and          *
+*  limitation may not apply to You.                                    *
+*                                                                      *
+************************************************************************
+
+8. Litigation
+-------------
+
+Any litigation relating to this License may be brought only in the
+courts of a jurisdiction where the defendant maintains its principal
+place of business and such litigation shall be governed by laws of that
+jurisdiction, without reference to its conflict-of-law provisions.
+Nothing in this Section shall prevent a party's ability to bring
+cross-claims or counter-claims.
+
+9. Miscellaneous
+----------------
+
+This License represents the complete agreement concerning the subject
+matter hereof. If any provision of this License is held to be
+unenforceable, such provision shall be reformed only to the extent
+necessary to make it enforceable. Any law or regulation which provides
+that the language of a contract shall be construed against the drafter
+shall not be used to construe this License against a Contributor.
+
+10. Versions of the License
+---------------------------
+
+10.1. New Versions
+
+Mozilla Foundation is the license steward. Except as provided in Section
+10.3, no one other than the license steward has the right to modify or
+publish new versions of this License. Each version will be given a
+distinguishing version number.
+
+10.2. Effect of New Versions
+
+You may distribute the Covered Software under the terms of the version
+of the License under which You originally received the Covered Software,
+or under the terms of any subsequent version published by the license
+steward.
+
+10.3. Modified Versions
+
+If you create software not governed by this License, and you want to
+create a new license for such software, you may create and use a
+modified version of this License if you rename the license and remove
+any references to the name of the license steward (except to note that
+such modified license differs from this License).
+
+10.4. Distributing Source Code Form that is Incompatible With Secondary
+Licenses
+
+If You choose to distribute Source Code Form that is Incompatible With
+Secondary Licenses under the terms of this version of the License, the
+notice described in Exhibit B of this License must be attached.
+
+Exhibit A - Source Code Form License Notice
+-------------------------------------------
+
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+If it is not possible or desirable to put the notice in a particular
+file, then You may include the notice in a location (such as a LICENSE
+file in a relevant directory) where a recipient would be likely to look
+for such a notice.
+
+You may add additional accurate notices of copyright ownership.
+
+Exhibit B - "Incompatible With Secondary Licenses" Notice
+---------------------------------------------------------
+
+  This Source Code Form is "Incompatible With Secondary Licenses", as
+  defined by the Mozilla Public License, v. 2.0.
+
+### Licence text 28 — 3 components
+
+Components using this text:
+
+  - nom 8.0.0
+  - winnow 0.5.40
+  - winnow 1.0.3
+
+Copyright notices:
+
+Copyright (c) 2014-2019 Geoffroy Couprie
+
+Licence text:
+
+Copyright (c) 2014-2019 Geoffroy Couprie
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+### Licence text 29 — 2 components
+
+Components using this text:
+
+  - DocumentFormat.OpenXml 3.3.0
+  - DocumentFormat.OpenXml.Framework 3.3.0
+
+Copyright notices:
+
+Copyright (c) .NET Foundation and Contributors
+
+Licence text:
+
+﻿The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+### Licence text 30 — 2 components
+
+Components using this text:
+
   - System.IO.Packaging 10.0.0
   - System.IO.Packaging 8.0.1
-  - System.Security.Cryptography.Pkcs 8.0.1
 
 Copyright notices:
 
@@ -10118,462 +10571,6 @@ Licensed under the Apache License, Version 2.0.
 Available at
 https://github.com/SixLabors/ImageSharp/blob/f4f689ce67ecbcc35cebddba5aacb603e6d1068a/LICENSE
 
-### Licence text 28 — 3 components
-
-Components using this text:
-
-  - cssparser 0.36.0
-  - cssparser-macros 0.6.1
-  - dtoa-short 0.3.5
-
-Licence text:
-
-Mozilla Public License Version 2.0
-==================================
-
-1. Definitions
---------------
-
-1.1. "Contributor"
-    means each individual or legal entity that creates, contributes to
-    the creation of, or owns Covered Software.
-
-1.2. "Contributor Version"
-    means the combination of the Contributions of others (if any) used
-    by a Contributor and that particular Contributor's Contribution.
-
-1.3. "Contribution"
-    means Covered Software of a particular Contributor.
-
-1.4. "Covered Software"
-    means Source Code Form to which the initial Contributor has attached
-    the notice in Exhibit A, the Executable Form of such Source Code
-    Form, and Modifications of such Source Code Form, in each case
-    including portions thereof.
-
-1.5. "Incompatible With Secondary Licenses"
-    means
-
-    (a) that the initial Contributor has attached the notice described
-        in Exhibit B to the Covered Software; or
-
-    (b) that the Covered Software was made available under the terms of
-        version 1.1 or earlier of the License, but not also under the
-        terms of a Secondary License.
-
-1.6. "Executable Form"
-    means any form of the work other than Source Code Form.
-
-1.7. "Larger Work"
-    means a work that combines Covered Software with other material, in 
-    a separate file or files, that is not Covered Software.
-
-1.8. "License"
-    means this document.
-
-1.9. "Licensable"
-    means having the right to grant, to the maximum extent possible,
-    whether at the time of the initial grant or subsequently, any and
-    all of the rights conveyed by this License.
-
-1.10. "Modifications"
-    means any of the following:
-
-    (a) any file in Source Code Form that results from an addition to,
-        deletion from, or modification of the contents of Covered
-        Software; or
-
-    (b) any new file in Source Code Form that contains any Covered
-        Software.
-
-1.11. "Patent Claims" of a Contributor
-    means any patent claim(s), including without limitation, method,
-    process, and apparatus claims, in any patent Licensable by such
-    Contributor that would be infringed, but for the grant of the
-    License, by the making, using, selling, offering for sale, having
-    made, import, or transfer of either its Contributions or its
-    Contributor Version.
-
-1.12. "Secondary License"
-    means either the GNU General Public License, Version 2.0, the GNU
-    Lesser General Public License, Version 2.1, the GNU Affero General
-    Public License, Version 3.0, or any later versions of those
-    licenses.
-
-1.13. "Source Code Form"
-    means the form of the work preferred for making modifications.
-
-1.14. "You" (or "Your")
-    means an individual or a legal entity exercising rights under this
-    License. For legal entities, "You" includes any entity that
-    controls, is controlled by, or is under common control with You. For
-    purposes of this definition, "control" means (a) the power, direct
-    or indirect, to cause the direction or management of such entity,
-    whether by contract or otherwise, or (b) ownership of more than
-    fifty percent (50%) of the outstanding shares or beneficial
-    ownership of such entity.
-
-2. License Grants and Conditions
---------------------------------
-
-2.1. Grants
-
-Each Contributor hereby grants You a world-wide, royalty-free,
-non-exclusive license:
-
-(a) under intellectual property rights (other than patent or trademark)
-    Licensable by such Contributor to use, reproduce, make available,
-    modify, display, perform, distribute, and otherwise exploit its
-    Contributions, either on an unmodified basis, with Modifications, or
-    as part of a Larger Work; and
-
-(b) under Patent Claims of such Contributor to make, use, sell, offer
-    for sale, have made, import, and otherwise transfer either its
-    Contributions or its Contributor Version.
-
-2.2. Effective Date
-
-The licenses granted in Section 2.1 with respect to any Contribution
-become effective for each Contribution on the date the Contributor first
-distributes such Contribution.
-
-2.3. Limitations on Grant Scope
-
-The licenses granted in this Section 2 are the only rights granted under
-this License. No additional rights or licenses will be implied from the
-distribution or licensing of Covered Software under this License.
-Notwithstanding Section 2.1(b) above, no patent license is granted by a
-Contributor:
-
-(a) for any code that a Contributor has removed from Covered Software;
-    or
-
-(b) for infringements caused by: (i) Your and any other third party's
-    modifications of Covered Software, or (ii) the combination of its
-    Contributions with other software (except as part of its Contributor
-    Version); or
-
-(c) under Patent Claims infringed by Covered Software in the absence of
-    its Contributions.
-
-This License does not grant any rights in the trademarks, service marks,
-or logos of any Contributor (except as may be necessary to comply with
-the notice requirements in Section 3.4).
-
-2.4. Subsequent Licenses
-
-No Contributor makes additional grants as a result of Your choice to
-distribute the Covered Software under a subsequent version of this
-License (see Section 10.2) or under the terms of a Secondary License (if
-permitted under the terms of Section 3.3).
-
-2.5. Representation
-
-Each Contributor represents that the Contributor believes its
-Contributions are its original creation(s) or it has sufficient rights
-to grant the rights to its Contributions conveyed by this License.
-
-2.6. Fair Use
-
-This License is not intended to limit any rights You have under
-applicable copyright doctrines of fair use, fair dealing, or other
-equivalents.
-
-2.7. Conditions
-
-Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted
-in Section 2.1.
-
-3. Responsibilities
--------------------
-
-3.1. Distribution of Source Form
-
-All distribution of Covered Software in Source Code Form, including any
-Modifications that You create or to which You contribute, must be under
-the terms of this License. You must inform recipients that the Source
-Code Form of the Covered Software is governed by the terms of this
-License, and how they can obtain a copy of this License. You may not
-attempt to alter or restrict the recipients' rights in the Source Code
-Form.
-
-3.2. Distribution of Executable Form
-
-If You distribute Covered Software in Executable Form then:
-
-(a) such Covered Software must also be made available in Source Code
-    Form, as described in Section 3.1, and You must inform recipients of
-    the Executable Form how they can obtain a copy of such Source Code
-    Form by reasonable means in a timely manner, at a charge no more
-    than the cost of distribution to the recipient; and
-
-(b) You may distribute such Executable Form under the terms of this
-    License, or sublicense it under different terms, provided that the
-    license for the Executable Form does not attempt to limit or alter
-    the recipients' rights in the Source Code Form under this License.
-
-3.3. Distribution of a Larger Work
-
-You may create and distribute a Larger Work under terms of Your choice,
-provided that You also comply with the requirements of this License for
-the Covered Software. If the Larger Work is a combination of Covered
-Software with a work governed by one or more Secondary Licenses, and the
-Covered Software is not Incompatible With Secondary Licenses, this
-License permits You to additionally distribute such Covered Software
-under the terms of such Secondary License(s), so that the recipient of
-the Larger Work may, at their option, further distribute the Covered
-Software under the terms of either this License or such Secondary
-License(s).
-
-3.4. Notices
-
-You may not remove or alter the substance of any license notices
-(including copyright notices, patent notices, disclaimers of warranty,
-or limitations of liability) contained within the Source Code Form of
-the Covered Software, except that You may alter any license notices to
-the extent required to remedy known factual inaccuracies.
-
-3.5. Application of Additional Terms
-
-You may choose to offer, and to charge a fee for, warranty, support,
-indemnity or liability obligations to one or more recipients of Covered
-Software. However, You may do so only on Your own behalf, and not on
-behalf of any Contributor. You must make it absolutely clear that any
-such warranty, support, indemnity, or liability obligation is offered by
-You alone, and You hereby agree to indemnify every Contributor for any
-liability incurred by such Contributor as a result of warranty, support,
-indemnity or liability terms You offer. You may include additional
-disclaimers of warranty and limitations of liability specific to any
-jurisdiction.
-
-4. Inability to Comply Due to Statute or Regulation
----------------------------------------------------
-
-If it is impossible for You to comply with any of the terms of this
-License with respect to some or all of the Covered Software due to
-statute, judicial order, or regulation then You must: (a) comply with
-the terms of this License to the maximum extent possible; and (b)
-describe the limitations and the code they affect. Such description must
-be placed in a text file included with all distributions of the Covered
-Software under this License. Except to the extent prohibited by statute
-or regulation, such description must be sufficiently detailed for a
-recipient of ordinary skill to be able to understand it.
-
-5. Termination
---------------
-
-5.1. The rights granted under this License will terminate automatically
-if You fail to comply with any of its terms. However, if You become
-compliant, then the rights granted under this License from a particular
-Contributor are reinstated (a) provisionally, unless and until such
-Contributor explicitly and finally terminates Your grants, and (b) on an
-ongoing basis, if such Contributor fails to notify You of the
-non-compliance by some reasonable means prior to 60 days after You have
-come back into compliance. Moreover, Your grants from a particular
-Contributor are reinstated on an ongoing basis if such Contributor
-notifies You of the non-compliance by some reasonable means, this is the
-first time You have received notice of non-compliance with this License
-from such Contributor, and You become compliant prior to 30 days after
-Your receipt of the notice.
-
-5.2. If You initiate litigation against any entity by asserting a patent
-infringement claim (excluding declaratory judgment actions,
-counter-claims, and cross-claims) alleging that a Contributor Version
-directly or indirectly infringes any patent, then the rights granted to
-You by any and all Contributors for the Covered Software under Section
-2.1 of this License shall terminate.
-
-5.3. In the event of termination under Sections 5.1 or 5.2 above, all
-end user license agreements (excluding distributors and resellers) which
-have been validly granted by You or Your distributors under this License
-prior to termination shall survive termination.
-
-************************************************************************
-*                                                                      *
-*  6. Disclaimer of Warranty                                           *
-*  -------------------------                                           *
-*                                                                      *
-*  Covered Software is provided under this License on an "as is"       *
-*  basis, without warranty of any kind, either expressed, implied, or  *
-*  statutory, including, without limitation, warranties that the       *
-*  Covered Software is free of defects, merchantable, fit for a        *
-*  particular purpose or non-infringing. The entire risk as to the     *
-*  quality and performance of the Covered Software is with You.        *
-*  Should any Covered Software prove defective in any respect, You     *
-*  (not any Contributor) assume the cost of any necessary servicing,   *
-*  repair, or correction. This disclaimer of warranty constitutes an   *
-*  essential part of this License. No use of any Covered Software is   *
-*  authorized under this License except under this disclaimer.         *
-*                                                                      *
-************************************************************************
-
-************************************************************************
-*                                                                      *
-*  7. Limitation of Liability                                          *
-*  --------------------------                                          *
-*                                                                      *
-*  Under no circumstances and under no legal theory, whether tort      *
-*  (including negligence), contract, or otherwise, shall any           *
-*  Contributor, or anyone who distributes Covered Software as          *
-*  permitted above, be liable to You for any direct, indirect,         *
-*  special, incidental, or consequential damages of any character      *
-*  including, without limitation, damages for lost profits, loss of    *
-*  goodwill, work stoppage, computer failure or malfunction, or any    *
-*  and all other commercial damages or losses, even if such party      *
-*  shall have been informed of the possibility of such damages. This   *
-*  limitation of liability shall not apply to liability for death or   *
-*  personal injury resulting from such party's negligence to the       *
-*  extent applicable law prohibits such limitation. Some               *
-*  jurisdictions do not allow the exclusion or limitation of           *
-*  incidental or consequential damages, so this exclusion and          *
-*  limitation may not apply to You.                                    *
-*                                                                      *
-************************************************************************
-
-8. Litigation
--------------
-
-Any litigation relating to this License may be brought only in the
-courts of a jurisdiction where the defendant maintains its principal
-place of business and such litigation shall be governed by laws of that
-jurisdiction, without reference to its conflict-of-law provisions.
-Nothing in this Section shall prevent a party's ability to bring
-cross-claims or counter-claims.
-
-9. Miscellaneous
-----------------
-
-This License represents the complete agreement concerning the subject
-matter hereof. If any provision of this License is held to be
-unenforceable, such provision shall be reformed only to the extent
-necessary to make it enforceable. Any law or regulation which provides
-that the language of a contract shall be construed against the drafter
-shall not be used to construe this License against a Contributor.
-
-10. Versions of the License
----------------------------
-
-10.1. New Versions
-
-Mozilla Foundation is the license steward. Except as provided in Section
-10.3, no one other than the license steward has the right to modify or
-publish new versions of this License. Each version will be given a
-distinguishing version number.
-
-10.2. Effect of New Versions
-
-You may distribute the Covered Software under the terms of the version
-of the License under which You originally received the Covered Software,
-or under the terms of any subsequent version published by the license
-steward.
-
-10.3. Modified Versions
-
-If you create software not governed by this License, and you want to
-create a new license for such software, you may create and use a
-modified version of this License if you rename the license and remove
-any references to the name of the license steward (except to note that
-such modified license differs from this License).
-
-10.4. Distributing Source Code Form that is Incompatible With Secondary
-Licenses
-
-If You choose to distribute Source Code Form that is Incompatible With
-Secondary Licenses under the terms of this version of the License, the
-notice described in Exhibit B of this License must be attached.
-
-Exhibit A - Source Code Form License Notice
--------------------------------------------
-
-  This Source Code Form is subject to the terms of the Mozilla Public
-  License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-If it is not possible or desirable to put the notice in a particular
-file, then You may include the notice in a location (such as a LICENSE
-file in a relevant directory) where a recipient would be likely to look
-for such a notice.
-
-You may add additional accurate notices of copyright ownership.
-
-Exhibit B - "Incompatible With Secondary Licenses" Notice
----------------------------------------------------------
-
-  This Source Code Form is "Incompatible With Secondary Licenses", as
-  defined by the Mozilla Public License, v. 2.0.
-
-### Licence text 29 — 3 components
-
-Components using this text:
-
-  - nom 8.0.0
-  - winnow 0.5.40
-  - winnow 1.0.3
-
-Copyright notices:
-
-Copyright (c) 2014-2019 Geoffroy Couprie
-
-Licence text:
-
-Copyright (c) 2014-2019 Geoffroy Couprie
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-### Licence text 30 — 2 components
-
-Components using this text:
-
-  - DocumentFormat.OpenXml 3.3.0
-  - DocumentFormat.OpenXml.Framework 3.3.0
-
-Copyright notices:
-
-Copyright (c) .NET Foundation and Contributors
-
-Licence text:
-
-﻿The MIT License (MIT)
-
-Copyright (c) .NET Foundation and Contributors
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
 ### Licence text 31 — 2 components
 
 Components using this text:
@@ -10901,31 +10898,6 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
 Components using this text:
 
-  - entities 4.5.0
-  - entities 7.0.1
-
-Copyright notices:
-
-Copyright (c) Felix Böhm
-
-Licence text:
-
-Copyright (c) Felix Böhm
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-### Licence text 36 — 2 components
-
-Components using this text:
-
   - enumflags2 0.7.12
   - enumflags2_derive 0.7.12
 
@@ -11005,7 +10977,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-### Licence text 37 — 2 components
+### Licence text 36 — 2 components
 
 Components using this text:
 
@@ -11040,7 +11012,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-### Licence text 38 — 2 components
+### Licence text 37 — 2 components
 
 Components using this text:
 
@@ -11269,7 +11241,7 @@ prospectively choose to deem waived or otherwise exclude such Section(s) of
 the License, but only in their entirety and only with respect to the Combined
 Software.
 
-### Licence text 39 — 2 components
+### Licence text 38 — 2 components
 
 Components using this text:
 
@@ -11309,12 +11281,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### Licence text 40 — 2 components
+### Licence text 39 — 2 components
 
 Components using this text:
 
   - source-map 0.6.1
-  - source-map-js 1.2.1
+  - source-map-js 1.2.2
 
 Copyright notices:
 
@@ -11351,7 +11323,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### Licence text 41 — 2 components
+### Licence text 40 — 2 components
 
 Components using this text:
 
@@ -11389,7 +11361,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### Licence text 42 — 2 components
+### Licence text 41 — 2 components
 
 Components using this text:
 
@@ -11418,7 +11390,7 @@ freely, subject to the following restrictions:
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
-### Licence text 43 — 1 component
+### Licence text 42 — 1 component
 
 Components using this text:
 
@@ -11454,7 +11426,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### Licence text 44 — 1 component
+### Licence text 43 — 1 component
 
 Components using this text:
 
@@ -11488,7 +11460,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Licence text 45 — 1 component
+### Licence text 44 — 1 component
 
 Components using this text:
 
@@ -11524,7 +11496,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE.
 
-### Licence text 46 — 1 component
+### Licence text 45 — 1 component
 
 Components using this text:
 
@@ -11558,7 +11530,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-### Licence text 47 — 1 component
+### Licence text 46 — 1 component
 
 Components using this text:
 
@@ -11583,7 +11555,7 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
 AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-### Licence text 48 — 1 component
+### Licence text 47 — 1 component
 
 Components using this text:
 
@@ -11786,7 +11758,7 @@ Licence text:
    See the License for the specific language governing permissions and
    limitations under the License.
 
-### Licence text 49 — 1 component
+### Licence text 48 — 1 component
 
 Components using this text:
 
@@ -11856,7 +11828,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-### Licence text 50 — 1 component
+### Licence text 49 — 1 component
 
 Components using this text:
 
@@ -11878,7 +11850,7 @@ The above copyright notice and this permission notice (including the next paragr
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Licence text 51 — 1 component
+### Licence text 50 — 1 component
 
 Components using this text:
 
@@ -12131,7 +12103,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ~~~~
 
-### Licence text 52 — 1 component
+### Licence text 51 — 1 component
 
 Components using this text:
 
@@ -12166,7 +12138,7 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Licence text 53 — 1 component
+### Licence text 52 — 1 component
 
 Components using this text:
 
@@ -12782,7 +12754,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-### Licence text 54 — 1 component
+### Licence text 53 — 1 component
 
 Components using this text:
 
@@ -12822,7 +12794,7 @@ This project contains portions of code and architectural concepts originally
 derived from the "nipper" project (https://github.com/importcjj/nipper), 
 developed by Chen Jiaju, licensed under the MIT License and the Apache License 2.0 (dual licensed).
 
-### Licence text 55 — 1 component
+### Licence text 54 — 1 component
 
 Components using this text:
 
@@ -12895,7 +12867,7 @@ and labelled as such in comments in the individual source files. All
 have been licensed under extremely permissive terms.
 ------------------------------------------------------------------------------
 
-### Licence text 56 — 1 component
+### Licence text 55 — 1 component
 
 Components using this text:
 
@@ -13030,6 +13002,30 @@ express Statement of Purpose.
  d. Affirmer understands and acknowledges that Creative Commons is not a
     party to this document and has no duty or obligation with respect to
     this CC0 or use of the Work.
+
+### Licence text 56 — 1 component
+
+Components using this text:
+
+  - entities 7.0.1
+
+Copyright notices:
+
+Copyright (c) Felix Böhm
+
+Licence text:
+
+Copyright (c) Felix Böhm
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ### Licence text 57 — 1 component
 
@@ -15546,12 +15542,12 @@ or tag the package was built from where one is recorded.
 | Swashbuckle.AspNetCore.Swagger | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
 | Swashbuckle.AspNetCore.SwaggerGen | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
 | Swashbuckle.AspNetCore.SwaggerUI | 10.0.1 | nuget | `1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef` | https://raw.githubusercontent.com/domaindrivendev/Swashbuckle.AspNetCore/1d4a0e94ed7c5fdf6bfbbd70455d2afb4593beef/LICENSE |
-| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-MIT |
 | toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-APACHE |
-| toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-MIT |
+| toml_parser | 1.1.2+spec-1.1.0 | cargo | `toml_parser-v1.1.2` | https://raw.githubusercontent.com/toml-rs/toml/toml_parser-v1.1.2/LICENSE-MIT |
 | toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-APACHE |
-| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
+| toml_writer | 1.1.1+spec-1.1.0 | cargo | `toml_writer-v1.1.1` | https://raw.githubusercontent.com/toml-rs/toml/toml_writer-v1.1.1/LICENSE-MIT |
 | unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
+| unic-char-property | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-APACHE |
 | unic-char-range | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |
 | unic-common | 0.9.0 | cargo | `v0.9.0` | https://raw.githubusercontent.com/open-i18n/rust-unic/v0.9.0/LICENSE-MIT |

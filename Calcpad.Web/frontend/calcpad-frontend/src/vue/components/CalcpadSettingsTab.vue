@@ -1,26 +1,33 @@
 <template>
-  <div class="settings-tab">
+  <div ref="rootEl" class="settings-tab" :class="{ 'search-active': searchActive }">
     <div class="settings-toolbar">
-      <input
+      <CalcpadSearchField
         v-model="searchQuery"
-        type="text"
-        class="search-input"
-        placeholder="Search settings..."
+        class="settings-search"
+        :placeholder="t('Search settings...')"
       />
-      <button
-        class="toolbar-btn"
-        :title="allCollapsed ? 'Expand all' : 'Collapse all'"
-        @click="setAll(!allCollapsed)"
-      >
-        {{ allCollapsed ? 'Expand All' : 'Collapse All' }}
-      </button>
+      <CollapseAllButton v-if="!searchActive" :expand="allCollapsed" @click="setAll(!allCollapsed)" />
     </div>
 
     <div class="settings-container">
+      <section v-show="sectionVisible('language')" class="settings-section">
+        <h3 class="section-header" @click="toggle('language')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('language') }">&#x25BC;</span>
+          {{ t('Language') }}
+        </h3>
+        <div v-show="bodyVisible('language')" class="section-body">
+          <div class="setting-group">
+            <label for="uiLanguage">{{ t('Language:') }}</label>
+            <select id="uiLanguage" v-model="localeSetting" @change="changeLocale">
+              <option v-for="opt in LOCALE_OPTIONS" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
+            </select>
+          </div>
+        </div>
+      </section>
       <section v-show="sectionVisible('math')" class="settings-section">
         <h3 class="section-header" @click="toggle('math')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('math') }">&#x25BC;</span>
-          Math Settings
+          <CalcpadSearchHighlight :text="t('Math Settings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
           <div
@@ -35,13 +42,13 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               />
-              {{ spec.label }}
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <template v-else>
               <label :for="spec.key">
-                {{ spec.label }}:
-                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+                <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+                <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
               </label>
               <select
                 v-if="spec.type === 'enum'"
@@ -49,7 +56,7 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               >
-                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
               </select>
               <input
                 v-else-if="spec.type === 'number'"
@@ -78,7 +85,7 @@
       <section v-show="sectionVisible('plot')" class="settings-section">
         <h3 class="section-header" @click="toggle('plot')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('plot') }">&#x25BC;</span>
-          Plot Settings
+          <CalcpadSearchHighlight text="Plot Settings" :query="query" />
         </h3>
         <div v-show="bodyVisible('plot')" class="section-body">
           <div
@@ -89,13 +96,15 @@
           >
             <label>
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
-              {{ spec.label }}
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
           </div>
 
           <div v-show="rowVisible('plot', 'screenScale')" class="setting-group">
-            <label for="screenScaleFactor">Screen Scale Factor:</label>
+            <label for="screenScaleFactor">
+              <CalcpadSearchHighlight text="Screen Scale Factor:" :query="query" />
+            </label>
             <input
               id="screenScaleFactor"
               v-model.number="localSettings.plot.screenScaleFactor"
@@ -115,13 +124,13 @@
           >
             <label v-if="spec.type === 'boolean'">
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
-              {{ spec.label }}
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <template v-else>
               <label :for="spec.key">
-                {{ spec.label }}:
-                <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+                <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+                <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
               </label>
               <select
                 v-if="spec.type === 'enum'"
@@ -129,7 +138,7 @@
                 v-model="settingModel(spec.key).value"
                 @change="updateSettings"
               >
-                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
               </select>
               <input
                 v-else
@@ -142,7 +151,9 @@
           </div>
 
           <div v-show="rowVisible('plot', 'lightDirection')" class="setting-group">
-            <label for="lightDirection">Light Direction:</label>
+            <label for="lightDirection">
+              <CalcpadSearchHighlight text="Light Direction:" :query="query" />
+            </label>
             <select
               id="lightDirection"
               v-model="localSettings.plot.lightDirection"
@@ -166,8 +177,8 @@
             class="setting-group"
           >
             <label :for="spec.key">
-              {{ spec.label }}:
-              <span v-if="spec.detail" class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+              <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <input
               :id="spec.key"
@@ -186,12 +197,12 @@
       <section v-show="sectionVisible('units')" class="settings-section">
         <h3 class="section-header" @click="toggle('units')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('units') }">&#x25BC;</span>
-          Units
+          <CalcpadSearchHighlight text="Units" :query="query" />
         </h3>
         <div v-show="bodyVisible('units')" class="section-body">
           <div v-show="rowVisible('units', 'isUs')" class="setting-group">
             <label for="nonMetricUnits">
-              Non-Metric Units:
+              <CalcpadSearchHighlight text="Non-Metric Units:" :query="query" />
               <span class="setting-info" title="Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).">ⓘ</span>
             </label>
             <select
@@ -209,7 +220,7 @@
       <section v-show="sectionVisible('pdf')" class="settings-section">
         <h3 class="section-header" @click="toggle('pdf')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('pdf') }">&#x25BC;</span>
-          PDF Export
+          <CalcpadSearchHighlight text="PDF Export" :query="query" />
         </h3>
         <div v-show="bodyVisible('pdf')" class="section-body">
           <div
@@ -219,8 +230,8 @@
             class="setting-group"
           >
             <label :for="'pdf-' + spec.key">
-              {{ spec.label }}:
-              <span class="setting-info" :title="spec.detail">ⓘ</span>
+              <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
+              <span class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
             <select
               v-if="spec.type === 'boolean'"
@@ -237,7 +248,7 @@
               v-model="localPdfSettings[spec.key]"
               @change="updatePdfSettings"
             >
-              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <option v-for="opt in spec.options" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
             </select>
             <input
               v-else
@@ -253,8 +264,30 @@
 
           <div v-show="rowVisible('pdf', 'reset')" class="settings-actions">
             <button @click="resetPdfSettings" class="reset-button">
-              Reset PDF Settings
+              <CalcpadSearchHighlight text="Reset PDF Settings" :query="query" />
             </button>
+          </div>
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('user')" class="settings-section">
+        <h3 class="section-header" @click="toggle('user')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('user') }">&#x25BC;</span>
+          User
+        </h3>
+        <div v-show="bodyVisible('user')" class="section-body">
+          <div v-show="rowVisible('user', 'userName')" class="setting-group">
+            <label for="userName">
+              User Name:
+              <span class="setting-info" title="Recorded in a file's info (Info tab) as its author, who last updated it, and who reviewed it.">ⓘ</span>
+            </label>
+            <input
+              id="userName"
+              v-model="userName"
+              type="text"
+              placeholder="e.g. jsmith"
+              @change="updateUserName"
+            />
           </div>
         </div>
       </section>
@@ -262,7 +295,7 @@
       <section v-show="sectionVisible('editor')" class="settings-section">
         <h3 class="section-header" @click="toggle('editor')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('editor') }">&#x25BC;</span>
-          Editor
+          <CalcpadSearchHighlight text="Editor" :query="query" />
         </h3>
         <div v-show="bodyVisible('editor')" class="section-body">
           <div v-show="rowVisible('editor', 'quickTyping')" class="setting-group">
@@ -272,13 +305,15 @@
                 type="checkbox"
                 @change="updateQuickTyping"
               />
-              Enable Quick Typing
+              <CalcpadSearchHighlight text="Enable Quick Typing" :query="query" />
               <span class="setting-info" title="Type shortcuts like ~a → α, ~' → ′">ⓘ</span>
             </label>
           </div>
 
           <div v-show="rowVisible('editor', 'commentFormat')" class="setting-group">
-            <label for="commentFormat">Comment Format:</label>
+            <label for="commentFormat">
+              <CalcpadSearchHighlight text="Comment Format:" :query="query" />
+            </label>
             <select
               id="commentFormat"
               v-model="commentFormat"
@@ -297,7 +332,7 @@
                 type="checkbox"
                 @change="updateFormattingHotkeys"
               />
-              Enable Formatting Hotkeys
+              <CalcpadSearchHighlight text="Enable Formatting Hotkeys" :query="query" />
               <span class="setting-info" title="Ctrl+B for bold, Ctrl+I for italic, etc.">ⓘ</span>
             </label>
           </div>
@@ -309,7 +344,7 @@
                 type="checkbox"
                 @change="updatePreviewCursorSync"
               />
-              Sync Preview to Cursor Line
+              <CalcpadSearchHighlight text="Sync Preview to Cursor Line" :query="query" />
               <span class="setting-info" title="Scroll the preview to follow the line the cursor is on in the editor.">ⓘ</span>
             </label>
           </div>
@@ -321,7 +356,7 @@
                 type="checkbox"
                 @change="updateAutoRun"
               />
-              Auto-Run Preview
+              <CalcpadSearchHighlight text="Auto-Run Preview" :query="query" />
               <span class="setting-info" title="When off, the preview only re-renders when it is first opened or a manual run is triggered.">ⓘ</span>
             </label>
           </div>
@@ -333,7 +368,7 @@
                 type="checkbox"
                 @change="updateAutoInputMode"
               />
-              Open #UI Documents in Input Mode
+              <CalcpadSearchHighlight text="Open #UI Documents in Input Mode" :query="query" />
               <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it.">ⓘ</span>
             </label>
           </div>
@@ -345,14 +380,54 @@
                 type="checkbox"
                 @change="updatePreviewUiOverrides"
               />
-              Apply #UI Values in Preview
+              <CalcpadSearchHighlight text="Apply #UI Values in Preview" :query="query" />
               <span class="setting-info" title="Preview normally shows the document's own values. Turn this on to render it with the values entered into the input form instead, for tracking down an error that only appears once a form is filled in.">ⓘ</span>
             </label>
           </div>
 
+          <div v-show="rowVisible('editor', 'previewPdf')" class="setting-group">
+            <label>
+              <input
+                v-model="enablePreviewPdf"
+                type="checkbox"
+                @change="updatePreviewPdf"
+              />
+              <CalcpadSearchHighlight text="Render Preview as PDF" :query="query" />
+              <span class="setting-info" title="Preview and Report show the PDF export itself, with its exact pages, headers, and footers. Slower than the HTML preview.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-show="rowVisible('editor', 'showFileMetadata')" class="setting-group">
+            <label>
+              <input
+                v-model="showFileMetadata"
+                type="checkbox"
+                @change="updateShowFileMetadata"
+              />
+              <CalcpadSearchHighlight text="Show File Metadata" :query="query" />
+              <span class="setting-info" title="Show the file info and saved #UI values comments at the end of the file. They are hidden by default and edited in the Properties tab.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('editor', 'completionDelayMs')" class="setting-group">
+            <label for="completionDelayMs">
+              <CalcpadSearchHighlight text="Completion Delay (ms):" :query="query" />
+              <span class="setting-info" title="How long to wait before showing code suggestions while typing. Zero shows them immediately.">ⓘ</span>
+            </label>
+            <input
+              id="completionDelayMs"
+              v-model.number="completionDelayMs"
+              type="number"
+              min="0"
+              step="1"
+              required
+              @change="updateCompletionDelayMs"
+            />
+          </div>
+
           <div v-if="versionConfig.isDesktop" v-show="rowVisible('editor', 'fontFamily')" class="setting-group">
             <label for="editorFontFamily">
-              Font Family:
+              <CalcpadSearchHighlight text="Font Family:" :query="query" />
               <span class="setting-info" title="JuliaMono is the bundled default. Drop .woff2/.woff/.ttf/.otf files into the fonts folder to make them available here.">ⓘ</span>
             </label>
             <select
@@ -383,12 +458,14 @@
               title="Open the folder where custom fonts can be dropped. Reopen the Font Family picker to pick up new fonts."
               @click="openFontsFolder"
             >
-              Open Fonts Folder
+              <CalcpadSearchHighlight text="Open Fonts Folder" :query="query" />
             </button>
           </div>
 
           <div v-show="rowVisible('editor', 'previewTheme')" class="setting-group">
-            <label for="previewTheme">Preview Theme:</label>
+            <label for="previewTheme">
+              <CalcpadSearchHighlight text="Preview Theme:" :query="query" />
+            </label>
             <select
               id="previewTheme"
               v-model="previewTheme"
@@ -401,7 +478,9 @@
           </div>
 
           <div v-show="rowVisible('editor', 'darkBackground')" class="setting-group">
-            <label for="darkBackground">Dark Mode Background:</label>
+            <label for="darkBackground">
+              <CalcpadSearchHighlight text="Dark Mode Background:" :query="query" />
+            </label>
             <div class="color-input-row">
               <input
                 id="darkBackground"
@@ -411,7 +490,6 @@
                 @input="updateDarkBackground"
               />
               <button
-                class="reset-inline-btn"
                 title="Reset to default (#1e1e1e)"
                 @click="resetDarkBackground"
               >
@@ -421,7 +499,9 @@
           </div>
 
           <div v-show="rowVisible('editor', 'colorTheme')" class="setting-group">
-            <label for="colorTheme">Color Theme:</label>
+            <label for="colorTheme">
+              <CalcpadSearchHighlight text="Color Theme:" :query="query" />
+            </label>
             <select
               id="colorTheme"
               v-model="colorTheme"
@@ -431,7 +511,7 @@
                 v-if="colorTheme && !knownThemeLabels.has(colorTheme) && colorTheme !== 'System'"
                 :value="colorTheme"
               >{{ colorTheme }}</option>
-              <option value="System">System</option>
+              <option value="System">{{ t('System') }}</option>
               <optgroup v-if="darkThemes.length" label="Dark">
                 <option
                   v-for="t in darkThemes"
@@ -450,7 +530,9 @@
           </div>
 
           <div v-show="rowVisible('editor', 'linterMinSeverity')" class="setting-group">
-            <label for="linterMinSeverity">Linter Minimum Severity:</label>
+            <label for="linterMinSeverity">
+              <CalcpadSearchHighlight text="Linter Minimum Severity:" :query="query" />
+            </label>
             <select
               id="linterMinSeverity"
               v-model="linterMinSeverity"
@@ -464,14 +546,26 @@
         </div>
       </section>
 
+      <section v-show="sectionVisible('formatting')" class="settings-section">
+        <h3 class="section-header" @click="toggle('formatting')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('formatting') }">&#x25BC;</span>
+          <CalcpadSearchHighlight text="Formatting" :query="query" />
+        </h3>
+        <div v-show="bodyVisible('formatting')" class="section-body">
+          <slot name="formatting"></slot>
+        </div>
+      </section>
+
       <section v-show="sectionVisible('server')" class="settings-section">
         <h3 class="section-header" @click="toggle('server')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('server') }">&#x25BC;</span>
-          Server Settings
+          <CalcpadSearchHighlight text="Server Settings" :query="query" />
         </h3>
         <div v-show="bodyVisible('server')" class="section-body">
           <div v-show="rowVisible('server', 'url')" class="setting-group">
-            <label for="serverUrl">Remote Server URL:</label>
+            <label for="serverUrl">
+              <CalcpadSearchHighlight text="Remote Server URL:" :query="query" />
+            </label>
             <input
               id="serverUrl"
               v-model="localSettings.server.url"
@@ -485,7 +579,7 @@
       <section v-show="sectionVisible('diagnostics')" class="settings-section">
         <h3 class="section-header" @click="toggle('diagnostics')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('diagnostics') }">&#x25BC;</span>
-          Diagnostics
+          <CalcpadSearchHighlight text="Diagnostics" :query="query" />
         </h3>
         <div v-show="bodyVisible('diagnostics')" class="section-body">
           <div v-show="rowVisible('diagnostics', 'logsFolder')" class="setting-group">
@@ -494,13 +588,13 @@
               title="Opens the folder containing server logs and the most recent crash dump."
               @click="openLogsFolder"
             >
-              Open Logs Folder
+              <CalcpadSearchHighlight text="Open Logs Folder" :query="query" />
             </button>
           </div>
 
           <div v-show="rowVisible('diagnostics', 'logLevel')" class="setting-group">
             <label for="logLevel">
-              Log Level:
+              <CalcpadSearchHighlight text="Log Level:" :query="query" />
               <span class="setting-info" :title="logLevelDetail">&#9432;</span>
             </label>
             <select
@@ -512,13 +606,13 @@
                 v-for="opt in LOG_LEVEL_OPTIONS"
                 :key="opt.value"
                 :value="opt.value"
-              >{{ opt.label }}</option>
+              >{{ tt(opt.label) }}</option>
             </select>
           </div>
 
           <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('diagnostics', 'maxOutputLines')" class="setting-group">
             <label for="maxOutputLines">
-              Max Output Lines (per channel):
+              <CalcpadSearchHighlight text="Max Output Lines (per channel):" :query="query" />
               <span class="setting-info" title="Lines retained in each Output channel before older lines are dropped. Lower values reduce memory use and improve responsiveness when logs are noisy.">ⓘ</span>
             </label>
             <input
@@ -534,7 +628,7 @@
 
           <div v-show="rowVisible('diagnostics', 'maxPreviewSize')" class="setting-group">
             <label for="maxPreviewSize">
-              Max Preview Size (MB):
+              <CalcpadSearchHighlight text="Max Preview Size (MB):" :query="query" />
               <span class="setting-info" title="A worksheet that renders to more HTML than this is not shown in the preview — showing it risks running the app out of memory. Exporting to PDF, HTML or DOCX is unaffected. Raise it only if you need very large documents on screen.">ⓘ</span>
             </label>
             <input
@@ -550,7 +644,7 @@
 
           <div v-show="rowVisible('diagnostics', 'maxPreviewConsoleMessages')" class="setting-group">
             <label for="maxPreviewConsoleMessages">
-              Max Preview Console Messages:
+              <CalcpadSearchHighlight text="Max Preview Console Messages:" :query="query" />
               <span class="setting-info" title="How many console lines one preview render may relay before the rest are dropped. A worksheet whose scripts log in a loop can otherwise flood the console channel. Raise it when debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless.">ⓘ</span>
             </label>
             <input
@@ -569,11 +663,13 @@
       <section v-show="sectionVisible('configuration')" class="settings-section">
         <h3 class="section-header" @click="toggle('configuration')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('configuration') }">&#x25BC;</span>
-          Configuration
+          <CalcpadSearchHighlight text="Configuration" :query="query" />
         </h3>
         <div v-show="bodyVisible('configuration')" class="section-body">
           <div v-show="rowVisible('configuration', 'activeConfig')" class="setting-group">
-            <label for="activeConfig">Active Config:</label>
+            <label for="activeConfig">
+              <CalcpadSearchHighlight text="Active Config:" :query="query" />
+            </label>
             <select
               id="activeConfig"
               :value="activeConfig"
@@ -588,7 +684,9 @@
           </div>
 
           <div v-show="rowVisible('configuration', 'saveConfig')" class="setting-group">
-            <label for="configName">Save current settings as:</label>
+            <label for="configName">
+              <CalcpadSearchHighlight text="Save current settings as:" :query="query" />
+            </label>
             <div class="color-input-row">
               <input
                 id="configName"
@@ -598,7 +696,6 @@
                 @keyup.enter="saveNamedConfig"
               />
               <button
-                class="reset-inline-btn"
                 :disabled="!newConfigName.trim()"
                 @click="saveNamedConfig"
               >
@@ -610,10 +707,10 @@
 
           <div v-show="rowVisible('configuration', 'actions')" class="settings-actions">
             <button @click="openSettingsFolder" class="reset-button">
-              Open Settings Folder
+              <CalcpadSearchHighlight text="Open Settings Folder" :query="query" />
             </button>
             <button @click="resetSettings" class="reset-button">
-              Reset to Default
+              <CalcpadSearchHighlight text="Reset to Default" :query="query" />
             </button>
           </div>
         </div>
@@ -631,18 +728,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, reactive } from 'vue'
+import { ref, watch, computed, reactive, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+import CalcpadSearchField from './CalcpadSearchField.vue'
+import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
+import CollapseAllButton from './CollapseAllButton.vue'
 import type { WritableComputedRef } from 'vue'
 import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
 import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
-import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH, LOG_LEVEL_OPTIONS } from '../../types/settings'
+import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTINGS_PATH, LOG_LEVEL_OPTIONS, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
+import { LOCALE_OPTIONS, readLocaleSetting, resolveLocale, writeLocaleSetting, type LocaleSetting } from '../../i18n'
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   MAX_CONSOLE_MESSAGES_PER_DOCUMENT,
 } from '../../services/preview-limits'
+
+const { t, t: tt, locale } = useI18n()
+const localeSetting = ref<LocaleSetting>(readLocaleSetting())
+
+function changeLocale() {
+  writeLocaleSetting(localeSetting.value)
+  locale.value = resolveLocale(localeSetting.value)
+  document.documentElement.lang = locale.value
+}
 
 // Props
 interface Props {
@@ -657,6 +768,8 @@ interface Props {
   initialEnableAutoRun?: boolean
   initialEnableAutoInputMode?: boolean
   initialEnablePreviewUiOverrides?: boolean
+  initialEnablePreviewPdf?: boolean
+  initialShowFileMetadata?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialLogLevel?: string
@@ -667,7 +780,11 @@ interface Props {
   initialActiveConfig?: string
   initialAvailableConfigs?: string[]
   initialEditorFontFamily?: string
+  initialCompletionDelayMs?: number
   initialAvailableFonts?: string[]
+  initialUserName?: string
+  /** A setting to bring into view and focus, by its section and input id. */
+  focusRequest?: { section: string; id: string } | null
   appVersion?: string
   pdfSettings?: PdfSettings
 }
@@ -684,6 +801,8 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnableAutoRun: true,
   initialEnableAutoInputMode: true,
   initialEnablePreviewUiOverrides: false,
+  initialEnablePreviewPdf: false,
+  initialShowFileMetadata: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialLogLevel: 'warning',
@@ -694,7 +813,10 @@ const props = withDefaults(defineProps<Props>(), {
   initialActiveConfig: 'default',
   initialAvailableConfigs: () => ['default'],
   initialEditorFontFamily: 'JuliaMono',
+  initialCompletionDelayMs: DEFAULT_COMPLETION_DELAY_MS,
   initialAvailableFonts: () => [],
+  initialUserName: '',
+  focusRequest: null,
   appVersion: '',
   pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS })
 })
@@ -711,6 +833,8 @@ const emit = defineEmits<{
   updateAutoRun: [enabled: boolean]
   updateAutoInputMode: [enabled: boolean]
   updatePreviewUiOverrides: [enabled: boolean]
+  updatePreviewPdf: [enabled: boolean]
+  updateShowFileMetadata: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateLogLevel: [level: string]
@@ -725,6 +849,9 @@ const emit = defineEmits<{
   openFontsFolder: []
   refreshFonts: []
   updateEditorFontFamily: [family: string]
+  updateCompletionDelayMs: [delayMs: number]
+  updateUserName: [value: string]
+  focusHandled: []
   updatePdfSettings: [settings: PdfSettings]
   resetPdfSettings: []
 }>()
@@ -739,7 +866,7 @@ const localSettings = ref<Settings>({ ...props.settings })
 // #settings-directive counterpart and so stay hardcoded, to keep the visible
 // field order unchanged.
 const MATH_KEYS = [
-  'decimals', 'degrees', 'complex', 'substitute', 'formatEquations',
+  'decimals', 'degrees', 'returnAngleUnits', 'complex', 'substitute', 'formatEquations',
   'zeroSmallMatrixElements', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
 ].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
@@ -797,11 +924,13 @@ const enablePreviewCursorSync = ref(props.initialEnablePreviewCursorSync)
 const enableAutoRun = ref(props.initialEnableAutoRun)
 const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
 const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
+const enablePreviewPdf = ref(props.initialEnablePreviewPdf)
+const showFileMetadata = ref(props.initialShowFileMetadata)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const logLevel = ref(props.initialLogLevel)
 const logLevelDetail = computed(() =>
-  LOG_LEVEL_OPTIONS.find(o => o.value === logLevel.value)?.detail ?? ''
+  tt(LOG_LEVEL_OPTIONS.find(o => o.value === logLevel.value)?.detail ?? '')
 )
 const maxOutputLines = ref(props.initialMaxOutputLines)
 const maxPreviewSizeMB = ref(props.initialMaxPreviewSize)
@@ -809,7 +938,9 @@ const maxPreviewConsoleMessages = ref(props.initialMaxPreviewConsoleMessages)
 const activeConfig = ref(props.initialActiveConfig)
 const availableConfigs = ref<string[]>(props.initialAvailableConfigs)
 const editorFontFamily = ref(props.initialEditorFontFamily)
+const completionDelayMs = ref(props.initialCompletionDelayMs)
 const availableFonts = ref<string[]>(props.initialAvailableFonts)
+const userName = ref(props.initialUserName)
 const newConfigName = ref('')
 const saveError = ref('')
 
@@ -825,6 +956,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     rows: {
       decimals: 'decimals precision digits',
       degrees: 'angle units degrees radians gradians',
+      returnAngleUnits: 'return angle units inverse trig asin acos atan atan2 phase degrees radians',
       complex: 'complex numbers imaginary',
       substitute: 'substitute variables',
       formatEquations: 'format equations professional inline',
@@ -867,11 +999,17 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       marginRight: 'pdf right margin page',
       showPageNumbers: 'pdf page numbers footer',
       showDate: 'pdf date timestamp header',
-      documentTitle: 'pdf document title header',
+      showTitle: 'pdf document title header show hide',
       dateTimeFormat: 'pdf timestamp date time format',
       headerFooterLines: 'pdf header footer separator lines none both',
       lineColor: 'pdf line color separator header footer',
       reset: 'reset pdf settings default'
+    }
+  },
+  user: {
+    title: 'User',
+    rows: {
+      userName: 'user name username author reviewer file info'
     }
   },
   editor: {
@@ -884,13 +1022,20 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       autoRun: 'auto-run preview render',
       autoInputMode: 'auto input mode ui form first open',
       previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
+      previewPdf: 'render preview as pdf print preview pages viewer',
+      showFileMetadata: 'show hide file metadata info ui overrides comment footer',
       fontFamily: 'editor font family juliamono system',
+      completionDelayMs: 'completion delay autocomplete code suggestions milliseconds ms',
       fontsFolder: 'open fonts folder custom',
       previewTheme: 'preview theme system light dark',
       darkBackground: 'dark mode background color',
       colorTheme: 'color theme syntax',
       linterMinSeverity: 'linter minimum severity error warning information'
     }
+  },
+  formatting: {
+    title: 'Formatting',
+    rows: { prettify: 'prettify document auto indent style tab space spaces per level trim trailing whitespace' }
   },
   server: {
     title: 'Server Settings',
@@ -1034,6 +1179,14 @@ const updatePreviewUiOverrides = () => {
   emit('updatePreviewUiOverrides', enablePreviewUiOverrides.value)
 }
 
+const updatePreviewPdf = () => {
+  emit('updatePreviewPdf', enablePreviewPdf.value)
+}
+
+const updateShowFileMetadata = () => {
+  emit('updateShowFileMetadata', showFileMetadata.value)
+}
+
 const updateDarkBackground = () => {
   emit('updateDarkBackground', darkBackground.value)
 }
@@ -1115,6 +1268,16 @@ const updateEditorFontFamily = () => {
   emit('updateEditorFontFamily', editorFontFamily.value)
 }
 
+const updateCompletionDelayMs = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (input.reportValidity()) emit('updateCompletionDelayMs', input.valueAsNumber)
+}
+
+const updateUserName = () => {
+  userName.value = userName.value.trim()
+  emit('updateUserName', userName.value)
+}
+
 // Watch for prop changes
 watch(
   () => props.settings,
@@ -1190,6 +1353,20 @@ watch(
 )
 
 watch(
+  () => props.initialEnablePreviewPdf,
+  (newValue) => {
+    enablePreviewPdf.value = newValue
+  }
+)
+
+watch(
+  () => props.initialShowFileMetadata,
+  (newValue) => {
+    showFileMetadata.value = newValue
+  }
+)
+
+watch(
   () => props.initialEnableAutoRun,
   (newValue) => {
     enableAutoRun.value = newValue
@@ -1260,6 +1437,37 @@ watch(
 )
 
 watch(
+  () => props.initialCompletionDelayMs,
+  (delayMs) => {
+    completionDelayMs.value = delayMs
+  }
+)
+
+watch(
+  () => props.initialUserName,
+  (newValue) => {
+    userName.value = newValue
+  }
+)
+
+// A search or a collapsed section would otherwise leave the requested field hidden.
+const rootEl = ref<HTMLElement | null>(null)
+watch(
+  () => props.focusRequest,
+  async (request) => {
+    if (!request) return
+    searchQuery.value = ''
+    collapsed[request.section] = false
+    await nextTick()
+    const input = rootEl.value?.querySelector<HTMLElement>(`#${request.id}`)
+    input?.scrollIntoView({ block: 'center' })
+    input?.focus()
+    emit('focusHandled')
+  },
+  { immediate: true }
+)
+
+watch(
   () => props.initialAvailableFonts,
   (newValue) => {
     availableFonts.value = newValue
@@ -1285,6 +1493,7 @@ watch(
 
 .settings-toolbar {
   display: flex;
+  align-items: center;
   gap: 6px;
   padding: 12px;
   /* Pinned above .settings-container, which scrolls under it. */
@@ -1293,35 +1502,8 @@ watch(
   background: var(--vscode-editor-background);
 }
 
-.search-input {
+.settings-search {
   flex: 1;
-  padding: 8px;
-  background: var(--vscode-input-background);
-  border: 1px solid var(--vscode-input-border);
-  color: var(--vscode-input-foreground);
-  border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--vscode-focusBorder);
-}
-
-.toolbar-btn {
-  padding: 6px 10px;
-  background: var(--vscode-button-secondaryBackground);
-  border: 1px solid var(--vscode-button-border);
-  color: var(--vscode-button-secondaryForeground);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
-  white-space: nowrap;
-}
-
-.toolbar-btn:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .settings-container {
@@ -1337,7 +1519,6 @@ watch(
   gap: 6px;
   margin: 12px 0 8px 0;
   color: var(--vscode-sideBarSectionHeader-foreground);
-  font-size: var(--calcpad-font-size-lg);
   font-weight: bold;
   border-bottom: 1px solid var(--vscode-panel-border);
   padding-bottom: 4px;
@@ -1355,11 +1536,14 @@ watch(
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: var(--calcpad-font-size-sm);
 }
 
 .expand-icon.collapsed {
   transform: rotate(-90deg);
+}
+
+.search-active .expand-icon {
+  visibility: hidden;
 }
 
 .setting-group {
@@ -1369,7 +1553,6 @@ watch(
 .setting-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-input-foreground);
   font-weight: normal;
 }
@@ -1383,7 +1566,6 @@ watch(
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
 }
 
 .setting-group input[type="checkbox"] {
@@ -1408,24 +1590,8 @@ watch(
   flex: 1;
 }
 
-.reset-inline-btn {
-  padding: 6px 10px;
-  background: var(--vscode-button-secondaryBackground);
-  border: 1px solid var(--vscode-button-border);
-  color: var(--vscode-button-secondaryForeground);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
-  white-space: nowrap;
-}
-
-.reset-inline-btn:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
-}
-
 .setting-info {
   margin-left: 4px;
-  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   cursor: help;
 }
@@ -1438,13 +1604,7 @@ watch(
 .setting-error {
   display: block;
   margin-top: 4px;
-  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-errorForeground, #f48771);
-}
-
-.reset-inline-btn[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .settings-actions {
@@ -1460,37 +1620,14 @@ watch(
 
 .reset-button {
   width: 100%;
-  padding: 8px;
-  background: var(--vscode-button-secondaryBackground);
-  border: 1px solid var(--vscode-button-border);
-  color: var(--vscode-button-secondaryForeground);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
   margin-top: 16px;
-}
-
-.reset-button:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .diagnostics-button {
   width: 100%;
-  padding: 6px 10px;
-  background: var(--vscode-button-secondaryBackground);
-  border: 1px solid var(--vscode-button-border);
-  color: var(--vscode-button-secondaryForeground);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
-}
-
-.diagnostics-button:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
 }
 
 .app-version {
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
 }
 
@@ -1503,7 +1640,6 @@ watch(
 
 .no-results {
   padding: 16px 4px;
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
   text-align: center;
 }

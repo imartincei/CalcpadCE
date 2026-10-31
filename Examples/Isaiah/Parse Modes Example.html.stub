@@ -103,7 +103,7 @@ Hello from macro
    Still to check
   </li>
  </ul>
- <h3>Inputs</h3>
+ <h1>Inputs</h1>
  <p>
   <span class="eq">
    <var>G</var>
@@ -132,7 +132,7 @@ Hello from macro
    = 1.5
   </span>
  </p>
- <h3>Design load</h3>
+ <h1>Design load</h1>
  <p>
   <span class="eq">
    <var>E</var>

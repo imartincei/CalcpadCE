@@ -11,8 +11,8 @@ cubicRoots_1(a; Q; R) = $block{
 cubicRoots_3(a; Q; R) = $block{
   θ = acos(R/sqr(Q^3));
   x_1 = -2*sqr(Q)*cos(θ/3) - a/3;
-  x_2 = -2*sqr(Q)*cos((θ - 2*π)/3) - a/3;
-  x_3 = -2*sqr(Q)*cos((θ + 2*π)/3) - a/3;
+  x_2 = -2*sqr(Q)*cos((θ - 2*π*rad)/3) - a/3;
+  x_3 = -2*sqr(Q)*cos((θ + 2*π*rad)/3) - a/3;
   x = hp([x_1; x_2; x_3]);
 }
 cubicRoots(a; b; c) = $block{

@@ -638,6 +638,7 @@
    <b class="b0">[</b>
    0 0.524 0.785 1.05 1.57
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse sine
  </p>
@@ -653,6 +654,7 @@
    <b class="b0">[</b>
    1.57 1.05 0.785 0.524 0
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse cosine
  </p>
@@ -668,6 +670,7 @@
    <b class="b0">[</b>
    0 0.464 0.615 0.714 0.785
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse tangent
  </p>
@@ -688,6 +691,7 @@
    <b class="b0">[</b>
    1.57 1.05 0.785 0.524 0
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - the angle whose tangent is the quotient of y and x
  </p>
@@ -709,6 +713,7 @@
    <b class="b0">[</b>
    0 0.524 0.785 1.05 1.57
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse cosecant
  </p>
@@ -730,6 +735,7 @@
    <b class="b0">[</b>
    1.57 1.05 0.785 0.524 0
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse secant
  </p>
@@ -745,6 +751,7 @@
    <b class="b0">[</b>
    1.57 1.11 0.955 0.857 0.785
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   - inverse cotangent
  </p>

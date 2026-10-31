@@ -710,13 +710,21 @@
    )  =
    <b class="b0">[</b>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    0
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -747,13 +755,21 @@
    )  =
    <b class="b0">[</b>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    0
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -768,13 +784,21 @@
    )  =
    <b class="b0">[</b>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    1.57
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -805,13 +829,21 @@
    )  =
    <b class="b0">[</b>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    1.57
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <span class="err">Undefined</span>
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -825,7 +857,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
+   -1.29
+   <i>rad</i>
+   1.44
+   <i>rad</i>
+   1.34
+   <i>rad</i>
+   0.808
+   <i>rad</i>
+   0
+   <i>rad</i>
+   1.47
+   <i>rad</i>
+   -1.16
+   <i>rad</i>
+   1.42
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -855,7 +902,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
+   -1.29
+   <i>rad</i>
+   1.44
+   <i>rad</i>
+   1.34
+   <i>rad</i>
+   0.808
+   <i>rad</i>
+   0
+   <i>rad</i>
+   1.47
+   <i>rad</i>
+   -1.16
+   <i>rad</i>
+   1.42
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -869,7 +931,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
+   -0.278
+   <i>rad</i>
+   0.128
+   <i>rad</i>
+   0.231
+   <i>rad</i>
+   0.762
+   <i>rad</i>
+   1.57
+   <i>rad</i>
+   0.0997
+   <i>rad</i>
+   -0.41
+   <i>rad</i>
+   0.147
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -899,7 +976,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
+   -0.278
+   <i>rad</i>
+   0.128
+   <i>rad</i>
+   0.231
+   <i>rad</i>
+   0.762
+   <i>rad</i>
+   1.57
+   <i>rad</i>
+   0.0997
+   <i>rad</i>
+   -0.41
+   <i>rad</i>
+   0.147
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -913,9 +1005,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   1.86 1.44 1.33 0.301
+   1.86
+   <i>rad</i>
+   1.44
+   <i>rad</i>
+   1.33
+   <i>rad</i>
+   0.301
+   <i>rad</i>
    <span class="err">+∞</span>
-   1.47 2.02 1.42
+   <i>rad</i>
+   1.47
+   <i>rad</i>
+   2.02
+   <i>rad</i>
+   1.42
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -945,9 +1050,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   1.86 1.44 1.33 0.301
+   1.86
+   <i>rad</i>
+   1.44
+   <i>rad</i>
+   1.33
+   <i>rad</i>
+   0.301
+   <i>rad</i>
    <span class="err">+∞</span>
-   1.47 2.02 1.42
+   <i>rad</i>
+   1.47
+   <i>rad</i>
+   2.02
+   <i>rad</i>
+   1.42
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -961,9 +1079,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -0.29 0.129 0.238 1.27
+   -0.29
+   <i>rad</i>
+   0.129
+   <i>rad</i>
+   0.238
+   <i>rad</i>
+   1.27
+   <i>rad</i>
    <span class="err">+∞</span>
-   0.1 -0.45 0.149
+   <i>rad</i>
+   0.1
+   <i>rad</i>
+   -0.45
+   <i>rad</i>
+   0.149
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -993,9 +1124,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -0.29 0.129 0.238 1.27
+   -0.29
+   <i>rad</i>
+   0.129
+   <i>rad</i>
+   0.238
+   <i>rad</i>
+   1.27
+   <i>rad</i>
    <span class="err">+∞</span>
-   0.1 -0.45 0.149
+   <i>rad</i>
+   0.1
+   <i>rad</i>
+   -0.45
+   <i>rad</i>
+   0.149
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>
@@ -1014,7 +1158,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
+   -2.36
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.464
+   <i>rad</i>
+   0
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   -2.36
+   <i>rad</i>
+   0.785
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   ,
@@ -1053,7 +1212,22 @@
    </var>
    )  =
    <b class="b0">[</b>
-   -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
+   -2.36
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.464
+   <i>rad</i>
+   0
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   -2.36
+   <i>rad</i>
+   0.785
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
  </p>

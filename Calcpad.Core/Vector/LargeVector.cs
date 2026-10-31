@@ -6,6 +6,8 @@ namespace Calcpad.Core
     {
         private int _capacity;
         private int _length;
+        // Matrix rows are vectors, so reserving 1% per row costs n²/200 for a sparse n×n matrix.
+        private protected const int InitialCapacityLimit = 32;
 
         internal override RealValue this[int index]
         {
@@ -55,7 +57,7 @@ namespace Calcpad.Core
                 if (_length <= 10)
                     _capacity = _length;
                 else if (_capacity < _length / 100)
-                    _capacity = _length / 100;
+                    _capacity = Math.Max(_capacity, Math.Min(_length / 100, InitialCapacityLimit));
 
                 _values = new RealValue[_capacity];
             }

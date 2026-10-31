@@ -75,12 +75,12 @@ V_Rd_c = max(V_Rd_c_min;V_Rd_c_)'kN
 	#if V_Ed ≤ V_Rd_max_45
 		V_Ed'kN ≤'V_Rd_max_45'kN. The check is satisfied!
 		'Angle of concrete struts
-		θ_ = 0.5*asin(V_Ed/V_Rd_max_45)'°
+		θ_ = 0.5*asin(V_Ed/V_Rd_max_45)
 		'<p class="ref">(6.7N)</p>
 		'The angle is limited between 21,8° ≤ θ ≤ 45°(1 ≤ cot(θ) ≤ 2.5)
-		θ = max(21.8;min(θ_;45))'°
+		θ = max(21.8°;min(θ_;45°))
 		'<p class="ref">(6.9)</p>
-		'Bearing capacity check at'θ'°
+		'Bearing capacity check at'θ
 		V_Rd_max = α_cw*b*z*ν_1*f_cd/(cot(θ) + tan(θ))*10^-3'kN
 		'</div>
 		'Design check:'V_Ed'kN ≤'V_Rd_max'kN

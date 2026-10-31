@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import { DEFAULT_COMPLETION_DELAY_MS } from 'calcpad-frontend/types/settings';
 import { calcpadLanguageConfiguration, calcpadMonarchLanguage } from './language';
 import { calcpadDarkTheme, calcpadLightTheme } from './theme';
 
@@ -33,6 +34,7 @@ export interface CalcpadEditorOptions {
     fontSize?: number;
     fontFamily?: string;
     wordWrap?: 'on' | 'off';
+    completionDelayMs?: number;
 }
 
 const SYSTEM_FONT_STACK = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace";
@@ -81,6 +83,7 @@ export function createCalcpadEditor(
         value: options?.value ?? '',
         readOnly: options?.readOnly ?? false,
         automaticLayout: true,
+        fixedOverflowWidgets: true,
         minimap: { enabled: false },
         fontSize: options?.fontSize ?? 14,
         lineHeight: 22,
@@ -91,9 +94,7 @@ export function createCalcpadEditor(
         wordWrap: options?.wordWrap ?? 'on',
         tabSize: 4,
         insertSpaces: true,
-        // Rainbow bracket colorization clobbers the theme's `bracket` token
-        // color. VS Code extension disables it for the same reason.
-        bracketPairColorization: { enabled: false },
+        bracketPairColorization: { enabled: true },
         matchBrackets: 'always',
         'semanticHighlighting.enabled': true,
         // Match VS Code's default-but-flipped suggest behavior: Tab accepts
@@ -102,6 +103,7 @@ export function createCalcpadEditor(
         // surprises users who just want a newline.
         acceptSuggestionOnEnter: 'off',
         acceptSuggestionOnCommitCharacter: false,
+        quickSuggestionsDelay: options?.completionDelayMs ?? DEFAULT_COMPLETION_DELAY_MS,
         tabCompletion: 'on',
         // Calcpad source is full of Greek letters, math symbols, and other
         // non-ASCII glyphs — Monaco's unicode highlighter flags all of them.
@@ -110,6 +112,10 @@ export function createCalcpadEditor(
             invisibleCharacters: false,
             nonBasicASCII: false,
         },
+    });
+    container.classList.add('monaco-workbench');
+    editor.onDidDispose(() => {
+        container.classList.remove('monaco-workbench');
     });
     return editor;
 }

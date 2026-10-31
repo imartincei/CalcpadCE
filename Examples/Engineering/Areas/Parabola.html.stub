@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Area of a parabolic segment $A = \tfrac{2}{3} a\, h$ from chord length and height. -->
- <h3>Area and Arc Length of Parabolic Segment</h3>
+ <h1>Area and Arc Length of Parabolic Segment</h1>
  <div style="max-width:120mm;">
   <img alt="parabola.png" class="side" src="Images/math/area/parabola.png" style="height:60pt;"/>
  </div>

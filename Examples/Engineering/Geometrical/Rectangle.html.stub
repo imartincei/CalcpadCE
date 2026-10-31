@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a rectangle: area, $I_x = b h^3 / 12$, $I_y = h b^3 / 12$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Rectangle</h3>
+ <h1>Geometrical Properties of Rectangle</h1>
  <div style="max-width:120mm">
   <img alt="rectangle.png" class="side" src="Images/mechanics/sections/rectangle.png" style="height:150pt;"/>
  </div>

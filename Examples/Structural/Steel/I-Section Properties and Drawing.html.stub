@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Catalogue-driven variant of the I-section properties calculation: a single drop-down selector populates the dimensions and an SVG sketch of the chosen rolled section is rendered alongside the results. -->
- <h3>
+ <h1>
   Design of steel I-Section
   <hr/>
   <small>
@@ -8,7 +8,7 @@
    <strong>Eurocode</strong>
    : EN 1993-1-1
   </small>
- </h3>
+ </h1>
  <div style="max-width:150mm; padding-left:5mm; background:#f0f0ee; border: solid 1pt #e4e4e0; border-radius:6pt; box-shadow: 3pt 3pt 6pt rgba(0, 0, 0, 0.4)">
   <p>
   </p>

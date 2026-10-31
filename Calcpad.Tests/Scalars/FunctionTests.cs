@@ -654,7 +654,7 @@
         public void Phase_Minus_1()
         {
             var result = new TestCalc(new()).Run("phase(-1)");
-            Assert.Equal(Math.PI, result, Tol);
+            Assert.Equal(180d, result, Tol);
         }
         #endregion
 

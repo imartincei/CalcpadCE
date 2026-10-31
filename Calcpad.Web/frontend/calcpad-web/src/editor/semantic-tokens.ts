@@ -1,6 +1,11 @@
 import * as monaco from 'monaco-editor';
 import { CalcpadApiClient } from 'calcpad-frontend/api/client';
-import { SEMANTIC_TOKEN_TYPES, mapTokenTypeToIndex } from 'calcpad-frontend/services/highlight';
+import {
+    SEMANTIC_TOKEN_TYPES,
+    SEMANTIC_TOKEN_MODIFIERS,
+    mapTokenTypeToIndex,
+    getTokenModifiers,
+} from 'calcpad-frontend/services/highlight';
 import { truncateBase64Content } from 'calcpad-frontend/services/base64-truncate';
 import type { FileContextProvider } from './diagnostics';
 import { documentIdFor } from './document-id';
@@ -19,7 +24,7 @@ export function registerSemanticTokensProvider(
 ): SemanticTokensHandle {
     const legend = {
         tokenTypes: SEMANTIC_TOKEN_TYPES,
-        tokenModifiers: [] as string[],
+        tokenModifiers: SEMANTIC_TOKEN_MODIFIERS,
     };
     const changed = new monaco.Emitter<void>();
 
@@ -49,6 +54,7 @@ export function registerSemanticTokensProvider(
             // Encode as delta-encoded uint32 array per Monaco spec:
             // [deltaLine, deltaStartChar, length, tokenType, tokenModifiers]
             const data: number[] = [];
+            const lines = content.split(/\r?\n/);
             let prevLine = 0;
             let prevChar = 0;
 
@@ -62,7 +68,8 @@ export function registerSemanticTokensProvider(
                 const deltaLine = line - prevLine;
                 const deltaChar = deltaLine === 0 ? char - prevChar : char;
 
-                data.push(deltaLine, deltaChar, token.length, tokenTypeIndex, 0);
+                const modifiers = getTokenModifiers(token.typeId, lines[line]);
+                data.push(deltaLine, deltaChar, token.length, tokenTypeIndex, modifiers);
 
                 prevLine = line;
                 prevChar = char;

@@ -1,5 +1,5 @@
 <div class="calcpad-output">
- <h3>Scroll Anchoring Test - #UI with an asynchronously rendered drawing</h3>
+ <h1>Scroll Anchoring Test - #UI with an asynchronously rendered drawing</h1>
  <p>
   Every #UI edit re-renders the whole document. The drawing below is not part of that
   <p>render: its script imports a viewer from a CDN, draws to a canvas and only makes the</p>

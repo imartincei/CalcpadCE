@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a square rhombus (rotated square): area, $I_x = I_y$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Square Rhombus</h3>
+ <h1>Geometrical Properties of Square Rhombus</h1>
  <div style="max-width:120mm">
   <img alt="rombus-square.png" class="side" src="Images/mechanics/sections/rhombus.png" style="height:135pt;"/>
  </div>

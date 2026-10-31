@@ -47,6 +47,28 @@ jobs:
         shell: pwsh
         run: ./build-desktop.ps1
 
+      - name: Install WebView2 runtime
+        shell: pwsh
+        run: |
+          $runtimeKeys = @(
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+            'HKCU:\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          )
+          $runtime = Get-ItemProperty -Path $runtimeKeys -Name pv -ErrorAction SilentlyContinue |
+            Where-Object { $_.pv -and [version]$_.pv -gt [version]'0.0.0.0' }
+          if (-not $runtime) {
+            $installer = Join-Path $env:RUNNER_TEMP 'MicrosoftEdgeWebview2Setup.exe'
+            Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile $installer
+            $process = Start-Process -FilePath $installer -ArgumentList '/silent', '/install' -WindowStyle Hidden -Wait -PassThru
+            if ($process.ExitCode -ne 0) { throw "WebView2 installation failed: $($process.ExitCode)" }
+          }
+
+      - name: Run window regression tests
+        shell: pwsh
+        env:
+          CALCPAD_TEST_DESKTOP: Default
+        run: ./tools/desktop-test/window-tests.ps1
+
       - name: Test runtime prerequisites
         working-directory: Calcpad.Web/frontend/calcpad-desktop
         shell: powershell

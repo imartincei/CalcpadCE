@@ -2,7 +2,7 @@
  <script src="https://code.jquery.com/jquery-3.6.3.min.js">
  </script>
  <!-- Same tapered steel pole as the static variant, with the lower mode shapes animated in pure SVG by frame switching driven by a small inline jQuery script. -->
- <h3>Free vibrations of steel pole with variable cross-section of arbitrary shape</h3>
+ <h1>Free vibrations of steel pole with variable cross-section of arbitrary shape</h1>
  <hr/>
  <h3>Static scheme</h3>
  <p>

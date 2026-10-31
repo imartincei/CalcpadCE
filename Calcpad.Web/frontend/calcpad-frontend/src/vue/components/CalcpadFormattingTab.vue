@@ -1,21 +1,19 @@
 <template>
   <div class="formatting-tab">
     <div class="formatting-container p-3">
-      <h3 class="section-title">Prettify</h3>
-      <p class="section-desc">
-        Auto-indents the active document. Content is not modified outside of whitespace.
-      </p>
+      <h3 class="section-title">{{ t('Prettify') }}</h3>
+      <p class="section-desc">{{ t('Auto-indents the active document. Content is not modified outside of whitespace.') }}</p>
 
-      <div class="form-row">
-        <label for="indentStyle">Indent style</label>
+      <div class="setting-group">
+        <label for="indentStyle">{{ t('Indent style:') }}</label>
         <select id="indentStyle" :value="indentStyle" @change="onIndentStyleChange">
-          <option value="tab">Tab</option>
-          <option value="space">Space</option>
+          <option value="tab">{{ t('Tab') }}</option>
+          <option value="space">{{ t('Space') }}</option>
         </select>
       </div>
 
-      <div class="form-row" v-if="indentStyle === 'space'">
-        <label for="indentSize">Spaces per level</label>
+      <div class="setting-group" v-if="indentStyle === 'space'">
+        <label for="indentSize">{{ t('Spaces per level:') }}</label>
         <input
           id="indentSize"
           type="number"
@@ -26,20 +24,18 @@
         />
       </div>
 
-      <div class="form-row">
-        <label class="checkbox-label">
+      <div class="setting-group">
+        <label>
           <input
             type="checkbox"
             :checked="trimTrailingWhitespace"
             @change="onTrimChange"
-          />
-          Trim trailing whitespace
-        </label>
+          />{{ t('Trim trailing whitespace') }}</label>
       </div>
 
       <div class="actions">
-        <button class="primary-button" @click="onPrettify">
-          Prettify Document
+        <button @click="onPrettify" :disabled="sourceUnavailable" :title="sourceUnavailable ? t('Unavailable in input mode') : undefined">
+          {{ t('Prettify Document') }}
         </button>
       </div>
     </div>
@@ -47,13 +43,18 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 interface Props {
+  sourceUnavailable?: boolean
   indentStyle?: 'tab' | 'space'
   indentSize?: number
   trimTrailingWhitespace?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
+  sourceUnavailable: false,
   indentStyle: 'tab',
   indentSize: 4,
   trimTrailingWhitespace: true
@@ -89,7 +90,6 @@ function onPrettify() {
 
 <style scoped>
 .formatting-tab {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -97,18 +97,16 @@ function onPrettify() {
 .formatting-container {
   overflow-y: auto;
   flex: 1;
-  padding: 12px;
+  padding: 0;
 }
 
 .section-title {
   margin: 0 0 8px 0;
-  font-size: var(--calcpad-font-size-lg);
   font-weight: 600;
   color: var(--vscode-foreground);
 }
 
 .section-desc {
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
   margin: 0 0 16px 0;
   line-height: 1.5;
@@ -118,65 +116,10 @@ function onPrettify() {
   background: var(--vscode-textCodeBlock-background);
   padding: 1px 4px;
   border-radius: 2px;
-  font-size: var(--calcpad-font-size-sm);
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  font-size: var(--calcpad-font-size-md);
-  color: var(--vscode-foreground);
-}
-
-.form-row label {
-  min-width: 140px;
-}
-
-.form-row select,
-.form-row input[type="number"] {
-  background: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, transparent);
-  padding: 4px 6px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-  border-radius: 2px;
-}
-
-.form-row input[type="number"] {
-  width: 70px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  min-width: 0;
-}
-
-.checkbox-label input[type="checkbox"] {
-  margin: 0;
 }
 
 .actions {
   margin-top: 8px;
 }
 
-.primary-button {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  padding: 6px 14px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.primary-button:hover {
-  background: var(--vscode-button-hoverBackground);
-}
 </style>

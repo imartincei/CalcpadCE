@@ -7,7 +7,7 @@ It shows what your document defines, lets you insert symbols and snippets, contr
 Because every CalcpadCE frontend embeds the same panel, the tabs and settings are identical everywhere; only how you open it differs:
 
 * **VS Code** — click the **CalcpadCE** icon in the activity bar. The view title bar has buttons to refresh and stop the background calculation engine.
-* **Desktop app** — **View → Toggle Sidebar**.
+* **Desktop app** — press **Ctrl+Shift+B** or use the sidebar reveal button.
 
 ## Panel tabs
 
@@ -17,15 +17,15 @@ The **CalcpadCE** view is organized into tabs:
 | --- | ------------ |
 | **Insert** | Searchable palette of symbols, built-in functions, and snippets. Click an item to insert it at the cursor. Includes an **Insert Image** button and a Symbol Palette. |
 | **TOC** | Live table of contents built from your document headings. Click a heading to jump to that line. |
-| **Settings** | All calculation, plot, unit, PDF export, theme, editor, and linter settings, plus named configurations. See [Settings Documentation](new-settings.md). |
+| **Settings** | All calculation, plot, unit, PDF export, theme, editor, formatting, and linter settings, plus named configurations. See [Settings Documentation](new-settings.md). |
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
 | **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. Also allows editing #UI JSON, #settings JSON, and the UI Overrides line. |
-| **Formatting** | Prettify options and the **Prettify Document** button. |
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports and the portable formats. See  [Exports Documentation](new-exports.md). |
 | **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
-While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Formatting**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
+While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
 **TOC**, **Settings**, and **Export** stay available.
+**Prettify Document** is disabled in input mode.
 
 ### Insert
 
@@ -62,7 +62,7 @@ While a [`#UI` input form](new-ui-mode.md) is open and there is no editor to scr
 
 ### Formatting (Prettify)
 
-Controls the **Prettify Document** command, which reformats the active file:
+Open **Settings → Formatting** to use the **Prettify Document** command, which reformats the active file:
 
 * **Indent style** — Tab or Space
 * **Spaces per level** — used when the indent style is Space

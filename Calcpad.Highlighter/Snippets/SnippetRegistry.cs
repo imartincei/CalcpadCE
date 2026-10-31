@@ -20,7 +20,7 @@ namespace Calcpad.Highlighter.Snippets
         /// <summary>
         /// All available snippets combined from all categories.
         /// </summary>
-        public static readonly FrozenSet<SnippetItem> AllSnippets;
+        public static readonly SnippetItem[] AllSnippets;
 
         /// <summary>
         /// Snippets grouped by their top-level category.
@@ -61,7 +61,7 @@ namespace Calcpad.Highlighter.Snippets
             allItems.AddRange(MarkdownSnippets.Items);
             allItems.AddRange(SymbolSnippets.Items);
 
-            AllSnippets = allItems.ToFrozenSet();
+            AllSnippets = allItems.ToArray();
 
             // Group by top-level category
             ByCategory = allItems

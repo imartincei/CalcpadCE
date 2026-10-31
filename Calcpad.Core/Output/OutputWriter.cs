@@ -86,7 +86,7 @@ namespace Calcpad.Core
                 if (c.IsWhitespace())
                     continue;
 
-                if (c == '·')
+                if (c is '·' or '×')
                     c = '*';
 
                 switch (c)
@@ -224,11 +224,14 @@ namespace Calcpad.Core
             }
         }
 
+        protected static string MultiplySymbol =>
+            CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "zh" ? "×" : "·";
+
         protected static string FormatOperatorHelper(char c) => c switch
         {
             Calculator.NegChar => "-",
             '-' => " − ",
-            '*' => "·",
+            '*' => MultiplySymbol,
             '/' => "/",
             '÷' => "/",
             '<' => " < ",

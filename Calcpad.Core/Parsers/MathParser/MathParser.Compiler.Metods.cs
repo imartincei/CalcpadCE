@@ -31,12 +31,6 @@ namespace Calcpad.Core
                     BindingFlags.Static | BindingFlags.NonPublic
                 );
 
-            private static readonly MethodInfo EvaluatePhasorMethod =
-                typeof(ComplexCalculator).GetMethod(
-                    nameof(ComplexCalculator.EvaluateOperator),
-                    BindingFlags.Static | BindingFlags.NonPublic
-                );
-
             private static readonly MethodInfo EvaluateFunction2Method =
                 typeof(IValue).GetMethod(
                     nameof(IValue.EvaluateFunction2),
@@ -189,6 +183,12 @@ namespace Calcpad.Core
                 typeof(Exceptions).GetMethod(
                     nameof(Exceptions.InfiniteLoop),
                     BindingFlags.Static | BindingFlags.NonPublic
+                );
+
+            private static readonly MethodInfo GetVariableValueMethod =
+                typeof(Evaluator).GetMethod(
+                    nameof(Evaluator.GetVariableValue),
+                    BindingFlags.Instance | BindingFlags.NonPublic
                 );
 
             private static readonly MethodInfo LuDecompositionMethod =

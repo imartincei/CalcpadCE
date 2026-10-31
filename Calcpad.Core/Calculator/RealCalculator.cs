@@ -141,7 +141,7 @@ namespace Calcpad.Core
 
         private static RealValue Real(in RealValue value) => value;
         private static RealValue Imaginary(in RealValue _) => RealValue.Zero;
-        private static RealValue Phase(in RealValue value) => new(value.D >= 0d ? 0d : Math.PI);
+        private RealValue Phase(in RealValue value) => ToAngleUnits(value.D >= 0d ? 0d : Math.PI);
         internal static RealValue Abs(in RealValue value) => new(Math.Abs(value.D), value.Units);
         private static RealValue Sign(in RealValue value) => double.IsNaN(value.D) ? RealValue.NaN : new(Math.Sign(value.D));
 
@@ -239,7 +239,7 @@ namespace Calcpad.Core
         {
             CheckTrigFunctionUnits("acsc", value.Units);
             return value.D == 0d ?
-                RealValue.PositiveInfinity :
+                ToAngleUnits(double.PositiveInfinity) :
                 ToAngleUnits(Math.Asin(1d / value.D));
         }
 
@@ -247,7 +247,7 @@ namespace Calcpad.Core
         {
             CheckTrigFunctionUnits("asec", value.Units);
             return value.D == 0d ?
-                RealValue.PositiveInfinity :
+                ToAngleUnits(double.PositiveInfinity) :
                 ToAngleUnits(Math.Acos(1d / value.D));
         }
 

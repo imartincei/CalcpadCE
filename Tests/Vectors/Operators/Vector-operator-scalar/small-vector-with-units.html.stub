@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <h1>Arithmetic operators</h1>
- <h3>Addition</h3>
+ <h1>Addition</h1>
  <p>
   <span class="eq">
    <var>
@@ -340,7 +340,7 @@
  </p>
  <p>
  </p>
- <h3>Subtraction</h3>
+ <h1>Subtraction</h1>
  <p>
   <span class="eq">
    <var>
@@ -688,7 +688,7 @@
  </p>
  <p>
  </p>
- <h3>Multiplication</h3>
+ <h1>Multiplication</h1>
  <p>
   <span class="eq">
    <var>
@@ -1096,7 +1096,7 @@
  </p>
  <p>
  </p>
- <h3>Division</h3>
+ <h1>Division</h1>
  <p>
   <span class="eq">
    <var>
@@ -1414,7 +1414,7 @@
  </p>
  <p>
  </p>
- <h3>Exponentiation</h3>
+ <h1>Exponentiation</h1>
  <p>
   <span class="eq">
    <var>
@@ -1662,7 +1662,7 @@
  </p>
  <p>
  </p>
- <h3>Division bar</h3>
+ <h1>Division bar</h1>
  <p>
   <span class="eq">
    <var>
@@ -2147,7 +2147,7 @@
  </p>
  <p>
  </p>
- <h3>Integer division</h3>
+ <h1>Integer division</h1>
  <p>
   <span class="eq">
    <var>
@@ -2540,7 +2540,7 @@
  </p>
  <p>
  </p>
- <h3>Modulo (remainder)</h3>
+ <h1>Modulo (remainder)</h1>
  <p>
   <span class="eq">
    <var>
@@ -2897,7 +2897,7 @@
  </p>
  <p>
  </p>
- <h3>Factorial</h3>
+ <h1>Factorial</h1>
  <p>
   <span class="eq">
    <var>
@@ -3051,7 +3051,7 @@
  <p>
  </p>
  <h1>Relational operators</h1>
- <h3>Equal to</h3>
+ <h1>Equal to</h1>
  <p>
   <span class="eq">
    <var>
@@ -3370,7 +3370,7 @@
  </p>
  <p>
  </p>
- <h3>Not equal to</h3>
+ <h1>Not equal to</h1>
  <p>
   <span class="eq">
    <var>
@@ -3689,7 +3689,7 @@
  </p>
  <p>
  </p>
- <h3>Less than</h3>
+ <h1>Less than</h1>
  <p>
   <span class="eq">
    <var>
@@ -4020,7 +4020,7 @@
  </p>
  <p>
  </p>
- <h3>Greater than</h3>
+ <h1>Greater than</h1>
  <p>
   <span class="eq">
    <var>
@@ -4356,7 +4356,7 @@
  </p>
  <p>
  </p>
- <h3>Less than or equal</h3>
+ <h1>Less than or equal</h1>
  <p>
   <span class="eq">
    <var>
@@ -4697,7 +4697,7 @@
  </p>
  <p>
  </p>
- <h3>Greater than or equal</h3>
+ <h1>Greater than or equal</h1>
  <p>
   <span class="eq">
    <var>
@@ -5026,7 +5026,7 @@
  <p>
  </p>
  <h1>Logical operators</h1>
- <h3>Logical AND</h3>
+ <h1>Logical AND</h1>
  <p>
   <span class="eq">
    <var>
@@ -5350,7 +5350,7 @@
  </p>
  <p>
  </p>
- <h3>Logical OR</h3>
+ <h1>Logical OR</h1>
  <p>
   <span class="eq">
    <var>
@@ -5697,7 +5697,7 @@
  </p>
  <p>
  </p>
- <h3>Logical XOR</h3>
+ <h1>Logical XOR</h1>
  <p>
   <span class="eq">
    <var>
@@ -6038,7 +6038,7 @@
  </p>
  <p>
  </p>
- <h3>Assignment</h3>
+ <h1>Assignment</h1>
  <p>
   <span class="eq">
    <var>

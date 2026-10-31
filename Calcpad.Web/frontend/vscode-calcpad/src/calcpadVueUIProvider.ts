@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper } from 'calcpad-frontend';
-import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits } from 'calcpad-frontend';
+import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -12,6 +12,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'calcpadVueUI';
 
     private _view?: vscode.WebviewView;
+    private _webviewReady = false;
+    private _pendingInsertSearch = false;
     private _outputChannel: VSCodeLogger;
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
@@ -34,6 +36,12 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public resolveUiControls?: () => Promise<UiControl[] | null>;
     /** Entered #UI values the panel rewrote, so the extension's in-memory ones follow. */
     public onUiOverridesEdited?: (documentUri: string, overrides: Record<string, string>) => void;
+    public onShowFileMetadataChanged?: () => void;
+    /** The compiled worksheet being worked in, which has no text editor for the Properties tab to read. */
+    public getCompiledSource?: () => { uri: vscode.Uri; text: string } | undefined;
+    public updateCompiledFileInfo?: (uri: vscode.Uri, patch: unknown) => void;
+    /** Saves a compiled worksheet with unsaved changes; false when it couldn't be saved. */
+    public saveCompiled?: (uri: vscode.Uri) => Promise<boolean>;
 
     /** Parse mode at a document line. Set by the extension, so the server cache is used first. */
     public getParseMode?: (document: vscode.TextDocument, line: number) => ParseMode;
@@ -60,6 +68,14 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         _token: vscode.CancellationToken,
     ) {
         this._view = webviewView;
+        this._webviewReady = false;
+        webviewView.onDidChangeVisibility(() => {
+            if (!webviewView.visible) this._webviewReady = false;
+        });
+        webviewView.onDidDispose(() => {
+            this._view = undefined;
+            this._webviewReady = false;
+        });
         this._outputChannel.appendLine('Resolving Vue webview view', 'verbose');
 
         webviewView.webview.options = {
@@ -78,7 +94,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             this._outputChannel.appendLine(`Received message: ${data.type}`, 'verbose');
             switch (data.type) {
                 case 'insertText': {
-                    const insertEditor = vscode.window.activeTextEditor;
+                    const insertEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
                     if (insertEditor) {
                         const position = insertEditor.selection.active;
                         // Markup snippets are written for Calcpad mode; an #html/#markdown
@@ -88,6 +104,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                         await insertEditor.edit(editBuilder => {
                             editBuilder.insert(position, text);
                         });
+                        await vscode.window.showTextDocument(insertEditor.document, insertEditor.viewColumn);
                     }
                     break;
                 }
@@ -178,10 +195,20 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     this._settingsManager.setExtra('autoInputMode', data.enabled);
                     break;
 
+                case 'updateShowFileMetadata':
+                    this._settingsManager.setExtra('showFileMetadata', !!data.enabled);
+                    this.onShowFileMetadataChanged?.();
+                    break;
+
                 // Changes what an open preview renders, so it is re-run rather than
                 // left showing the values the previous setting asked for.
                 case 'updatePreviewUiOverrides':
                     this._settingsManager.setExtra('previewUiOverrides', data.enabled);
+                    void this.onSettingsChanged?.();
+                    break;
+
+                case 'updatePreviewPdf':
+                    this._settingsManager.setExtra('previewPdf', !!data.enabled);
                     void this.onSettingsChanged?.();
                     break;
 
@@ -299,6 +326,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 case 'getInsertData':
+                    this._webviewReady = true;
+                    if (this._pendingInsertSearch) this.focusInsertSearch();
                     this._sendInitialData();
                     break;
 
@@ -390,6 +419,26 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateMetadata':
                     await this._handleUpdateMetadata(data);
+                    break;
+
+                case 'getDocumentMetadata':
+                    this.refreshDocumentMetadata();
+                    break;
+
+                case 'updateFileInfo':
+                    await this._handleUpdateFileInfo(data.patch);
+                    break;
+
+                case 'updateUiOverrides':
+                    await this._handleUpdateUiOverrides(data.overrides);
+                    break;
+
+                case 'markFileReviewed':
+                    await this._markFileReviewed();
+                    break;
+
+                case 'updateUserName':
+                    this._settingsManager.setExtra('userName', String(data.value ?? '').trim());
                     break;
 
                 case 'getUiControls':
@@ -485,6 +534,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enableAutoRun: sm.getExtraBool('autoRun', true),
             enableAutoInputMode: sm.getExtraBool('autoInputMode', true),
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
+            enablePreviewPdf: sm.getExtraBool('previewPdf', false),
+            showFileMetadata: sm.getExtraBool('showFileMetadata', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
             logLevel: coerceLogLevel(sm.getExtra('logLevel', 'warning')),
@@ -492,6 +543,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             maxPreviewSizeMB: sm.getExtraNumber('maxPreviewSizeMB', DEFAULT_PREVIEW_SIZE_MB),
             maxPreviewConsoleMessages: sm.getExtraNumber(
                 'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT),
+            userName: sm.getExtra('userName', ''),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };
@@ -602,6 +654,93 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'metadataContext', block });
     }
 
+    /** Push the source editor's file info and saved #UI values to the Properties tab. */
+    public refreshDocumentMetadata() {
+        const compiled = this.getCompiledSource?.();
+        const document = compiled ? undefined : this._calcpadSourceEditor()?.document;
+        const text = compiled?.text ?? document?.getText();
+        this._view?.webview.postMessage({
+            type: 'documentMetadata',
+            info: text !== undefined ? readFileInfo(text.split(/\r?\n/)) : null,
+            uiOverrides: text !== undefined ? readUiOverrides(text) ?? {} : {},
+            hasDocument: text !== undefined,
+            docKey: (compiled?.uri ?? document?.uri)?.toString() ?? '',
+        });
+    }
+
+    private _calcpadSourceEditor(): vscode.TextEditor | undefined {
+        const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+        return editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')
+            ? editor
+            : undefined;
+    }
+
+    private async _applyFooterEdits(editor: vscode.TextEditor, edits: LineEdit[]): Promise<void> {
+        if (!edits.length) return;
+        const document = editor.document;
+        const eol = document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+        const ranges = toRangeEdits(edits, document.lineCount, i => document.lineAt(i).text.length, eol);
+        await editor.edit(editBuilder => {
+            for (const r of ranges)
+                editBuilder.replace(new vscode.Range(r.startLine, r.startCharacter, r.endLine, r.endCharacter), r.text);
+        });
+    }
+
+    /** Writes the Properties tab's saved #UI values into the footer, and hands them to the in-memory store. */
+    private async _handleUpdateUiOverrides(raw: unknown): Promise<void> {
+        const editor = this.getCompiledSource?.() ? undefined : this._calcpadSourceEditor();
+        if (!editor || !raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+        const overrides = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, String(v)]));
+        await this._applyFooterEdits(editor, planMetadataFooter(editor.document.getText().split(/\r?\n/), { uiOverrides: overrides }));
+        this.onUiOverridesEdited?.(editor.document.uri.toString(), overrides);
+        this.refreshDocumentMetadata();
+    }
+
+    /** Applies the Properties tab's file-info edit; a document without one has nothing to edit yet. */
+    private async _handleUpdateFileInfo(patch: unknown): Promise<void> {
+        const compiled = this.getCompiledSource?.();
+        if (compiled) {
+            this.updateCompiledFileInfo?.(compiled.uri, patch);
+            this.refreshDocumentMetadata();
+            return;
+        }
+        const editor = this._calcpadSourceEditor();
+        if (!editor) return;
+        const document = editor.document;
+        const lines = document.getText().split(/\r?\n/);
+        const current = readFileInfo(lines);
+        if (!current) return;
+
+        await this._applyFooterEdits(editor, planFileInfoEdit(lines, { ...current, ...sanitizeFileInfoPatch(patch) }));
+        this.refreshDocumentMetadata();
+    }
+
+    /**
+     * Records the user as reviewer and saves. Pending edits are saved first, so the review
+     * is dated after them and its own save, changing nothing else, leaves last-updated alone.
+     */
+    private async _markFileReviewed(): Promise<void> {
+        const userName = this._settingsManager.getExtra('userName', '');
+        if (!userName) return;
+        const review = () => ({ reviewedBy: userName, reviewedAt: new Date().toISOString() });
+
+        const compiled = this.getCompiledSource?.();
+        if (compiled) {
+            if (!await this.saveCompiled?.(compiled.uri)) return;
+            this.updateCompiledFileInfo?.(compiled.uri, review());
+            await this.saveCompiled?.(compiled.uri);
+            this.refreshDocumentMetadata();
+            return;
+        }
+
+        const document = this._calcpadSourceEditor()?.document;
+        if (!document) return;
+        if (document.isDirty && !await document.save()) return;
+        await this._handleUpdateFileInfo(review());
+        await document.save();
+        this.refreshDocumentMetadata();
+    }
+
     /** Tell the panel to drop a document's unapplied Properties form. */
     public discardMetadataDraft(docKey: string) {
         this._view?.webview.postMessage({ type: 'metadataDraftDiscard', docKey });
@@ -633,6 +772,15 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     /** Ask the panel to switch to a given tab id. */
     public focusTab(tab: string) {
         this._view?.webview.postMessage({ type: 'focusTab', tab });
+    }
+
+    public focusInsertSearch(): void {
+        this._pendingInsertSearch = true;
+        this._view?.show(false);
+        if (this._webviewReady) {
+            this._view!.webview.postMessage({ type: 'focusInsertSearch' });
+            this._pendingInsertSearch = false;
+        }
     }
 
     /**
@@ -795,7 +943,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
     <div id="app">
-        <div style="padding: 20px; text-align: center; color: var(--vscode-descriptionForeground); font-size: var(--calcpad-font-size-md);">
+        <div style="padding: 20px; text-align: center; color: var(--vscode-descriptionForeground);">
             Loading Vue.js CalcpadCE UI...
             <br><small>If this message persists, check the developer console for errors</small>
         </div>

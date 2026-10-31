@@ -419,7 +419,7 @@
    </span>
   </span>
  </p>
- <h3>For matrix multiplication we need to make m2 a row</h3>
+ <h1>For matrix multiplication we need to make m2 a row</h1>
  <p>
   <span class="eq">
    <b>
@@ -1002,7 +1002,7 @@
    </span>
   </span>
  </p>
- <h3>Exponentiation and the remainder operators must be without a unit. Therefore we need to define an unitless matrix</h3>
+ <h1>Exponentiation and the remainder operators must be without a unit. Therefore we need to define an unitless matrix</h1>
  <p>
   <span class="eq">
    <b>

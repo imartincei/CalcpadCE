@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a rhombus from its two diagonals: area, $I_x$, $I_y$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Rhombus</h3>
+ <h1>Geometrical Properties of Rhombus</h1>
  <div style="max-width:130mm">
   <img alt="rombus.png" class="side" src="Images/mechanics/sections/rhombus.png" style="height:135pt;"/>
  </div>

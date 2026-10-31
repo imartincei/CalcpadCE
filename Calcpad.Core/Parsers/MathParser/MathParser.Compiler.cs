@@ -14,7 +14,7 @@ namespace Calcpad.Core
             private readonly MathParser _parser;
             private readonly Container<CustomFunction> _functions;
             private readonly List<SolverBlock> _solveBlocks;
-            private readonly Calculator _calc;
+            private Calculator _calc => _parser._calc;
             private readonly MatrixCalculator _matrixCalc;
             private bool _allowAssignment;
 
@@ -24,7 +24,6 @@ namespace Calcpad.Core
                 _evaluatorInstance = Expression.Constant(_parser._evaluator);
                 _functions = parser._functions;
                 _solveBlocks = parser._solveBlocks;
-                _calc = parser._calc;
                 _matrixCalc = parser._matrixCalc;
             }
 
@@ -70,7 +69,7 @@ namespace Calcpad.Core
                     {
                         case TokenTypes.Constant:
                             stackBuffer.Push(
-                                Expression.Constant(((ValueToken)t).Value,
+                                Expression.Constant(_parser.CheckConstant(((ValueToken)t).Value),
                                 typeof(IValue)));
                             continue;
                         case TokenTypes.Unit:
@@ -223,7 +222,7 @@ namespace Calcpad.Core
                     TokenTypes.Input when t.Content == "?" =>
                         throw Exceptions.UndefinedInputField(),
                     _ =>
-                        Expression.Constant(((ValueToken)t).Value, typeof(IValue))
+                        Expression.Constant(_parser.CheckConstant(((ValueToken)t).Value), typeof(IValue))
                 };
 
             private Expression ParseToken(Token t, Expression a)
@@ -314,6 +313,9 @@ namespace Calcpad.Core
 
                         if (method == GetMatrixElementMethod)
                             return Expression.Call(SetMatrixElementMethod, args[0], args[1], args[2], b);
+
+                        if (method == GetVariableValueMethod)
+                            a = Expression.Property(args[0], typeof(Variable), nameof(Variable.Value));
                     }
                     if (a is MemberExpression ma)
                     {
@@ -340,10 +342,6 @@ namespace Calcpad.Core
                     '∨' => Expression.Or(a, b),
                     '⊕' => Expression.ExclusiveOr(a, b),
                     '⦼' => Expression.Modulo(a, b),
-                    '∠' => Expression.Call(
-                            EvaluatePhasorMethod,
-                            Expression.Constant(a),
-                            Expression.Constant(b)),
                     _ => Expression.Call(EvaluateOperatorMethod,
                             Expression.Constant(_matrixCalc),
                             Expression.Constant(t.Index), a, b),
@@ -366,7 +364,7 @@ namespace Calcpad.Core
             {
                 var v = t.Variable;
                 if (v.IsInitialized || t.Type == TokenTypes.Vector || t.Type == TokenTypes.Matrix)
-                    return Expression.Property(Expression.Constant(v), typeof(Variable), nameof(Variable.Value));
+                    return Expression.Call(_evaluatorInstance, GetVariableValueMethod, Expression.Constant(v), Expression.Constant(t.Content));
                 try
                 {
                     var u = Unit.Get(t.Content, _parser.IsUs);

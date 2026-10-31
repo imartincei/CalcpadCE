@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Plots the four-minimum [Himmelblau test surface](https://en.wikipedia.org/wiki/Himmelblau%27s_function) $f(x, y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2$, a standard optimisation benchmark. -->
- <h3>Himmelblau's function</h3>
+ <h1>Himmelblau's function</h1>
  <p>
   <span class="eq">
    <var>f</var>

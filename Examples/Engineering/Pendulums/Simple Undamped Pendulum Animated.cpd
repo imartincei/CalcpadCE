@@ -122,13 +122,13 @@ r2d = 180/π
 '<h4>Plot results</h4>
 '<table><tr><td>
 'Rotation - <var>θ</var>(<var>t</var>), [°]<br/>
-$Plot{t(i)|θ_e(t(i))*r2d & t(i)|θ_RK4.i*r2d @ i = 1 : min(1.5*N; n)}
+$Plot{t(i)|θ_e(t(i))/deg & t(i)|θ_RK4.i*r2d @ i = 1 : min(1.5*N; n)}
 '</td><td><br/><br/><br/>
 '<b style="color:Red">━━━</b> Theoretical <br/>
 '<b style="color:Lime">╸╸╸</b> Runge-Kutta 4
 '</td></tr><tr><td>
 'Absolute error Δθ(<var>t</var>), [°]<br/>
-$Plot{t(i)|(θ_RK4.i - θ_e(t(i)))*r2d @ i = 1 : min(1.5*N; n)}
+$Plot{t(i)|(θ_RK4.i - θ_e(t(i))/rad)*r2d @ i = 1 : min(1.5*N; n)}
 '</td><td><br/><br/><br/>
 '<p><b style="color:Red">━━━</b> Runge-Kutta 4
 '</td></tr><tr><td>

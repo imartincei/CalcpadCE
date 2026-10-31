@@ -19,5 +19,8 @@
     "typescript": "^5.9.0",
     "vue": "^3.5.0"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "vue-i18n": "^11.4.16"
+  }
 }

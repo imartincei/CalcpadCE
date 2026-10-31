@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Multiline cubic-roots function returning all three roots of $x^3 + a x^2 + b x + c = 0$ via the [Cardano formula](https://en.wikipedia.org/wiki/Cubic_equation), with discriminant-based real/complex branching. -->
- <h3>Cubic Equation Roots Function</h3>
+ <h1>Cubic Equation Roots Function</h1>
  <p>
   For solving equations of type:
   <span class="eq">
@@ -190,6 +190,8 @@
      <var>θ</var>
      − 2 ·
      <var>π</var>
+     ·
+     <var>rad</var>
      <span class="dvl">
      </span>
      3
@@ -217,6 +219,8 @@
      <var>θ</var>
      + 2 ·
      <var>π</var>
+     ·
+     <var>rad</var>
      <span class="dvl">
      </span>
      3

@@ -37,7 +37,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src/CalcpadVuePanel'),
-      '@calcpad-vue': resolve(__dirname, '../calcpad-frontend/src/vue')
+      '@calcpad-vue': resolve(__dirname, '../calcpad-frontend/src/vue'),
+      '@calcpad-i18n': resolve(__dirname, '../calcpad-frontend/src/i18n')
     }
   },
   define: {

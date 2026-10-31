@@ -247,6 +247,7 @@ function buildPreviewShell(options: ShellOptions): string {
     <style>
         :root { --cpd-bg: ${background}; }
         html, body { height: 100%; margin: 0; padding: 0; background: var(--cpd-bg); }
+        body { font: var(--vscode-font-size)/1.4 var(--vscode-font-family); }
         /* Both buffers stay painted so the swap is a z-index flip. The frame behind keeps
            full size because its scroll restore measures against a real viewport. */
         .cpd-frame {
@@ -271,7 +272,6 @@ function buildPreviewShell(options: ShellOptions): string {
             gap: 14px;
             background: color-mix(in srgb, var(--cpd-bg) 70%, transparent);
             color: var(--vscode-foreground, #333);
-            font: 14px/1.4 var(--vscode-font-family, 'Segoe UI', sans-serif);
             pointer-events: none;
         }
         .cpd-loading[hidden] { display: none; }
@@ -298,7 +298,6 @@ function buildPreviewShell(options: ShellOptions): string {
             border-radius: 0 0 4px 4px;
             background: var(--vscode-editorWidget-background, #252526);
             color: var(--vscode-editorWidget-foreground, #ccc);
-            font: 12px var(--vscode-font-family, 'Segoe UI', sans-serif);
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .cpd-find-bar[hidden] { display: none; }

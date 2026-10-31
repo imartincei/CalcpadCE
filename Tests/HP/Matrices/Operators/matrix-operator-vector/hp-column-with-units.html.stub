@@ -327,7 +327,7 @@
  </p>
  <p>
  </p>
- <h3>For matrix multiplication we need to make m2 a matrix row</h3>
+ <h1>For matrix multiplication we need to make m2 a matrix row</h1>
  <p>
   <span class="eq">
    <b>
@@ -656,7 +656,7 @@
  </p>
  <p>
  </p>
- <h3>Exponentiation and the remainder operators must be without a unit. Therefore we need to define an unitless vector</h3>
+ <h1>Exponentiation and the remainder operators must be without a unit. Therefore we need to define an unitless vector</h1>
  <p>
   <span class="eq">
    <b>

@@ -609,7 +609,16 @@
    </var>
    )  =
    <b class="b0">[</b>
-   0 0.524 0.785 1.05 1.57
+   0
+   <i>rad</i>
+   0.524
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   1.05
+   <i>rad</i>
+   1.57
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse sine
@@ -624,7 +633,16 @@
    </var>
    )  =
    <b class="b0">[</b>
-   1.57 1.05 0.785 0.524 0
+   1.57
+   <i>rad</i>
+   1.05
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.524
+   <i>rad</i>
+   0
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse cosine
@@ -639,7 +657,16 @@
    </var>
    )  =
    <b class="b0">[</b>
-   0 0.464 0.615 0.714 0.785
+   0
+   <i>rad</i>
+   0.464
+   <i>rad</i>
+   0.615
+   <i>rad</i>
+   0.714
+   <i>rad</i>
+   0.785
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse tangent
@@ -659,7 +686,16 @@
    </var>
    )  =
    <b class="b0">[</b>
-   1.57 1.05 0.785 0.524 0
+   1.57
+   <i>rad</i>
+   1.05
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.524
+   <i>rad</i>
+   0
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - the angle whose tangent is the quotient of y and x
@@ -680,7 +716,16 @@
    <span class="b1">)</span>
    =
    <b class="b0">[</b>
-   0 0.524 0.785 1.05 1.57
+   0
+   <i>rad</i>
+   0.524
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   1.05
+   <i>rad</i>
+   1.57
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse cosecant
@@ -701,7 +746,16 @@
    <span class="b1">)</span>
    =
    <b class="b0">[</b>
-   1.57 1.05 0.785 0.524 0
+   1.57
+   <i>rad</i>
+   1.05
+   <i>rad</i>
+   0.785
+   <i>rad</i>
+   0.524
+   <i>rad</i>
+   0
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse secant
@@ -716,7 +770,16 @@
    </var>
    )  =
    <b class="b0">[</b>
-   1.57 1.11 0.955 0.857 0.785
+   1.57
+   <i>rad</i>
+   1.11
+   <i>rad</i>
+   0.955
+   <i>rad</i>
+   0.857
+   <i>rad</i>
+   0.785
+   <i>rad</i>
    <b class="b0">]</b>
   </span>
   - inverse cotangent

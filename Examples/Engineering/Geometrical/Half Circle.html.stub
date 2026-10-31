@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a half circle: area, centroid offset, second moments of area and radii of gyration. -->
- <h3>Geometrical Properties of Half Circle</h3>
+ <h1>Geometrical Properties of Half Circle</h1>
  <div style="max-width:120mm">
   <img alt="half-circle.png" class="side" src="Images/mechanics/sections/half-circle.png" style="height:112pt;"/>
  </div>

@@ -10,7 +10,7 @@
 'Height at roof ridge -'h_1 = ? {9}'m
 'Height at roof eaves -'h_2 = ? {8}'m
 'Pitch angle
-α = atan((h_1 - h_2)*2/B)'°
+α = atan((h_1 - h_2)*2/B)
 'Spacing between:
 '&nbsp;&nbsp;&nbsp;&nbsp; - frames -'a = ? {6}'m
 '&nbsp;&nbsp;&nbsp;&nbsp; - wind columns -'b = ? {4}'m
@@ -251,48 +251,48 @@ e'm,'e/4'm,'e/10'm
 '<div class="fold">
 '<p><b>Minimum values (–)</b></p>
 '<p><b>External pressure coefficients</b></p>
-#if α ≡ 0
+#if α ≡ 0°
 	'Zone F -'C_pe,10,F = -1.8','C_pe,1,F = -2.5
 	'Zone G -'C_pe,10,G = -1.2','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.7','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.2','C_pe,1,I = -0.2
-#else if α ≤ 5
-	k = (5 - α)/5
+#else if α ≤ 5°
+	k = (5° - α)/5°
 	'Zone F -'C_pe,10,F = -1.7 - 0.1*k','C_pe,1,F = -2.5
 	'Zone G -'C_pe,10,G = -1.2','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.6 - 0.1*k','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.6 + 0.4*k','C_pe,1,I = -0.6 + 0.4*k
 	'Zone J -'C_pe,10,J = -0.6','C_pe,1,J = -0.6
-#else if α ≤ 15
-	k = (15 - α)/10
+#else if α ≤ 15°
+	k = (15° - α)/10°
 	'Zone F -'C_pe,10,F = -0.9 - 0.8*k','C_pe,1,F = -2.0 - 0.5*k
 	'Zone G -'C_pe,10,G = -0.8 - 0.4*k','C_pe,1,G = -1.5 - 0.5*k
 	'Zone H -'C_pe,10,H = -0.3 - 0.3*k','C_pe,1,H = -0.3 - 0.9*k
 	'Zone I -'C_pe,10,I = -0.4 - 0.2*k','C_pe,1,I = -0.4 - 0.2*k
 	'Zone J -'C_pe,10,J = -1.0 + 0.4*k','C_pe,1,J = -1.5 + 0.9*k
-#else if α ≤ 30
-	k = (30 - α)/15
+#else if α ≤ 30°
+	k = (30° - α)/15°
 	'Zone F -'C_pe,10,F = -0.5 - 0.4*k','C_pe,1,F = -1.5 - 0.5*k
 	'Zone G -'C_pe,10,G = -0.5 - 0.3*k','C_pe,1,G = -1.5
 	'Zone H -'C_pe,10,H = -0.2 - 0.1*k','C_pe,1,H = -0.2 - 0.1*k
 	'Zone I -'C_pe,10,I = -0.4','C_pe,1,I = -0.4
 	'Zone J -'C_pe,10,J = -0.5 - 0.5*k','C_pe,1,J = -0.5 - 1.0*k
-#else if α ≤ 45
-	k = (45 - α)/15
+#else if α ≤ 45°
+	k = (45° - α)/15°
 	'Zone F -'C_pe,10,F = 0.0 - 0.5*k','C_pe,1,F = 0.0 - 1.5*k
 	'Zone G -'C_pe,10,G = 0.0 - 0.5*k','C_pe,1,G = 0.0 - 1.5*k
 	'Zone H -'C_pe,10,H = 0.0 - 0.2*k','C_pe,1,H = 0.0 - 0.2*k
 	'Zone I -'C_pe,10,I = -0.2 - 0.2*k','C_pe,1,I = -0.2 - 0.2*k
 	'Zone J -'C_pe,10,J = -0.3 - 0.2*k','C_pe,1,J = -0.3 - 0.2*k
-#else if α ≤ 60
-	k = (60 - α)/15
+#else if α ≤ 60°
+	k = (60° - α)/15°
 	'Zone F -'C_pe,10,F = 0.7 - 0.7*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.7 - 0.7*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.7 - 0.7*k','C_pe,1,H = C_pe,10,H
 	'Zone I -'C_pe,10,I = -0.2','C_pe,1,I = C_pe,10,I
 	'Zone J -'C_pe,10,J = -0.3','C_pe,1,J = C_pe,10,J
-#else if α ≤ 75
-	k = (75 - α)/15
+#else if α ≤ 75°
+	k = (75° - α)/15°
 	'Zone F -'C_pe,10,F = 0.8 - 0.1*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.8 - 0.1*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.8 - 0.1*k','C_pe,1,H = C_pe,10,H
@@ -304,7 +304,7 @@ e'm,'e/4'm,'e/10'm
 'Zone G -'w_G = (C_pe,10,G - C_pi)*q_p'kN/m²
 'Zone H -'w_H = (C_pe,10,H - C_pi)*q_p'kN/m²
 'Zone I -'w_I = (C_pe,10,I - C_pi)*q_p'kN/m²
-#if α ≠ 0
+#if α ≠ 0°
 	'Zone J -'w_J = (C_pe,10,J - C_pi)*q_p'kN/m²
 #end if
 #if a > 0
@@ -313,7 +313,7 @@ e'm,'e/4'm,'e/10'm
 	'Zone G -'w_b,G = (C_pe,10,G - C_pi)*q_p*a'kN/m
 	'Zone H -'w_b,H = (C_pe,10,H - C_pi)*q_p*a'kN/m
 	'Zone I -'w_b,I = (C_pe,10,I - C_pi)*q_p*a'kN/m
-	#if α ≠ 0
+	#if α ≠ 0°
 		'Zone J -'w_b,J = (C_pe,10,J - C_pi)*q_p*a'kN/m
 	#end if
 #end if
@@ -324,7 +324,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,1,G
 		'Zone H -'C_pe,H = C_pe,1,H
 		'Zone I -'C_pe,I = C_pe,1,I
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,1,J
 		#end if
 	#else if A_p ≥ 10
@@ -332,7 +332,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,10,G
 		'Zone H -'C_pe,H = C_pe,10,H
 		'Zone I -'C_pe,I = C_pe,10,I
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,10,J
 		#end if
 	#else
@@ -340,7 +340,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,1,G - (C_pe,1,G - C_pe,10,G)*log(A_p)
 		'Zone H -'C_pe,H = C_pe,1,H - (C_pe,1,H - C_pe,10,H)*log(A_p)
 		'Zone I -'C_pe,I = C_pe,1,I - (C_pe,1,I - C_pe,10,I)*log(A_p)
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,1,J - (C_pe,1,J - C_pe,10,J)*log(A_p)
 		#end if
 	#end if
@@ -350,7 +350,7 @@ e'm,'e/4'm,'e/10'm
 	'Zone G -'w_s,G = (C_pe,G - C_pi)*q_p*c_p'kN/m
 	'Zone H -'w_s,H = (C_pe,H - C_pi)*q_p*c_p'kN/m
 	'Zone I -'w_s,I = (C_pe,I - C_pi)*q_p*c_p'kN/m
-	#if α ≠ 0
+	#if α ≠ 0°
 		'Zone J -'w_s,J = (C_pe,J - C_pi)*q_p*c_p'kN/m
 	#end if
 #end if
@@ -364,7 +364,7 @@ e'm,'e/4'm,'e/10'm
 '<tr><td>Zone G</td><td>'C_pe,10,G'</td><td>'C_pe,1,G'</td><td>'C_pe,G'</td><td>'w_G'</td><td>'w_b,G'</td><td>'w_s,G'</td></tr>
 '<tr><td>Zone H</td><td>'C_pe,10,H'</td><td>'C_pe,1,H'</td><td>'C_pe,H'</td><td>'w_H'</td><td>'w_b,H'</td><td>'w_s,H'</td></tr>
 '<tr><td>Zone I</td><td>'C_pe,10,I'</td><td>'C_pe,1,I'</td><td>'C_pe,I'</td><td>'w_I'</td><td>'w_b,I'</td><td>'w_s,I'</td></tr>
-#if α ≠ 0
+#if α ≠ 0°
 	'<tr><td>Zone J</td><td>'C_pe,10,J'</td><td>'C_pe,1,J'</td><td>'C_pe,J'</td><td>'w_J'</td><td>'w_b,J'</td><td>'w_s,J'</td></tr>
 #end if
 '</table>
@@ -372,48 +372,48 @@ e'm,'e/4'm,'e/10'm
 '<br/>
 '<div class="fold">
 '<p><b>Maximum values (+)</b></p>
-#if α ≡ 0
+#if α ≡ 0°
 	'Zone F -'C_pe,10,F = -1.8','C_pe,1,F = -2.5
 	'Zone G -'C_pe,10,G = -1.2','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.7','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = 0.2','C_pe,1,I = 0.2
-#else if α ≤ 5
-	k = (5 - α)/5
+#else if α ≤ 5°
+	k = (5° - α)/5°
 	'Zone F -'C_pe,10,F = 0.0','C_pe,1,F = 0.0
 	'Zone G -'C_pe,10,G = 0.0','C_pe,1,G = 0.0
 	'Zone H -'C_pe,10,H = 0.0','C_pe,1,H = 0.0
 	'Zone I -'C_pe,10,I = -0.6','C_pe,1,I = -0.6
 	'Zone J -'C_pe,10,J = 0.2','C_pe,1,J = 0.2
-#else if α ≤ 15
-	k = (15 - α)/10
+#else if α ≤ 15°
+	k = (15° - α)/10°
 	'Zone F -'C_pe,10,F = 0.2 - 0.2*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.2 - 0.2*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.2 - 0.2*k','C_pe,1,H = C_pe,10,H
 	'Zone I -'C_pe,10,I = 0.0 - 0.6*k','C_pe,1,I = C_pe,10,I
 	'Zone J -'C_pe,10,J = 0.0 + 0.2*k','C_pe,1,J = C_pe,10,J
-#else if α ≤ 30
-	k = (30 - α)/15
+#else if α ≤ 30°
+	k = (30° - α)/15°
 	'Zone F -'C_pe,10,F = 0.7 - 0.5*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.7 - 0.5*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.4 - 0.2*k','C_pe,1,H = C_pe,10,H
 	'Zone I -'C_pe,10,I = 0.0','C_pe,1,I = C_pe,10,H
 	'Zone J -'C_pe,10,J = 0.0','C_pe,1,J = C_pe,10,J
-#else if α ≤ 45
-	k = (45 - α)/15
+#else if α ≤ 45°
+	k = (45° - α)/15°
 	'Zone F -'C_pe,10,F = 0.7','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.7','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.6 - 0.2*k','C_pe,1,H = C_pe,10,H
 	'Zone I -'C_pe,10,I = 0.0','C_pe,1,I = C_pe,10,I
 	'Zone J -'C_pe,10,J = 0.0','C_pe,1,J = C_pe,10,J
-#else if α ≤ 60
-	k = (60 - α)/15
+#else if α ≤ 60°
+	k = (60° - α)/15°
 	'Zone F -'C_pe,10,F = 0.7 - 0.7*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.7 - 0.7*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.7 - 0.7*k','C_pe,1,H = C_pe,10,H
 	'Zone I -'C_pe,10,I = -0.2 + 0.2*k','C_pe,1,I = C_pe,10,I
 	'Zone J -'C_pe,10,J = -0.3 + 0.3*k','C_pe,1,J = C_pe,10,J
-#else if α ≤ 75
-	k = (75 - α)/15
+#else if α ≤ 75°
+	k = (75° - α)/15°
 	'Zone F -'C_pe,10,F = 0.8 - 0.1*k','C_pe,1,F = C_pe,10,F
 	'Zone G -'C_pe,10,G = 0.8 - 0.1*k','C_pe,1,G = C_pe,10,G
 	'Zone H -'C_pe,10,H = 0.8 - 0.1*k','C_pe,1,H = C_pe,10,H
@@ -425,7 +425,7 @@ e'm,'e/4'm,'e/10'm
 'Zone G -'w_G = (C_pe,10,G - C_pi)*q_p'kN/m²
 'Zone H -'w_H = (C_pe,10,H - C_pi)*q_p'kN/m²
 'Zone I -'w_I = (C_pe,10,I - C_pi)*q_p'kN/m²
-#if α ≠ 0
+#if α ≠ 0°
 	'Zone J -'w_J = (C_pe,10,J - C_pi)*q_p'kN/m²
 #end if
 #if a > 0
@@ -434,7 +434,7 @@ e'm,'e/4'm,'e/10'm
 	'Zone G -'w_b,G = (C_pe,10,G - C_pi)*q_p*a'kN/m
 	'Zone H -'w_b,H = (C_pe,10,H - C_pi)*q_p*a'kN/m
 	'Zone I -'w_b,I = (C_pe,10,I - C_pi)*q_p*a'kN/m
-	#if α ≠ 0
+	#if α ≠ 0°
 		'Zone J -'w_b,J = (C_pe,10,J - C_pi)*q_p*a'kN/m
 	#end if
 #end if
@@ -445,7 +445,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,1,G
 		'Zone H -'C_pe,H = C_pe,1,H
 		'Zone I -'C_pe,I = C_pe,1,I
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,1,J
 		#end if
 	#else if A_p ≥ 10
@@ -453,7 +453,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,10,G
 		'Zone H -'C_pe,H = C_pe,10,H
 		'Zone I -'C_pe,I = C_pe,10,I
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,10,J
 		#end if
 	#else
@@ -461,7 +461,7 @@ e'm,'e/4'm,'e/10'm
 		'Zone G -'C_pe,G = C_pe,1,G - (C_pe,1,G - C_pe,10,G)*log(A_p)
 		'Zone H -'C_pe,H = C_pe,1,H - (C_pe,1,H - C_pe,10,H)*log(A_p)
 		'Zone I -'C_pe,I = C_pe,1,I - (C_pe,1,I - C_pe,10,I)*log(A_p)
-		#if α ≠ 0
+		#if α ≠ 0°
 			'Zone J -'C_pe,J = C_pe,1,J - (C_pe,1,J - C_pe,10,J)*log(A_p)
 		#end if
 	#end if
@@ -470,7 +470,7 @@ e'm,'e/4'm,'e/10'm
 	'Zone G -'w_s,G = (C_pe,G - C_pi)*q_p*c_p'kN/m
 	'Zone H -'w_s,H = (C_pe,H - C_pi)*q_p*c_p'kN/m
 	'Zone I -'w_s,I = (C_pe,I - C_pi)*q_p*c_p'kN/m
-	#if α ≠ 0
+	#if α ≠ 0°
 		'Zone J -'w_s,J = (C_pe,J - C_pi)*q_p*c_p'kN/m
 	#end if
 #end if
@@ -484,7 +484,7 @@ e'm,'e/4'm,'e/10'm
 '<tr><td>Zone G</td><td>'C_pe,10,G'</td><td>'C_pe,1,G'</td><td>'C_pe,G'</td><td>'w_G'</td><td>'w_b,G'</td><td>'w_s,G'</td></tr>
 '<tr><td>Zone H</td><td>'C_pe,10,H'</td><td>'C_pe,1,H'</td><td>'C_pe,H'</td><td>'w_H'</td><td>'w_b,H'</td><td>'w_s,H'</td></tr>
 '<tr><td>Zone I</td><td>'C_pe,10,I'</td><td>'C_pe,1,I'</td><td>'C_pe,I'</td><td>'w_I'</td><td>'w_b,I'</td><td>'w_s,I'</td></tr>
-#if α ≠ 0
+#if α ≠ 0°
 	'<tr><td>Zone J</td><td>'C_pe,10,J'</td><td>'C_pe,1,J'</td><td>'C_pe,J'</td><td>'w_J'</td><td>'w_b,J'</td><td>'w_s,J'</td></tr>
 #end if
 '</table>
@@ -632,43 +632,43 @@ e'm,'e/4'm,'e/10'm
 '<div class="fold">
 '<p><b>Results</b></p>
 '<p><b>External pressure coefficients</b></p>
-#if α ≡ 0
+#if α ≡ 0°
 	'Zone F -'C_pe,10,F = -1.8','C_pe,1,F = -2.5
 	'Zone G -'C_pe,10,G = -1.2','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.7','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.2','C_pe,1,I = -0.2
-#else if α ≤ 5
-	k = (5 - α)/5
+#else if α ≤ 5°
+	k = (5° - α)/5°
 	'Zone F -'C_pe,10,F = -1.6 - 0.2*k','C_pe,1,F = -2.2 - 0.3*k
 	'Zone G -'C_pe,10,G = -1.3 + 0.1*k','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.7','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.6 + 0.4*k','C_pe,1,I = -0.6 + 0.4*k
-#else if α ≤ 15
-	k = (15 - α)/10
+#else if α ≤ 15°
+	k = (15° - α)/10°
 	'Zone F -'C_pe,10,F = -1.3 - 0.3*k','C_pe,1,F = -2.0 - 0.2*k
 	'Zone G -'C_pe,10,G = -1.3','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.6 - 0.1*k','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.5 - 0.1*k','C_pe,1,I = -0.5 - 0.1*k
-#else if α ≤ 30
-	k = (30 - α)/15
+#else if α ≤ 30°
+	k = (30° - α)/15°
 	'Zone F -'C_pe,10,F = -1.1 - 0.2*k','C_pe,1,F = -1.5 - 0.5*k
 	'Zone G -'C_pe,10,G = -1.4 + 0.1*k','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.8 + 0.2*k','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.5','C_pe,1,I = -0.5
-#else if α ≤ 45
-	k = (45 - α)/15
+#else if α ≤ 45°
+	k = (45° - α)/15°
 	'Zone F -'C_pe,10,F = -1.1','C_pe,1,F = -1.5
 	'Zone G -'C_pe,10,G = -1.4','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.9 + 0.1*k','C_pe,1,H = -1.2
 	'Zone I -'C_pe,10,I = -0.5','C_pe,1,I = -0.5
-#else if α ≤ 60
-	k = (60 - α)/15
+#else if α ≤ 60°
+	k = (60° - α)/15°
 	'Zone F -'C_pe,10,F = -1.1','C_pe,1,F = -1.5
 	'Zone G -'C_pe,10,G = -1.2 - 0.2*k','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.8 - 0.1*k','C_pe,1,H = -1.0 - 0.2*k
 	'Zone I -'C_pe,10,I = -0.5','C_pe,1,I = -0.5
-#else if α ≤ 75
-	k = (75 - α)/15
+#else if α ≤ 75°
+	k = (75° - α)/15°
 	'Zone F -'C_pe,10,F = -1.1','C_pe,1,F = -1.5
 	'Zone G -'C_pe,10,G = -1.2','C_pe,1,G = -2.0
 	'Zone H -'C_pe,10,H = -0.8','C_pe,1,H = -1.0

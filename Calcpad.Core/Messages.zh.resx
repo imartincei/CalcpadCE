@@ -427,6 +427,15 @@
   <data name="Cross_product_is_definedonly_for_vectors_with_2_and_3_elements" xml:space="preserve">
     <value>叉积仅对2和3个元素的向量有定义.</value>
   </data>
+  <data name="Complex_numbers_are_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>复数在复数模式之外不受支持.</value>
+  </data>
+  <data name="Function_0_with_complex_values_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>包含复数值的函数"{0}"在复数模式之外不受支持.</value>
+  </data>
+  <data name="Complex_variable_0_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>复数变量"{0}"在复数模式之外不受支持.</value>
+  </data>
   <data name="Function_0_is_not_defined_in_complex_mode" xml:space="preserve">
     <value>函数{0}在复数模式下未定义.</value>
   </data>

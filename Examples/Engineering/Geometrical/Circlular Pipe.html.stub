@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a circular pipe: area, $I_x = I_y = \pi (D^4 - d^4)/64$, section modulus and radii of gyration. -->
- <h3>Geometrical Properties of Circular Pipe</h3>
+ <h1>Geometrical Properties of Circular Pipe</h1>
  <div style="max-width:150mm">
   <img alt="circular-pipe.png" class="side" src="Images/mechanics/sections/circular-pipe.png" style="height:135pt;"/>
  </div>

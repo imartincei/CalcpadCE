@@ -9,6 +9,7 @@ In VS Code, do not use VS Code's own settings editor.
 | ------- | ------ | ------- |
 | **Decimals** | 0–15 | Decimal places shown in results. |
 | **Angle Units** | Degrees / Radians / Gradians | Trigonometric angle setting. |
+| **Return Angle Units** | on/off | Inverse trig functions (`asin`, `atan2`, `phase`, etc.) return results with the current angle unit attached. Off returns unitless numbers. A document can override it with `ReturnAngleUnits = 0`. |
 | **Complex Numbers** | on/off | Enable complex-number arithmetic. |
 | **Substitute Variables** | on/off | Substitute variable values into the output. |
 | **Format Equations** | on/off | *Professional* (on) renders equations in stacked math form; *Inline* (off) renders them on a single line. |
@@ -87,6 +88,8 @@ Pick the Monaco editor's font family from:
 - **Auto-Run Preview** *(default on)* — when off, the preview only re-renders when the preview panel is first opened or a manual **Run Preview** is triggered (**Ctrl+Alt+X**, the ▶ Run button, the editor context menu, or the Server → Refresh menu in the desktop app). Turn this off for large documents where every keystroke re-render is too costly.
 - **Open `#UI` Documents in Input Mode** *(default on)* — a document declaring `#UI` controls opens as its input form the first time you open it. See [UI Mode](new-ui-mode.md).
 - **Apply `#UI` Values in Preview** *(default off)* — Preview normally renders the document's own default values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. Useful for tracking down errors that only appear once a form is filled in. This also affects exporting and #write/#append.
+- **Render Preview as PDF** *(default off)* — **Preview** and **Report** show the [PDF export](new-exports.md#pdf-export) itself in a built-in PDF viewer, with its exact pages, headers and footers, zoom (− / + / Fit, or Ctrl+Wheel) and a page counter. It follows **Auto-Run Preview**, but each render generates a PDF, so it is slower than the HTML preview. **Unwrapped** and the input form are unaffected.
+- **Show File Metadata** *(default off)* — show the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the end of the file. Edit it in the [Properties tab](new-calcpad-panel.md#properties).
 
 ## Data output
 

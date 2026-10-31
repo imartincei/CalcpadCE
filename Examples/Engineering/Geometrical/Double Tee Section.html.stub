@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a Double Tee (I-beam) profile: area, centroid, $I_x$, $I_y$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Double Tee Section</h3>
+ <h1>Geometrical Properties of Double Tee Section</h1>
  <div style="max-width:150mm">
   <img alt="double-tee.png" class="side" src="Images/mechanics/sections/double-tee.png" style="height:165pt;"/>
  </div>

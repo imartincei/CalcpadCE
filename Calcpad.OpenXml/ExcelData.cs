@@ -251,7 +251,7 @@ namespace Calcpad.OpenXml
         private static void InsertValue(Row row, string cellRef, string value)
         {
             Cell cell = InsertCell(row, cellRef);
-            if (double.TryParse(value, CultureInfo.CurrentCulture.NumberFormat, out var d))
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var d))
             {
                 cell.CellValue = new CellValue(d);
                 cell.DataType = CellValues.Number;

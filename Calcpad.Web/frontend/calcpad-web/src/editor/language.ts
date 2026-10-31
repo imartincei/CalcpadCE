@@ -1,10 +1,8 @@
-import * as monaco from 'monaco-editor';
+import type * as monaco from 'monaco-editor';
 
 /**
- * Calcpad code gets no local tokens: its highlighting comes from the server's semantic
- * tokens (as in the VS Code extension), so unhighlighted code is a visible signal that the
- * server is not connected. This tokenizer only hands #html/#markdown content to Monaco's
- * built-in grammars, following the same push/pop stack as ExpressionParser.
+ * Semantic tokens provide Calcpad highlighting.
+ * Local tokens identify comments, literal text, and embedded HTML/Markdown.
  */
 const endDirective = /^\s*#end\s+(html|cpd|markdown)\b.*$/;
 const openers: monaco.languages.IMonarchLanguageRule[] = [
@@ -29,12 +27,52 @@ function embeddedStates(language: string): [monaco.languages.IMonarchLanguageRul
 const [htmlOuter, htmlBody] = embeddedStates('html');
 const [mdOuter, markdownBody] = embeddedStates('markdown');
 
+function commentState(quote: string): monaco.languages.IMonarchLanguageRule[] {
+    const text = {
+        cases: {
+            '@eos': { token: 'comment', next: '@pop' },
+            '@default': 'comment',
+        },
+    };
+    return [
+        [new RegExp(`[^${quote}<]* _\\s*$`), 'comment'],
+        [/<!--/, { token: 'htmlComment.comment', next: '@htmlComment' }],
+        [/-->/, {
+            cases: {
+                '@eos': { token: 'htmlComment.comment', next: '@pop' },
+                '@default': 'htmlComment.comment',
+            },
+        }],
+        [new RegExp(quote), { token: 'comment', next: '@pop' }],
+        [/<[^>]*>/, text],
+        [new RegExp(`[^${quote}<]+`), text],
+        [/</, text],
+        [/$/, { token: 'comment', next: '@pop' }],
+    ];
+}
+
 export const calcpadMonarchLanguage: monaco.languages.IMonarchLanguage = {
     ignoreCase: true,
     defaultToken: '',
     tokenizer: {
-        root: [...openers, [/.+/, '']],
-        cpdBlock: [[endDirective, { token: '', next: '@pop' }], ...openers, [/.+/, '']],
+        root: [...openers, { include: '@code' }],
+        cpdBlock: [[endDirective, { token: '', next: '@pop' }], ...openers, { include: '@code' }],
+        code: [
+            [/^(\s*#include\s+)([^#'"]*)/, ['', 'string']],
+            [/^(\s*#(?:projectpath|librarypath|format)\s+)([^'"]*)/, ['', 'string']],
+            [/^(\s*#(?:read|write|append)\s+.*?\s+(?:from|to)\s+)([^@'"]*?)(?=\s+(?:sep|type)\b|@|['"]|$)/, ['', 'string']],
+            [/^(\s*#settings\s+)(.*)$/, ['', 'string']],
+            [/^(\s*#ui\s*)(\{[^}]*\})/, ['', 'string']],
+            [/'/, { cases: { '@eos': 'comment', '@default': { token: 'comment', next: '@singleComment' } } }],
+            [/"/, { cases: { '@eos': 'comment', '@default': { token: 'comment', next: '@doubleComment' } } }],
+            [/[^'"]+/, ''],
+        ],
+        singleComment: commentState("'"),
+        doubleComment: commentState('"'),
+        htmlComment: [
+            [/-->/, { token: '@rematch', next: '@pop' }],
+            [/[^-]+|-(?!->)/, 'htmlComment.comment'],
+        ],
         htmlOuter,
         htmlBody,
         mdOuter,
@@ -56,6 +94,7 @@ export const calcpadLanguageConfiguration: monaco.languages.LanguageConfiguratio
         ['{', '}'],
         ['[', ']'],
     ],
+    colorizedBracketPairs: [['(', ')']],
     autoClosingPairs: [
         { open: '(', close: ')' },
         { open: '{', close: '}' },

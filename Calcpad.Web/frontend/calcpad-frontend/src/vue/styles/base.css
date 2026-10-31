@@ -1,14 +1,8 @@
 /* Base styles for CalcpadVuePanel */
 
-/* Not in calcpad-web's vscode-variables.css: the VS Code webview imports only
-   this file, and unlike the --vscode-* vars these are not injected by the host. */
 :root {
-  --calcpad-font-size-xxs: 9px;
-  --calcpad-font-size-xs: 11px;
-  --calcpad-font-size-sm: 12px;
-  --calcpad-font-size-md: 13px;
-  --calcpad-font-size-lg: 14px;
-  --calcpad-font-size-xl: 16px;
+  --calcpad-font-size-icon-small: 0.75em;
+  --calcpad-font-size-icon-large: 1.2em;
 }
 
 * {
@@ -24,6 +18,41 @@ body {
   background: var(--vscode-editor-background);
   -webkit-user-select: none;
   user-select: none;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+:where(h1, h2, h3, h4, h5, h6, code, kbd, pre, small) {
+  font-size: inherit;
+}
+
+select:not([multiple]):not([size]),
+select:not([multiple]):not([size])::picker(select) {
+  appearance: base-select;
+}
+
+select::picker(select) {
+  background: var(--vscode-dropdown-listBackground);
+  color: var(--vscode-dropdown-foreground);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 3px;
+}
+
+select option {
+  padding: 4px 8px;
+}
+
+select option:checked,
+select option:hover,
+select option:focus {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
 }
 
 .monaco-editor,
@@ -88,7 +117,6 @@ select,
 .settings-container h3 {
   margin: 16px 0 8px 0;
   color: var(--vscode-sideBarSectionHeader-foreground);
-  font-size: var(--calcpad-font-size-lg);
   font-weight: bold;
   border-bottom: 1px solid var(--vscode-panel-border);
   padding-bottom: 4px;
@@ -105,7 +133,6 @@ select,
 .setting-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-input-foreground);
   font-weight: normal;
 }
@@ -119,7 +146,6 @@ select,
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
 }
 
 .setting-group input[type="checkbox"] {
@@ -132,22 +158,6 @@ select,
   display: flex;
   align-items: center;
   cursor: pointer;
-}
-
-.reset-button {
-  width: 100%;
-  padding: 8px;
-  background: var(--vscode-button-secondaryBackground);
-  border: 1px solid var(--vscode-button-border);
-  color: var(--vscode-button-secondaryForeground);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
-  margin-top: 16px;
-}
-
-.reset-button:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
 }
 
 /* Variables tab styles */
@@ -178,7 +188,7 @@ select,
 
 .expand-icon {
   transition: transform 0.2s;
-  font-size: var(--calcpad-font-size-md);
+  font-size: var(--calcpad-font-size-icon-small);
 }
 
 .variables-content {
@@ -208,20 +218,17 @@ select,
 
 .variable-name {
   font-weight: 600;
-  font-size: var(--calcpad-font-size-lg);
   color: var(--vscode-symbolIcon-variableForeground);
   margin-bottom: 4px;
 }
 
 .variable-type {
-  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   margin-bottom: 4px;
 }
 
 .variable-content {
   font-family: var(--vscode-editor-font-family);
-  font-size: var(--calcpad-font-size-sm);
   background: var(--vscode-textCodeBlock-background);
   padding: 4px 6px;
   border-radius: 2px;
@@ -232,7 +239,6 @@ select,
 }
 
 .variable-source {
-  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   margin-top: 4px;
 }
@@ -322,7 +328,6 @@ select,
   padding: 6px 12px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
 }
 
 .s3-filters button:hover {
@@ -350,13 +355,11 @@ select,
 
 .s3-file-name {
   font-weight: bold;
-  font-size: var(--calcpad-font-size-md);
   margin-bottom: 4px;
   word-break: break-word;
 }
 
 .s3-file-meta {
-  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
 }
 
@@ -367,7 +370,6 @@ select,
 .s3-tag {
   background: var(--vscode-badge-background);
   color: var(--vscode-badge-foreground);
-  font-size: var(--calcpad-font-size-xxs);
   padding: 2px 4px;
   border-radius: 2px;
   margin-right: 4px;
@@ -386,7 +388,6 @@ select,
   padding: 4px 8px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: var(--calcpad-font-size-xs);
 }
 
 .form-group {
@@ -396,7 +397,6 @@ select,
 .form-group label {
   display: block;
   margin-bottom: 4px;
-  font-size: var(--calcpad-font-size-md);
 }
 
 .form-group input {
@@ -406,7 +406,6 @@ select,
   border: 1px solid var(--vscode-input-border);
   color: var(--vscode-input-foreground);
   border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
 }
 
 .calcpad-context-menu {
@@ -421,44 +420,92 @@ select,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.calcpad-context-item {
+/* Common button styles */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button:where(:not(.secondary, .tertiary, .icon, .context-menu)) {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+}
+
+button:where(:not(.secondary, .tertiary, .icon, .context-menu):hover:not(:disabled)) {
+  background: var(--vscode-button-hoverBackground);
+}
+
+button.secondary {
+  padding: 6px 14px;
+  background: var(--vscode-button-secondaryBackground);
+  border: none;
+  color: var(--vscode-button-secondaryForeground);
+  border-radius: 2px;
+}
+
+button.secondary:hover:not(:disabled) {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+button.tertiary {
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px dashed var(--vscode-input-border, var(--vscode-widget-border));
+  color: var(--vscode-foreground);
+  border-radius: 2px;
+}
+
+button.tertiary:hover:not(:disabled) {
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+button.icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground);
+  border-radius: 0;
+}
+
+button.icon:hover,
+button.icon.active {
+  color: var(--vscode-tab-activeForeground);
+}
+
+button.icon svg {
   display: block;
+}
+
+button.context-menu {
+  display: flex;
+  justify-content: flex-start;
   width: 100%;
   padding: 5px 14px;
   text-align: left;
   background: transparent;
   color: inherit;
   border: none;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
-  font-family: inherit;
+  border-radius: 0;
+  transition: none;
 }
 
-.calcpad-context-item:hover {
-  background: var(--vscode-menu-selectionBackground);
-  color: var(--vscode-menu-selectionForeground);
-}
-
-/* Common button styles */
-.btn {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  padding: 6px 12px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
-  font-family: var(--vscode-font-family);
-  transition: background-color 0.2s ease;
-}
-
-.btn:hover {
-  background: var(--vscode-button-hoverBackground);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+button.context-menu:hover:not(:disabled) {
+  background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground, #04395e));
+  color: var(--vscode-menu-selectionForeground, inherit);
 }
 
 /* Common input styles */
@@ -468,7 +515,6 @@ select,
   color: var(--vscode-input-foreground);
   padding: 6px 8px;
   border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
 }
 
@@ -508,4 +554,13 @@ select,
 
 .p-4 {
   padding: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  :root *,
+  :root *::before,
+  :root *::after {
+    transition: none !important;
+  }
 }

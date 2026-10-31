@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a hollow elliptical pipe: area, $I_x$, $I_y$, section moduli and radii of gyration from the four semi-axes. -->
- <h3>Geometrical Properties of Elliptical Pipe</h3>
+ <h1>Geometrical Properties of Elliptical Pipe</h1>
  <div style="max-width:120mm">
   <img alt="elliptical-pipe.png" class="side" src="Images/mechanics/sections/elliptical-pipe.png" style="height:112pt;"/>
  </div>

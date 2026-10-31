@@ -32,6 +32,16 @@ VENDORED_REPOS = {
     "jsuites": "https://github.com/jsuites/jsuites",
 }
 
+# Optional deps only `require`d under Node; their platform binaries share the prefix.
+NODE_ONLY_OPTIONAL = (
+    "@napi-rs/canvas",  # pdfjs-dist's server-side canvas
+)
+
+
+def _node_only(name: str) -> bool:
+    return any(name == n or name.startswith(n + "-") for n in NODE_ONLY_OPTIONAL)
+
+
 # Reference assemblies: compiled against, never redistributed on any build.
 REF_PREFIXES = (
     "microsoft.aspnetcore.app.ref",
@@ -318,7 +328,8 @@ def prod_reachable(lockfile: Path) -> set[str] | None:
         for d in (entry.get("dependencies") or {}):
             queue.append((path, d))
         for d in (entry.get("optionalDependencies") or {}):
-            queue.append((path, d))
+            if not _node_only(d):
+                queue.append((path, d))
     return {p.rsplit("node_modules/", 1)[-1] for p in seen}
 
 
@@ -351,7 +362,9 @@ def collect_npm(root: str, component: str) -> None:
             lic = lic.get("type", "")
 
         note = ""
-        if reachable is not None and pkg["name"] not in reachable:
+        if _node_only(pkg["name"]):
+            note = "not-shipped: Node-only optional dependency, never reaches a bundle"
+        elif reachable is not None and pkg["name"] not in reachable:
             note = "not-shipped: optional peer, never reaches a bundle"
 
         out.writerow([

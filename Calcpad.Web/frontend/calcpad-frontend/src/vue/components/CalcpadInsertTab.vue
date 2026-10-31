@@ -1,80 +1,93 @@
 <template>
   <div class="insert-tab">
-    <div class="search-container">
-      <input
-        v-model="searchTerm"
-        type="text"
-        placeholder="Search items..."
-        class="search-input"
-      />
-    </div>
+    <CalcpadSearchField
+      ref="searchField"
+      v-model="searchTerm"
+      :placeholder="t('Search items... (Alt+I)')"
+      class="search-container"
+      @submit="focusResult(0)"
+      @keydown.down.exact="enterResults($event, 0)"
+      @keydown.up.exact="enterResults($event, filteredItems.length - 1)"
+    />
 
-    <!-- Symbols Palette -->
-    <div v-if="symbolGroups.length > 0" class="symbols-palette">
-      <div class="symbols-palette-header" @click="symbolsPaletteOpen = !symbolsPaletteOpen">
-        <span class="symbols-palette-arrow" :class="{ open: symbolsPaletteOpen }">&#x25B6;</span>
-        <span class="symbols-palette-title">Symbol Palette</span>
-      </div>
-      <div v-show="symbolsPaletteOpen" class="symbols-palette-body">
-        <div v-for="group in symbolGroups" :key="group.name" class="symbol-group">
-          <div class="symbol-group-header" @click="toggleGroup(group.name)">
-            <span class="symbol-group-arrow" :class="{ open: isGroupOpen(group.name) }">&#x25B6;</span>
-            <span class="symbol-group-label">{{ group.name }}</span>
-          </div>
-          <div v-show="isGroupOpen(group.name)" class="symbol-grid">
-            <button
-              v-for="item in group.items"
-              :key="item.tag"
-              class="symbol-btn"
-              :title="buildTooltip(item)"
-              @click="insertItem(item)"
-            >
-              {{ item.tag }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="image-insert-container">
-      <button @click="insertImage" class="image-insert-btn" title="Insert an image from file">
-        Insert Image
-      </button>
-    </div>
-
-    <div v-if="searchTerm && filteredItems.length === 0" class="no-items">
-      No items found for "{{ searchTerm }}"
-    </div>
-    <div v-else-if="displayItems.length === 0" class="no-items">
-      No insert items available
-    </div>
-    <div v-else-if="searchTerm" class="search-results">
-      <div
-        v-for="item in displayItems"
-        :key="item.tag"
-        @click="insertItem(item)"
-        class="insert-item"
-        :title="buildTooltip(item)"
-      >
-        <div class="item-display">{{ formatDisplayText(item) }}</div>
-        <div v-if="formatSecondaryText(item)" class="item-description">
-          {{ formatSecondaryText(item) }}
-        </div>
-        <div v-if="item.categoryPath" class="item-category">
-          {{ item.categoryPath }}
-        </div>
-      </div>
-    </div>
-    <div v-else class="tree-view">
-      <div class="tree-actions">
-        <button @click="collapseAll" class="collapse-btn">
-          Collapse All
+    <div class="insert-scroll-container">
+      <div v-if="!searchQuery" class="insert-actions">
+        <button @click="insertImage" class="icon" :title="t('Insert an image from file')" :aria-label="t('Insert an image from file')">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+            <rect x="2" y="2" width="12" height="12" rx="1" />
+            <circle cx="5.5" cy="5.5" r="1.5" />
+            <path d="m14 12-4-4-3 3-2-2-3 3" />
+          </svg>
         </button>
+        <CollapseAllButton v-if="displayItems.length > 0" @click="collapseAll" />
       </div>
-      <div id="tree-container" class="tree-container">
-        <!-- Tree structure will be built here -->
-        <div class="tree-placeholder">
-          Loading insert items...
+
+      <!-- Symbols Palette -->
+      <div v-if="!searchQuery && symbolGroups.length > 0" class="symbols-palette">
+        <div class="symbols-palette-header" :title="t('Symbol Palette')" @click="panelState.symbolsPaletteOpen = !panelState.symbolsPaletteOpen">
+          <span class="symbols-palette-arrow" :class="{ open: panelState.symbolsPaletteOpen }">&#x25B6;</span>
+          <span class="symbols-palette-title" :aria-label="t('Symbol Palette')">{{ t('Symbols:') }}<span class="symbols-palette-examples">α β π Δ Ω x̄ ẋ °</span>
+          </span>
+        </div>
+        <div v-show="panelState.symbolsPaletteOpen" class="symbols-palette-body">
+          <div v-for="group in symbolGroups" :key="group.name" class="symbol-group">
+            <div class="symbol-group-header" :title="group.name" @click="toggleGroup(group.name)">
+              <span class="symbol-group-arrow" :class="{ open: isGroupOpen(group.name) }">&#x25B6;</span>
+              <span class="symbol-group-label" :aria-label="group.name">{{ group.preview }}</span>
+            </div>
+            <div v-show="isGroupOpen(group.name)" class="symbol-grid">
+              <button
+                v-for="item in group.items"
+                :key="itemKeys.get(item)"
+                class="symbol-btn"
+                :title="buildTooltip(item)"
+                @click="insertItem(item)"
+              >
+                {{ item.tag }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="searchQuery && filteredItems.length === 0" class="no-items">
+        No items found for "{{ searchQuery }}"
+      </div>
+      <div v-else-if="displayItems.length === 0" class="no-items">{{ t('No insert items available') }}</div>
+      <div
+        v-else-if="searchQuery"
+        ref="searchResults"
+        class="insert-results"
+        role="listbox"
+        :aria-label="t('Insert search results')"
+        @keydown.down.exact.prevent.stop="focusResult(Math.min(selectedResultIndex + 1, filteredItems.length - 1))"
+        @keydown.up.exact.prevent.stop="focusResult(Math.max(selectedResultIndex - 1, 0))"
+        @keydown.home.exact.prevent.stop="focusResult(0)"
+        @keydown.end.exact.prevent.stop="focusResult(filteredItems.length - 1)"
+        @keydown.space.prevent.stop
+        @keydown.enter.prevent.stop="!$event.repeat && insertSelectedResult()"
+      >
+        <div
+          v-for="(item, index) in displayItems"
+          :key="itemKeys.get(item)"
+          class="insert-result"
+          role="option"
+          :aria-selected="selectedResultIndex === index"
+          :tabindex="index === Math.max(selectedResultIndex, 0) ? 0 : -1"
+          @focus="selectedResultIndex = index"
+          @click="focusResult(index)"
+          @dblclick.prevent="insertItem(item)"
+          :title="buildTooltip(item)"
+        >
+          <CalcpadSearchHighlight class="item-display" :text="formatDisplayText(item)" :query="searchQuery" />
+          <CalcpadSearchHighlight v-if="formatSecondaryText(item)" class="item-description" :text="formatSecondaryText(item)" :query="searchQuery" />
+          <CalcpadSearchHighlight v-if="item.categoryPath" class="item-category" :text="item.categoryPath" :query="searchQuery" />
+        </div>
+      </div>
+      <div v-else>
+        <div id="tree-container">
+          <!-- Tree structure will be built here -->
+          <div class="tree-placeholder">{{ t('Loading insert items...') }}</div>
         </div>
       </div>
     </div>
@@ -82,9 +95,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
+import CalcpadSearchField from './CalcpadSearchField.vue'
+import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
+import CollapseAllButton from './CollapseAllButton.vue'
 import type { InsertItem } from '../types'
 import { replaceParameterPlaceholders } from '../../text/snippet-insert'
+
+const { t } = useI18n()
 
 // Props
 interface Props {
@@ -101,22 +120,37 @@ const emit = defineEmits<{
 
 // State
 const searchTerm = ref('')
-const symbolsPaletteOpen = ref(false)
-// All symbol groups start collapsed; users open them on demand.
-const openSymbolGroups = ref<Set<string>>(new Set())
+const searchField = ref<InstanceType<typeof CalcpadSearchField> | null>(null)
+const searchResults = ref<HTMLDivElement | null>(null)
+const selectedResultIndex = ref(-1)
+const searchQuery = computed(() => searchTerm.value.trim())
+defineExpose({ focusSearch: () => searchField.value!.focus() })
+
+const STORAGE_KEY = 'calcpad.insert.panels'
+const panelState = reactive({
+  symbolsPaletteOpen: false,
+  openSymbolGroups: [] as string[],
+  openCategories: [] as string[]
+})
+Object.assign(panelState, JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}'))
+
+watch(panelState, () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(panelState))
+}, { flush: 'sync' })
 
 const toggleGroup = (name: string) => {
-  const next = new Set(openSymbolGroups.value)
+  const next = new Set(panelState.openSymbolGroups)
   if (next.has(name)) next.delete(name)
   else next.add(name)
-  openSymbolGroups.value = next
+  panelState.openSymbolGroups = [...next]
 }
 
-const isGroupOpen = (name: string): boolean => openSymbolGroups.value.has(name)
+const isGroupOpen = (name: string): boolean => panelState.openSymbolGroups.includes(name)
 
 // Symbol palette helpers
 interface SymbolGroup {
   name: string
+  preview: string
   items: InsertItem[]
 }
 
@@ -136,41 +170,82 @@ const symbolGroups = computed((): SymbolGroup[] => {
     }
     groups.get(groupName)!.push(item)
   }
-  return Array.from(groups.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([name, items]) => ({
-      name,
-      items: items.sort((a, b) => (a.description || '').localeCompare(b.description || ''))
-    }))
+  return Array.from(groups.entries()).map(([name, items]) => ({
+    name,
+    preview: items.slice(0, 4).map(item => item.tag).join(' '),
+    items
+  }))
 })
 
 // Computed
+const itemKeys = computed(() => new Map(
+  props.insertItems.map((item, index) => [item, index])
+))
+
 const filteredItems = computed(() => {
-  if (!searchTerm.value.trim()) {
+  if (!searchQuery.value) {
     return []
   }
 
-  const term = searchTerm.value.toLowerCase()
+  const term = searchQuery.value.toLowerCase()
+  const scoreMatch = (text: string) => {
+    const normalizedText = text.toLowerCase()
+    let matchedCharacters = 0
+    let wordStart = 0
+    let position = normalizedText.indexOf(term)
+    while (position !== -1) {
+      matchedCharacters += term.length
+      if (!/[\p{L}\p{M}\p{N}_]$/u.test(normalizedText.slice(0, position))) {
+        wordStart = 1
+      }
+      position = normalizedText.indexOf(term, position + term.length)
+    }
+    return {
+      coverage: matchedCharacters ? matchedCharacters / normalizedText.length : 0,
+      wordStart
+    }
+  }
 
-  const itemMatches = props.insertItems.filter((item: InsertItem) =>
-    item.label?.toLowerCase().includes(term) ||
-    item.tag?.toLowerCase().includes(term) ||
-    item.description?.toLowerCase().includes(term)
-  )
-
-  const categoryMatches = props.insertItems.filter((item: InsertItem) =>
-    item.categoryPath?.toLowerCase().includes(term) &&
-    !itemMatches.includes(item)
-  )
-
-  return [...itemMatches, ...categoryMatches]
+  return props.insertItems
+    .map(item => ({
+      item,
+      titleScore: scoreMatch(formatTitleText(item)),
+      descriptionScore: scoreMatch(formatSecondaryText(item)),
+      categoryScore: scoreMatch(item.categoryPath ?? '')
+    }))
+    .filter(({ item, titleScore, descriptionScore, categoryScore }) =>
+      titleScore.coverage > 0 || descriptionScore.coverage > 0 || categoryScore.coverage > 0 ||
+      item.label?.toLowerCase().includes(term) ||
+      item.tag.toLowerCase().includes(term) ||
+      item.description?.toLowerCase().includes(term)
+    )
+    // In each field, prefer word-start matches, then higher coverage.
+    // Count matches without overlap; coverage is matched characters divided by field length.
+    // Move to the next field only on a tie:
+    // 1. Title.
+    // 2. Description.
+    // 3. Category.
+    // Keep the original order when all fields tie.
+    .sort((a, b) =>
+      b.titleScore.wordStart - a.titleScore.wordStart ||
+      b.titleScore.coverage - a.titleScore.coverage ||
+      b.descriptionScore.wordStart - a.descriptionScore.wordStart ||
+      b.descriptionScore.coverage - a.descriptionScore.coverage ||
+      b.categoryScore.wordStart - a.categoryScore.wordStart ||
+      b.categoryScore.coverage - a.categoryScore.coverage
+    )
+    .map(({ item }) => item)
 })
 
 const displayItems = computed(() => {
-  if (searchTerm.value.trim()) {
+  if (searchQuery.value) {
     return filteredItems.value
   }
   return props.insertItems
+})
+
+watch(filteredItems, () => {
+  selectedResultIndex.value = -1
 })
 
 // Types for tree structure built from flat items
@@ -222,13 +297,16 @@ const MARKUP_CATEGORIES = new Set(['HTML', 'Metadata Properties', 'SVG', 'Markdo
 const isMarkupItem = (item: InsertItem): boolean =>
   MARKUP_CATEGORIES.has((item.categoryPath ?? '').split(' > ')[0])
 
-// Format display text (uses label if available, falls back to tag).
-// Appends (~shortcut) for items with quick typing support.
-const formatDisplayText = (item: InsertItem): string => {
+const formatTitleText = (item: InsertItem): string => {
   const name = isMarkupItem(item)
     ? item.label || item.description || item.tag
     : item.label || item.tag
-  const display = replaceParameterPlaceholders(name, item)
+  return replaceParameterPlaceholders(name, item)
+}
+
+// Appends (~shortcut) for items with quick typing support.
+const formatDisplayText = (item: InsertItem): string => {
+  const display = formatTitleText(item)
   if (item.quickType) {
     return display + ' (~' + item.quickType + ')'
   }
@@ -305,6 +383,26 @@ const buildTooltip = (item: InsertItem): string => {
 }
 
 // Methods
+const focusResult = async (index: number) => {
+  if (!searchQuery.value || filteredItems.value.length === 0) return
+  selectedResultIndex.value = index
+  await nextTick()
+  const result = searchResults.value!.querySelectorAll<HTMLElement>('[role="option"]')[index]
+  result.focus({ preventScroll: true })
+  result.scrollIntoView({ block: 'nearest' })
+}
+
+const enterResults = (event: KeyboardEvent, index: number) => {
+  if (!searchQuery.value || filteredItems.value.length === 0 || event.isComposing) return
+  event.preventDefault()
+  event.stopPropagation()
+  void focusResult(index)
+}
+
+const insertSelectedResult = () => {
+  if (selectedResultIndex.value !== -1) insertItem(filteredItems.value[selectedResultIndex.value])
+}
+
 const insertImage = () => {
   emit('insertImage')
 }
@@ -314,6 +412,9 @@ const insertItem = (item: InsertItem) => {
 }
 
 const collapseAll = () => {
+  panelState.symbolsPaletteOpen = false
+  panelState.openSymbolGroups = []
+  panelState.openCategories = []
   const checkboxes = document.querySelectorAll('#tree-container input[type="checkbox"]')
   checkboxes.forEach(checkbox => {
     (checkbox as HTMLInputElement).checked = false
@@ -340,33 +441,32 @@ const buildTreeStructure = () => {
   buildTreeStructureRecursive(treeData, treeRoot, 0)
 }
 
-const buildTreeStructureRecursive = (data: TreeNode, parentUl: HTMLUListElement, level: number) => {
+const buildTreeStructureRecursive = (data: TreeNode, parentUl: HTMLUListElement, level: number, parentPath: string[] = []) => {
   if (level >= 5) return // Prevent infinite recursion
 
-  Object.keys(data).sort((a, b) => a.localeCompare(b)).forEach(categoryKey => {
+  Object.keys(data).forEach(categoryKey => {
     const categoryData = data[categoryKey]
+    const categoryPath = [...parentPath, categoryKey]
 
     if (Array.isArray(categoryData)) {
-      const { li, ul } = createTreeSection(categoryKey, level)
+      const { li, ul } = createTreeSection(categoryKey, level, categoryPath)
 
-      const sorted = [...categoryData].sort((a, b) =>
-        formatDisplayText(a).localeCompare(formatDisplayText(b))
-      )
-      sorted.forEach((item: InsertItem) => {
+      categoryData.forEach((item: InsertItem) => {
         const itemLi = createTreeItem(item)
         ul.appendChild(itemLi)
       })
 
       parentUl.appendChild(li)
     } else if (typeof categoryData === 'object' && categoryData !== null) {
-      const { li, ul } = createTreeSection(categoryKey, level)
-      buildTreeStructureRecursive(categoryData as TreeNode, ul, level + 1)
+      const { li, ul } = createTreeSection(categoryKey, level, categoryPath)
+      buildTreeStructureRecursive(categoryData as TreeNode, ul, level + 1, categoryPath)
       parentUl.appendChild(li)
     }
   })
 }
 
-const createTreeSection = (title: string, level: number) => {
+const createTreeSection = (title: string, level: number, categoryPath: string[]) => {
+  const categoryId = categoryPath.join(' > ')
   const checkboxId = 'checkbox-' + Date.now() + '-' + Math.random()
   const levelClass = level > 0 ? ' level-' + level : ''
 
@@ -376,7 +476,7 @@ const createTreeSection = (title: string, level: number) => {
   const checkbox = document.createElement('input')
   checkbox.type = 'checkbox'
   checkbox.id = checkboxId
-  checkbox.checked = false // Default to collapsed
+  checkbox.checked = panelState.openCategories.includes(categoryId)
 
   const label = document.createElement('label')
   label.setAttribute('for', checkboxId)
@@ -386,6 +486,10 @@ const createTreeSection = (title: string, level: number) => {
   label.addEventListener('click', (e) => {
     e.preventDefault()
     checkbox.checked = !checkbox.checked
+    const next = new Set(panelState.openCategories)
+    if (checkbox.checked) next.add(categoryId)
+    else next.delete(categoryId)
+    panelState.openCategories = [...next]
   })
 
   const ul = document.createElement('ul')
@@ -444,30 +548,25 @@ watch(
 
 <style scoped>
 .insert-tab {
-  padding: 12px 12px 0;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .search-container {
-  margin-bottom: 12px;
+  flex-shrink: 0;
+  margin: 12px;
 }
 
-.search-input {
-  width: 100%;
-  padding: 8px;
-  background: var(--vscode-input-background);
-  border: 1px solid var(--vscode-input-border);
-  color: var(--vscode-input-foreground);
-  border-radius: 3px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--vscode-focusBorder);
+.insert-scroll-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 12px;
 }
 
 /* Symbols Palette */
@@ -486,7 +585,6 @@ watch(
   cursor: pointer;
   background: var(--vscode-sideBar-background);
   font-weight: bold;
-  font-size: var(--calcpad-font-size-md);
   user-select: none;
 }
 
@@ -494,9 +592,12 @@ watch(
   background: var(--vscode-list-hoverBackground);
 }
 
+.symbols-palette-examples {
+  font-size: var(--calcpad-font-size-icon-large);
+}
+
 .symbols-palette-arrow {
   display: inline-block;
-  font-size: var(--calcpad-font-size-xxs);
   transition: transform 0.2s ease;
 }
 
@@ -519,7 +620,6 @@ watch(
   padding: 3px 6px;
   cursor: pointer;
   user-select: none;
-  font-size: var(--calcpad-font-size-sm);
   font-weight: 600;
   color: var(--vscode-descriptionForeground);
 }
@@ -530,7 +630,7 @@ watch(
 
 .symbol-group-arrow {
   display: inline-block;
-  font-size: var(--calcpad-font-size-xxs);
+  font-size: var(--calcpad-font-size-icon-small);
   transition: transform 0.2s ease;
 }
 
@@ -540,6 +640,9 @@ watch(
 
 .symbol-group-label {
   flex: 1;
+  font-size: var(--calcpad-font-size-icon-large);
+  font-weight: normal;
+  color: var(--vscode-editor-foreground);
 }
 
 .symbol-grid {
@@ -560,7 +663,7 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 2px;
   cursor: pointer;
-  font-size: var(--calcpad-font-size-lg);
+  font-size: var(--calcpad-font-size-icon-large);
   color: var(--vscode-editor-foreground);
   line-height: 1;
 }
@@ -570,24 +673,11 @@ watch(
   border-color: var(--vscode-focusBorder);
 }
 
-.image-insert-container {
-  margin-bottom: 12px;
-}
-
-.image-insert-btn {
-  width: 100%;
-  padding: 6px 8px;
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-}
-
-.image-insert-btn:hover {
-  background: var(--vscode-button-hoverBackground);
+.insert-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
 .no-items {
@@ -597,77 +687,67 @@ watch(
   font-style: italic;
 }
 
-.search-results {
-  flex: 1;
-  overflow-y: auto;
+.insert-results {
+  display: block;
+  overflow: visible;
+  height: max-content;
+  width: 100%;
+  padding: 4px;
+  border: none;
+  color: inherit;
+  background: transparent;
+  font: inherit;
 }
 
-.insert-item {
+.insert-result {
+  display: block;
+  width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   padding: 8px;
   margin: 2px 0;
+  scroll-margin: 4px;
   border: 1px solid var(--vscode-widget-border);
   border-radius: 3px;
-  cursor: pointer;
+  cursor: default;
   background: var(--vscode-editor-background);
-  transition: border-color 0.2s ease;
 }
 
-.insert-item:hover {
+.insert-result[aria-selected="true"] {
   border-color: var(--vscode-focusBorder);
-  background: var(--vscode-list-hoverBackground);
+}
+
+.insert-result:focus {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
+.item-display,
+.item-description,
+.item-category {
+  display: block;
 }
 
 .item-display {
   font-weight: bold;
   color: var(--vscode-editor-foreground);
-  font-size: var(--calcpad-font-size-md);
   font-family: monospace;
 }
 
 .item-description {
-  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-descriptionForeground);
   margin-top: 2px;
 }
 
 .item-category {
-  font-size: var(--calcpad-font-size-xs);
   color: var(--vscode-descriptionForeground);
   margin-top: 2px;
   opacity: 0.7;
-}
-
-.tree-view {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.tree-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-.collapse-btn {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  padding: 4px 8px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
-}
-
-.collapse-btn:hover {
-  background: var(--vscode-button-hoverBackground);
-}
-
-.tree-container {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
 }
 
 .tree-placeholder {
@@ -700,7 +780,6 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 3px;
   font-weight: bold;
-  font-size: var(--calcpad-font-size-sm);
   position: relative;
 }
 
@@ -735,7 +814,6 @@ watch(
   border: 1px solid var(--vscode-widget-border);
   border-radius: 2px;
   cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
   color: var(--vscode-editor-foreground);
   text-align: left;
 }

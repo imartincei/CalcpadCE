@@ -28,7 +28,7 @@ Calcpad language reference, in `docs/` at the repo root. `quick-reference.md` co
 1. Units on every dimensioned quantity; `|` to set output units.
 2. `#hide` / `#end hide` around hidden content.
 3. `;` separates function and macro arguments, never `,`.
-4. HTML headings in comments for structure: `'<h3>Section</h3>`.
+4. Headings for structure: `"Title` renders as `<h1>`; use `'<h2>Section</h2>` and below for subsections.
 
 ## Workflow
 

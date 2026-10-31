@@ -16,4 +16,7 @@ namespace Calcpad.Core
         /// <summary>Offset in the parsed expression where the error was found, or -1.</summary>
         internal int Position { get; set; } = -1;
     }
+
+    internal sealed class ComplexInRealModeException(string message)
+        : MathParserException(message, "CPD-5537", CalcpadErrorKind.Values);
 }

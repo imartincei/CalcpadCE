@@ -480,7 +480,7 @@ Results will appear in the "**Output**" box on the right as a professionally for
 
     - Units for trigonometric functions: `#deg` - degrees, `#rad` - radians, `#gra` - gradians
     - Separator for target units: \|
-    - Return angles with units: *ReturnAngleUnits* = 1
+    - Return unitless angles: *ReturnAngleUnits* = 0
     - Dimensionless: %, ‰, ‱, pcm, ppm, ppb, ppt, ppq
     - Angle: °, ′, ″, deg, rad, grad, rev
 

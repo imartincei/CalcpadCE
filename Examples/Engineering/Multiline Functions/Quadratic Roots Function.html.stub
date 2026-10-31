@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Multiline quadratic-roots function returning both roots of $a x^2 + b x + c = 0$ via the discriminant, with real/complex branching. -->
- <h3>Quadratic Equation Roots function</h3>
+ <h1>Quadratic Equation Roots function</h1>
  <p>Multiline code block example:</p>
  <p>
   <span class="eq">

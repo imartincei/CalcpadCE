@@ -6,16 +6,14 @@ namespace Calcpad.Server.Services
     /// <summary>
     /// Loads font files bundled with the backend (filesystem Fonts/ folder or
     /// embedded resources under <c>Calcpad.Server.Fonts.*</c>) and generates
-    /// @font-face rules plus a <c>window.__calcpadFonts</c> dict for the
-    /// rendered page. Drop a .woff / .woff2 / .ttf / .otf file into the Fonts/
+    /// @font-face rules for the rendered page. Drop a .woff / .woff2 / .ttf / .otf file into the Fonts/
     /// directory and it gets picked up automatically.
     /// </summary>
     internal static class BundledFonts
     {
         private readonly record struct FontFace(string Family, string? Weight = null, string? Style = null);
 
-        // Filename -> the @font-face rule(s) it should be registered as.
-        // Files bundled but not listed here still land in window.__calcpadFonts, just without a rule.
+        // Filename -> the @font-face rule(s) it should be registered as. Unlisted files are ignored.
         private static readonly Dictionary<string, FontFace[]> FontFaces =
             new(StringComparer.OrdinalIgnoreCase)
             {
@@ -29,7 +27,6 @@ namespace Calcpad.Server.Services
             };
 
         private static IReadOnlyDictionary<string, string>? _cachedDataUrls;
-        private static string? _cachedScriptTag;
         private static string? _cachedFontFaceStyleTag;
         private static readonly object _lock = new();
 
@@ -48,37 +45,6 @@ namespace Calcpad.Server.Services
                 _cachedDataUrls = map;
                 return _cachedDataUrls;
             }
-        }
-
-        /// <summary>
-        /// Returns a <c>&lt;script&gt;</c> tag that defines
-        /// <c>window.__calcpadFonts</c> with every bundled font, or an empty
-        /// string if none are bundled.
-        /// </summary>
-        public static string GetInjectionScript()
-        {
-            if (_cachedScriptTag != null) return _cachedScriptTag;
-
-            var fonts = GetDataUrls();
-            if (fonts.Count == 0)
-            {
-                _cachedScriptTag = string.Empty;
-                return _cachedScriptTag;
-            }
-
-            var sb = new StringBuilder();
-            sb.Append("<script>window.__calcpadFonts={");
-            bool first = true;
-            foreach (var (fileName, dataUrl) in fonts)
-            {
-                if (!first) sb.Append(',');
-                first = false;
-                sb.Append('"').Append(JsEscape(fileName)).Append("\":\"").Append(JsEscape(dataUrl)).Append('"');
-            }
-            sb.Append("};</script>");
-
-            _cachedScriptTag = sb.ToString();
-            return _cachedScriptTag;
         }
 
         /// <summary>
@@ -202,8 +168,5 @@ namespace Calcpad.Server.Services
                 _ => null
             };
         }
-
-        private static string JsEscape(string s) =>
-            s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("</", "<\\/");
     }
 }

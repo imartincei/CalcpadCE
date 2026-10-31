@@ -9,7 +9,7 @@ import { buildCrashRecord, extractConfigError, SERVER_CONFIG_ERROR_EXIT_CODE, ty
  * process is spawned and killed by the Tauri Rust layer (see src-tauri/src/lib.rs):
  *   - `spawn_sidecar` runs at app startup and emits `server-url` when Kestrel binds.
  *   - `stop_server` / `restart_server` are exposed as invoke commands.
- *   - The child is killed on window close and app exit — no TS shutdown work.
+ *   - The child is killed when the application exits.
  *
  * This class keeps the crash counter and the "auto-restart exhausted" UI hook,
  * which are the parts the frontend has to own. Everything else is delegated.
@@ -72,8 +72,19 @@ export class TauriServerManager {
 
     /** `autoRestartEnabled` is off in secondary windows: `server-crashed` is broadcast, so
      *  every window would otherwise race to respawn the one sidecar. */
-    constructor(logger: ServerManagerLogger, private readonly autoRestartEnabled = true) {
+    constructor(logger: ServerManagerLogger, private autoRestartEnabled = true) {
         this.logger = logger;
+    }
+
+    setAutoRestartEnabled(enabled: boolean): void {
+        if (this.autoRestartEnabled === enabled) return;
+        this.autoRestartEnabled = enabled;
+        if (enabled && !this._isRunning && !this._configInvalid && this._crashCount > 0
+            && this._crashCount < MAX_AUTO_RESTARTS && !this._autoRestartPending
+            && !this._manualRestartInFlight) {
+            this._autoRestartPending = true;
+            setTimeout(() => { void this.autoRestart(); }, AUTO_RESTART_DELAY_MS);
+        }
     }
 
     setLogger(logger: ServerManagerLogger): void {
@@ -396,7 +407,7 @@ export class TauriServerManager {
         return this.stop();
     }
 
-    /** Detach event listeners. Rust reaps the sidecar on window close. */
+    /** Detach this window's event listeners. */
     async dispose(): Promise<void> {
         this.clearStabilityReset();
         try { this.unlistenUrl?.(); } catch { /* ignore */ }

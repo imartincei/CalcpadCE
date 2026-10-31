@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of an equilateral triangle: area, centroid, $I_x$, $I_y$, section moduli and radii of gyration in closed form. -->
- <h3>Geometrical Properties of Equilateral Triangle</h3>
+ <h1>Geometrical Properties of Equilateral Triangle</h1>
  <div style="max-width:120mm">
   <img alt="equilateral-triangle.png" class="side" src="Images/mechanics/sections/equilateral-triangle.png" style="height:135pt;"/>
  </div>

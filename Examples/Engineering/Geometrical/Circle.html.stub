@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a solid circle: area, $I_x = I_y = \pi d^4 / 64$, section modulus and radius of gyration. -->
- <h3>Geometrical Properties of Circle</h3>
+ <h1>Geometrical Properties of Circle</h1>
  <div style="max-width:120mm">
   <img alt="circle.png" class="side" src="Images/mechanics/sections/circle.png" style="height:135pt;"/>
  </div>

@@ -399,7 +399,7 @@
         [Trait("Category", "HPDiagonalMatrixFunctions")]
         public void HPDiagonalMatrixAsin()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("asin"));
             Assert.Equal(0, result);
         }
@@ -417,7 +417,7 @@
         [Trait("Category", "HPDiagonalMatrixFunctions")]
         public void HPDiagonalMatrixAtan()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("atan"));
             Assert.Equal(0, result);
         }
@@ -426,7 +426,7 @@
         [Trait("Category", "HPDiagonalMatrixFunctions")]
         public void HPDiagonalMatrixAtan2()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run([
                 "n = 500",
                 RandomMatrixA,

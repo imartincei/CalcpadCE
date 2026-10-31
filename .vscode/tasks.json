@@ -3,19 +3,39 @@
     "tasks": [
         // ── Tests (Calcpad.Tests) ───────────────────────────────────────
         {
+            // Shared Debug build so parallel tasks don't race on obj/.
+            "label": "Build: .NET",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/Calcpad.Tests/Calcpad.Tests.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "Tests: Run",
+            "dependsOn": "Build: .NET",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
             "type": "process",
             "command": "dotnet",
             "args": [
                 "test",
                 "${workspaceFolder}/Calcpad.Tests/Calcpad.Tests.csproj",
+                "--no-build",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
             "presentation": {
                 "reveal": "always",
                 "panel": "dedicated"
@@ -178,6 +198,23 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
+            }
+        },
+        {
+            "label": "Frontend Lib: Build",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "build"],
+            "options": {
+                "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-frontend"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "base": "$tsc",
+                "fileLocation": ["relative", "${workspaceFolder}/Calcpad.Web/frontend/calcpad-frontend"]
             }
         },
         {
@@ -575,6 +612,199 @@
                 "reveal": "always",
                 "panel": "dedicated"
             },
+            "problemMatcher": []
+        },
+
+        // ── Checks ──────────────────────────────────────────────────────
+        {
+            "label": "Check: .NET Lint",
+            "type": "process",
+            "group": "test",
+            "dependsOn": "Build: .NET",
+            "options": { "cwd": "${workspaceFolder}" },
+            "command": "bash",
+            "linux": {
+                "args": ["-c", "rc=0; for p in Calcpad.Core/Calcpad.Core.csproj Calcpad.Highlighter/Calcpad.Highlighter.csproj Calcpad.Web/backend/Calcpad.Server.csproj Calcpad.Tests/Calcpad.Tests.csproj; do for c in style analyzers; do dotnet format $c \"$p\" --verify-no-changes || rc=1; done; done; exit $rc"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "$rc=0; foreach($p in 'Calcpad.Core\\Calcpad.Core.csproj','Calcpad.Highlighter\\Calcpad.Highlighter.csproj','Calcpad.Web\\backend\\Calcpad.Server.csproj','Calcpad.Tests\\Calcpad.Tests.csproj'){ foreach($c in 'style','analyzers'){ dotnet format $c $p --verify-no-changes; if($LASTEXITCODE){$rc=1} } }; exit $rc"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Check: .NET Whitespace",
+            "type": "process",
+            "group": "test",
+            "dependsOn": "Build: .NET",
+            "options": { "cwd": "${workspaceFolder}" },
+            "command": "bash",
+            "linux": {
+                "args": ["-c", "rc=0; for p in Calcpad.Core/Calcpad.Core.csproj Calcpad.Highlighter/Calcpad.Highlighter.csproj Calcpad.Web/backend/Calcpad.Server.csproj Calcpad.Tests/Calcpad.Tests.csproj; do dotnet format whitespace \"$p\" --verify-no-changes || rc=1; done; exit $rc"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "$rc=0; foreach($p in 'Calcpad.Core\\Calcpad.Core.csproj','Calcpad.Highlighter\\Calcpad.Highlighter.csproj','Calcpad.Web\\backend\\Calcpad.Server.csproj','Calcpad.Tests\\Calcpad.Tests.csproj'){ dotnet format whitespace $p --verify-no-changes; if($LASTEXITCODE){$rc=1} }; exit $rc"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Fix: .NET Format",
+            "type": "process",
+            "dependsOn": "Build: .NET",
+            "options": { "cwd": "${workspaceFolder}" },
+            "command": "bash",
+            "linux": {
+                "args": ["-c", "for p in Calcpad.Core/Calcpad.Core.csproj Calcpad.Highlighter/Calcpad.Highlighter.csproj Calcpad.Web/backend/Calcpad.Server.csproj Calcpad.Tests/Calcpad.Tests.csproj; do dotnet format \"$p\"; done"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "foreach($p in 'Calcpad.Core\\Calcpad.Core.csproj','Calcpad.Highlighter\\Calcpad.Highlighter.csproj','Calcpad.Web\\backend\\Calcpad.Server.csproj','Calcpad.Tests\\Calcpad.Tests.csproj'){ dotnet format $p }"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Check: .NET Build Warnings",
+            "type": "process",
+            "group": "test",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/Calcpad.Tests/Calcpad.Tests.csproj",
+                "--no-incremental",
+                "-warnaserror",
+                "--artifacts-path", "${workspaceFolder}/artifacts/warnings-check",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Check: TypeScript (Frontend Lib)",
+            "type": "shell",
+            "group": "test",
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-frontend" },
+            "linux": {
+                "command": "bash",
+                "args": ["-c", "[ -d node_modules ] || npm install; rc=0; npx tsc --noEmit --pretty false -p . || rc=1; npx tsc --pretty false -p tsconfig.scripts.json || rc=1; exit $rc"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "if(-not(Test-Path node_modules)){npm install}; $rc=0; npx tsc --noEmit --pretty false -p .; if($LASTEXITCODE){$rc=1}; npx tsc --pretty false -p tsconfig.scripts.json; if($LASTEXITCODE){$rc=1}; exit $rc"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": {
+                "base": "$tsc",
+                "fileLocation": ["relative", "${workspaceFolder}/Calcpad.Web/frontend/calcpad-frontend"]
+            }
+        },
+        {
+            "label": "Check: TypeScript (Web)",
+            "type": "shell",
+            "group": "test",
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-web" },
+            "linux": {
+                "command": "bash",
+                "args": ["-c", "[ -d node_modules ] || npm install; rc=0; npx vue-tsc --noEmit --pretty false -p . || rc=1; npx tsc --pretty false -p tsconfig.node.json || rc=1; exit $rc"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "if(-not(Test-Path node_modules)){npm install}; $rc=0; npx vue-tsc --noEmit --pretty false -p .; if($LASTEXITCODE){$rc=1}; npx tsc --pretty false -p tsconfig.node.json; if($LASTEXITCODE){$rc=1}; exit $rc"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": {
+                "base": "$tsc",
+                "fileLocation": ["relative", "${workspaceFolder}/Calcpad.Web/frontend/calcpad-web"]
+            }
+        },
+        {
+            "label": "Check: TypeScript (Extension)",
+            "type": "shell",
+            "group": "test",
+            "dependsOn": "Frontend Lib: Build",
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad" },
+            "linux": {
+                "command": "bash",
+                "args": ["-c", "[ -d node_modules ] || npm install; rc=0; npx tsc --noEmit --pretty false -p . || rc=1; npx vue-tsc --noEmit --pretty false -p tsconfig.vue.json || rc=1; npx tsc --pretty false -p tsconfig.node.json || rc=1; exit $rc"]
+            },
+            "windows": {
+                "command": "powershell",
+                "args": ["-NoProfile", "-Command", "if(-not(Test-Path node_modules)){npm install}; $rc=0; npx tsc --noEmit --pretty false -p .; if($LASTEXITCODE){$rc=1}; npx vue-tsc --noEmit --pretty false -p tsconfig.vue.json; if($LASTEXITCODE){$rc=1}; npx tsc --pretty false -p tsconfig.node.json; if($LASTEXITCODE){$rc=1}; exit $rc"]
+            },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": {
+                "base": "$tsc",
+                "fileLocation": ["relative", "${workspaceFolder}/Calcpad.Web/frontend/vscode-calcpad"]
+            }
+        },
+        {
+            "label": "Check: Rust",
+            "type": "process",
+            "group": "test",
+            "command": "cargo",
+            "args": ["clippy", "--all-targets", "--message-format", "short", "--", "-D", "warnings"],
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/src-tauri" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": {
+                "owner": "rust",
+                "fileLocation": ["relative", "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/src-tauri"],
+                "pattern": {
+                    "regexp": "^(.+?):(\\d+):(\\d+): (warning|error)(?:\\[\\w+\\])?: (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Check: Rust Format",
+            "type": "process",
+            "group": "test",
+            "command": "cargo",
+            "args": ["fmt", "--check"],
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/src-tauri" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Fix: Rust Format",
+            "type": "process",
+            "command": "cargo",
+            "args": ["fmt"],
+            "options": { "cwd": "${workspaceFolder}/Calcpad.Web/frontend/calcpad-desktop/src-tauri" },
+            "presentation": { "reveal": "always", "panel": "dedicated" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Check: All",
+            "dependsOn": [
+                "Check: .NET Lint",
+                "Check: .NET Build Warnings",
+                "Check: TypeScript (Frontend Lib)",
+                "Check: TypeScript (Web)",
+                "Check: TypeScript (Extension)",
+                "Check: Rust",
+                "Check: Rust Format"
+            ],
+            "dependsOrder": "parallel",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run All Verifications",
+            "dependsOn": [
+                "Tests: Run",
+                "Scripts: Compare Renderings (Write)",
+                "Check: All"
+            ],
+            "dependsOrder": "parallel",
+            "group": "test",
             "problemMatcher": []
         },
 

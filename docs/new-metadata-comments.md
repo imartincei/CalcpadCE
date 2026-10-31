@@ -64,6 +64,20 @@ Wrap those lines between a `LintIgnore` and an `EndLintIgnore` marker, listing t
 The **Properties** tab has a picker for the codes, so you don't have to memorize them.
 See [Suppressing diagnostics](new-linter.md#suppressing-diagnostics-lint-ignore) for additional details.
 
+## File metadata footer
+
+CalcpadCE stores document-level data at the end of the file:
+
+```calcpad
+'<!--CalcpadCE Metadata-->
+'<!--{"uiOverrides":{"L:1":"8"}}-->
+'<!--{"fileInfo":{"title":"Beam Check","author":"J. Smith"}}-->
+```
+
+`uiOverrides` holds [saved input values](new-ui-mode.md#saving-what-was-entered).
+`fileInfo` holds the title, author, reviewer, and timestamps, which gets created on save.
+The footer is hidden unless **Show File Metadata** is on in [Settings](new-settings.md#editor-features), and never appears in the preview or exports.
+
 ## See also
 
 - [The CalcpadCE Panel & Settings](new-calcpad-panel.md)

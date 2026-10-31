@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Numerical sizing of a rectangular foundation pad under axial force and biaxial bending: the side-ratio $k = a / b$ that minimises the base area while keeping the maximum stress below the permissible value and avoiding uplift is found with the embedded `Inf` solver. -->
- <h3>Single load case problem</h3>
+ <h1>Single load case problem</h1>
  <p>Loads:</p>
  <p>
   Compression -
@@ -653,7 +653,7 @@ circle.Series3 {fill:CornflowerBlue;}
    </circle>
   </g>
  </svg>
- <h3>Multiple load cases problem</h3>
+ <h1>Multiple load cases problem</h1>
  <p>Loads:</p>
  <p>
   Compression -

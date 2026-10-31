@@ -1,8 +1,10 @@
 import * as monaco from 'monaco-editor';
 
+export const UNTITLED_TITLE = 'Untitled';
+
 export interface TabState {
     id: string;
-    /** Display label — filename or "Untitled-N". */
+    /** Display label. */
     title: string;
     /** Absolute filesystem path; null for unsaved untitled tabs. */
     filePath: string | null;
@@ -11,6 +13,15 @@ export interface TabState {
 
 export interface TabSnapshot extends TabState {
     isActive: boolean;
+}
+
+export interface TabTransfer {
+    title: string;
+    filePath: string | null;
+    content: string;
+    dirty: boolean;
+    viewState: monaco.editor.ICodeEditorViewState | null;
+    version: number;
 }
 
 /**
@@ -66,7 +77,6 @@ export type TabRemovedListener = (tabId: string) => void;
 export class TabManager {
     private tabs: InternalTab[] = [];
     private _activeId: string | null = null;
-    private _untitledCounter = 0;
     private _seq = 0;
 
     private listeners = new Set<TabsListener>();
@@ -181,15 +191,61 @@ export class TabManager {
 
     // ---- Mutation ----
 
+    reorder(id: string, beforeId: string | null): void {
+        if (id === beforeId) return;
+        const index = this.tabs.findIndex(tab => tab.id === id);
+        const [tab] = this.tabs.splice(index, 1);
+        const destination = beforeId === null ? this.tabs.length : this.tabs.findIndex(t => t.id === beforeId);
+        this.tabs.splice(destination, 0, tab);
+        this.emit();
+    }
+
+    exportTab(id: string): TabTransfer {
+        const tab = this.tabs.find(t => t.id === id)!;
+        return {
+            title: docFor(tab.model).title,
+            filePath: docFor(tab.model).filePath,
+            content: tab.model.getValue(),
+            dirty: tab.dirty,
+            viewState: id === this._activeId ? this.editor.saveViewState() : tab.viewState,
+            version: tab.model.getVersionId(),
+        };
+    }
+
+    importTab(transfer: TabTransfer, model?: monaco.editor.ITextModel): string {
+        const id = model ? this.openLinked(model) : this.createTab(transfer).id;
+        const tab = this.tabs.find(t => t.id === id)!;
+        tab.viewState = transfer.viewState;
+        if (!model && transfer.dirty) {
+            docFor(tab.model).savedVersionId = -1;
+            tab.dirty = true;
+        }
+        this.activate(id);
+        if (tab.viewState) this.editor.restoreViewState(tab.viewState);
+        this.emit();
+        return id;
+    }
+
     /**
      * Create a new untitled tab with the given content (default empty) and activate it,
-     * returning its id. `title` overrides the default "Untitled-N" label.
+     * returning its id.
+     * `title` overrides the default label.
      */
     newUntitled(content: string = '', title?: string): string {
         let label = title;
         if (!label) {
-            this._untitledCounter += 1;
-            label = `Untitled-${this._untitledCounter}`;
+            const untitledTitles = new Set(monaco.editor.getModels().flatMap(model => {
+                const doc = docs.get(model);
+                return doc?.filePath === null && new RegExp(`^${UNTITLED_TITLE}(?:-\\d+)?$`).test(doc.title)
+                    ? [doc.title]
+                    : [];
+            }));
+            label = UNTITLED_TITLE;
+            if (untitledTitles.size > 0) {
+                let suffix = 1;
+                while (untitledTitles.has(`${UNTITLED_TITLE}-${suffix}`)) suffix += 1;
+                label = `${UNTITLED_TITLE}-${suffix}`;
+            }
         }
         const tab = this.createTab({ title: label, filePath: null, content });
         this.activate(tab.id);
@@ -200,10 +256,10 @@ export class TabManager {
      * Open a file in a new tab and return its id. A tab already holding that path is
      * activated instead, and `content` is ignored.
      */
-    openFile(filePath: string, content: string): string {
+    openFile(filePath: string, content: string, position?: monaco.IPosition): string {
         const existing = this.tabs.find(t => docFor(t.model).filePath === filePath);
         if (existing) {
-            this.activate(existing.id);
+            this.activate(existing.id, position);
             return existing.id;
         }
 
@@ -218,12 +274,13 @@ export class TabManager {
             doc.title = baseName(filePath);
             doc.savedVersionId = active.model.getAlternativeVersionId();
             active.dirty = false;
+            this.activate(active.id, position);
             this.emit();
             return active.id;
         }
 
         const tab = this.createTab({ title: baseName(filePath), filePath, content });
-        this.activate(tab.id);
+        this.activate(tab.id, position);
         return tab.id;
     }
 
@@ -261,8 +318,14 @@ export class TabManager {
      * Switch the editor to the given tab. Saves the previous tab's view state
      * so cursor + scroll restore on switch-back.
      */
-    activate(id: string): void {
-        if (id === this._activeId) return;
+    activate(id: string, position?: monaco.IPosition): void {
+        if (id === this._activeId) {
+            if (position) {
+                this.editor.setPosition(position, 'code.jump');
+                this.editor.revealPositionInCenter(position);
+            }
+            return;
+        }
         const next = this.tabs.find(t => t.id === id);
         if (!next) return;
 
@@ -275,6 +338,10 @@ export class TabManager {
         this.editor.setModel(next.model);
         if (next.viewState) {
             this.editor.restoreViewState(next.viewState);
+        }
+        if (position) {
+            this.editor.setPosition(position, 'code.jump');
+            this.editor.revealPositionInCenter(position);
         }
         this.editor.focus();
         this.emit();
@@ -425,14 +492,6 @@ export class TabManager {
         // across rename and unique even when two tabs hold the same file path.
         const uri = monaco.Uri.parse(`inmemory:///${id}.cpd`);
         const model = monaco.editor.createModel(opts.content, 'calcpad', uri);
-        // Models created this way start with Monaco's global bracket-pair-colorization
-        // default (enabled), independent of the `bracketPairColorization: { enabled: false }`
-        // passed to individual editor instances in setup.ts — that option only takes effect
-        // when an editor creates its own model implicitly. Disable it here instead, so rainbow
-        // bracket colors never clobber the theme's semantic-token colors for this model.
-        model.updateOptions({
-            bracketColorizationOptions: { enabled: false, independentColorPoolPerBracketType: false },
-        });
         const savedVersionId = model.getAlternativeVersionId();
         const doc: DocEntry = {
             filePath: opts.filePath,

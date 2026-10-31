@@ -424,6 +424,15 @@
   <data name="Cross_product_is_definedonly_for_vectors_with_2_and_3_elements" xml:space="preserve">
     <value>Векторното произведение е дефинирано само за вектори с 2 или 3 елемента.</value>
   </data>
+  <data name="Complex_numbers_are_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Комплексните числа не се поддържат извън комплексен режим.</value>
+  </data>
+  <data name="Function_0_with_complex_values_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Функцията "{0}" с комплексни стойности не се поддържа извън комплексен режим.</value>
+  </data>
+  <data name="Complex_variable_0_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Комплексната променлива "{0}" не се поддържа извън комплексен режим.</value>
+  </data>
   <data name="Function_0_is_not_defined_in_complex_mode" xml:space="preserve">
     <value>Функцията {0} не е дефинирана в комплексен режим.</value>
   </data>

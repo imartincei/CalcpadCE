@@ -149,6 +149,12 @@
         "description": "JSON payload of #settings and #UI"
       }
     ],
+    "semanticTokenModifiers": [
+      {
+        "id": "heading",
+        "description": "Comment on a line starting with \", rendered as a heading"
+      }
+    ],
     "semanticTokenScopes": [
       {
         "scopes": {
@@ -633,6 +639,10 @@
     },
     "keybindings": [
       {
+        "command": "vscode-calcpad.showInsert",
+        "key": "alt+i"
+      },
+      {
         "command": "calcpad.runPreview",
         "key": "ctrl+alt+x",
         "mac": "cmd+alt+x",
@@ -803,6 +813,9 @@
         "enabled": true,
         "rules": {
           "comment:calcpad": "#57A64A",
+          "comment.heading:calcpad": {
+            "bold": true
+          },
           "keyword:calcpad": "#FF80FF",
           "operator:calcpad": "#ECC860",
           "bracket:calcpad": "#FF69B4",
@@ -844,13 +857,19 @@
           "enabled": true,
           "rules": {
             "comment:calcpad": "#008000",
-            "keyword:calcpad": "#AF00DB",
-            "operator:calcpad": "#8A6A00",
-            "bracket:calcpad": "#D6006E",
+            "comment.heading:calcpad": {
+              "bold": true
+            },
+            "keyword:calcpad": "#CF00CF",
+            "operator:calcpad": "#947016",
+            "bracket:calcpad": "#E01281",
             "const:calcpad": "#000000",
-            "lineContinuation:calcpad": "#8A6A00",
-            "variable:calcpad": "#0033CC",
-            "localVariable:calcpad": "#2060CC",
+            "lineContinuation:calcpad": "#947016",
+            "variable:calcpad": "#0000FF",
+            "localVariable:calcpad": {
+              "foreground": "#4169E1",
+              "bold": true
+            },
             "function:calcpad": {
               "foreground": "#000000",
               "bold": true
@@ -860,25 +879,25 @@
               "foreground": "#B01FB0",
               "italic": true
             },
-            "units:calcpad": "#007D7D",
+            "units:calcpad": "#007FA8",
             "setting:calcpad": "#0070C1",
             "settingsJson:calcpad": "#0070C1",
-            "controlBlockKeyword:calcpad": "#AF00DB",
-            "endKeyword:calcpad": "#AF00DB",
-            "command:calcpad": "#AF00DB",
+            "controlBlockKeyword:calcpad": "#CF00CF",
+            "endKeyword:calcpad": "#CF00CF",
+            "command:calcpad": "#CF00CF",
             "include:calcpad": "#6A00D6",
             "filePath:calcpad": "#6A00D6",
-            "dataExchangeKeyword:calcpad": "#AF00DB",
+            "dataExchangeKeyword:calcpad": "#CF00CF",
             "htmlComment:calcpad": {
               "foreground": "#5F6B7A",
               "italic": true
             },
-            "tag:calcpad": "#9400B8",
+            "tag:calcpad": "#9932CC",
             "htmlContent:calcpad": "#008000",
-            "javascript:calcpad": "#8A6A00",
-            "css:calcpad": "#0033CC",
-            "svg:calcpad": "#007D7D",
-            "input:calcpad": "#DB0000",
+            "javascript:calcpad": "#947016",
+            "css:calcpad": "#0000FF",
+            "svg:calcpad": "#008383",
+            "input:calcpad": "#EC0000",
             "format:calcpad": "#61686F"
           }
         }
@@ -924,7 +943,9 @@
   },
   "dependencies": {
     "calcpad-frontend": "file:../calcpad-frontend",
+    "pdfjs-dist": "6.4.299",
     "terser": "^5.46.0",
-    "vue": "^3.5.21"
+    "vue": "^3.5.21",
+    "vue-i18n": "^11.4.16"
   }
 }

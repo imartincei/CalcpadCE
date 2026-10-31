@@ -2,13 +2,14 @@ using Calcpad.Core;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 using Calcpad.Server.Controllers;
+using System.Text.RegularExpressions;
 
 namespace Calcpad.Server.Services
 {
     /// <summary>Where a stepped <c>#UI</c> form stopped, returned in <c>X-Calcpad-Pause</c>.</summary>
     public sealed record PauseInfo(string? Next, string? Previous);
 
-    public class CalcpadService
+    public partial class CalcpadService
     {
         private readonly string _tempDirectory;
 
@@ -168,6 +169,8 @@ namespace Calcpad.Server.Services
                     }
                 }
 
+                htmlResult = StripHostMetadata(htmlResult);
+
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
@@ -201,7 +204,7 @@ a = 10
 b = 5
 'Addition:
 sum = a + b
-'Subtraction:  
+'Subtraction:
 diff = a - b
 'Multiplication:
 prod = a * b
@@ -310,9 +313,9 @@ tan_angle = tan(angle°)";
                 }
                 stringBuilder.AppendLine("</p>");
             }
-            
+
             stringBuilder.AppendLine("</div>");
-            
+
             // Add error summary
             if (errors.Count != 0)
             {
@@ -325,7 +328,7 @@ tan_angle = tan(angle°)";
                 }
                 if (errors.Count > 0)
                     stringBuilder.Append(" ...");
-                
+
                 stringBuilder.AppendLine("</div>");
                 stringBuilder.AppendLine("<style>body {padding-top:1.1em;} .code p {margin:0; line-height:1.55em;}</style>");
             }
@@ -333,7 +336,7 @@ tan_angle = tan(angle°)";
             {
                 stringBuilder.AppendLine("<style>.code p {margin:0; line-height:1.55em;}</style>");
             }
-            
+
             return stringBuilder.ToString();
         }
 
@@ -404,7 +407,7 @@ tan_angle = tan(angle°)";
                 // First try to read from embedded resource (for single-file deployments)
                 var assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 var resourceName = "Calcpad.Server.template.html";
-                
+
                 using var stream = assembly.GetManifestResourceStream(resourceName);
                 if (stream != null)
                 {
@@ -413,7 +416,7 @@ tan_angle = tan(angle°)";
                     FileLogger.LogVerbose("Loaded HTML template from embedded resource");
                     return template;
                 }
-                
+
                 // Fallback to file system (for development and non-single-file deployments)
                 var templatePath = Path.Combine(AppContext.BaseDirectory, "template.html");
                 if (File.Exists(templatePath))
@@ -422,7 +425,7 @@ tan_angle = tan(angle°)";
                     FileLogger.LogVerbose("Loaded HTML template from file system", templatePath);
                     return template;
                 }
-                
+
                 throw new FileNotFoundException($"Template file not found at {templatePath}");
             }
             catch (Exception ex)
@@ -461,10 +464,8 @@ tan_angle = tan(angle°)";
             var templateWithTheme = _htmlTemplate.Replace("<body>", $"<body{themeClass}>");
 
             // Register @font-face rules for fonts referenced by name in the
-            // template CSS (e.g. Jost*), so they don't depend on OS installation,
-            // and expose window.__calcpadFonts for any other client-side use.
-            // Injected before </head> so it runs before any module scripts in body.
-            var headMarkup = BundledFonts.GetFontFaceStyleTag() + BundledFonts.GetInjectionScript();
+            // template CSS (e.g. Jost*), so they don't depend on OS installation.
+            var headMarkup = BundledFonts.GetFontFaceStyleTag();
 
             // The datagrid libraries are large, so they only go in when a grid is
             // actually present. jspreadsheet has to be defined before the event
@@ -502,5 +503,18 @@ tan_angle = tan(angle°)";
                 // Ignore cleanup errors
             }
         }
+
+        /// <summary>Removes the metadata footer's comments from rendered output and from the unwrapped listing.</summary>
+        internal static string StripHostMetadata(string html)
+        {
+            html = RenderedMetadataRegex().Replace(html, "");
+            return ListedMetadataRegex().Replace(html, "");
+        }
+
+        [GeneratedRegex(@"<!--(?:CalcpadCE Metadata|\{(?:(?!-->).)*?""(?:uiOverrides|fileInfo)""(?:(?!-->).)*)-->[ \t]*(?:\r?\n)?", RegexOptions.Singleline)]
+        private static partial Regex RenderedMetadataRegex();
+
+        [GeneratedRegex(@"<p class=""line-text""[^>]*>(?:(?!</p>).)*?<span class=""htmlComment"">&lt;!--(?:CalcpadCE Metadata|\{(?:(?!--&gt;).)*?&quot;(?:uiOverrides|fileInfo)&quot;(?:(?!--&gt;).)*)--&gt;</span></p>(?:\r?\n)?", RegexOptions.Singleline)]
+        private static partial Regex ListedMetadataRegex();
     }
 }

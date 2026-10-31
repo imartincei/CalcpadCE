@@ -188,6 +188,14 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void TitleLine_RendersAsH1()
+        {
+            var html = Render("\"Title\n'text");
+            Assert.Matches(@"<h1[^>]*>Title\s*</h1>", html);
+            Assert.Matches(@"<p[^>]*>text\s*</p>", html);
+        }
+
+        [Fact]
         public void MarkdownHeadings_AreContentNotKeywords()
         {
             var html = Render("#markdown\n# One\n## Two\n#end markdown");

@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a right triangle: area, centroid offsets, $I_x$, $I_y$, section moduli and radii of gyration in closed form. -->
- <h3>Geometrical Properties of Right Triangle</h3>
+ <h1>Geometrical Properties of Right Triangle</h1>
  <div style="max-width:120mm">
   <img alt="right-triangle.png" class="side" src="Images/mechanics/sections/right-triangle.png" style="height:127pt;"/>
  </div>
@@ -365,9 +365,8 @@
     -0.0556
    </span>
    <span class="b1">)</span>
-   = 73.15
+   = 73.15°
   </span>
-  <sup>о</sup>
  </p>
  <p>Polar moment of area</p>
  <p>

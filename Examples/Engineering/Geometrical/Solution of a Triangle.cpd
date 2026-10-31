@@ -16,12 +16,12 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	'Radius of escribed circle:
 	R = a*b*c/(4*A)
 	'Angles (Law of cosines):
-	α = acos((b^2 + c^2 - a^2)/(2*b*c))'&deg;
-	β = acos((c^2 + a^2 - b^2)/(2*c*a))'&deg;
-	γ = acos((a^2 + b^2 - c^2)/(2*a*b))'&deg;
-	#if (α ≡ 90) + (β ≡ 90) + (γ ≡ 90)
+	α = acos((b^2 + c^2 - a^2)/(2*b*c))
+	β = acos((c^2 + a^2 - b^2)/(2*c*a))
+	γ = acos((a^2 + b^2 - c^2)/(2*a*b))
+	#if (α ≡ 90°) + (β ≡ 90°) + (γ ≡ 90°)
 		'<p>Type of triangle: right,
-	#else if (α > 90) + (β > 90) + (γ > 90)
+	#else if (α > 90°) + (β > 90°) + (γ > 90°)
 		'<p>Type of triangle: obtuse,
 	#else
 		'<p>Type of triangle: acute,
@@ -135,7 +135,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	l_c = sqrt(a*b*(1 - c^2/(a + b)^2))
 	#hide
 	x_o = c/2
-	y_o = sqr(R^2 - c^2/4)*sign(90 - γ)
+	y_o = sqr(R^2 - c^2/4)*sign(90° - γ)
 	y_min = y_o - R
 	y_max = y_o + R
 	dx = 2*R

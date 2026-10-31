@@ -46,7 +46,7 @@ Declare the input with `#UI` and give it an ordinary value:
 #UI L = 6m
 ```
 
-Entering a value in the input form is stored in a `uiOverrides` entry on the first line of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
+Entering a value in the input form is stored in a `uiOverrides` entry at the end of the CalcpadCE file, so the file keeps its own default values and they stay unchanged when input fields are updated.
 You never have to write that entry yourself, but it is plain text if you ever want to edit it.
 
 ### `%u` in comments is removed
@@ -98,6 +98,61 @@ That snippet also contains examples to change font sizes, so here is a condensed
 #end val
 ```
 
+### `"` headings render as `<h1>` instead of `<h3>`
+
+A `"Title` line now renders as `<h1>`, so the report outline starts at the top level and leaves room for more levels of subsections below it.
+The heading sizes were scaled down to match, so `<h1>` is the size `<h3>` used to be.
+
+| Element | Before | Now |
+| ------- | ------ | --- |
+| `h1` | 2.1em | 1.4em |
+| `h2` | 1.7em | 1.32em |
+| `h3` | 1.4em | 1.24em |
+| `h4` | 1.2em | 1.16em |
+| `h5` | 1.1em | 1.08em |
+| `h6` | 1em | 1em |
+
+#### What breaks
+
+Only the report appearance changes.
+`"` headings look the same as before, but HTML headings (`'<h1>` to `'<h6>`) and Markdown headings (`#` to `######`) render smaller.
+Custom CSS that targeted `h3` to style `"` headings now needs to target `h1`.
+
+#### How to update
+
+There are two ways to get a report to render exactly as before.
+
+**Option 1:** restore the old sizes for every level and convert each `"Title` line to `'<h3>Title</h3>`.
+This works for any document, but each `"` heading has to be changed:
+
+```calcpad
+#val
+'<style>
+'  h1 { font-size: 2.1em; }
+'  h2 { font-size: 1.7em; }
+'  h3 { font-size: 1.4em; }
+'  h4 { font-size: 1.2em; }
+'  h5 { font-size: 1.1em; }
+'  h6 { font-size: 1em; }
+'</style>
+#end val
+```
+
+**Option 2:** keep `h1` at 1.4em and restore the old sizes for the other levels.
+No headings need to be edited, but this breaks the table of contents order and only works if the document has no `'<h1>` or `#` headings of its own:
+
+```calcpad
+#val
+'<style>
+'  h2 { font-size: 1.7em; }
+'  h3 { font-size: 1.4em; }
+'  h4 { font-size: 1.2em; }
+'  h5 { font-size: 1.1em; }
+'  h6 { font-size: 1em; }
+'</style>
+#end val
+```
+
 ### Dots are no longer allowed as part of a variable name
 
 A dot after an identifier is now always element access. Names can no longer contain a dot.
@@ -125,3 +180,44 @@ Rename with an underscore or a comma, both of which are still valid variable nam
 F_max = 10
 a,1 = 4
 ```
+
+### Inverse trig functions return angle units by default
+
+`asin`, `acos`, `atan`, `acsc`, `asec`, `acot`, `atan2` and `phase` now attach the current angle unit to their result (`°`, `rad` or `grad`).
+Previously this required `ReturnAngleUnits = 1`, and the result was a unitless number otherwise.
+The default is now the **Return Angle Units** setting, which is on.
+
+Two related fixes change results under `#deg` and `#gra`:
+
+- `phase` now follows `#deg`/`#rad`/`#gra` like `atan2` does. It always returned radians before.
+- In `A∠φ`, a unitless `φ` is now read in the current angle units. It was always read as radians before, so under `#deg`, `1∠45` was 1∠(45 rad).
+
+#### What breaks
+
+Mixing an inverse trig result with a unitless number is an error:
+
+| Code | Before | Now |
+| ---- | ------ | --- |
+| `atan(1)` | `45` | `45°` |
+| `atan(x) - 1` | a number | `Inconsistent units: "° - unitless".` |
+| `phase(1 + 1i)` under `#deg` | `0.785` | `45°` |
+| `re(1∠45)` under `#deg` | `0.525` | `0.707` |
+
+Workarounds such as `phase(z)*180/π` now give the wrong answer under `#deg`.
+
+Inverse trig on a diagonal or triangular matrix leaves its off-diagonal zeros unitless, so combining the result with an angle is an error, e.g. `atan(diagonal(3; 1)) + 1°`.
+This is a known limitation that will be fixed in a future update.
+Use `hp()` matrices, which share one unit across all elements, or set `#settings {"returnAngleUnits": false}` before running these calculations.
+
+#### How to update
+
+Remove manual conversions like `*180/π` after `phase`, and add angle units where a result is combined with unitless numbers, e.g. `atan(x) - 1rad`.
+
+To keep the old unitless results instead, turn off **Return Angle Units** in the [Settings](new-settings.md#math) tab, or add either line at the top of the document:
+
+```calcpad
+ReturnAngleUnits = 0
+#settings {"returnAngleUnits": false}
+```
+
+Write `1∠(45rad)` to keep a radian phasor angle under `#deg`.

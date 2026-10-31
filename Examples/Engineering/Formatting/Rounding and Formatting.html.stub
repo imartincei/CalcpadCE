@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Reference for the $round$, $format$ and $scale$ directives, covering decimal rounding, significant figures, scientific notation and unit-aware display. -->
- <h3>Rounding and formatting numbers in CalcpadCE</h3>
+ <h1>Rounding and formatting numbers in CalcpadCE</h1>
  <p>
   Custom rounding -
   <span class="eq">

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -305,6 +306,54 @@ namespace Calcpad.Tests
             var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"Steel\", \"Concrete\"], \"values\": [\"200GPa\", \"25GPa\"]} E = 200GPa\nE", enableUi: true, overrides);
             Assert.DoesNotContain("Error", html);
             Assert.Contains("<option value=\"25GPa\" selected>", html);
+        }
+
+        [Fact]
+        public void Options_MatchUnderADecimalCommaCulture()
+        {
+            var culture = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("it-IT");
+            try
+            {
+                var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"a\", \"b\"], \"values\": [\"0.13\", \"0.34\"]} α = 0.34\n" +
+                    "#UI {\"type\": \"radio\", \"keys\": [\"a\", \"b\"], \"values\": [\"0.21\", \"0.34\"]} β = 0.34", enableUi: true);
+                Assert.Contains("<option value=\"0.34\" selected>", html);
+                Assert.Contains("value=\"0.34\" checked", html);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = culture;
+            }
+        }
+
+        [Fact]
+        public void Dropdown_MatchesTheUnroundedValue()
+        {
+            var html = Render("#UI {\"type\": \"dropdown\", \"keys\": [\"a\", \"b\"], \"values\": [\"0.1\", \"0.123456\"]} k = 0.123456", enableUi: true);
+            Assert.Contains("<option value=\"0.123456\" selected>", html);
+        }
+
+        [Fact]
+        public void Options_MatchAcrossUnits_FirstMatchOnly()
+        {
+            var html = Render("#UI {\"type\": \"radio\", \"keys\": [\"a\", \"b\"], \"values\": [\"1m\", \"50cm\"]} L = 500mm\n" +
+                "#UI {\"type\": \"dropdown\", \"keys\": [\"a\", \"b\"], \"values\": [\"1m\", \"100cm\"]} M = 1m", enableUi: true);
+            Assert.Contains("value=\"50cm\" checked", html);
+            Assert.Contains("<option value=\"1m\" selected>", html);
+            Assert.DoesNotContain("<option value=\"100cm\" selected>", html);
+        }
+
+        [Fact]
+        public void Dropdown_UnitlessOptionTakesTheDeclaredUnit()
+        {
+            const string source = "#UI {\"type\": \"dropdown\", \"keys\": [\"S235\", \"S355\"], \"values\": [\"235\", \"355\"]} f = 355MPa\nr = f/1MPa";
+            Assert.Contains("<option value=\"355\" selected>", Render(source, enableUi: true));
+
+            var overrides = new Dictionary<string, string> { ["f:1"] = "235" };
+            var html = Render(source, enableUi: true, overrides);
+            Assert.DoesNotContain("Error", html);
+            Assert.Contains("<option value=\"235\" selected>", html);
+            Assert.Contains("= 235</span>", html);
         }
 
         [Theory]

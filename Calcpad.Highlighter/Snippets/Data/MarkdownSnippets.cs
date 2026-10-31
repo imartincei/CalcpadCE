@@ -12,6 +12,18 @@ namespace Calcpad.Highlighter.Snippets.Data
         [
             new SnippetItem
             {
+                Insert = "# text",
+                Description = "Markdown heading level 1",
+                Category = "Markdown"
+            },
+            new SnippetItem
+            {
+                Insert = "## text",
+                Description = "Markdown heading level 2",
+                Category = "Markdown"
+            },
+            new SnippetItem
+            {
                 Insert = "### text",
                 Description = "Markdown heading level 3",
                 Category = "Markdown"

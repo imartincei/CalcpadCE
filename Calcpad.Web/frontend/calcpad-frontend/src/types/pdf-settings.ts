@@ -8,9 +8,11 @@ export interface PdfSettings {
   marginBottom: string;
   marginLeft: string;
   marginRight: string;
-  documentTitle: string;
+  /** Header title, from the file info's title rather than a setting; see {@link resolveEffectivePdfSettings}. */
+  documentTitle?: string;
   showPageNumbers: boolean;
   showDate: boolean;
+  showTitle: boolean;
   dateTimeFormat: string;
   headerFooterLines: string;
   lineColor: string;
@@ -59,7 +61,7 @@ export const PDF_SETTING_KEYS: MetadataSettingKey[] = [
   { key: 'marginRight', label: 'Right margin', detail: `Right page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
   { key: 'showPageNumbers', label: 'Page numbers', detail: 'Show "Page n of m" in the footer', type: 'boolean', def: true },
   { key: 'showDate', label: 'Date', detail: 'Show the timestamp in the header', type: 'boolean', def: true },
-  { key: 'documentTitle', label: 'Document title', detail: 'Header title (defaults to the file name)', type: 'string', def: '' },
+  { key: 'showTitle', label: 'Title', detail: "Show the file's Info title (or the file name) in the header", type: 'boolean', def: true },
   { key: 'dateTimeFormat', label: 'Timestamp format', detail: '.NET date/time format string, e.g. M/d/yyyy h:mm tt', type: 'string', def: 'M/d/yyyy h:mm tt' },
   {
     key: 'headerFooterLines', label: 'Show header/footer lines', detail: 'Which separator line(s) to draw', type: 'enum', def: 'both',
@@ -90,23 +92,23 @@ export const DEFAULT_PDF_SETTINGS: Readonly<PdfSettings> = PDF_SETTING_KEYS.redu
   {} as Record<string, unknown>,
 ) as Readonly<PdfSettings>;
 
-/** Defaults filled in for whatever `stored` doesn't set. */
+/**
+ * Defaults filled in for whatever `stored` doesn't set. A stored `documentTitle` is dropped:
+ * the title is per file now (its file info), and one host-wide title never fit every file.
+ */
 export function resolveStoredPdfSettings(stored: Partial<PdfSettings> | null | undefined): PdfSettings {
-  return { ...DEFAULT_PDF_SETTINGS, ...stored };
+  const { documentTitle: _hostWideTitle, ...rest } = stored ?? {};
+  return { ...DEFAULT_PDF_SETTINGS, ...rest };
 }
 
 /**
  * The PDF options an export should use: `stored` with `documentOverrides` layered over
- * it key by key. `fallbackTitle` — e.g. the file name — is used only when neither
- * source sets a non-empty `documentTitle`.
+ * it key by key, titled `documentTitle` (see `pdfDocumentTitle`).
  */
 export function resolveEffectivePdfSettings(
   stored: Partial<PdfSettings> | null | undefined,
   documentOverrides: Partial<PdfSettings> | undefined,
-  fallbackTitle?: string,
+  documentTitle: string,
 ): PdfSettings {
-  const merged = { ...resolveStoredPdfSettings(stored), ...documentOverrides };
-  if (fallbackTitle !== undefined)
-    merged.documentTitle = documentOverrides?.documentTitle || stored?.documentTitle || fallbackTitle;
-  return merged;
+  return { ...resolveStoredPdfSettings(stored), ...documentOverrides, documentTitle };
 }

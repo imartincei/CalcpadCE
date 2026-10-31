@@ -69,6 +69,14 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void SettingsDirective_ReturnAngleUnits()
+        {
+            Assert.Contains("°", Render("x = atan(1)"));
+            Assert.DoesNotContain("°", Render("#settings {\"returnAngleUnits\": false}\nx = atan(1)"));
+            Assert.Contains("°", Render("#settings {\"returnAngleUnits\": false}\nReturnAngleUnits = 1\nx = atan(1)"));
+        }
+
+        [Fact]
         public void SettingsDirective_MalformedJson_ReportsError()
         {
             var parser = new ExpressionParser { Settings = new Settings(), Debug = true };

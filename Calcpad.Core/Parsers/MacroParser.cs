@@ -92,6 +92,7 @@ namespace Calcpad.Core
             private readonly string[] _parameters;
             // Null entry = required
             private readonly string[] _defaults;
+            // Longest first, so a parameter never matches the start of a longer one
             private readonly int[] _order;
             private readonly SearchValues<char> _starts;
 
@@ -108,24 +109,15 @@ namespace Calcpad.Core
                 }
                 else
                 {
-                    _parameters = [.. parameters];
+                    string[] p = [.. parameters];
+                    _parameters = p;
                     _defaults = [.. defaults];
-                    _order = Sort(_parameters);
-                    _starts = SearchValues.Create([.. _parameters.Where(p => p.Length > 0).Select(p => p[0]).Distinct()]);
+                    _order = [.. Enumerable.Range(0, p.Length)
+                        .Where(i => p[i].Length > 0)
+                        .OrderByDescending(i => p[i].Length)];
+                    _starts = SearchValues.Create([.. _order.Select(i => p[i][0]).Distinct()]);
                     HasDefaults = Array.Exists(_defaults, d => d is not null);
                 }
-            }
-
-            private static int[] Sort(string[] parameters)
-            {
-                var n = parameters.Length;
-                var sorted = new SortedList<string, int>();
-                for (int i = 0; i < n; ++i)
-                {
-                    var s = new string(parameters[i].Reverse().ToArray());
-                    sorted.Add(s, i);
-                }
-                return sorted.Values.Reverse().ToArray();
             }
 
             internal int GetParameterIndex(ReadOnlySpan<char> name)
@@ -197,11 +189,9 @@ namespace Calcpad.Core
             private int MatchParameter(ReadOnlySpan<char> s)
             {
                 foreach (var j in _order)
-                {
-                    var p = _parameters[j];
-                    if (p.Length > 0 && s.StartsWith(p, StringComparison.Ordinal))
+                    if (s.StartsWith(_parameters[j], StringComparison.Ordinal))
                         return j;
-                }
+
                 return -1;
             }
             internal static MacroException ArgumentCountError(int start = -1, int end = -1) =>
@@ -809,9 +799,10 @@ namespace Calcpad.Core
         }
 
         /// <summary>
-        /// Drops #local sections and saved 'uiOverrides' comments from included content.
-        /// Those comments only apply to the file that carries them, as the host restores them
-        /// from the open document before #include is expanded.
+        /// Drops #local sections and saved host metadata comments from included content.
+        /// 'uiOverrides' only applies to the file that carries it, as the host restores it
+        /// from the open document before #include is expanded. 'fileInfo' and the metadata
+        /// footer go too, so an included file's details don't show up in the host file.
         /// </summary>
         /// <param name="keepLineCount">Blank filtered lines instead of removing them.</param>
         public static string FilterIncludedContent(string content, bool keepLineCount = false)
@@ -820,16 +811,16 @@ namespace Calcpad.Core
                 return content;
 
             var isLocal = false;
-            var isUiOverridesComment = false;
+            var isHostComment = false;
             var lines = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             var outputLines = new List<string>(lines.Length);
             foreach (var line in lines)
             {
                 bool keep;
-                if (isUiOverridesComment)
+                if (isHostComment)
                 {
                     if (line.Contains("-->", StringComparison.Ordinal))
-                        isUiOverridesComment = false;
+                        isHostComment = false;
 
                     keep = false;
                 }
@@ -843,9 +834,9 @@ namespace Calcpad.Core
                     isLocal = false;
                     keep = false;
                 }
-                else if (IsUiOverridesCommentStart(line))
+                else if (IsHostCommentStart(line))
                 {
-                    isUiOverridesComment = !line.Contains("-->", StringComparison.Ordinal);
+                    isHostComment = !line.Contains("-->", StringComparison.Ordinal);
                     keep = false;
                 }
                 else
@@ -859,13 +850,15 @@ namespace Calcpad.Core
             return string.Join(Environment.NewLine, outputLines);
         }
 
-        // A cheap substring check rather than a JSON parse; the host always writes the key verbatim.
-        private static bool IsUiOverridesCommentStart(string line)
+        // A cheap substring check rather than a JSON parse; the host always writes the keys verbatim.
+        private static bool IsHostCommentStart(string line)
         {
             var trimmed = line.TrimStart();
             return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
                 && trimmed.Contains("<!--", StringComparison.Ordinal)
-                && trimmed.Contains("uiOverrides", StringComparison.Ordinal);
+                && (trimmed.Contains("\"uiOverrides\"", StringComparison.Ordinal)
+                    || trimmed.Contains("\"fileInfo\"", StringComparison.Ordinal)
+                    || trimmed.Contains("<!--CalcpadCE Metadata-->", StringComparison.Ordinal));
         }
 
         private static bool IsIncludeLine(ReadOnlySpan<char> lineContent) =>

@@ -37,3 +37,6 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     with:
       version: ${{ needs.determine-version.outputs.version }}
+
+  checks:
+    uses: ./.github/workflows/run-checks.yml

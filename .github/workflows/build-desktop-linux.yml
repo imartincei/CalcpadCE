@@ -45,6 +45,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: Calcpad.Web/frontend/calcpad-desktop/src-tauri
+          cache-directories: tools/desktop-test/.work/linux-tests/target
 
       - name: Install Tauri system dependencies
         run: |
@@ -56,6 +57,15 @@ jobs:
             libayatana-appindicator3-dev \
             libxdo-dev \
             libssl-dev \
+            webkit2gtk-driver \
+            xvfb \
+            openbox \
+            xdotool \
+            x11-utils \
+            dbus-x11 \
+            sway \
+            wtype \
+            python3 \
             patchelf \
             xdg-utils \
             file \
@@ -72,6 +82,36 @@ jobs:
         run: |
           chmod +x build-desktop.sh
           ./build-desktop.sh
+
+      - name: Install desktop test driver
+        run: cargo install tauri-driver --version 2.0.6 --locked
+
+      - name: Run GTK window regression tests
+        timeout-minutes: 15
+        run: bash tools/desktop-test/linux-tests.sh
+
+      - name: Run GTK tests with display scaling
+        timeout-minutes: 10
+        env:
+          GDK_SCALE: '2'
+        run: bash tools/desktop-test/linux-tests.sh --skip-build
+
+      - name: Run GTK Wayland regression tests
+        timeout-minutes: 10
+        run: bash tools/desktop-test/linux-tests.sh --wayland --skip-build
+
+      - name: Upload GTK test diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-desktop-tests-${{ matrix.arch }}
+          path: |
+            tools/desktop-test/.work/linux-tests/profile-*/driver.log
+            tools/desktop-test/.work/linux-tests/profile-*/screenshot.png
+            tools/desktop-test/.work/linux-tests/profile-*/state.json
+            tools/desktop-test/.work/linux-tests/profile-*/data/**/logs/*.log
+            tools/desktop-test/.work/linux-tests/openbox.log
+            tools/desktop-test/.work/linux-tests/sway.log
 
       # The PKGBUILD packages the tree build-desktop.sh just produced and has no
       # build() stage, so an Arch userland with base-devel and --nodeps is enough.

@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Cross-section properties of an asymmetric or built-up I-section computed from seven user-supplied dimensions, with classification per Eurocode EN 1993-1-1 and elastic and plastic section moduli for both axes. -->
- <h3>
+ <h1>
   Design of steel I-Section
   <hr/>
   <small>
@@ -8,7 +8,7 @@
    <strong>Eurocode</strong>
    : EN 1993-1-1
   </small>
- </h3>
+ </h1>
  <div style="max-width:180mm">
   <p>
   </p>

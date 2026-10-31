@@ -404,7 +404,7 @@
         [Trait("Category", "HPUpperTriangularMatrixFunctions")]
         public void HPUpperTriangularMatrixAsin()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("asin"));
             Assert.Equal(0, result);
         }
@@ -422,7 +422,7 @@
         [Trait("Category", "HPUpperTriangularMatrixFunctions")]
         public void HPUpperTriangularMatrixAtan()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("atan"));
             Assert.Equal(0, result);
         }
@@ -431,7 +431,7 @@
         [Trait("Category", "HPUpperTriangularMatrixFunctions")]
         public void HPUpperTriangularMatrixAtan2()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run([
                 "n = 500",
                 RandomMatrixA,

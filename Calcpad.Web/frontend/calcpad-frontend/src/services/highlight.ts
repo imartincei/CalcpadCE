@@ -91,3 +91,12 @@ export function mapTokenTypeToIndex(typeId: number): number {
     }
     return SEMANTIC_TOKEN_TYPES.indexOf(tokenTypeName);
 }
+
+export const SEMANTIC_TOKEN_MODIFIERS = ['heading'];
+
+/**
+ * Modifier bitmask for a token. Comments on lines starting with " render as <h1> headings.
+ */
+export function getTokenModifiers(typeId: number, lineText: string | undefined): number {
+    return typeId === CalcpadTokenType.Comment && lineText?.trimStart().startsWith('"') ? 1 : 0;
+}

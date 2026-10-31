@@ -76,6 +76,15 @@ The editor provides IDE-grade navigation across variables, functions, macros, an
 
 Hovering over a built-in function shows its signature, description, return type, per-parameter documentation, and a runnable example.
 
+Use the mouse Back and Forward buttons to revisit cursor positions across tabs.
+Or, use the following keyboard shortcuts:
+
+| Platform | Back | Forward |
+| -------- | ---- | ------- |
+| Windows | **Alt+Left** | **Alt+Right** |
+| Linux | **Ctrl+Alt+-** | **Ctrl+Shift+-** |
+| macOS | **Ctrl+-** | **Ctrl+Shift+-** |
+
 Hover, definitions, references, the linter, the preview, and the TOC are all scoped to the document you are editing, so symbols and errors never bleed between unrelated documents.
 
 ## Path completion for includes and data files

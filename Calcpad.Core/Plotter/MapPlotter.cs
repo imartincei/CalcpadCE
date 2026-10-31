@@ -500,7 +500,7 @@ namespace Calcpad.Core
             return d;
         }
 
-        private GCHandle SetBitmapBits(SKBitmap bitmap, double[,,] values)
+        private IntPtr SetBitmapBits(SKBitmap bitmap, double[,,] values)
         {
             Node light = new(), spec = new();
             double length, ks = 0.5;
@@ -569,30 +569,36 @@ namespace Calcpad.Core
                     }
                 }
             }
-            GCHandle pinnedArray = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+            IntPtr pointer = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, pointer, bytes.Length);
             bitmap.SetPixels(pointer);
-            return pinnedArray;
+            return pointer;
         }
 
         private string DrawPng(Map m, int x0, int y0, double xs, double ys, Box bounds, string fileName = null)
         {
             var values = Interpolate(m);
             using var bitmap = new SKBitmap(Width, Height);
-            var gcHandle = SetBitmapBits(bitmap, values);
-            using var canvas = new SKCanvas(bitmap);
-            DrawGridPng(canvas, x0, y0, xs, ys, bounds);
-            DrawColorScalePng(canvas, m);
-            string src = null;
-            if (string.IsNullOrEmpty(fileName))
-                src = ImageToBase64(bitmap);
-            else
+            var pixels = SetBitmapBits(bitmap, values);
+            try
             {
-                src = Settings.ImageUri + fileName;
-                PngToFile(bitmap, Settings.ImagePath, fileName);
+                using var canvas = new SKCanvas(bitmap);
+                DrawGridPng(canvas, x0, y0, xs, ys, bounds);
+                DrawColorScalePng(canvas, m);
+                string src;
+                if (string.IsNullOrEmpty(fileName))
+                    src = ImageToBase64(bitmap);
+                else
+                {
+                    src = Settings.ImageUri + fileName;
+                    PngToFile(bitmap, Settings.ImagePath, fileName);
+                }
+                return HtmlImg(src);
             }
-            gcHandle.Free();
-            return HtmlImg(src);
+            finally
+            {
+                Marshal.FreeHGlobal(pixels);
+            }
         }
 
         private string DrawSvg(Map m, double x0, double y0, double xs, double ys, Box bounds, string fileName = null)
@@ -604,9 +610,15 @@ namespace Calcpad.Core
             string src;
             using (var bitmap = new SKBitmap(w, h))
             {
-                var gcHandle = SetBitmapBits(bitmap, values);
-                src = ImageToBase64(bitmap);
-                gcHandle.Free();
+                var pixels = SetBitmapBits(bitmap, values);
+                try
+                {
+                    src = ImageToBase64(bitmap);
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(pixels);
+                }
             }
             g.DrawImage(Left, Margin, w, h, src);
             DrawGridSvg(g, x0, y0, xs, ys, bounds);

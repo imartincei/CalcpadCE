@@ -1,3 +1,4 @@
+using System.Globalization;
 using Calcpad.Core;
 
 namespace Calcpad.Tests;
@@ -114,6 +115,94 @@ public class WriteDirectiveTests
 
         Assert.False(File.Exists(temp.Path("out.csv")));
         Assert.DoesNotContain("written to", html);
+    }
+
+    /// <summary>A decimal comma would collide with the column separator and read back as a thousands one.</summary>
+    [Fact]
+    public void UnderADecimalCommaCulture_CsvUsesInvariantNumbers()
+    {
+        using var temp = new WriteDir();
+        InCulture("it-IT", () => temp.Run("M = [1.5; 0|0; 2.25kN]", "#write M to out.csv"));
+
+        Assert.Equal(["1.5,0", "0,2.25kN"], File.ReadAllLines(temp.Path("out.csv")));
+    }
+
+    [Theory]
+    [InlineData("out.csv sep=';'")]
+    [InlineData("out.xlsx")]
+    public void UnderADecimalCommaCulture_ValuesReadBack(string target)
+    {
+        using var temp = new WriteDir();
+        var html = InCulture("it-IT", () => temp.Run(
+            "M = [1.5; 0|0; 2.25]", $"#write M to {target}", $"#read R from {target}", "r = R.(1; 1) + R.(2; 2)"));
+
+        Assert.DoesNotContain("class=\"err\"", html);
+        Assert.Contains("= 3,75", html);
+    }
+
+    /// <summary>Trailing zeros are written, so a zero last column survives the round trip.</summary>
+    [Fact]
+    public void TrailingZeroColumns_AreWritten()
+    {
+        using var temp = new WriteDir();
+        var html = temp.Run("M = [1; 0|2; 0]", "#write M to out.csv", "#read R from out.csv", "c = n_cols(R)");
+
+        Assert.Equal(["1,0", "2,0"], File.ReadAllLines(temp.Path("out.csv")));
+        Assert.Contains("= 2</span>", html);
+    }
+
+    [Fact]
+    public void TriangularRows_AreWrittenInFull()
+    {
+        using var temp = new WriteDir();
+        temp.Run("U = utriang(3)", "U.(1; 1) = 1", "#write U to out.csv type=Y");
+
+        Assert.Equal(["1,0,0", "0,0", "0"], File.ReadAllLines(temp.Path("out.csv")));
+    }
+
+    /// <summary>An appended zero must overwrite the cell, not leave the old value behind.</summary>
+    [Fact]
+    public void AppendedZeros_OverwriteTheRange()
+    {
+        using var temp = new WriteDir();
+        var html = temp.Run(
+            "A = [1; 2|3; 4]",
+            "#write A to out.xlsx@Sheet1!A1",
+            "B = [5; 0|6; 0]",
+            "#append B to out.xlsx@Sheet1!A1",
+            "#read R from out.xlsx@Sheet1!A1:B2",
+            "s = R.(1; 2) + R.(2; 2)");
+
+        Assert.Contains("= 0</span>", html);
+    }
+
+    /// <summary>A comma is never a thousands separator, so "1,5" is 1.5 or an error, never 15.</summary>
+    [Theory]
+    [InlineData("it-IT", "= 3,75")]
+    [InlineData("en-US", "Cannot evaluate")]
+    public void ReadingADecimalComma_FollowsTheCulture(string culture, string expected)
+    {
+        using var temp = new WriteDir();
+        File.WriteAllText(temp.Path("in.csv"), "1,5;2,25\n");
+        var html = InCulture(culture, () => temp.Run("#read R from in.csv sep=';'", "r = R.(1; 1) + R.(1; 2)"));
+
+        Assert.Contains(expected, html);
+        Assert.DoesNotContain("37,5", html);
+        Assert.DoesNotContain("240", html);
+    }
+
+    private static string InCulture(string name, Func<string> run)
+    {
+        var culture = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(name);
+        try
+        {
+            return run();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = culture;
+        }
     }
 
     /// <summary>A folder to write into, with a worksheet path to resolve relative targets against.</summary>

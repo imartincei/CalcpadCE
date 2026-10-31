@@ -15,6 +15,18 @@ namespace Calcpad.Highlighter.Snippets.Data
             // ============================================
             new SnippetItem
             {
+                Insert = "'<h1>text</h1>",
+                Description = "Heading level 1",
+                Category = "HTML"
+            },
+            new SnippetItem
+            {
+                Insert = "'<h2>text</h2>",
+                Description = "Heading level 2",
+                Category = "HTML"
+            },
+            new SnippetItem
+            {
                 Insert = "'<h3>text</h3>",
                 Description = "Heading level 3",
                 Category = "HTML"

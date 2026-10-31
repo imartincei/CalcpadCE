@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
-import { writeUiOverrides } from 'calcpad-frontend';
+import { writeUiOverrides, stampFileInfoText, patchFileInfoText, onlyReviewChanged } from 'calcpad-frontend';
 import type { CalcpadApiClient, UiOverrideStore, UiPauseStore } from 'calcpad-frontend';
 import { handleFrameStateMessage } from './previewFrame';
 
@@ -11,11 +11,18 @@ import { handleFrameStateMessage } from './previewFrame';
  * `encodeCpdz` needs to keep the other entries of a composite archive on save.
  */
 class CompiledWorksheetDocument implements vscode.CustomDocument {
+    /** Changed since last written in place, which is what makes a save an update. */
+    public dirty = false;
+    /** The source as last read or written, so a save that only records a review isn't an update. */
+    public savedText: string;
+
     constructor(
         readonly uri: vscode.Uri,
         public text: string,
         public originalBytes: Uint8Array,
-    ) {}
+    ) {
+        this.savedText = text;
+    }
 
     dispose(): void { /* nothing held beyond the fields above */ }
 }
@@ -56,6 +63,10 @@ export class CalcpadCompiledEditorProvider
     private readonly _reports = new Map<string, vscode.WebviewPanel>();
     private _registration: vscode.Disposable | undefined;
 
+    /** Who and what a save stamps into the file info. */
+    public fileInfoStamp?: () => { userName: string; programVersion: string };
+    public onDidWrite?: (uri: vscode.Uri) => void;
+
     constructor(
         private readonly _apiClient: CalcpadApiClient,
         private readonly _uiOverrides: UiOverrideStore,
@@ -92,6 +103,21 @@ export class CalcpadCompiledEditorProvider
      */
     public sourceFor(uri: vscode.Uri): string | undefined {
         return this._docs.get(uri.toString())?.text;
+    }
+
+    public isDirty(uri: vscode.Uri): boolean {
+        return !!this._docs.get(uri.toString())?.dirty;
+    }
+
+    /** Applies the Info tab's edit to an open compiled worksheet. Returns false when nothing changed. */
+    public updateFileInfo(uri: vscode.Uri, patch: unknown): boolean {
+        const document = this._docs.get(uri.toString());
+        const text = document && patchFileInfoText(document.text, patch);
+        if (!document || text == null || text === document.text) return false;
+        document.text = text;
+        document.dirty = true;
+        this._onDidChange.fire({ document });
+        return true;
     }
 
     /** Re-renders an open compiled worksheet's form and report. */
@@ -164,6 +190,7 @@ export class CalcpadCompiledEditorProvider
             if (message?.type !== 'uiValueChange') return;
             const docKey = document.uri.toString();
             if (!this._uiOverrides.set(docKey, String(message.varName), String(message.newValue))) return;
+            document.dirty = true;
             this._onDidChange.fire({ document });
             // Re-render so results depending on the edited value recalculate.
             void this._refresh(document);
@@ -173,14 +200,14 @@ export class CalcpadCompiledEditorProvider
     }
 
     async saveCustomDocument(document: CompiledWorksheetDocument): Promise<void> {
-        await this._write(document, document.uri);
+        await this._write(document, document.uri, { stamp: document.dirty });
     }
 
     async saveCustomDocumentAs(
         document: CompiledWorksheetDocument,
         destination: vscode.Uri,
     ): Promise<void> {
-        await this._write(document, destination);
+        await this._write(document, destination, { stamp: true });
     }
 
     async revertCustomDocument(document: CompiledWorksheetDocument): Promise<void> {
@@ -188,7 +215,9 @@ export class CalcpadCompiledEditorProvider
         const decoded = await this._apiClient.decodeCpdz(bytes);
         if (!decoded) throw new Error(`Could not re-read the compiled worksheet ${document.uri.fsPath}`);
         document.text = decoded.content;
+        document.savedText = decoded.content;
         document.originalBytes = bytes;
+        document.dirty = false;
         // Drop the entered values so the form comes back as the file has it.
         this._uiOverrides.clear(document.uri.toString());
         this._uiPause.clear(document.uri.toString());
@@ -211,21 +240,34 @@ export class CalcpadCompiledEditorProvider
     /**
      * Re-encodes around the entered values and writes to `target`, handing the original bytes
      * to the encoder so a composite archive keeps its bundled images. Writing in place adopts
-     * the result as the document's new baseline; a backup or Save As leaves it alone.
+     * the result as the document's new baseline; a backup leaves it alone, and is not a save,
+     * so it stamps no file info.
      */
     private async _write(
         document: CompiledWorksheetDocument,
         target: vscode.Uri,
-        { inPlace = true }: { inPlace?: boolean } = {},
+        { inPlace = true, stamp = false }: { inPlace?: boolean; stamp?: boolean } = {},
     ): Promise<void> {
         const overrides = this._uiOverrides.toRecord(document.uri.toString());
-        const text = overrides ? writeUiOverrides(document.text, overrides) : document.text;
+        let text = overrides ? writeUiOverrides(document.text, overrides) : document.text;
+        const stamper = stamp ? this.fileInfoStamp?.() : undefined;
+        if (stamper) {
+            const inPlaceSave = target.toString() === document.uri.toString();
+            text = stampFileInfoText(text, {
+                ...stamper,
+                fileName: target.fsPath,
+                reviewOnly: inPlaceSave && onlyReviewChanged(document.savedText, text),
+            });
+        }
         const bytes = await this._apiClient.encodeCpdz(text, document.originalBytes);
         if (!bytes) throw new Error(`Could not write the compiled worksheet ${target.fsPath}`);
         await vscode.workspace.fs.writeFile(target, bytes);
         if (inPlace) {
             document.text = text;
+            document.savedText = text;
             document.originalBytes = bytes;
+            document.dirty = false;
+            this.onDidWrite?.(document.uri);
         }
         this._log.appendLine(`[cpdz] wrote ${target.fsPath}`);
     }

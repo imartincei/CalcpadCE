@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a square: area $A = a^2$, $I_x = I_y = a^4/12$, section modulus and radius of gyration. -->
- <h3>Geometrical Properties of Square</h3>
+ <h1>Geometrical Properties of Square</h1>
  <div style="max-width:100mm">
   <img alt="square.png" class="side" src="Images/mechanics/sections/square.png" style="height:135pt;"/>
  </div>

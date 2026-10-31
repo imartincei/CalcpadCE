@@ -1,7 +1,11 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+}
+
+/* Preserve Monaco's native box sizing. */
+:where([class*="monaco"], [class*="monaco"] *) {
+    box-sizing: revert;
 }
 
 html, body, #app {
@@ -10,10 +14,7 @@ html, body, #app {
     overflow: hidden;
 }
 
-/* Tell the browser which color scheme to use so native widgets (the <select>
- * popup, scrollbars, form controls) render with the matching OS theme instead
- * of the default. CSS alone cannot style the popup of a <select>. Follows
- * <html data-theme="…">, which is set by the app-theme applier. */
+/* Native controls follow the active app theme. */
 html {
     color-scheme: dark;
 }
@@ -34,7 +35,6 @@ select {
     border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
     border-radius: 2px;
     padding: 2px 6px;
-    font-size: var(--calcpad-font-size-md);
     cursor: pointer;
 }
 select:focus {
@@ -67,20 +67,151 @@ select option {
     pointer-events: none;
 }
 
-/* Wrappers around the editor and preview panes. Normally they contribute nothing:
-   `display: contents` dissolves them so their children are direct flex items of
-   `.app-layout` and sit side by side. In #UI input mode `.work-area` becomes a column
-   instead, which stacks the surviving tab strip above the form. */
-.work-area,
-.preview-area {
-    display: contents;
-}
-
-.work-area.ui-mode {
+.work-area {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    min-height: 0;
+}
+
+.document-tabs {
+    --document-toolbar-gap: 8px;
+    display: flex;
+    flex-shrink: 0;
+    min-width: 0;
+    background: var(--vscode-editorGroupHeader-tabsBackground);
+}
+
+.document-tabs .tab-strip {
+    flex: 1;
+    min-width: min(120px, 30%);
+}
+
+.document-tabs .tab-strip.active-group {
+    box-shadow: inset 0 2px 0 var(--vscode-focusBorder);
+}
+
+.results-toolbar {
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 75%;
+    gap: var(--document-toolbar-gap);
+    padding: 0 0 0 var(--document-toolbar-gap);
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder, #1e1e1e);
+}
+
+.results-toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.results-toolbar > *,
+.results-toolbar button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.results-toolbar .preview-mode-group {
+    margin-left: 0;
+    gap: 4px;
+}
+
+.document-tabs > .tab-actions {
+    gap: 4px;
+    padding: 0 var(--document-toolbar-gap);
+    border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder, #1e1e1e);
+}
+
+.document-panes {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+}
+
+.document-panes.split-layout {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--pane-divider-width) minmax(0, var(--results-width));
+    grid-template-rows: minmax(0, var(--top-group-size)) 4px auto minmax(0, var(--bottom-group-size)) auto;
+}
+
+.split-layout .editor-pane,
+.split-layout .editor-groups,
+.split-layout .editor-group {
+    display: contents;
+}
+
+.split-layout .editor-area {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.split-layout .editor-group ~ .editor-group .editor-area {
+    grid-row: 4;
+}
+
+.split-layout .editor-group > .tab-strip {
+    position: relative;
+    z-index: 6;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
+}
+
+.split-layout .editor-groups > .group-divider {
+    position: relative;
+    z-index: 6;
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+.split-layout > .pane-divider {
+    grid-column: 2;
+    grid-row: 1 / -1;
+}
+
+.split-layout .preview-pane {
+    width: auto;
+    display: grid;
+    grid-column: 3;
+    grid-row: 1 / -1;
+    grid-template-rows: subgrid;
+    min-width: 0;
+}
+
+.split-layout .preview-frames {
+    display: contents;
+}
+
+.split-layout .preview-buffers {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.split-layout .preview-buffers ~ .preview-buffers {
+    grid-row: 4 / 6;
+}
+
+.split-layout .preview-frames > .group-divider {
+    display: none;
+}
+
+.split-layout .bottom-panel {
+    grid-column: 1;
+    grid-row: 5;
+}
+
+.preview-area {
+    display: contents;
+}
+
+.work-area.ui-mode .document-panes {
+    flex-direction: column;
 }
 
 /* Just the tab strip is left, so the editor side hugs its content and the panes
@@ -98,10 +229,40 @@ select option {
 }
 
 .editor-pane {
+    position: relative;
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+}
+
+.file-drop-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: color-mix(in oklch, var(--vscode-editorWidget-background) 95%, transparent);
+    color: var(--vscode-editorWidget-foreground);
+    pointer-events: none;
+}
+
+.file-drop-overlay svg {
+    width: 7rem;
+    height: 7rem;
+}
+
+.file-drop-names {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 2rem;
+    font-weight: 600;
 }
 
 .spacer {
@@ -110,7 +271,6 @@ select option {
 
 .status-bar .status-server {
     padding: 1px 8px;
-    font-size: var(--calcpad-font-size-md);
     background: rgba(0, 0, 0, 0.35);
     border-radius: 2px;
     -webkit-user-select: none;
@@ -134,13 +294,16 @@ select option {
     color: var(--vscode-button-secondaryForeground, #ccc);
     border: none;
     padding: 2px 8px;
-    font-size: var(--calcpad-font-size-sm);
     cursor: pointer;
     border-radius: 2px;
 }
 
-.toolbar-btn:hover:not(:disabled) {
+.toolbar-btn:hover:not(.active):not(:disabled) {
     background: var(--vscode-button-secondaryHoverBackground, #4a4d51);
+}
+
+.toolbar-btn.active:hover:not(:disabled) {
+    background: var(--vscode-button-hoverBackground);
 }
 
 .toolbar-btn:disabled {
@@ -173,6 +336,12 @@ select option {
     flex: 1;
     min-width: 0;
     min-height: 0;
+}
+
+.monaco-editor .find-widget {
+    margin-top: 4px;
+    border: 1px solid var(--vscode-widget-border);
+    border-radius: 8px;
 }
 
 /* Floats over the code rather than sitting in the status bar, where it was too easy
@@ -229,28 +398,8 @@ select option {
     overflow: hidden;
 }
 
-/* Subtle top accent on the focused group's tab strip when split, mirroring
- * VS Code's active-group highlight. */
 .editor-group.active-group .tab-strip {
     box-shadow: inset 0 2px 0 var(--vscode-focusBorder, #007acc);
-}
-
-.group-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    flex-shrink: 0;
-    background: transparent;
-    color: var(--vscode-tab-inactiveForeground, #969696);
-    border: none;
-    border-left: 1px solid var(--vscode-tab-border, #252526);
-    cursor: pointer;
-    font-size: var(--calcpad-font-size-sm);
-}
-.group-close:hover {
-    background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
-    color: var(--vscode-tab-hoverForeground, #ffffff);
 }
 
 /* Draggable horizontal divider between the two stacked groups (editor + preview). */
@@ -288,7 +437,6 @@ select option {
     gap: 14px;
     background: rgba(255, 255, 255, 0.7);
     color: #333;
-    font-size: var(--calcpad-font-size-lg);
     pointer-events: none;
 }
 .preview-loading-overlay.preview-dark {
@@ -312,7 +460,6 @@ select option {
 }
 
 .panel-scope {
-    font-size: var(--calcpad-font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--vscode-descriptionForeground, #888);
@@ -336,12 +483,33 @@ select option {
 }
 
 .tab-list {
+    --tab-fade-left: 0px;
+    --tab-fade-right: 0px;
     display: flex;
     flex: 1;
     min-width: 0;
     align-items: flex-start;
     overflow-x: auto;
     overflow-y: hidden;
+}
+
+.tab-list.overflow-left {
+    --tab-fade-left: 24px;
+}
+
+.tab-list.overflow-right {
+    --tab-fade-right: 24px;
+}
+
+.tab-list.overflow-left,
+.tab-list.overflow-right {
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        #000 var(--tab-fade-left),
+        #000 calc(100% - var(--tab-fade-right)),
+        transparent
+    );
 }
 
 @supports selector(::-webkit-scrollbar) {
@@ -370,7 +538,6 @@ select option {
     color: var(--vscode-tab-inactiveForeground, #969696);
     border-right: 1px solid var(--vscode-tab-border, #252526);
     cursor: pointer;
-    font-size: var(--calcpad-font-size-lg);
     white-space: nowrap;
     max-width: 240px;
     flex-shrink: 0;
@@ -378,9 +545,35 @@ select option {
     border-top: 1px solid transparent;
 }
 
+.tab-list > .tab:last-of-type {
+    border-right: none;
+}
+
 .tab:hover {
     background: var(--vscode-tab-hoverBackground, #2a2d2e);
     color: var(--vscode-tab-hoverForeground, #ffffff);
+}
+
+.tab-dragging {
+    opacity: 0.5;
+}
+
+.dragging-tab,
+.dragging-tab * {
+    cursor: grabbing !important;
+    user-select: none !important;
+}
+
+.tab-drop-marker {
+    position: fixed;
+    width: 2px;
+    background: var(--vscode-focusBorder, #007acc);
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.tab[data-tab-id] {
+    touch-action: none;
 }
 
 .tab.active {
@@ -394,25 +587,23 @@ select option {
     text-overflow: ellipsis;
 }
 
-.tab-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+button.tab-close {
     width: 18px;
     height: 18px;
-    padding: 0;
     margin-left: 2px;
-    background: transparent;
     color: inherit;
-    border: none;
     border-radius: 3px;
-    cursor: pointer;
-    font-size: var(--calcpad-font-size-sm);
     line-height: 1;
 }
 
-.tab-close:hover {
+button.tab-close:hover:not(:disabled) {
     background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+    color: inherit;
+}
+
+button.tab-close:disabled {
+    opacity: 0.2;
+    cursor: default;
 }
 
 .tab-dirty-dot {
@@ -423,26 +614,33 @@ select option {
     height: 18px;
     margin-right: 4px;
     color: var(--vscode-tab-activeForeground, #ffffff);
-    font-size: var(--calcpad-font-size-xs);
+    font-size: var(--calcpad-font-size-icon-small);
     line-height: 1;
     pointer-events: none;
 }
 
-.tab-new {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    flex-shrink: 0;
-    background: transparent;
-    color: var(--vscode-tab-inactiveForeground, #969696);
-    border: none;
-    cursor: pointer;
-    font-size: var(--calcpad-font-size-xl);
+button.tab-new {
+    --tab-new-hover-inset: 0px;
+    border-top: 1px solid transparent;
+    font-size: var(--calcpad-font-size-icon-large);
+    line-height: 1;
 }
 
-.tab-new:hover {
-    background: var(--vscode-tab-hoverBackground, #2a2d2e);
+button.tab-new svg {
+    width: 1em;
+    height: 1em;
+}
+
+.tab-strip.active-group button.tab-new {
+    --tab-new-hover-inset: 2px;
+}
+
+button.tab-new:hover {
+    background: linear-gradient(
+        to bottom,
+        transparent var(--tab-new-hover-inset),
+        var(--vscode-tab-hoverBackground, #2a2d2e) var(--tab-new-hover-inset)
+    ) border-box no-repeat;
     color: var(--vscode-tab-hoverForeground, #ffffff);
 }
 
@@ -451,24 +649,17 @@ select option {
     align-items: stretch;
     flex-shrink: 0;
     background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
-    border-left: 1px solid var(--vscode-widget-border, #454545);
 }
 
-.tab-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    padding: 0;
-    background: transparent;
-    color: var(--vscode-tab-inactiveForeground, #969696);
-    border: none;
-    cursor: pointer;
+.tab-actions button,
+.results-sidebar-toggle {
+    height: auto;
 }
 
-.tab-action svg {
-    width: 14px;
-    height: 14px;
+.tab-actions svg,
+.results-sidebar-toggle svg {
+    width: 16px;
+    height: 16px;
 }
 
 .results-sidebar-toggle {
@@ -476,19 +667,17 @@ select option {
     align-self: stretch;
 }
 
-.tab-action:hover {
+.tab-actions button:hover:not(:disabled),
+.results-sidebar-toggle:hover:not(:disabled) {
     background: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
     color: var(--vscode-tab-hoverForeground, #ffffff);
 }
 
 /* Icon-only, so the ring is the only focus cue. */
-.tab-action:focus-visible {
+.tab-actions button:focus-visible,
+.results-sidebar-toggle:focus-visible {
     outline: 1px solid var(--vscode-focusBorder, #007acc);
     outline-offset: -2px;
-}
-
-.tab-action.active {
-    color: var(--vscode-tab-activeForeground, #ffffff);
 }
 
 .tab-context-menu {
@@ -501,29 +690,6 @@ select option {
     border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border, #454545));
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.tab-context-item {
-    display: block;
-    width: 100%;
-    padding: 5px 14px;
-    text-align: left;
-    background: transparent;
-    color: inherit;
-    border: none;
-    cursor: pointer;
-    font-size: var(--calcpad-font-size-md);
-    font-family: inherit;
-}
-
-.tab-context-item:hover:not(:disabled) {
-    background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground, #04395e));
-    color: var(--vscode-menu-selectionForeground, inherit);
-}
-
-.tab-context-item:disabled {
-    opacity: 0.5;
-    cursor: default;
 }
 
 .tab-context-sep {
@@ -577,7 +743,7 @@ select option {
     background: var(--vscode-toolbar-hoverBackground, #2a2d2e);
 }
 .sidebar-rail-icon {
-    font-size: var(--calcpad-font-size-lg);
+    font-size: var(--calcpad-font-size-icon-large);
     line-height: 1;
 }
 .sidebar-rail.collapsed {
@@ -670,7 +836,7 @@ select option {
 /* Find-in-preview widget (VS Code editor-find analog), floated top-right. */
 .preview-find {
     position: absolute;
-    top: 36px;
+    top: 6px;
     right: 18px;
     z-index: 1000;
     display: flex;
@@ -687,8 +853,6 @@ select option {
 .preview-find-input {
     width: 180px;
     padding: 3px 6px;
-    font-size: var(--calcpad-font-size-md);
-    font-family: inherit;
     background: var(--vscode-input-background, #3c3c3c);
     color: var(--vscode-input-foreground, #cccccc);
     border: 1px solid var(--vscode-input-border, transparent);
@@ -703,7 +867,6 @@ select option {
 .preview-find-count {
     min-width: 34px;
     text-align: center;
-    font-size: var(--calcpad-font-size-sm);
     opacity: 0.8;
 }
 
@@ -714,7 +877,6 @@ select option {
     border: none;
     border-radius: 2px;
     cursor: pointer;
-    font-size: var(--calcpad-font-size-md);
     line-height: 1;
 }
 
@@ -725,17 +887,6 @@ select option {
 .preview-find-btn:disabled {
     opacity: 0.4;
     cursor: default;
-}
-
-.preview-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-inline-start: 12px;
-    background: var(--vscode-titleBar-activeBackground, #3c3c3c);
-    border-bottom: 1px solid var(--vscode-widget-border);
-    font-size: var(--calcpad-font-size-md);
-    min-height: 30px;
 }
 
 /* Double-buffered preview: both frames stay visible and painted, one occluding the
@@ -792,7 +943,6 @@ select option {
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--vscode-panelTitle-inactiveForeground, #888);
-    font-size: var(--calcpad-font-size-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 6px 8px;
@@ -812,7 +962,6 @@ select option {
     background: var(--vscode-dropdown-background, #3c3c3c);
     color: var(--vscode-dropdown-foreground, #cccccc);
     border: 1px solid var(--vscode-dropdown-border, #3c3c3c);
-    font-size: var(--calcpad-font-size-sm);
     padding: 2px 6px;
     margin-left: 8px;
     border-radius: 2px;
@@ -840,7 +989,6 @@ select option {
     border-radius: 4px;
     padding: 16px 18px 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-    font-size: var(--calcpad-font-size-lg);
 }
 .modal-title {
     font-weight: 600;
@@ -854,7 +1002,6 @@ select option {
    stretch the dialog, and keep it visually separate from our own wording. */
 .modal-url {
     font-family: var(--vscode-editor-font-family, monospace);
-    font-size: var(--calcpad-font-size-md);
     background: var(--vscode-editor-background, #1e1e1e);
     border: 1px solid var(--vscode-widget-border, #474747);
     border-radius: 3px;
@@ -871,26 +1018,12 @@ select option {
     justify-content: flex-end;
     gap: 8px;
 }
-.modal-btn {
-    background: var(--vscode-button-secondaryBackground, #3a3d41);
-    color: var(--vscode-button-secondaryForeground, #cccccc);
+button.modal-btn {
     border: none;
     padding: 4px 12px;
     border-radius: 2px;
     cursor: pointer;
-    font-size: var(--calcpad-font-size-md);
 }
-.modal-btn:hover {
-    background: var(--vscode-button-secondaryHoverBackground, #45494e);
-}
-.modal-btn.primary {
-    background: var(--vscode-button-background, #0e639c);
-    color: var(--vscode-button-foreground, #ffffff);
-}
-.modal-btn.primary:hover {
-    background: var(--vscode-button-hoverBackground, #1177bb);
-}
-
 .quick-pick-list {
     display: flex;
     flex-direction: column;
@@ -910,17 +1043,12 @@ select option {
     background: var(--vscode-list-hoverBackground, #2a2d2e);
     border-color: var(--vscode-focusBorder, #007fd4);
 }
-.quick-pick-option-label {
-    font-size: var(--calcpad-font-size-md);
-}
 .quick-pick-option-detail {
-    font-size: var(--calcpad-font-size-sm);
     color: var(--vscode-descriptionForeground, #858585);
     margin-top: 2px;
 }
 
 .problems-badge {
-    font-size: var(--calcpad-font-size-xs);
     padding: 0 5px;
     border-radius: 8px;
     min-width: 18px;
@@ -947,7 +1075,6 @@ select option {
     flex: 1;
     overflow-y: auto;
     font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
-    font-size: var(--calcpad-font-size-md);
 }
 
 .problem-row {
@@ -968,7 +1095,6 @@ select option {
     flex-shrink: 0;
     width: 16px;
     text-align: center;
-    font-size: var(--calcpad-font-size-md);
 }
 
 .problem-icon.lintError {
@@ -993,13 +1119,11 @@ select option {
 .problem-code {
     flex-shrink: 0;
     color: var(--vscode-descriptionForeground, #888);
-    font-size: var(--calcpad-font-size-sm);
 }
 
 .problem-location {
     flex-shrink: 0;
     color: var(--vscode-descriptionForeground, #888);
-    font-size: var(--calcpad-font-size-sm);
 }
 
 .problems-empty {
@@ -1014,7 +1138,6 @@ select option {
     flex: 1;
     overflow-y: auto;
     font-family: var(--vscode-editor-font-family, 'Cascadia Code', Consolas, monospace);
-    font-size: var(--calcpad-font-size-md);
 }
 
 .output-row {
@@ -1062,7 +1185,7 @@ select option {
 }
 
 /* Status bar */
-.status-bar {
+#app > .status-bar {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1070,13 +1193,12 @@ select option {
     height: 22px;
     background: var(--vscode-statusBar-background, #007acc);
     color: var(--vscode-statusBar-foreground, #fff);
-    font-size: var(--calcpad-font-size-md);
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
 }
 
-.status-bar:hover {
+#app > .status-bar:hover {
     background: var(--vscode-statusBar-hoverBackground, #1f8ad2);
 }
 
@@ -1115,6 +1237,5 @@ select option {
 }
 
 .status-text {
-    font-size: var(--calcpad-font-size-sm);
     opacity: 0.8;
 }

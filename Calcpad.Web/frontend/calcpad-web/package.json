@@ -25,12 +25,15 @@
     "@tauri-apps/plugin-store": "^2",
     "calcpad-frontend": "file:../calcpad-frontend",
     "monaco-editor": "^0.52.0",
-    "vue": "^3.5.39"
+    "pdfjs-dist": "6.4.299",
+    "vue": "^3.5.39",
+    "vue-i18n": "^11.4.16"
   },
   "devDependencies": {
     "@types/node": "^24",
     "@vitejs/plugin-vue": "^6.0.7",
     "typescript": "^5.9.0",
-    "vite": "^8.1.3"
+    "vite": "^8.1.3",
+    "vue-tsc": "^3.3.13"
   }
 }

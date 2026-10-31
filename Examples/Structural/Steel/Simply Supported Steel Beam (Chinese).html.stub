@@ -1,0 +1,711 @@
+<div class="calcpad-output">
+ <!-- Simply supported steel beam under a uniform load: bending, shear and deflection checks. 中文算例。-->
+ <div style="max-width:180mm;">
+  <h1>📐 简支钢梁计算书</h1>
+  <p>
+  </p>
+  <h2>一、输入参数</h2>
+  <p>
+   <strong>几何参数</strong>
+  </p>
+  <p>
+   梁跨度 —
+   <span class="eq">
+    <var>L</var>
+    =
+    <u class="input-9">7.5</u>
+   </span>
+   m
+  </p>
+  <p>
+  </p>
+  <p>
+   <strong>荷载参数</strong>
+  </p>
+  <p>
+   均布荷载标准值 —
+   <span class="eq">
+    <var>q</var>
+    <sub>k</sub>
+    =
+    <u class="input-12">10</u>
+   </span>
+   kN/m
+  </p>
+  <p>
+   荷载分项系数 —
+   <span class="eq">
+    <var>γ</var>
+    <sub>G</sub>
+    = 1.3
+   </span>
+  </p>
+  <p>
+   弹性模量 —
+   <span class="eq">
+    <var>E</var>
+    =
+    <u class="input-14">206</u>
+   </span>
+   GPa
+  </p>
+  <p>
+  </p>
+  <p>
+   <strong>截面参数</strong>
+  </p>
+  <p>
+   截面惯性矩 —
+   <span class="eq">
+    <var>I</var>
+    <sub>y</sub>
+    =
+    <u class="input-17">23170</u>
+   </span>
+   cm⁴
+  </p>
+  <p>
+   截面高度 —
+   <span class="eq">
+    <var>h</var>
+    =
+    <u class="input-18">300</u>
+   </span>
+   mm
+  </p>
+  <p>
+   截面塑性发展系数 —
+   <span class="eq">
+    <var>γ</var>
+    <sub>x</sub>
+    = 1.05
+   </span>
+  </p>
+  <p>
+   钢材抗弯强度设计值 —
+   <span class="eq">
+    <var>f</var>
+    =
+    <u class="input-20">215</u>
+   </span>
+   MPa
+  </p>
+  <p>
+  </p>
+  <h2>三、计算结果</h2>
+  <p>
+   支座反力
+   <span class="eq">
+    <var>R</var>
+    <sub>A</sub>
+    = 48.75
+   </span>
+  </p>
+  <p>
+   跨中最大弯矩
+   <span class="eq">
+    <var>M</var>
+    <sub>max</sub>
+    = 91.41
+   </span>
+  </p>
+  <p>
+   跨中最大挠度
+   <span class="eq">
+    <var>d</var>
+    <sub>max</sub>
+    = 8.63
+   </span>
+  </p>
+  <p>
+   弯曲应力
+   <span class="eq">
+    <var>σ</var>
+    = 56.36
+   </span>
+  </p>
+  <p>
+   强度设计值
+   <span class="eq">
+    <var>f</var>
+    = 215
+   </span>
+  </p>
+  <p>
+   应力比
+   <span class="eq">
+    <var>η</var>
+    = 0.262
+   </span>
+  </p>
+  <p>✅ 强度满足要求。</p>
+  <p>
+  </p>
+  <h2>四、内力与变形简图</h2>
+  <p>
+  </p>
+  <h3>4.1 剪力简图</h3>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    (
+    <var>x</var>
+    )  =
+    <var>q</var>
+    ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>L</var>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    −
+    <var>x</var>
+    <span class="b1">)</span>
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:420.37pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2270 840" width="2270px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2000" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2180" y1="667.15" y2="667.15">
+    </line>
+    <text class="sm end" x="161" y="685.15">-40</text>
+    <line class="Grid" x1="180" x2="2180" y1="544.08" y2="544.08">
+    </line>
+    <text class="sm end" x="161" y="562.08">-20</text>
+    <line class="Grid" x1="180" x2="2180" y1="421" y2="421">
+    </line>
+    <text class="sm end" x="161" y="439">0</text>
+    <line class="Grid" x1="180" x2="2180" y1="297.92" y2="297.92">
+    </line>
+    <text class="sm end" x="161" y="315.92">20</text>
+    <line class="Grid" x1="180" x2="2180" y1="174.85" y2="174.85">
+    </line>
+    <text class="sm end" x="161" y="192.85">40</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="313.33" x2="313.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="313.33" y="772">0.5</text>
+    <line class="Grid" x1="446.67" x2="446.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="446.67" y="772">1</text>
+    <line class="Grid" x1="580" x2="580" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="580" y="772">1.5</text>
+    <line class="Grid" x1="713.33" x2="713.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="713.33" y="772">2</text>
+    <line class="Grid" x1="846.67" x2="846.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="846.67" y="772">2.5</text>
+    <line class="Grid" x1="980" x2="980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="980" y="772">3</text>
+    <line class="Grid" x1="1113.33" x2="1113.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1113.33" y="772">3.5</text>
+    <line class="Grid" x1="1246.67" x2="1246.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1246.67" y="772">4</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">4.5</text>
+    <line class="Grid" x1="1513.33" x2="1513.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1513.33" y="772">5</text>
+    <line class="Grid" x1="1646.67" x2="1646.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1646.67" y="772">5.5</text>
+    <line class="Grid" x1="1780" x2="1780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1780" y="772">6</text>
+    <line class="Grid" x1="1913.33" x2="1913.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1913.33" y="772">6.5</text>
+    <line class="Grid" x1="2046.67" x2="2046.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2046.67" y="772">7</text>
+    <line class="Grid" x1="2180" x2="2180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2180" y="772">7.5</text>
+    <line class="Axis" x1="180" x2="2180" y1="421" y2="421">
+    </line>
+    <text x="2202" y="403">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -48.75]</text>
+    <text class="end" x="2262" y="44">[7.5; 48.75]</text>
+    <polyline class="Series1" points="180,721 244.52,701.65 309.03,682.29 373.55,662.94 438.06,643.58 502.58,624.23 567.1,604.87 631.61,585.52 696.13,566.16 760.65,546.81 825.16,527.45 889.68,508.1 954.19,488.74 1018.71,469.39 1083.23,450.03 1147.74,430.68 1212.26,411.32 1276.77,391.97 1341.29,372.61 1405.81,353.26 1470.32,333.9 1534.84,314.55 1599.35,295.19 1663.87,275.84 1728.39,256.48 1792.9,237.13 1857.42,217.77 1921.94,198.42 1986.45,179.06 2050.97,159.71 2115.48,140.35 2180,121">
+    </polyline>
+    <polygon class="Fill1" points="180,421 180,721 244.52,701.65 309.03,682.29 373.55,662.94 438.06,643.58 502.58,624.23 567.1,604.87 631.61,585.52 696.13,566.16 760.65,546.81 825.16,527.45 889.68,508.1 954.19,488.74 1018.71,469.39 1083.23,450.03 1147.74,430.68 1212.26,411.32 1276.77,391.97 1341.29,372.61 1405.81,353.26 1470.32,333.9 1534.84,314.55 1599.35,295.19 1663.87,275.84 1728.39,256.48 1792.9,237.13 1857.42,217.77 1921.94,198.42 1986.45,179.06 2050.97,159.71 2115.48,140.35 2180,121 2180,421" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>图 1 剪力简图（kN）</p>
+  <p>
+  </p>
+  <h3>4.2 弯矩简图</h3>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    (
+    <var>x</var>
+    )  =
+    <span class="dvc">
+     <var>q</var>
+     ·
+     <var>x</var>
+     ·  (
+     <var>L</var>
+     −
+     <var>x</var>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:420.37pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2270 840" width="2270px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2000" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2180" y1="646.68" y2="646.68">
+    </line>
+    <text class="sm end" x="161" y="664.68">-80</text>
+    <line class="Grid" x1="180" x2="2180" y1="515.26" y2="515.26">
+    </line>
+    <text class="sm end" x="161" y="533.26">-60</text>
+    <line class="Grid" x1="180" x2="2180" y1="383.84" y2="383.84">
+    </line>
+    <text class="sm end" x="161" y="401.84">-40</text>
+    <line class="Grid" x1="180" x2="2180" y1="252.42" y2="252.42">
+    </line>
+    <text class="sm end" x="161" y="270.42">-20</text>
+    <line class="Grid" x1="180" x2="2180" y1="121" y2="121">
+    </line>
+    <text class="sm end" x="161" y="139">0</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="313.33" x2="313.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="313.33" y="772">0.5</text>
+    <line class="Grid" x1="446.67" x2="446.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="446.67" y="772">1</text>
+    <line class="Grid" x1="580" x2="580" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="580" y="772">1.5</text>
+    <line class="Grid" x1="713.33" x2="713.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="713.33" y="772">2</text>
+    <line class="Grid" x1="846.67" x2="846.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="846.67" y="772">2.5</text>
+    <line class="Grid" x1="980" x2="980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="980" y="772">3</text>
+    <line class="Grid" x1="1113.33" x2="1113.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1113.33" y="772">3.5</text>
+    <line class="Grid" x1="1246.67" x2="1246.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1246.67" y="772">4</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">4.5</text>
+    <line class="Grid" x1="1513.33" x2="1513.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1513.33" y="772">5</text>
+    <line class="Grid" x1="1646.67" x2="1646.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1646.67" y="772">5.5</text>
+    <line class="Grid" x1="1780" x2="1780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1780" y="772">6</text>
+    <line class="Grid" x1="1913.33" x2="1913.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1913.33" y="772">6.5</text>
+    <line class="Grid" x1="2046.67" x2="2046.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2046.67" y="772">7</text>
+    <line class="Grid" x1="2180" x2="2180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2180" y="772">7.5</text>
+    <line class="Axis" x1="180" x2="2180" y1="121" y2="121">
+    </line>
+    <text x="2202" y="103">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -91.31]</text>
+    <text class="end" x="2262" y="44">[7.5; 2.6E-13]</text>
+    <polyline class="Series1" points="180,121 244.52,196 309.03,266 373.55,331 438.06,391 502.58,446 567.1,496 631.61,541 696.13,581 760.65,616 825.16,646 889.68,671 954.19,691 1018.71,706 1083.23,716 1147.74,721 1212.26,721 1276.77,716 1341.29,706 1405.81,691 1470.32,671 1534.84,646 1599.35,616 1663.87,581 1728.39,541 1792.9,496 1857.42,446 1921.94,391 1986.45,331 2050.97,266 2115.48,196 2180,121">
+    </polyline>
+    <polygon class="Fill1" points="180,121 180,121 244.52,196 309.03,266 373.55,331 438.06,391 502.58,446 567.1,496 631.61,541 696.13,581 760.65,616 825.16,646 889.68,671 954.19,691 1018.71,706 1083.23,716 1147.74,721 1212.26,721 1276.77,716 1341.29,706 1405.81,691 1470.32,671 1534.84,646 1599.35,616 1663.87,581 1728.39,541 1792.9,496 1857.42,446 1921.94,391 1986.45,331 2050.97,266 2115.48,196 2180,121 2180,121" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>图 2 弯矩简图（kN·m）</p>
+  <p>
+  </p>
+  <h3>4.3 挠度简图</h3>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    (
+    <var>x</var>
+    )  =
+    <span class="dvc">
+     <var>q</var>
+     <sub>k</sub>
+     ·
+     <var>x</var>
+     ·  (
+     <var>L</var>
+     <sup>3</sup>
+     − 2 ·
+     <var>L</var>
+     ·
+     <var>x</var>
+     <sup>2</sup>
+     +
+     <var>x</var>
+     <sup>3</sup>
+     )
+     <span class="dvl">
+     </span>
+     24 ·
+     <var>EI</var>
+    </span>
+   </span>
+  </p>
+  <svg class="plot" data-plot="svg" height="840px" style="width:420.37pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2270 840" width="2270px" xmlns="http://www.w3.org/2000/svg">
+   <style type="text/css">
+    .plot text {fill:Black; font-family:'Segoe UI', Sans; font-size:44px}
+.plot text.left {text-anchor: start;}
+.plot text.sm {font-size:44px}
+.plot text.mid {text-anchor: middle;}
+.plot text.end {text-anchor: end;}
+.plot .Grid, .plot .Frame, .plot .Axis{fill:none; stroke-width:4;}
+.plot .Grid {stroke:rgba(0, 0, 0, 0.08);}
+.plot .Frame {stroke:rgba(0, 0, 0, 0.24);}
+.plot .Axis {stroke: Black;}
+.plot polyline {fill:none; stroke-width:6;}
+.plot [class^="Fill"] {stroke:none;}
+.Series1 {stroke:Tomato;}
+circle.Series1 {fill:Tomato;}
+.Fill1 {fill:Tomato; fill-opacity:0.050;}
+   </style>
+   <g class="plot">
+    <rect class="Frame" height="600" width="2000" x="180" y="120">
+    </rect>
+    <line class="Grid" x1="180" x2="2180" y1="677.1" y2="677.1">
+    </line>
+    <text class="sm end" x="161" y="695.1">-8</text>
+    <line class="Grid" x1="180" x2="2180" y1="538.07" y2="538.07">
+    </line>
+    <text class="sm end" x="161" y="556.07">-6</text>
+    <line class="Grid" x1="180" x2="2180" y1="399.05" y2="399.05">
+    </line>
+    <text class="sm end" x="161" y="417.05">-4</text>
+    <line class="Grid" x1="180" x2="2180" y1="260.02" y2="260.02">
+    </line>
+    <text class="sm end" x="161" y="278.02">-2</text>
+    <line class="Grid" x1="180" x2="2180" y1="121" y2="121">
+    </line>
+    <text class="sm end" x="161" y="139">0</text>
+    <line class="Grid" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="180" y="772">0</text>
+    <line class="Grid" x1="313.33" x2="313.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="313.33" y="772">0.5</text>
+    <line class="Grid" x1="446.67" x2="446.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="446.67" y="772">1</text>
+    <line class="Grid" x1="580" x2="580" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="580" y="772">1.5</text>
+    <line class="Grid" x1="713.33" x2="713.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="713.33" y="772">2</text>
+    <line class="Grid" x1="846.67" x2="846.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="846.67" y="772">2.5</text>
+    <line class="Grid" x1="980" x2="980" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="980" y="772">3</text>
+    <line class="Grid" x1="1113.33" x2="1113.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1113.33" y="772">3.5</text>
+    <line class="Grid" x1="1246.67" x2="1246.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1246.67" y="772">4</text>
+    <line class="Grid" x1="1380" x2="1380" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1380" y="772">4.5</text>
+    <line class="Grid" x1="1513.33" x2="1513.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1513.33" y="772">5</text>
+    <line class="Grid" x1="1646.67" x2="1646.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1646.67" y="772">5.5</text>
+    <line class="Grid" x1="1780" x2="1780" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1780" y="772">6</text>
+    <line class="Grid" x1="1913.33" x2="1913.33" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="1913.33" y="772">6.5</text>
+    <line class="Grid" x1="2046.67" x2="2046.67" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2046.67" y="772">7</text>
+    <line class="Grid" x1="2180" x2="2180" y1="120" y2="720">
+    </line>
+    <text class="sm mid" x="2180" y="772">7.5</text>
+    <line class="Axis" x1="180" x2="2180" y1="121" y2="121">
+    </line>
+    <text x="2202" y="103">x</text>
+    <line class="Axis" x1="180" x2="180" y1="120" y2="720">
+    </line>
+    <text class="mid" x="180" y="84">y</text>
+    <text x="8" y="823">[0; -8.63]</text>
+    <text class="end" x="2262" y="44">[7.5; 1.49E-14]</text>
+    <polyline class="Series1" points="180,121 244.52,182.81 309.03,243.87 373.55,303.49 438.06,361.02 502.58,415.86 567.1,467.47 631.61,515.33 696.13,559 760.65,598.09 825.16,632.25 889.68,661.17 954.19,684.6 1018.71,702.35 1050.97,709.05 1083.23,714.27 1115.48,718.01 1147.74,720.25 1180,721 1212.26,720.25 1244.52,718.01 1276.77,714.27 1309.03,709.05 1341.29,702.35 1405.81,684.6 1470.32,661.17 1534.84,632.25 1599.35,598.09 1663.87,559 1728.39,515.33 1792.9,467.47 1857.42,415.86 1921.94,361.02 1986.45,303.49 2050.97,243.87 2115.48,182.81 2180,121">
+    </polyline>
+    <polygon class="Fill1" points="180,121 180,121 244.52,182.81 309.03,243.87 373.55,303.49 438.06,361.02 502.58,415.86 567.1,467.47 631.61,515.33 696.13,559 760.65,598.09 825.16,632.25 889.68,661.17 954.19,684.6 1018.71,702.35 1050.97,709.05 1083.23,714.27 1115.48,718.01 1147.74,720.25 1180,721 1212.26,720.25 1244.52,718.01 1276.77,714.27 1309.03,709.05 1341.29,702.35 1405.81,684.6 1470.32,661.17 1534.84,632.25 1599.35,598.09 1663.87,559 1728.39,515.33 1792.9,467.47 1857.42,415.86 1921.94,361.02 1986.45,303.49 2050.97,243.87 2115.48,182.81 2180,121 2180,121" stroke-width="0">
+    </polygon>
+   </g>
+  </svg>
+  <p>图 3 挠度简图（mm）</p>
+  <p>
+  </p>
+  <h2>五、任意截面验算</h2>
+  <p>
+   验算位置 —
+   <span class="eq">
+    <var>x</var>
+    <sub>chk</sub>
+    =
+    <u class="input-85">1.875</u>
+   </span>
+   m
+  </p>
+  <p>
+   <span class="eq">
+    <var>M</var>
+    <sub>chk</sub>
+    =
+    <span class="dvc">
+     <var>q</var>
+     ·
+     <var>x</var>
+     <sub>chk</sub>
+     ·  (
+     <var>L</var>
+     −
+     <var>x</var>
+     <sub>chk</sub>
+     )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    =
+    <span class="dvc">
+     13 · 1.88 ·  ( 7.5 − 1.88 )
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    = 68.55
+   </span>
+   kN·m
+  </p>
+  <p>
+   <span class="eq">
+    <var>V</var>
+    <sub>chk</sub>
+    =
+    <var>q</var>
+    ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>L</var>
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    −
+    <var>x</var>
+    <sub>chk</sub>
+    <span class="b1">)</span>
+    = 13 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     7.5
+     <span class="dvl">
+     </span>
+     2
+    </span>
+    − 1.88
+    <span class="b1">)</span>
+    = 24.38
+   </span>
+   kN
+  </p>
+  <p>
+   <span class="eq">
+    <var>d</var>
+    <sub>chk</sub>
+    =
+    <span class="dvc">
+     <var>q</var>
+     <sub>k</sub>
+     ·
+     <var>x</var>
+     <sub>chk</sub>
+     ·  (
+     <var>L</var>
+     <sup>3</sup>
+     − 2 ·
+     <var>L</var>
+     ·
+     <var>x</var>
+     <sub>chk</sub>
+     <sup>2</sup>
+     +
+     <var>x</var>
+     <sub>chk</sub>
+     <sup>3</sup>
+     )
+     <span class="dvl">
+     </span>
+     24 ·
+     <var>EI</var>
+    </span>
+    · 1000 =
+    <span class="dvc">
+     10 · 1.88 ·  ( 7.5
+     <sup>3</sup>
+     − 2 · 7.5 · 1.88
+     <sup>2</sup>
+     + 1.88
+     <sup>3</sup>
+     )
+     <span class="dvl">
+     </span>
+     24 · 47730.2
+    </span>
+    · 1000 = 6.15
+   </span>
+   mm
+  </p>
+  <p>
+   <span class="eq">
+    <var>σ</var>
+    <sub>chk</sub>
+    =
+    <span class="dvc up">
+     <span class="dvc">
+      <var>M</var>
+      <sub>chk</sub>
+      <span class="dvl">
+      </span>
+      <var>γ</var>
+      <sub>x</sub>
+      ·
+      <var>W</var>
+     </span>
+     <span class="dvl">
+     </span>
+     1000
+    </span>
+    =
+    <span class="dvc up">
+     <span class="dvc">
+      68.55
+      <span class="dvl">
+      </span>
+      1.05 · 0.00154
+     </span>
+     <span class="dvl">
+     </span>
+     1000
+    </span>
+    = 42.27
+   </span>
+   MPa
+  </p>
+  <p>
+   截面弯矩
+   <span class="eq">
+    <var>M</var>
+    <sub>chk</sub>
+    = 68.55
+   </span>
+  </p>
+  <p>
+   截面剪力
+   <span class="eq">
+    <var>V</var>
+    <sub>chk</sub>
+    = 24.38
+   </span>
+  </p>
+  <p>
+   截面挠度
+   <span class="eq">
+    <var>d</var>
+    <sub>chk</sub>
+    = 6.15
+   </span>
+  </p>
+  <p>
+   截面应力
+   <span class="eq">
+    <var>σ</var>
+    <sub>chk</sub>
+    = 42.27
+   </span>
+  </p>
+ </div>
+</div>

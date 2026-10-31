@@ -4,27 +4,7 @@ namespace Calcpad.Core
 {
     internal class ComplexCalculator : Calculator
     {
-        private static readonly Operator<ComplexValue>[] _operators =
-            [
-                Pow,
-                (in ComplexValue a, in ComplexValue b) =>  a / b,
-                ComplexValue.IntDiv,
-                (in ComplexValue a, in ComplexValue b) => a % b,
-                (in ComplexValue a, in ComplexValue b) => a * b,
-                (in ComplexValue a, in ComplexValue b) => a - b,
-                (in ComplexValue a, in ComplexValue b) => a + b,
-                (in ComplexValue a, in ComplexValue b) => a < b,
-                (in ComplexValue a, in ComplexValue b) => a > b,
-                (in ComplexValue a, in ComplexValue b) => a <= b,
-                (in ComplexValue a, in ComplexValue b) => a >= b,
-                (in ComplexValue a, in ComplexValue b) => a == b,
-                (in ComplexValue a, in ComplexValue b) => a != b,
-                (in ComplexValue a, in ComplexValue b) => a & b,
-                (in ComplexValue a, in ComplexValue b) => a | b,
-                (in ComplexValue a, in ComplexValue b) => a ^ b,
-                (in ComplexValue a, in ComplexValue b) => Phasor(a, b),
-                //Assignments do not need implementation here
-            ];
+        private readonly Operator<ComplexValue>[] _operators;
         private readonly Function<ComplexValue>[] _functions;
         private readonly Operator<ComplexValue>[] Functions2;
         private static readonly Func<IScalarValue[], IScalarValue>[] MultiFunctions =
@@ -53,6 +33,28 @@ namespace Calcpad.Core
 
         public ComplexCalculator()
         {
+            _operators =
+            [
+                Pow,
+                (in ComplexValue a, in ComplexValue b) =>  a / b,
+                ComplexValue.IntDiv,
+                (in ComplexValue a, in ComplexValue b) => a % b,
+                (in ComplexValue a, in ComplexValue b) => a * b,
+                (in ComplexValue a, in ComplexValue b) => a - b,
+                (in ComplexValue a, in ComplexValue b) => a + b,
+                (in ComplexValue a, in ComplexValue b) => a < b,
+                (in ComplexValue a, in ComplexValue b) => a > b,
+                (in ComplexValue a, in ComplexValue b) => a <= b,
+                (in ComplexValue a, in ComplexValue b) => a >= b,
+                (in ComplexValue a, in ComplexValue b) => a == b,
+                (in ComplexValue a, in ComplexValue b) => a != b,
+                (in ComplexValue a, in ComplexValue b) => a & b,
+                (in ComplexValue a, in ComplexValue b) => a | b,
+                (in ComplexValue a, in ComplexValue b) => a ^ b,
+                Phasor,
+                //Assignments do not need implementation here
+            ];
+
             _functions =
             [
                 Sin,      // 0
@@ -139,7 +141,7 @@ namespace Calcpad.Core
         private static ComplexValue Imaginary(in ComplexValue value) => new(value.B, value.Units);
         internal static ComplexValue Abs(in ComplexValue value) =>
           new(Complex.Abs(value.Complex), value.Units);
-        private static ComplexValue Phase(in ComplexValue value) => new(value.Complex.Phase);
+        private ComplexValue Phase(in ComplexValue value) => ToAngleUnits(value.Complex.Phase);
         internal static ComplexValue Conjugate(in ComplexValue value) =>
            new(value.Complex.Conjugate, value.Units);
 
@@ -159,12 +161,10 @@ namespace Calcpad.Core
         }
 
 
-        internal static ComplexValue Phasor(ComplexValue a, ComplexValue b)
+        private ComplexValue Phasor(in ComplexValue a, in ComplexValue b)
         {
             CheckTrigFunctionUnits("phasor", b.Units);
-            var u = b.Units;
-            var d = u is null ? 1d : u.ConvertTo(Unit.Get("rad", false));
-            var phi = b.A * d;
+            var phi = FromAngleUnits(b).Re;
             var c = a.A * (Math.Cos(phi) + Complex.ImaginaryOne * Math.Sin(phi));
             return new ComplexValue(c, a.Units, a.IsUnit);
         }

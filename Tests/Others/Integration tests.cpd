@@ -1,4 +1,5 @@
 #rad
+ReturnAngleUnits = 0
 Γ(x) = $Integral{ln(1/t)^(x - 1) @ t = 0 : 1}
 erf(x) = 2/sqrt(π)*$Integral{exp(-t^2) @ t = 0 : x}
 "Integration tests

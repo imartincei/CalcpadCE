@@ -129,7 +129,7 @@
             string matrix = "[0.5; -0.5; 1| 0.866; -0.866; -1| 0.707; -0.707; 0]";
             var calc = new TestCalc(new());
             calc.Run($"Asin({matrix})");
-            Assert.Equal("[30 -30 90|60 -60 -90|44.99 -44.99 0]", calc.ToString());
+            Assert.Equal("[30° -30° 90°|60° -60° -90°|44.99° -44.99° 0°]", calc.ToString());
         }
         [Fact]
         public void MatrixAcos()
@@ -137,7 +137,7 @@
             string matrix = "[0.5; -0.5; 1| 0.866; -0.866; -1| 0.707; -0.707; 0]";
             var calc = new TestCalc(new());
             calc.Run($"Acos({matrix})");
-            Assert.Equal("[60 120 0|30 150 180|45.01 134.99 90]", calc.ToString());
+            Assert.Equal("[60° 120° 0°|30° 150° 180°|45.01° 134.99° 90°]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]
@@ -146,7 +146,7 @@
             string matrix = "[0.2588; 0.5; -0.2588| 0.866; -0.866; -0.5| 0.707; 0; -0.707]";
             var calc = new TestCalc(new());
             calc.Run($"Atan({matrix})");
-            Assert.Equal("[14.51 26.57 -14.51|40.89 -40.89 -26.57|35.26 0 -35.26]", calc.ToString());
+            Assert.Equal("[14.51° 26.57° -14.51°|40.89° -40.89° -26.57°|35.26° 0° -35.26°]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]
@@ -155,7 +155,7 @@
             string matrix = "[0.2588; 0.5; -0.2588| 0.866; -0.866; -0.5| 0.707; 0; -0.707]";
             var calc = new TestCalc(new());
             calc.Run($"Acsc({matrix})");
-            Assert.Equal("[ Undefined   Undefined   Undefined | Undefined   Undefined   Undefined | Undefined  +∞  Undefined ]", calc.ToString());
+            Assert.Equal("[ Undefined °  Undefined °  Undefined °| Undefined °  Undefined °  Undefined °| Undefined ° +∞°  Undefined °]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]
@@ -164,7 +164,7 @@
             string matrix = "[0.577; -0.577; 1| 0.577; 0.707; -1| 0; -1; 0.5]";
             var calc = new TestCalc(new());
             calc.Run($"Asec({matrix})");
-            Assert.Equal("[ Undefined   Undefined  0| Undefined   Undefined  180|+∞ 180  Undefined ]", calc.ToString());
+            Assert.Equal("[ Undefined °  Undefined ° 0°| Undefined °  Undefined ° 180°|+∞° 180°  Undefined °]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]
@@ -173,7 +173,7 @@
             string matrix = "[0.577; -0.577; 1| 0.577; 0.707; -1| 0; -1; 0.5]";
             var calc = new TestCalc(new());
             calc.Run($"Acot({matrix})");
-            Assert.Equal("[60.02 -60.02 45|60.02 54.74 -45|90 -45 63.43]", calc.ToString());
+            Assert.Equal("[60.02° -60.02° 45°|60.02° 54.74° -45°|90° -45° 63.43°]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]
@@ -183,7 +183,7 @@
             string matrix2 = "[0.5; -0.5; 1| 0.866; -0.866; -1| 0.707; -0.707; 0]";
             var calc = new TestCalc(new());
             calc.Run($"Atan2({matrix1}; {matrix2})");
-            Assert.Equal("[40.91 -139.09 45|56.33 -50.77 -135|90 -144.74 0]", calc.ToString());
+            Assert.Equal("[40.91° -139.09° 45°|56.33° -50.77° -135°|90° -144.74° 0°]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "ScalarFunctions")]

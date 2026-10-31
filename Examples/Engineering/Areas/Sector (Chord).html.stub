@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Area and arc length of a circular sector specified by its chord and height instead of the central angle. -->
- <h3>Area and Arch Length of Circular Sector</h3>
+ <h1>Area and Arch Length of Circular Sector</h1>
  <div style="max-width:110mm;">
   <img alt="sector-chord.png" class="side" src="Images/math/area/sector-chord.png" style="height:60pt;"/>
  </div>
@@ -48,9 +48,8 @@
     2 · 1
    </span>
    <span class="b1">)</span>
-   = 60
+   = 60°
   </span>
-  °
  </p>
  <p>Area</p>
  <p>
@@ -66,16 +65,16 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    360
+    360°
    </span>
    =
    <span class="dvc">
     3.14 · 1
     <sup>2</sup>
-    · 60
+    · 60°
     <span class="dvl">
     </span>
-    360
+    360°
    </span>
    = 0.524
   </span>
@@ -93,14 +92,14 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    =
    <span class="dvc">
-    3.14 · 1 · 60
+    3.14 · 1 · 60°
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    = 1.05
   </span>

@@ -877,9 +877,8 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>m</i>
    ; 134.51
    <i>mm</i>
-   )  = 3.85
+   )  = 3.85°
   </span>
-  °
  </p>
  <p>Reactions in supports</p>
  <p>
@@ -911,7 +910,7 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>kN</i>
    ·
    <b>cos</b>
-   ( 3.85 )  = 148.69
+   ( 3.85° )  = 148.69
    <i>kN</i>
   </span>
  </p>
@@ -944,7 +943,7 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>kN</i>
    ·
    <b>sin</b>
-   ( 3.85 )  = 10
+   ( 3.85° )  = 10
    <i>kN</i>
   </span>
  </p>

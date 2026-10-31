@@ -155,11 +155,11 @@ T_Rd,c = 2*A_k*t_ef*f_ctd*10^-6'kN·m
 	#if T_Ed/T_Rd,max,45 + V_Ed/V_Rd,max,45 ≤ 1
 		T_Ed/T_Rd,max,45 + V_Ed/V_Rd,max,45'≤'1.'The design check is satisfied!
 		'Angle between the concrete struts and the longitudinal reinforcement
-		θ = 0.5*asin(T_Ed/T_Rd,max,45 + V_Ed/V_Rd,max,45)'°
+		θ = 0.5*asin(T_Ed/T_Rd,max,45 + V_Ed/V_Rd,max,45)
 		'The angle is limited within 21,8° ≤ θ ≤ 45°
-		θ = max(21.8; min(θ; 45))'°
+		θ = max(21.8°; min(θ; 45°))
 		'<p class="ref">[(6.9) and (6.30) from EN 1992-1-1]</p>
-		'Bearing capacity check at'θ'°
+		'Bearing capacity check at'θ
 		V_Rd,max = α_cw*b_w*z*ν_1*f_cd*cot(θ)/(1 + cot(θ)^2)*10^-3'kN
 		T_Rd,max = 2*ν_1*α_cw*f_cd*A_k*t_ef*sin(θ)*cos(θ)*10^-6'kN·m
 		T_Ed/T_Rd,max + V_Ed/V_Rd,max

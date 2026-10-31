@@ -5,12 +5,12 @@ import {
     CalcpadApiClient,
     CalcpadTokenType,
     SEMANTIC_TOKEN_TYPES,
+    SEMANTIC_TOKEN_MODIFIERS,
     mapTokenTypeToIndex,
+    getTokenModifiers,
     truncateBase64Content,
 } from 'calcpad-frontend';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
-
-const SEMANTIC_TOKEN_MODIFIERS: string[] = [];
 
 export const semanticTokensLegend = new vscode.SemanticTokensLegend(
     SEMANTIC_TOKEN_TYPES,
@@ -82,6 +82,7 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
                 return a.column - b.column;
             });
 
+            const lines = content.split(/\r?\n/);
             let validCount = 0;
             for (const tok of tokens) {
                 if (tok.typeId === CalcpadTokenType.None) {
@@ -89,7 +90,7 @@ export class CalcpadSemanticTokensProvider implements vscode.DocumentSemanticTok
                 }
                 const tokenType = mapTokenTypeToIndex(tok.typeId);
                 if (tokenType >= 0) {
-                    builder.push(tok.line, tok.column, tok.length, tokenType, 0);
+                    builder.push(tok.line, tok.column, tok.length, tokenType, getTokenModifiers(tok.typeId, lines[tok.line]));
                     validCount++;
                 }
             }

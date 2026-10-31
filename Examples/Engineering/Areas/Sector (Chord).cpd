@@ -8,11 +8,11 @@
 #if a ≤ 2*r
 	'<-->
 	'Angle
-	α = 2*asin(a/(2*r))'&deg;
+	α = 2*asin(a/(2*r))
 	'Area
-	A = π*r^2*α/360
+	A = π*r^2*α/360°
 	'Arch length
-	S = π*r*α/180
+	S = π*r*α/180°
 	'<!--
 #else
 	'<-->

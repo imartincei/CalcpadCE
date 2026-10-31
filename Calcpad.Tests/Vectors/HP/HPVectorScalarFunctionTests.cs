@@ -130,7 +130,7 @@
             string vector = "hp([0.5; 0.866; 1; -0.5; -0.866; -1; 0])";
             var calc = new TestCalc(new());
             calc.Run($"Asin({vector})");
-            Assert.Equal("[30 60 90 -30 -60 -90 0]", calc.ToString());
+            Assert.Equal("[30° 60° 90° -30° -60° -90° 0°]", calc.ToString());
         }
 
         [Fact]
@@ -140,7 +140,7 @@
             string vector = "hp([0.5; 0.866; 1; -0.5; -0.866; -1; 0])";
             var calc = new TestCalc(new());
             calc.Run($"Acos({vector})");
-            Assert.Equal("[60 30 0 120 150 180 90]", calc.ToString());
+            Assert.Equal("[60° 30° 0° 120° 150° 180° 90°]", calc.ToString());
         }
 
         [Fact]
@@ -150,7 +150,7 @@
             string vector = "hp([0.5; 0.866; 1; -0.5; -0.866; -1; 0])";
             var calc = new TestCalc(new());
             calc.Run($"Atan({vector})");
-            Assert.Equal("[26.57 40.89 45 -26.57 -40.89 -45 0]", calc.ToString());
+            Assert.Equal("[26.57° 40.89° 45° -26.57° -40.89° -45° 0°]", calc.ToString());
         }
 
         [Fact]
@@ -160,7 +160,7 @@
             string vector = "hp([-3.5; 7.8; 4.25; π/3; 0; 10; -2.3; 6.75])";
             var calc = new TestCalc(new());
             calc.Run($"Acsc({vector})");
-            Assert.Equal("[-16.6 7.37 13.61 72.73 +∞ 5.74 -25.77 8.52]", calc.ToString());
+            Assert.Equal("[-16.6° 7.37° 13.61° 72.73° +∞° 5.74° -25.77° 8.52°]", calc.ToString());
         }
 
         [Fact]
@@ -170,7 +170,7 @@
             string vector = "hp([0.5; 0.866; 1; -0.5; -0.866; -1; 0])";
             var calc = new TestCalc(new());
             calc.Run($"Asec({vector})");
-            Assert.Equal("[ Undefined   Undefined  0  Undefined   Undefined  180 +∞]", calc.ToString());
+            Assert.Equal("[ Undefined °  Undefined ° 0°  Undefined °  Undefined ° 180° +∞°]", calc.ToString());
         }
 
         [Fact]
@@ -180,7 +180,7 @@
             string vector = "hp([0.5; 0.866; 1; -0.5; -0.866; -1; 0])";
             var calc = new TestCalc(new());
             calc.Run($"Acot({vector})");
-            Assert.Equal("[63.43 49.11 45 -63.43 -49.11 -45 90]", calc.ToString());
+            Assert.Equal("[63.43° 49.11° 45° -63.43° -49.11° -45° 90°]", calc.ToString());
         }
         [Fact]
         [Trait("Category", "HPScalarFunctions")]
@@ -190,7 +190,7 @@
             string vector2 = "hp([-3.5; 7.8; 4.25; π/4; 0; 10; -2.3; 6.75])";
             var calc = new TestCalc(new());
             calc.Run($"Atan2({vector}; {vector2})");
-            Assert.Equal("[-135 45 45 90 0 102.95 -18.82 90]", calc.ToString());
+            Assert.Equal("[-135° 45° 45° 90° 0° 102.95° -18.82° 90°]", calc.ToString());
         }
 
         [Fact]

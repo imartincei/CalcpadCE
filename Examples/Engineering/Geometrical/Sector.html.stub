@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a circular sector: area, centroid, second moments of area and radii of gyration as functions of radius and central angle. -->
- <h3>Geometrical Properties of Circular Sector</h3>
+ <h1>Geometrical Properties of Circular Sector</h1>
  <div style="max-width:150mm">
   <img alt="sector.png" class="side" src="Images/mechanics/sections/sector.png" style="height:120pt;"/>
  </div>

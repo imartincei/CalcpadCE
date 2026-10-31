@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a trapezoid: area, centroid offsets, $I_x$, $I_y$, section moduli and radii of gyration from the two parallel sides and height. -->
- <h3>Geometrical Properties of Trapezoid</h3>
+ <h1>Geometrical Properties of Trapezoid</h1>
  <div style="max-width:130mm">
   <img alt="Trapezoid.png" class="side" src="Images/mechanics/sections/trapezoid.png" style="height:135pt;"/>
  </div>

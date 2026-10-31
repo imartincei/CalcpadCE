@@ -8,7 +8,7 @@ import {
     formatMacroCompletion,
     formatFunctionCompletion,
     formatVariableCompletion,
-    formatCustomUnitCompletion,
+    isCompletableBuiltin,
     parseDirectiveLine,
     type CompletionData,
     type CompletionKind,
@@ -38,7 +38,6 @@ const VSCODE_KIND_MAP: Record<CompletionKind, vscode.CompletionItemKind> = {
     macro: vscode.CompletionItemKind.Class,
     function: vscode.CompletionItemKind.Function,
     variable: vscode.CompletionItemKind.Variable,
-    unit: vscode.CompletionItemKind.Unit,
     snippet: vscode.CompletionItemKind.Snippet,
 };
 
@@ -121,19 +120,14 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
                 for (const macro of definitions.macros) {
                     if (matches(macro.name)) completionItems.push(toVscodeCompletion(formatMacroCompletion(macro)));
                 }
-                for (const unit of definitions.customUnits) {
-                    if (matches(unit.name)) completionItems.push(toVscodeCompletion(formatCustomUnitCompletion(unit)));
-                }
             }
 
         } catch (error) {
             this.outputChannel.appendLine('[COMPLETION ERROR] ' + error, 'verbose');
         }
 
-        // Add built-in content from insert manager — only snippets that define a keyword
-        // (function, command, unit, constant, operator, setting, control keyword). UI-only
-        // entries like HTML tags, markdown syntax, symbols, and block templates are excluded.
-        const allInsertItems = this.insertManager.getAllItems().filter(item => !!item.keywordType);
+        // Keyword-defining built-ins only; units and UI-only snippets are excluded.
+        const allInsertItems = this.insertManager.getAllItems().filter(isCompletableBuiltin);
         for (const insertItem of allInsertItems) {
             // Filter by search term if provided
             if (!word || this.matchesSearchTerm(insertItem, word)) {

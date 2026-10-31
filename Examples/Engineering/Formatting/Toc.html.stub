@@ -1,5 +1,5 @@
 <div class="calcpad-output">
- <h3>Automatic Table of Contents</h3>
+ <h1>Automatic Table of Contents</h1>
  <style>#toc, #toc hr{border: solid 1px #8cf;} #toc{width: 300pt; background:#f0fcff; border-radius: 6pt; padding:12pt;} #toc li{list-style-type:none;} #toc ul{padding-left:1.5em;} #toc a{color:#08f;} #toc b{color:#06c;}</style>
  <article>
   <div id="toc">

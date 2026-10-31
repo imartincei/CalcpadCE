@@ -754,6 +754,7 @@
    <span class="err">Undefined</span>
    <span class="err">Undefined</span>
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -791,6 +792,7 @@
    <span class="err">Undefined</span>
    <span class="err">Undefined</span>
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -812,6 +814,7 @@
    <span class="err">Undefined</span>
    <span class="err">Undefined</span>
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -849,6 +852,7 @@
    <span class="err">Undefined</span>
    <span class="err">Undefined</span>
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -863,6 +867,7 @@
    <b class="b0">[</b>
    -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -893,6 +898,7 @@
    <b class="b0">[</b>
    -1.29 1.44 1.34 0.808 0 1.47 -1.16 1.42
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -907,6 +913,7 @@
    <b class="b0">[</b>
    -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -937,6 +944,7 @@
    <b class="b0">[</b>
    -0.278 0.128 0.231 0.762 1.57 0.0997 -0.41 0.147
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -953,6 +961,7 @@
    <span class="err">+∞</span>
    1.47 2.02 1.42
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -985,6 +994,7 @@
    <span class="err">+∞</span>
    1.47 2.02 1.42
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -1001,6 +1011,7 @@
    <span class="err">+∞</span>
    0.1 -0.45 0.149
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -1033,6 +1044,7 @@
    <span class="err">+∞</span>
    0.1 -0.45 0.149
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -1052,6 +1064,7 @@
    <b class="b0">[</b>
    -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
   ,
   <span class="eq">
@@ -1091,6 +1104,7 @@
    <b class="b0">[</b>
    -2.36 0.785 0.785 0.464 0 0.785 -2.36 0.785
    <b class="b0">]</b>
+   <i>rad</i>
   </span>
  </p>
  <p>

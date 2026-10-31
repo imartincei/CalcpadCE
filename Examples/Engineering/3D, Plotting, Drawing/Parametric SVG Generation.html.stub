@@ -3,7 +3,7 @@
 <p>Adjust any dimension and the drawing redraws itself — ideal for standardised structural detail libraries. -->
  <!-- A small library of reusable CalcpadCE `#def` macros that emit SVG primitives (line, rect, circle, text, dimensions).
 <p>Include this file with `#include svg_drawing.cpd` in any worksheet that needs to draw a parametric structural detail. -->
- <h3>Prestressed TT Panel - Parametric SVG Generation</h3>
+ <h1>Prestressed TT Panel - Parametric SVG Generation</h1>
  <p>Dimensions:</p>
  <p>
   Rib height -

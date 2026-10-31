@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "rootDir": "..",
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -12,7 +13,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/CalcpadVuePanel/*"],
-      "@calcpad-vue/*": ["../calcpad-frontend/src/vue/*"]
+      "@calcpad-vue/*": ["../calcpad-frontend/src/vue/*"],
+      "@calcpad-i18n": ["../calcpad-frontend/src/i18n"]
     },
     "types": ["vite/client", "node"],
     "typeRoots": ["./node_modules/@types", "./node_modules"]
@@ -22,7 +24,8 @@
     "src/CalcpadVuePanel/**/*.vue",
     "src/CalcpadVuePanel/env.d.ts",
     "../calcpad-frontend/src/vue/**/*.ts",
-    "../calcpad-frontend/src/vue/**/*.vue"
+    "../calcpad-frontend/src/vue/**/*.vue",
+    "../calcpad-frontend/src/i18n/**/*.ts"
   ],
   "exclude": [
     "node_modules",

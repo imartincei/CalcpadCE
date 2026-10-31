@@ -4,45 +4,7 @@
        the embedded webview. Blocking the default menu everywhere is safer than
        relying on children to opt in. -->
   <div class="calcpad-vue-ui" :class="{ split: isSplit }" @contextmenu.prevent>
-    <!-- Activity icons: only shown when the host app enables extra tabs (desktop).
-         VS Code webview keeps a single Calcpad view. -->
-    <div v-if="versionConfig.isDesktop" class="activity-icons">
-      <div class="activity-tabs" role="tablist">
-        <button
-          v-for="view in views"
-          :key="view.id"
-          :class="['activity-icon', { active: activeView === view.id }]"
-          :title="view.label"
-          :aria-label="view.label"
-          :aria-selected="activeView === view.id"
-          role="tab"
-          @click="switchView(view.id)"
-          v-html="view.icon"
-        ></button>
-      </div>
-      <!-- Sits on the bar that spans both views, since hiding takes both away. Showing
-           it again is the editor-area button's job — this bar goes with the sidebar. -->
-      <button
-        class="activity-icon activity-hide"
-        title="Hide the sidebar (Ctrl+Shift+B)"
-        aria-label="Hide the sidebar"
-        @click="hideSidebar()"
-      ><SidebarIcon /></button>
-    </div>
-
-    <CalcpadFilesTab
-      v-if="versionConfig.isDesktop && activeView === 'files'"
-      :opened-folder="openedFolder"
-      :tree-roots="fileTreeRoots"
-      @open-folder-request="handleOpenFolderRequest"
-      @open-file="handleOpenFile"
-      @expand-folder="handleExpandFolder"
-      @open-containing-folder="handleOpenContainingFolder"
-      @close-folder="handleCloseFolder"
-      @refresh-folder="handleRefreshFolder"
-    />
-
-    <div v-show="!versionConfig.isDesktop || activeView === 'calcpad'" class="calcpad-view" :class="{ split: isSplit }">
+    <div class="calcpad-view" :class="{ split: isSplit }">
     <div v-for="(pane, paneIndex) in panes" :key="pane.id" class="calcpad-pane">
     <div class="tab-bar">
     <div class="tab-container">
@@ -56,22 +18,22 @@
         {{ tab.label }}
       </button>
       <!-- Grouped so the pair wraps as a unit rather than splitting across rows at
-           the sidebar's minimum width (the second button is web-only). -->
+           the sidebar's minimum width. -->
       <div class="pane-actions">
         <button
-          class="pane-action"
+          class="icon"
           :title="isSplit ? 'Close this panel' : 'Split panel'"
           :aria-label="isSplit ? 'Close this panel' : 'Split panel'"
           @click="isSplit ? closePane(paneIndex) : splitPane()"
           v-html="isSplit ? CLOSE_ICON : SPLIT_ICON"
         ></button>
-        <!-- Hides the whole sidebar, unlike .pane-action beside it, which splits or
+        <!-- Hides the whole sidebar, unlike the button beside it, which splits or
              closes one of its inner panes. -->
         <button
-          v-if="versionConfig.isWeb && paneIndex === 0"
-          class="pane-action"
-          title="Hide the sidebar (Ctrl+Shift+B)"
-          aria-label="Hide the sidebar"
+          v-if="(versionConfig.isWeb || versionConfig.isDesktop) && paneIndex === 0"
+          class="icon"
+          :title="t('Hide the sidebar (Ctrl+Shift+B)')"
+          :aria-label="t('Hide the sidebar')"
           @click="hideSidebar()"
         ><SidebarIcon /></button>
       </div>
@@ -82,9 +44,22 @@
 
     <!-- `inert` rather than a per-control disabled flag: it takes the whole tab out of
          both pointer and keyboard reach in one attribute, whatever it holds. -->
-    <div class="tab-content" :class="{ unavailable: tabUnavailable(pane.activeTab) }" :inert="tabUnavailable(pane.activeTab)">
+    <div class="tab-content" :class="{ unavailable: tabUnavailable(pane.activeTab), 'insert-content': pane.activeTab === 'insert' }" :inert="tabUnavailable(pane.activeTab)">
+      <CalcpadFilesTab
+        v-if="pane.activeTab === 'files'"
+        :opened-folder="openedFolder"
+        :tree-roots="fileTreeRoots"
+        @open-folder-request="handleOpenFolderRequest"
+        @open-file="handleOpenFile"
+        @expand-folder="handleExpandFolder"
+        @open-containing-folder="handleOpenContainingFolder"
+        @close-folder="handleCloseFolder"
+        @refresh-folder="handleRefreshFolder"
+      />
+
       <CalcpadInsertTab
-        v-if="pane.activeTab === 'insert'"
+        v-else-if="pane.activeTab === 'insert'"
+        :ref="el => { if (paneIndex === 0) insertTab = el as InstanceType<typeof CalcpadInsertTab> | null }"
         :insert-items="insertItems"
         @insert-text="handleInsertText"
         @insert-image="handleInsertImage"
@@ -108,6 +83,8 @@
         :initial-enable-auto-run="enableAutoRun"
         :initial-enable-auto-input-mode="enableAutoInputMode"
         :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
+        :initial-enable-preview-pdf="enablePreviewPdf"
+        :initial-show-file-metadata="showFileMetadata"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-log-level="logLevel"
@@ -118,7 +95,11 @@
         :initial-active-config="activeConfig"
         :initial-available-configs="availableConfigs"
         :initial-editor-font-family="editorFontFamily"
+        :initial-completion-delay-ms="completionDelayMs"
         :initial-available-fonts="availableFonts"
+        :initial-user-name="userName"
+        :focus-request="settingFocus?.paneId === pane.id ? settingFocus : null"
+        @focus-handled="settingFocus = null"
         :app-version="appVersion"
         :pdf-settings="pdfSettings"
         @update-settings="handleUpdateSettings"
@@ -133,6 +114,8 @@
         @update-auto-run="handleUpdateAutoRun"
         @update-auto-input-mode="handleUpdateAutoInputMode"
         @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
+        @update-preview-pdf="handleUpdatePreviewPdf"
+        @update-show-file-metadata="handleUpdateShowFileMetadata"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-log-level="handleUpdateLogLevel"
@@ -147,22 +130,27 @@
         @open-fonts-folder="handleOpenFontsFolder"
         @refresh-fonts="handleRefreshFonts"
         @update-editor-font-family="handleUpdateEditorFontFamily"
-      />
+        @update-completion-delay-ms="handleUpdateCompletionDelayMs"
+        @update-user-name="handleUpdateUserName"
+      >
+        <template #formatting>
+          <CalcpadFormattingTab
+            :source-unavailable="inputMode"
+            :indent-style="prettifyIndentStyle"
+            :indent-size="prettifyIndentSize"
+            :trim-trailing-whitespace="prettifyTrimTrailing"
+            @prettify="handlePrettify"
+            @update-indent-style="handleUpdatePrettifyIndentStyle"
+            @update-indent-size="handleUpdatePrettifyIndentSize"
+            @update-trim-trailing="handleUpdatePrettifyTrim"
+          />
+        </template>
+      </CalcpadSettingsTab>
       <CalcpadVariablesTab
         v-else-if="pane.activeTab === 'variables'"
         :variables-data="variablesData"
         :loading="variablesLoading"
         @insert-text="handleInsertText"
-      />
-      <CalcpadFormattingTab
-        v-else-if="pane.activeTab === 'formatting'"
-        :indent-style="prettifyIndentStyle"
-        :indent-size="prettifyIndentSize"
-        :trim-trailing-whitespace="prettifyTrimTrailing"
-        @prettify="handlePrettify"
-        @update-indent-style="handleUpdatePrettifyIndentStyle"
-        @update-indent-size="handleUpdatePrettifyIndentSize"
-        @update-trim-trailing="handleUpdatePrettifyTrim"
       />
       <CalcpadExportTab
         v-else-if="pane.activeTab === 'export'"
@@ -187,10 +175,23 @@
         v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
         :ui-controls="uiControls"
+        :file-info="fileInfo"
+        :saved-ui-overrides="savedUiOverrides"
+        :has-document="fileInfoHasDocument"
+        :doc-key="fileInfoDocKey"
+        :user-name="userName"
+        :source-unavailable="inputMode"
+        :source-unavailable-note="INPUT_MODE_NOTE"
         @apply="handleApplyMetadata"
         @go-to-line="handleGoToLine"
         @refresh-ui-controls="handleRefreshUiControls"
-        @draft-dirty="handleMetadataDraftDirty"
+        @draft-dirty="handleDraftDirty($event, 'properties')"
+        @update-file-info="handleUpdateFileInfo"
+        @mark-reviewed="postMessage({ type: 'markFileReviewed' })"
+        @open-settings="openSetting(pane, 'user', 'userName')"
+        @file-info-draft-dirty="handleDraftDirty($event, 'info')"
+        @update-ui-overrides="handleUpdateUiOverrides"
+        @ui-overrides-draft-dirty="handleDraftDirty($event, 'uiOverrides')"
       />
     </div>
     </div>
@@ -199,7 +200,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import SidebarIcon from './SidebarIcon.vue'
 import CalcpadTocTab from './CalcpadTocTab.vue'
@@ -210,6 +212,7 @@ import CalcpadExportTab from './CalcpadExportTab.vue'
 import CalcpadFilesTab from './CalcpadFilesTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
+import type { FileInfo } from '../../services/file-info'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import { discardMetadataDraft } from '../metadata-drafts'
 import type { UiDirectiveData } from '../../text/ui-directive'
@@ -218,8 +221,10 @@ import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading,
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
-import { coerceWriteMode } from '../../types/settings'
+import { coerceWriteMode, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
+
+const { t } = useI18n()
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
@@ -235,27 +240,13 @@ const props = withDefaults(defineProps<Props>(), {
   appVersion: '',
 })
 
-// Views: string-identified so future views can be added by extending this list.
-// Icons are inline SVGs so no external asset dependencies.
-interface ViewDef { id: string; label: string; icon: string }
-const FOLDER_ICON = '<svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.5 10H2V3h4.29l.85.85.35.15H14v9z"/></svg>'
-// CalcpadCE brand logo (from docs/media/logo.svg): blue starburst with yellow
-// diagonal + central hole. Kept in its native colors so the branding stays
-// recognizable in the activity bar.
-const CALCPAD_ICON = '<svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cp-icon-gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#23A9F2"/><stop offset="100%" stop-color="#006DB0"/></linearGradient><mask id="cp-icon-hole"><rect width="100" height="100" fill="white"/><circle cx="50" cy="50" r="9" fill="black"/></mask></defs><path d="M 50 20 L 80 50" stroke="#FFC107" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M 17 17 Q 50 42 83 17 Q 58 50 83 83 Q 50 58 17 83 Q 42 50 17 17 Z" mask="url(#cp-icon-hole)" fill="url(#cp-icon-gradient)" stroke="url(#cp-icon-gradient)" stroke-width="3" stroke-linejoin="round"/><path d="M 80 50 L 50 80" stroke="#FFC107" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-const views: ViewDef[] = [
-  { id: 'files', label: 'Files', icon: FOLDER_ICON },
-  { id: 'calcpad', label: 'CalcpadCE', icon: CALCPAD_ICON }
-]
-const activeView = ref<string>('calcpad')
-
-// Files view state
+// Files tab state
 const openedFolder = ref<string | null>(null)
 const fileTreeRoots = ref<FileNode[]>([])
 
 // Split icon (two stacked rows) and close icon for the per-pane action button;
 // hide-sidebar collapses the panel itself.
-const SPLIT_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="8" x2="14" y2="8"/></svg>'
+const SPLIT_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="2.5" y1="8" x2="13.5" y2="8"/></svg>'
 const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
 
 // The side panel can be split into two panes, each with its own active tab.
@@ -264,6 +255,7 @@ const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" 
 interface Pane { id: number; activeTab: string }
 let paneSeq = 0
 const panes = ref<Pane[]>([{ id: paneSeq++, activeTab: 'insert' }])
+const insertTab = ref<InstanceType<typeof CalcpadInsertTab> | null>(null)
 const isSplit = computed(() => panes.value.length > 1)
 const insertItems = ref<InsertItem[]>([])
 const settings = ref<Settings>()
@@ -277,6 +269,8 @@ const enablePreviewCursorSync = ref(false)
 const enableAutoRun = ref(true)
 const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
+const enablePreviewPdf = ref(false)
+const showFileMetadata = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const logLevel = ref('warning')
@@ -286,6 +280,7 @@ const maxPreviewConsoleMessages = ref(DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT)
 const activeConfig = ref('default')
 const availableConfigs = ref<string[]>(['default'])
 const editorFontFamily = ref('JuliaMono')
+const completionDelayMs = ref(DEFAULT_COMPLETION_DELAY_MS)
 const availableFonts = ref<string[]>([])
 const variablesData = ref<VariablesData>({
   macros: [],
@@ -301,34 +296,56 @@ const prettifyIndentStyle = ref<'tab' | 'space'>('tab')
 const prettifyIndentSize = ref(4)
 const prettifyTrimTrailing = ref(true)
 
+const userName = ref('')
+const fileInfo = ref<FileInfo | null>(null)
+const savedUiOverrides = ref<Record<string, string>>({})
+const fileInfoHasDocument = ref(false)
+const fileInfoDocKey = ref('')
+
 const metadataBlock = ref<MetadataCommentBlock | null>(null)
 // #UI controls of the last input-form render, null until the host resolves them.
 const uiControls = ref<UiControl[] | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
-    { id: 'insert', label: 'Insert' },
-    { id: 'toc', label: 'TOC' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'variables', label: 'Variables' },
-    { id: 'formatting', label: 'Formatting' },
-    { id: 'export', label: 'Export' }
+    { id: 'insert', label: t('Insert') },
+    { id: 'toc', label: t('TOC') },
+    { id: 'settings', label: t('Settings') },
+    { id: 'variables', label: t('Variables') },
+    { id: 'export', label: t('Export') }
   ]
+  if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: t('Files') })
   // The metadata comment editor is driven by editor cursor tracking, available
   // in the VS Code webview and the desktop app (both host a real editor).
+  // File info is stamped on save, which only those two hosts have.
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
-    base.push({ id: 'metadata', label: 'Properties' })
+    base.push({ id: 'metadata', label: t('Properties') })
   }
   return base
 })
 
+// The first pane reopens on the tab it was last left on; a new install starts on the first tab.
+const START_TAB_KEY = 'calcpad.sidebar.activeTab'
+const storedStartTab = (): string => {
+  let stored: string | null = null
+  try {
+    stored = localStorage.getItem(START_TAB_KEY)
+  } catch {
+    // ignore unavailable storage
+  }
+  const tabId = stored === 'formatting' ? 'settings' : stored
+  return tabs.value.find(t => t.id === tabId)?.id ?? 'insert'
+}
+panes.value[0].activeTab = storedStartTab()
+
 /**
  * Input mode fills a worksheet in rather than editing it — the host hides the editor,
  * and for a compiled worksheet there is no source behind it at all. The tabs that act
- * on source have nothing to act on there, so their content is shown inert: TOC, Export
- * and Settings still work, since a filled-in worksheet is still navigated and exported.
+ * on source have nothing to act on there, so their content is shown inert: TOC, Export,
+ * Settings and Properties' File Info still work, since a filled-in worksheet is still
+ * navigated, exported and reviewed.
  */
-const SOURCE_TABS = ['insert', 'variables', 'formatting', 'metadata']
+const SOURCE_TABS = ['insert', 'variables']
 const INPUT_MODE_NOTE = 'Unavailable in input mode — this acts on the document source, which the input form does not edit.'
 const inputMode = ref(false)
 const tabUnavailable = (tabId: string) => inputMode.value && SOURCE_TABS.includes(tabId)
@@ -344,14 +361,6 @@ const writeMode = ref<WriteMode>('reportOnly')
 const writeResult = ref<{ ok: boolean; message: string } | null>(null)
 
 // Methods
-const switchView = (viewId: string) => {
-  activeView.value = viewId
-  if (viewId === 'files' && !openedFolder.value) {
-    // Ask host if a previously-opened folder is still around
-    postMessage({ type: 'getOpenedFolder' })
-  }
-}
-
 const handleOpenFolderRequest = () => {
   postMessage({ type: 'openFolder' })
 }
@@ -416,8 +425,19 @@ const hideSidebar = () => {
 
 const activateTab = (pane: Pane, tabId: string) => {
   pane.activeTab = tabId
+  if (pane === panes.value[0]) {
+    try {
+      localStorage.setItem(START_TAB_KEY, tabId)
+    } catch {
+      // ignore unavailable storage
+    }
+  }
   // Nothing below is worth asking the host for while the tab is inert.
   if (tabUnavailable(tabId)) return
+
+  if (tabId === 'files' && !openedFolder.value) {
+    postMessage({ type: 'getOpenedFolder' })
+  }
 
   // Request fresh data when switching to variables tab
   if (tabId === 'variables') {
@@ -431,14 +451,14 @@ const activateTab = (pane: Pane, tabId: string) => {
     postMessage({ type: 'getHeadings' })
   }
 
-  // Request prettify settings when switching to Formatting tab
-  if (tabId === 'formatting') {
+  // Load formatting preferences with Settings.
+  if (tabId === 'settings') {
     postMessage({ type: 'getPrettifySettings' })
   }
 
-  // Refresh the metadata comment at the cursor when opening the Metadata tab
   if (tabId === 'metadata') {
     postMessage({ type: 'getMetadataContext' })
+    postMessage({ type: 'getDocumentMetadata' })
   }
 
   // Fetch the current document's plots the first time the Export tab is opened.
@@ -449,10 +469,33 @@ const activateTab = (pane: Pane, tabId: string) => {
   }
 }
 
+// A setting another tab links to, focused by the Settings tab in that pane once it shows.
+const settingFocus = ref<{ paneId: number; section: string; id: string } | null>(null)
+
+const openSetting = (pane: Pane, section: string, id: string) => {
+  settingFocus.value = { paneId: pane.id, section, id }
+  activateTab(pane, 'settings')
+}
+
 // Host-facing entry point (focusTab message, defineExpose): always targets the
 // first pane so external callers don't need to know about the split.
 const switchTab = (tabId: string) => {
   activateTab(panes.value[0], tabId)
+}
+
+const focusInsertSearch = async () => {
+  if (tabUnavailable('insert')) return
+  switchTab('insert')
+  await nextTick()
+  insertTab.value!.focusSearch()
+}
+
+const handleInsertSearchShortcut = (event: KeyboardEvent) => {
+  if (event.key.toLowerCase() === 'i' && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+    event.preventDefault()
+    event.stopPropagation()
+    void focusInsertSearch()
+  }
 }
 
 const handleSavePdf = (variant: ExportVariant) => {
@@ -558,6 +601,16 @@ const handleUpdatePreviewUiOverrides = (enabled: boolean) => {
   postMessage({ type: 'updatePreviewUiOverrides', enabled })
 }
 
+const handleUpdatePreviewPdf = (enabled: boolean) => {
+  enablePreviewPdf.value = enabled
+  postMessage({ type: 'updatePreviewPdf', enabled })
+}
+
+const handleUpdateShowFileMetadata = (enabled: boolean) => {
+  showFileMetadata.value = enabled
+  postMessage({ type: 'updateShowFileMetadata', enabled })
+}
+
 const handleUpdateAutoRun = (enabled: boolean) => {
   enableAutoRun.value = enabled
   postMessage({ type: 'updateAutoRun', enabled })
@@ -628,6 +681,24 @@ const handleRefreshFonts = () => {
 const handleUpdateEditorFontFamily = (family: string) => {
   editorFontFamily.value = family
   postMessage({ type: 'updateEditorFontFamily', family })
+}
+
+const handleUpdateCompletionDelayMs = (delayMs: number) => {
+  completionDelayMs.value = delayMs
+  postMessage({ type: 'updateCompletionDelayMs', completionDelayMs: delayMs })
+}
+
+const handleUpdateUserName = (value: string) => {
+  userName.value = value
+  postMessage({ type: 'updateUserName', value })
+}
+
+const handleUpdateFileInfo = (patch: Partial<FileInfo>) => {
+  postMessage({ type: 'updateFileInfo', patch })
+}
+
+const handleUpdateUiOverrides = (overrides: Record<string, string>) => {
+  postMessage({ type: 'updateUiOverrides', overrides })
 }
 
 const handleUpdatePdfSettings = (settings: PdfSettings) => {
@@ -719,8 +790,8 @@ const handleApplyMetadata = (payload: { data: MetadataCommentData; settings: Set
   })
 }
 
-const handleMetadataDraftDirty = (payload: { docKey: string; dirty: boolean }) => {
-  postMessage({ type: 'metadataDraftDirty', docKey: payload.docKey, dirty: payload.dirty })
+const handleDraftDirty = (payload: { docKey: string; dirty: boolean }, form: 'properties' | 'info' | 'uiOverrides') => {
+  postMessage({ type: 'metadataDraftDirty', docKey: payload.docKey, dirty: payload.dirty, form })
 }
 
 // Message handler
@@ -743,6 +814,8 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableAutoRun === 'boolean') enableAutoRun.value = message.enableAutoRun
       if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
+      if (typeof message.enablePreviewPdf === 'boolean') enablePreviewPdf.value = message.enablePreviewPdf
+      if (typeof message.showFileMetadata === 'boolean') showFileMetadata.value = message.showFileMetadata
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       logLevel.value = message.logLevel || 'warning'
@@ -760,10 +833,21 @@ const handleMessage = (event: MessageEvent) => {
       if (message.activeConfig) activeConfig.value = message.activeConfig
       if (Array.isArray(message.availableConfigs)) availableConfigs.value = message.availableConfigs
       if (typeof message.editorFontFamily === 'string') editorFontFamily.value = message.editorFontFamily
+      completionDelayMs.value = message.completionDelayMs
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
+      if (typeof message.userName === 'string') userName.value = message.userName
+      break
+    case 'documentMetadata':
+      fileInfo.value = message.info ?? null
+      savedUiOverrides.value = message.uiOverrides && typeof message.uiOverrides === 'object' ? message.uiOverrides : {}
+      fileInfoHasDocument.value = !!message.hasDocument
+      fileInfoDocKey.value = String(message.docKey ?? '')
       break
     case 'editorFontFamilyChanged':
       if (typeof message.family === 'string') editorFontFamily.value = message.family
+      break
+    case 'completionDelayMsChanged':
+      completionDelayMs.value = message.completionDelayMs
       break
     case 'availableFontsChanged':
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
@@ -831,20 +915,28 @@ const handleMessage = (event: MessageEvent) => {
     case 'focusTab':
       if (typeof message.tab === 'string') switchTab(message.tab)
       break
+    case 'focusInsertSearch':
+      void focusInsertSearch()
+      break
   }
 }
 
-defineExpose({ switchTab, switchView })
+defineExpose({ switchTab, focusInsertSearch })
 
 // Initialize
 onMounted(() => {
   // Listen for messages from host
   window.addEventListener('message', handleMessage)
+  if (props.versionConfig.isVSCode) {
+    window.addEventListener('keydown', handleInsertSearchShortcut, true)
+  }
 
   // Request initial data
   postMessage({ type: 'getInsertData' })
   postMessage({ type: 'getSettings' })
   postMessage({ type: 'getPdfSettings' })
+  // The starting tab never gets a click, so its data is asked for here.
+  activateTab(panes.value[0], panes.value[0].activeTab)
 
   if (props.versionConfig.isDesktop) {
     postMessage({ type: 'getOpenedFolder' })
@@ -860,6 +952,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('message', handleMessage)
+  if (props.versionConfig.isVSCode) {
+    window.removeEventListener('keydown', handleInsertSearchShortcut, true)
+  }
   if (props.versionConfig.isDesktop) {
     window.removeEventListener('keydown', handleExportShortcut, true)
   }
@@ -873,14 +968,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   font-family: var(--vscode-font-family);
-  font-size: var(--vscode-font-size);
   color: var(--vscode-foreground);
   background: var(--vscode-editor-background);
-}
-
-.calcpad-vue-ui > .files-tab {
-  flex: 1 1 auto;
-  min-height: 0;
 }
 
 .calcpad-view {
@@ -895,61 +984,6 @@ onUnmounted(() => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-.activity-icons {
-  display: flex;
-  gap: 0;
-  padding: 4px 4px;
-  flex: 0 0 auto;
-  border-bottom: 1px solid var(--vscode-widget-border);
-  background: var(--vscode-activityBar-background, var(--vscode-editor-background));
-}
-
-/* The tablist holds only the view tabs; the hide button is not one of them. */
-.activity-tabs {
-  display: flex;
-}
-
-.activity-hide {
-  margin-left: auto;
-}
-
-.activity-hide :deep(svg) {
-  width: 20px;
-  height: 20px;
-}
-
-.activity-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--vscode-activityBar-inactiveForeground, var(--vscode-foreground));
-  cursor: pointer;
-  border-radius: 3px;
-  position: relative;
-  opacity: 0.75;
-  transition: background 0.15s ease, opacity 0.15s ease, color 0.15s ease;
-}
-
-.activity-icon:hover {
-  background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
-  opacity: 1;
-}
-
-.activity-icon.active {
-  color: var(--vscode-activityBar-foreground, var(--vscode-foreground));
-  background: var(--vscode-list-activeSelectionBackground, var(--vscode-toolbar-activeBackground, rgba(90, 93, 94, 0.5)));
-  opacity: 1;
-}
-
-.activity-icon :deep(svg) {
-  display: block;
 }
 
 .calcpad-view.split .calcpad-pane + .calcpad-pane {
@@ -973,24 +1007,24 @@ onUnmounted(() => {
 .tab {
   padding: 8px 12px;
   border: none;
+  border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--vscode-tab-inactiveForeground);
   cursor: pointer;
-  font-size: var(--calcpad-font-size-sm);
   font-weight: normal;
   border-radius: 0;
-  transition: all 0.2s ease;
-}
-
-.tab:hover {
-  background: var(--vscode-tab-hoverBackground);
-  color: var(--vscode-tab-activeForeground);
+  transition: background-color 0.2s ease, color 0.2s ease, border-bottom-color 0.2s ease;
 }
 
 .tab.active {
   background: var(--vscode-tab-activeBackground);
   color: var(--vscode-tab-activeForeground);
-  border-bottom: 2px solid var(--vscode-tab-activeBorder);
+  border-bottom-color: var(--vscode-tab-activeBorder);
+}
+
+.tab:hover {
+  background: var(--vscode-tab-hoverBackground);
+  color: var(--vscode-tab-activeForeground);
 }
 
 /* Still clickable while unavailable: opening the tab is how the note explaining
@@ -1006,27 +1040,8 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.pane-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--vscode-tab-inactiveForeground);
-  cursor: pointer;
-  border-radius: 0;
-  transition: all 0.2s ease;
-}
-
-.pane-action:hover {
-  background: var(--vscode-tab-hoverBackground);
-  color: var(--vscode-tab-activeForeground);
-}
-
-.pane-action :deep(svg) {
-  display: block;
+.pane-actions button {
+  height: auto;
 }
 
 .tab-content {
@@ -1041,12 +1056,16 @@ onUnmounted(() => {
   opacity: 0.45;
 }
 
+.tab-content.insert-content {
+  display: flex;
+  overflow: hidden;
+}
+
 /* Sits outside .tab-content so it stays legible while the tab itself is dimmed. */
 .unavailable-note {
   flex: 0 0 auto;
   margin: 0;
   padding: 8px 12px;
-  font-size: var(--calcpad-font-size-sm);
   font-style: italic;
   color: var(--vscode-descriptionForeground);
   border-bottom: 1px solid var(--vscode-widget-border);

@@ -2,7 +2,8 @@
 
 The **CalcpadCE Desktop App** is a native application for Windows.
 You get the full editor — multi-tab editing, syntax highlighting, autocomplete, live preview, and the CalcpadCE sidebar.
-It uses native file dialogs and menu bar and has offline capabilities.
+It uses native file dialogs and has offline capabilities.
+The custom title bar has a File menu, document actions, and window controls.
 
 See [Selecting a CalcpadCE Deployment](new-selecting-calcpadce-deployment.md) to help decide if this is the right CalcpadCE deployment for you.
 
@@ -44,7 +45,7 @@ On Linux, the app will tell you which package to install if none is found — se
    δ = P·L^3/(3·E·I)
    ```
 
-3. The **preview pane** renders your report live as you type. Toggle it from **View → Toggle Preview**.
+3. The **preview pane** renders your report live as you type. Toggle it with **Ctrl+P** or the results-pane button beside the tabs.
 4. Save with **Ctrl+S** (or **File → Save**). A native save dialog lets you choose the location.
 
 ## Working with tabs
@@ -88,18 +89,18 @@ Desktop specifics:
 
 ## The CalcpadCE sidebar
 
-Toggle the sidebar with **View → Toggle Sidebar**.
-It has a **Files** view and a **CalcpadCE** view.
+Toggle the sidebar with **Ctrl+Shift+B** or its hide and reveal buttons.
+The **Files** tab sits alongside the other sidebar tabs.
 
 The sidebar is the same across every CalcpadCE frontend — see **[The CalcpadCE Panel & Settings](new-calcpad-panel.md)** for a full walkthrough of each tab.
 
 ## Live results
 
 The **Results** pane renders your document live and re-renders as you type.
-Its toolbar (and **View → Result Mode**) offers four modes — **Preview**, **Unwrapped**, **Input**, and **Report** — each rendering the same thing its matching export captures.
+The controls beside the document tabs offer four modes — **Preview**, **Unwrapped**, **Input**, and **Report** — each rendering the same thing its matching export captures.
 See [Exports → Export variants](new-exports.md#export-variants) for a breakdown of each one.
 
-**View → Toggle Preview** shows and hides the pane.
+**Ctrl+P** or the results-pane button shows and hides the pane.
 Drag the border between the editor and the results pane to resize either side.
 
 Right-click a preview → **View Webview Source HTML** to inspect the rendered HTML.
@@ -112,13 +113,12 @@ If you turn **Settings → Auto-Run Preview** off, the preview only re-renders w
 - Click **▶ Run** on the editor toolbar.
 - Press **Ctrl+Alt+X**.
 - Right-click in the editor → **Run Preview**.
-- Use **Server → Refresh** in the menu bar.
 
 A manual run also re-lints the document, writes data, refreshes definitions and the table of contents, and rebuilds the Export tab's plot list.
 
 ## Splitting the editor
 
-The **Split ⬓** button in the editor toolbar (also **View → Split Editor**) opens a second editor group stacked below the first.
+The **Split ⬓** button beside the result modes opens a second editor group stacked below the first.
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click **Unsplit** (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
 The active group drives the sidebar.
@@ -138,23 +138,23 @@ Exporting is the same across every CalcpadCE frontend — see **[Exports](new-ex
 
 Desktop specifics:
 
-- Every export is in **File → Export**.
-- **File → Save As Compiled Worksheet…** and **File → Export Portable Package…** produce the two handoff formats — see [Exports → Portable exports](new-exports.md#portable-exports).
+- The title bar has Save, Open, PDF, and Word buttons.
+- PDF and Word exports open immediately in your default application from a temporary folder.
+- All export formats are available in the sidebar’s **Export** tab.
+- The **Export** tab includes compiled worksheets and portable packages — see [Exports → Portable exports](new-exports.md#portable-exports).
 
-## The native menu
+## The File menu
 
-The menu bar drives the whole app:
+Click **☰ File** beside the CalcpadCE logo to open the application menu:
 
-- **File** — New Tab · Open… · Save · Save As… · Save As Compiled Worksheet… · Export Portable Package… · Close Tab · Export ▸ · Quit — see [Exports](new-exports.md) for what each export command produces
-- **Edit** — Undo · Redo · Cut · Copy · Paste · Select All · Find · Replace
-- **View** — Toggle Sidebar · Go to Settings · Toggle Preview · Toggle Word Wrap · Split Editor · Result Mode: Preview / Unwrapped / Input / Report
-- **Server** — Refresh (**Ctrl+Alt+X**) · Show Server Log · Stop Server · Restart Server
-- **Help** — Documentation (opens the docs site in your default browser)
+The menu contains document commands, recent files, and server controls.
+Use **Show Server Log**, **Stop Server**, or **Restart Server** directly from this menu.
 
 ## Settings and configurations
 
 All calculation, plot, unit, theme, editor, and linter settings live in the **Settings** tab of the sidebar. 
-Open it with **View → Go to Settings** (Ctrl+,).
+Open it with **Ctrl+,** or click the **Settings** tab.
+Prettify and its options are in **Settings → Formatting**.
 The desktop app also supports **named configurations** — save different sets of settings (e.g. one for metric with 3 decimals, one for imperial with degrees) and switch the active configuration from the Settings tab; configurations persist between sessions.
 
 See **[The CalcpadCE Panel & Settings → Settings](new-calcpad-panel.md#settings)** for the full list, and **[→ Formatting](new-calcpad-panel.md#formatting-prettify)** for the Prettify options.
@@ -164,9 +164,8 @@ See **[The CalcpadCE Panel & Settings → Settings](new-calcpad-panel.md#setting
 The app runs the calculation engine inside it.
 It starts automatically when the app launches and shuts down when you close it — you never launch or configure it yourself.
 
-If calculations stop responding, use the **Server** menu:
+If calculations stop responding, use the **File** menu:
 
-- **Refresh** (**Ctrl+Alt+X**) — re-run the active document.
 - **Show Server Log** — open the engine's log file to diagnose a problem.
 - **Stop Server** / **Restart Server** — cycle the calculation engine.
 
@@ -176,7 +175,7 @@ If these do not work and the server shows "Disconnected" in the bottom-right cor
 
 | Symptom | Fix |
 | ------- | --- |
-| Preview blank or not updating | **Server → Refresh**, then **Server → Restart Server** if needed. Check **Server → Show Server Log** to see messages from the calculation engine. Click **Open Log Folder** in the **Settings** tab to submit logs showing an error as a Github Issue. |
+| Preview blank or not updating | Click **Refresh** beside the document tabs, then **File → Restart Server** if needed. Check **File → Show Server Log** to see messages from the calculation engine. Click **Open Log Folder** in the **Settings** tab to submit logs showing an error as a Github Issue. |
 | PDF export fails | Install a Chromium browser. On Linux the app names the package to install — see [Exports → Troubleshooting](new-exports.md#troubleshooting). |
 | Unsaved work after a crash | The app writes backup copies of unsaved files; reopen them from the Files tab. |
 

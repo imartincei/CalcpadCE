@@ -124,7 +124,7 @@ They share the line's JSON properties but are saved and overridden separately.
 
 `keys` and `values` are both required for a drop-down or radio group, and must be the same length.
 The datagrid properties throw an error on any other control.
-`forceUnits` and `allowExpression` will error on a drop-down, radio group or checkbox, which always substitute the whole value from their own `values` anyway.
+`forceUnits` and `allowExpression` will error on a drop-down, radio group or checkbox, which substitute their own `values` anyway.
 
 You don't have to write JSON by hand — the [Properties tab](new-calcpad-panel.md#properties) has a form for it that fills in the fields that apply to the control type it detects.
 
@@ -161,6 +161,7 @@ It implies `forceUnits: false` — a formula cannot carry an appended unit.
 
 `keys` are shown, `values` are substituted.
 A value may carry its own unit, so a drop-down can switch units as well as magnitudes.
+A value without one keeps the unit written in the document, so `"235"` on `f_y = 355MPa` gives `f_y = 235MPa`.
 
 ```text
 #UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
@@ -307,9 +308,10 @@ There is limited customization available using the datagrid properties, and more
 
 ## Saving what was entered
 
-Saving input values writes them into a metadata comment at the top of the document, which is what restores them the next time you open it:
+Saving input values writes them into a metadata comment at the end of the document, which is what restores them the next time you open it:
 
 ```text
+'<!--CalcpadCE Metadata-->
 '<!--{"uiOverrides":{"L:1":"8","q:1":"30"}}-->
 ```
 
@@ -319,7 +321,7 @@ Hand-writing an entry in the uiOverrides data works too, and the Properties tab 
 This is useful if you changed the CalcpadCE file after applying inputs and need to re-map renamed variables or want to remove deleted entries.
 
 See [Metadata Comments](new-metadata-comments.md) for the comment format itself.
-The comment has to be the **first line of the file** to take effect.
+The comment has to be in the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the **end of the file** to take effect.
 See [`#UI` overrides and includes](new-includes.md#ui-overrides-and-includes) for more information.
 
 Values do not have to be saved to be exported: an export made while the form is filled in uses what is currently entered.

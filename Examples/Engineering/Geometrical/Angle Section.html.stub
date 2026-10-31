@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of an angle (L) profile: area, centroid, $I_x$, $I_y$, principal axes and radii of gyration. -->
- <h3>Geometrical Properties of Angle Section</h3>
+ <h1>Geometrical Properties of Angle Section</h1>
  <div style="max-width:120mm">
   <img alt="angle.png" class="side" src="Images/mechanics/sections/angle.png" style="height:150pt;"/>
  </div>
@@ -771,9 +771,8 @@
     -750
    </span>
    <span class="b1">)</span>
-   = 19.79
+   = 19.79°
   </span>
-  <sup>о</sup>
  </p>
  <p>Polar moment of area</p>
  <p>

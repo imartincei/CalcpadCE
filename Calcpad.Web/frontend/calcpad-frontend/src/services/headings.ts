@@ -2,9 +2,9 @@
  * Heading extraction for the Table of Contents (TOC) sidebar tab.
  *
  * Calcpad documents support three heading syntaxes:
- *   1. Calcpad heading lines   – start with "   (default level 3)
+ *   1. Calcpad heading lines   – start with "   (level 1)
  *   2. HTML headings in text   – '<h1>…</h1>' through '<h6>…</h6>'
- *   3. Markdown headings       – ### through ###### in either " or ' lines
+ *   3. Markdown headings       – # through ###### in either " or ' lines
  */
 
 export interface TocHeading {
@@ -33,8 +33,8 @@ function stripHtml(text: string): string {
     return text.replace(/<[^>]*>/g, '').trim();
 }
 
-// Matches markdown heading syntax: ### through ######
-const MD_HEADING_RE = /^(#{3,6})\s+(.+)$/;
+// Matches markdown heading syntax: # through ######
+const MD_HEADING_RE = /^(#{1,6})\s+(.+)$/;
 
 // Matches HTML heading tags: <h1>…</h1> through <h6>…</h6>
 // Allows optional trailing ' (Calcpad text-line closing quote)
@@ -71,9 +71,9 @@ export function parseHeadings(text: string): TocHeading[] {
                     line: lineNumber,
                 });
             } else {
-                // Plain Calcpad heading – default level 3
+                // Plain Calcpad heading – level 1
                 headings.push({
-                    level: 3,
+                    level: 1,
                     text: stripMarkdown(stripHtml(content)),
                     line: lineNumber,
                 });

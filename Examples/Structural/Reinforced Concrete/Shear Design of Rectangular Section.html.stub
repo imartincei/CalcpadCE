@@ -687,9 +687,8 @@
       745.2
      </span>
      <span class="b1">)</span>
-     = 26.81
+     = 26.81°
     </span>
-    °
    </p>
    <p class="ref">(6.7N)</p>
    <p>The angle is limited between 21,8° ≤ θ ≤ 45°(1 ≤ cot(θ) ≤ 2.5)</p>
@@ -698,26 +697,24 @@
      <var>θ</var>
      =
      <b>max</b>
-     ( 21.8;
+     ( 21.8°;
      <b>min</b>
      (
      <var>θ_</var>
-     ; 45 )  )  =
+     ; 45° )  )  =
      <b>max</b>
-     ( 21.8;
+     ( 21.8°;
      <b>min</b>
-     ( 26.81; 45 )  )  = 26.81
+     ( 26.81°; 45° )  )  = 26.81°
     </span>
-    °
    </p>
    <p class="ref">(6.9)</p>
    <p>
     Bearing capacity check at
     <span class="eq">
      <var>θ</var>
-     = 26.81
+     = 26.81°
     </span>
-    °
    </p>
    <p>
     <span class="eq">
@@ -756,9 +753,9 @@
       <span class="dvl">
       </span>
       <b>cot</b>
-      ( 26.81 )  +
+      ( 26.81° )  +
       <b>tan</b>
-      ( 26.81 )
+      ( 26.81° )
      </span>
      · 10
      <sup>-3</sup>
@@ -814,7 +811,7 @@
      </span>
      675 · 434.78 ·
      <b>cot</b>
-     ( 26.81 )
+     ( 26.81° )
     </span>
     = 1033.28
    </span>
@@ -984,7 +981,7 @@
     <var>θ</var>
     )  = 0.5 · 600 ·
     <b>cot</b>
-    ( 26.81 )  = 593.58
+    ( 26.81° )  = 593.58
    </span>
    kN
   </p>
@@ -1010,7 +1007,7 @@
     <span class="dvc">
      675 ·
      <b>cot</b>
-     ( 26.81 )
+     ( 26.81° )
      <span class="dvl">
      </span>
      2

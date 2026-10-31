@@ -1,6 +1,5 @@
 <div class="calcpad-output">
- <!--{"uiOverrides":{"L:1":"20","W:1":"15","n:1":"14","P:1":"12","q:1":"5","v:1":"[4; 5; 6]","M:1":"[1; 2; 3 | 4; 4; 6]","Z:1":"[0; 0; 1; 0; 0]","G:1":"[0; 0; 0; 0 | 0; 0; 0; 0 | 0; 0; 0; 1]","c:1":"4","G:2":"[1; 0; 0; 0; 0; 0; 12 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0]","r:1":"3","flag:1":"0","grade:1":"2","E:1":"25GPa","load:1":"123","E2:1":"124","y:1:1":"4","y:1:2":"5","y:1:3":"6"}}-->
- <h3>UI Mode Test File</h3>
+ <h1>UI Mode Test File</h1>
  <p>Exercises every #UI JSON property, #UI inside macros/conditionals/loops, and the two documented error cases.</p>
  <p>
  </p>
@@ -822,7 +821,7 @@
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"}" on line [
-  <a data-text="141" href="#0">141</a>
+  <a data-text="140" href="#0">140</a>
   ]: The #UI keyword requires a variable assignment.
  </p>
  <p>
@@ -839,7 +838,7 @@
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"} k = max(E2)" on line [
-  <a data-text="148" href="#0">148</a>
+  <a data-text="147" href="#0">147</a>
   ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>
@@ -859,7 +858,7 @@
  </p>
  <p class="err">
   Error in "#UI {"type": "entry"} k2 = 2*E2" on line [
-  <a data-text="149" href="#0">149</a>
+  <a data-text="148" href="#0">148</a>
   ]: #UI does not support expressions unless 'allowExpression' is true.
  </p>
  <p>
@@ -893,4 +892,9 @@
    <b class="b0">]</b>
   </span>
  </p>
+ <p>
+ </p>
+ <!--CalcpadCE Metadata-->
+ <!--{"uiOverrides":{"L:1":"50","W:1":"15","n:1":"14","P:1":"12","q:1":"5","v:1":"[4; 5; 6]","M:1":"[1; 2; 3 | 4; 4; 6]","Z:1":"[0; 0; 1; 0; 0]","G:1":"[0; 0; 0; 0 | 0; 0; 0; 0 | 0; 0; 0; 1]","c:1":"4","G:2":"[1; 0; 0; 0; 0; 0; 12 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0 | 0; 0; 0; 0; 0; 0; 0]","r:1":"3","flag:1":"0","grade:1":"2","E:1":"25GPa","load:1":"123","E2:1":"124","y:1:1":"4","y:1:2":"5","y:1:3":"6"}}-->
+ <!--{"fileInfo":{"title":"UI Mode Test","project":&quot;,"author":&quot;,"createdAt":"2026-10-25T22:22:15.044Z","lastUpdatedBy":&quot;,"lastUpdatedAt":"2026-10-25T23:35:37.852Z","reviewedBy":&quot;,"reviewedAt":&quot;,"programVersion":"8.0.0-beta3-preview"}}-->
 </div>

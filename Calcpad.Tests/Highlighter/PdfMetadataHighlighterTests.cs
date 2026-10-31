@@ -142,7 +142,7 @@ namespace Calcpad.Tests.Highlighter
         [Fact]
         public void UiOverrides_NotAnObject_WarnsCpd3412()
         {
-            var result = Lint("'<!--{\"uiOverrides\":[\"L:1\"]}-->\nx = 1");
+            var result = Lint("x = 1\n'<!--{\"uiOverrides\":[\"L:1\"]}-->");
 
             Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3412" && d.Message.Contains("uiOverrides"));
         }
@@ -152,27 +152,75 @@ namespace Calcpad.Tests.Highlighter
         {
             // The host writes every entered value as a string; a bare number here would
             // come back as a value the form can't round-trip.
-            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":8}}-->\nx = 1");
+            var result = Lint("x = 1\n'<!--{\"uiOverrides\":{\"L:1\":8}}-->");
 
             Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3412" && d.Message.Contains("L:1"));
         }
 
         [Fact]
-        public void UiOverrides_NotOnFirstLine_WarnsCpd3416()
+        public void UiOverrides_NotAtEnd_WarnsCpd3416()
         {
-            // The host only ever reads a 'uiOverrides' comment off the file's first line,
-            // so one lower down - e.g. above a #UI line it means to target - is inert.
+            // The host keeps 'uiOverrides' at the end of the file, not above the #UI line it targets.
             var result = Lint("#UI L = 4\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI q = 1");
 
             Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3416");
         }
 
         [Fact]
-        public void UiOverrides_OnFirstLine_DoesNotWarnCpd3416()
+        public void UiOverrides_AtEnd_DoesNotWarnCpd3416()
         {
-            var result = Lint("'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+            var result = Lint("#UI L = 4\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n");
 
             Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3416");
+        }
+
+        [Fact]
+        public void UiOverrides_AboveFileInfo_DoesNotWarnCpd3416()
+        {
+            var result = Lint("#UI L = 4\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n'<!--{\"fileInfo\":{\"title\":\"Beam\"}}-->");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3416" || d.Code == "CPD-3421");
+        }
+
+        [Fact]
+        public void FileInfo_AboveUiOverrides_WarnsCpd3421()
+        {
+            var result = Lint("#UI L = 4\n'<!--{\"fileInfo\":{\"title\":\"Beam\"}}-->\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3421");
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3416");
+        }
+
+        [Fact]
+        public void UiOverrides_AboveContent_WarnsCpd3416()
+        {
+            var result = Lint("x = 1\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3416");
+        }
+
+        [Fact]
+        public void FileInfo_OnLastLine_ReportsNothing()
+        {
+            var result = Lint("x = 1\n'<!--{\"fileInfo\":{\"title\":\"Beam\",\"author\":\"jsmith\"}}-->\n\n");
+
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3421" || d.Code == "CPD-3412");
+        }
+
+        [Fact]
+        public void FileInfo_NotOnLastLine_WarnsCpd3421()
+        {
+            var result = Lint("'<!--{\"fileInfo\":{\"title\":\"Beam\"}}-->\nx = 1");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3421");
+        }
+
+        [Fact]
+        public void FileInfo_NonStringValue_WarnsCpd3412()
+        {
+            var result = Lint("x = 1\n'<!--{\"fileInfo\":{\"title\":3}}-->");
+
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3412" && d.Message.Contains("title"));
         }
 
         [Fact]

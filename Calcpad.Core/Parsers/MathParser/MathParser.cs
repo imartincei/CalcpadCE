@@ -157,6 +157,8 @@ namespace Calcpad.Core
                     AddComplexVariables();
                 else
                     RemoveComplexVariables();
+
+                ClearCache();
             }
         }
 
@@ -210,6 +212,7 @@ namespace Calcpad.Core
             }
         }
 
+        /// <summary>Invariant culture, so a written file reads back the same on any locale.</summary>
         internal string[][] GetMatrix(string name, char type)
         {
             if (!_variables.TryGetValue(name, out var variable))
@@ -243,30 +246,25 @@ namespace Calcpad.Core
                         var cmResult = new string[1][];
                         cmResult[0] = new string[rows];
                         for (int i = rows - 1; i >= 0; --i)
-                            cmResult[0][i] = matrix[i, 0].ToString();
+                            cmResult[0][i] = matrix[i, 0].ToString(CultureInfo.InvariantCulture);
                         return cmResult;
                     case DiagonalMatrix:
                     case HpDiagonalMatrix:
                         var dmResult = new string[1][];
                         dmResult[0] = new string[rows];
                         for (int i = rows - 1; i >= 0; --i)
-                            dmResult[0][i] = matrix[i, i].ToString();
+                            dmResult[0][i] = matrix[i, i].ToString(CultureInfo.InvariantCulture);
                         return dmResult;
+                    // Rows are written in full, trailing zeros too: a dropped zero would shrink
+                    // the matrix read back, or leave a stale cell behind in an appended range.
                     case LowerTriangularMatrix:
                     case HpLowerTriangularMatrix:
                         var ltmResult = new string[rows][];
                         for (int i = rows - 1; i >= 0; --i)
                         {
-                            var size = 0;
+                            ltmResult[i] = new string[i + 1];
                             for (int j = i; j >= 0; --j)
-                                if (!Equals(matrix[i, j], RealValue.Zero))
-                                {
-                                    size = j;
-                                    break;
-                                }
-                            ltmResult[i] = new string[size + 1];
-                            for (int j = size; j >= 0; --j)
-                                ltmResult[i][j] = matrix[i, j].ToString();
+                                ltmResult[i][j] = matrix[i, j].ToString(CultureInfo.InvariantCulture);
                         }
                         return ltmResult;
                     case UpperTriangularMatrix:
@@ -276,16 +274,9 @@ namespace Calcpad.Core
                         var utmResult = new string[rows][];
                         for (int i = rows - 1; i >= 0; --i)
                         {
-                            var size = i;
+                            utmResult[i] = new string[cols - i];
                             for (int j = cols - 1; j >= i; --j)
-                                if (!Equals(matrix[i, j], RealValue.Zero))
-                                {
-                                    size = j;
-                                    break;
-                                }
-                            utmResult[i] = new string[size - i + 1];
-                            for (int j = size; j >= i; --j)
-                                utmResult[i][j - i] = matrix[i, j].ToString();
+                                utmResult[i][j - i] = matrix[i, j].ToString(CultureInfo.InvariantCulture);
                         }
                         return utmResult;
                 }
@@ -294,16 +285,9 @@ namespace Calcpad.Core
             var result = new string[rows][];
             for (int i = rows - 1; i >= 0; --i)
             {
-                var size = 0;
+                result[i] = new string[cols];
                 for (int j = cols - 1; j >= 0; --j)
-                    if (!Equals(matrix[i, j], RealValue.Zero))
-                    {
-                        size = j;
-                        break;
-                    }
-                result[i] = new string[size + 1];
-                for (int j = size; j >= 0; --j)
-                    result[i][j] = matrix[i, j].ToString();
+                    result[i][j] = matrix[i, j].ToString(CultureInfo.InvariantCulture);
             }
             return result;
         }
@@ -439,9 +423,10 @@ namespace Calcpad.Core
             }
             var d = 1d;
             var numberSpan = s[..n];
+            // No thousands separators, or "1,5" would read as 15 before the decimal comma is tried.
             if (n > 0 &&
-                !double.TryParse(numberSpan, CultureInfo.InvariantCulture.NumberFormat, out d) &&
-                !double.TryParse(numberSpan, numFormat, out d))
+                !double.TryParse(numberSpan, NumberStyles.Float, CultureInfo.InvariantCulture, out d) &&
+                !double.TryParse(numberSpan, NumberStyles.Float, numFormat, out d))
                 throw Exceptions.InvalidNumber(numberSpan.ToString());
 
             Unit u = null;
@@ -493,19 +478,21 @@ namespace Calcpad.Core
                 AddComplexVariables();
         }
 
+        private static readonly string[] ComplexVariableNames = ["i", "ei", "πi"];
         private Variable[] _complexVariables;
+
+        private static Variable[] CreateComplexVariables() =>
+        [
+            new(Core.Complex.ImaginaryOne),
+            new(Math.E * Core.Complex.ImaginaryOne),
+            new(Math.PI * Core.Complex.ImaginaryOne)
+        ];
 
         private void AddComplexVariables()
         {
-            _complexVariables =
-            [
-                new(Core.Complex.ImaginaryOne),
-                new(Math.E * Core.Complex.ImaginaryOne),
-                new(Math.PI * Core.Complex.ImaginaryOne)
-            ];
-            _variables.TryAdd("i", _complexVariables[0]);
-            _variables.TryAdd("ei", _complexVariables[1]);
-            _variables.TryAdd("πi", _complexVariables[2]);
+            _complexVariables = CreateComplexVariables();
+            for (int k = 0; k < ComplexVariableNames.Length; ++k)
+                _variables.TryAdd(ComplexVariableNames[k], _complexVariables[k]);
         }
 
         private void RemoveComplexVariables()
@@ -513,10 +500,16 @@ namespace Calcpad.Core
             if (_complexVariables is null)
                 return;
 
-            foreach (var name in (string[])["i", "ei", "πi"])
-                if (_variables.TryGetValue(name, out var v) && Array.IndexOf(_complexVariables, v) >= 0)
+            // Keep constants the user reassigned
+            var defaults = CreateComplexVariables();
+            for (int k = 0; k < ComplexVariableNames.Length; ++k)
+            {
+                var name = ComplexVariableNames[k];
+                if (_variables.TryGetValue(name, out var v) &&
+                    ReferenceEquals(v, _complexVariables[k]) &&
+                    v.Value.Equals(defaults[k].Value))
                     _variables.Remove(name);
-
+            }
             _complexVariables = null;
         }
 
@@ -595,7 +588,7 @@ namespace Calcpad.Core
             if (_functionDefinitionIndex < 0)
             {
                 bool isAssignment = _rpn[0].Type == TokenTypes.Variable && IsAssignment(_rpn[^1].Content);
-                _calc.ReturnAngleUnits = GetSettingsVariable("ReturnAngleUnits", 0) != 0d;
+                _calc.ReturnAngleUnits = GetSettingsVariable("ReturnAngleUnits", _settings.ReturnAngleUnits ? 1d : 0d) != 0d;
                 Func<IValue> f = null;
                 if (!isVisible && cacheId >= 0 && cacheId < _equationCache.Count)
                     f = _equationCache[cacheId].Function;
@@ -659,6 +652,14 @@ namespace Calcpad.Core
         {
             if (_settings.IsComplex && !value.IsReal)
                 throw Exceptions.ResultNotReal(Core.Complex.Format(value.Complex, _settings.Decimals, Phasor, OutputWriter.OutputFormat.Text));
+        }
+
+        private IScalarValue CheckConstant(IScalarValue value)
+        {
+            if (value is ComplexValue c && !c.IsReal && !_settings.IsComplex)
+                throw Exceptions.ComplexNumberInRealMode();
+
+            return value;
         }
 
         private void AddFunction(Queue<Token> input)
@@ -759,6 +760,7 @@ namespace Calcpad.Core
                         if (index >= 0)
                             cf.Clear();
 
+                        cf.Name = name;
                         _functionDefinitionIndex = _functions.Add(name, cf);
                         return;
                     }

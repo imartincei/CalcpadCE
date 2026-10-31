@@ -8,7 +8,7 @@ import { buildSourceDefinitionResolver } from '../../text/source-definitions';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
 import type { ExportVariant } from '../../types/api';
-import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceLogLevel, writesAllowed } from '../../types/settings';
+import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceLogLevel, writesAllowed, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings';
 import { setLogLevel } from '../log-level';
 import type { CalcpadSettings, WriteMode } from '../../types/settings';
 import { resolveStoredPdfSettings, resolveEffectivePdfSettings } from '../../types/pdf-settings';
@@ -16,7 +16,9 @@ import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
-import { extractUiControls } from '../ui-overrides';
+import { extractUiControls, readUiOverrides } from '../ui-overrides';
+import { readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, stampFileInfoText, pdfDocumentTitle } from '../file-info';
+import { planMetadataFooter, toRangeEdits, type LineEdit } from '../metadata-footer';
 import type { UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
 import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
@@ -29,7 +31,11 @@ export interface ExportRequest {
     mime: string;
     extensions: string[];
     dialogTitle: string;
+    openDirectly?: boolean;
 }
+
+/** A sidebar form whose unapplied edits the host prompts about before closing a document. */
+export type DraftForm = 'properties' | 'info' | 'uiOverrides';
 
 export interface QuickPickOption<T> {
     label: string;
@@ -127,8 +133,11 @@ export abstract class BaseMessageBridge {
     private _uiControlsProvider: (() => UiControl[] | null) | null = null;
     private _uiControlsSink: ((controls: UiControl[]) => void) | null = null;
     private _uiOverridesSink: ((overrides: Record<string, string>) => void) | null = null;
-    private _metadataDirtySink: ((docKey: string, dirty: boolean) => void) | null = null;
+    private _metadataDirtySink: ((docKey: string, dirty: boolean, form: DraftForm) => void) | null = null;
+    private _documentSaver: { isDirty(): boolean; save(): Promise<boolean> } | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
+    /** App version stamped into file info; set by the host, which knows it. */
+    programVersion = '';
 
     constructor(serverUrl: string, logger?: ILogger) {
         const log: ILogger = logger ?? { appendLine: (msg: string) => console.debug('[CalcPad]', msg) };
@@ -210,8 +219,13 @@ export abstract class BaseMessageBridge {
         this._uiOverridesSink = fn;
     }
 
-    /** Host injects a sink for the Properties panel's unsaved-draft flag, per document. */
-    setMetadataDirtySink(fn: (docKey: string, dirty: boolean) => void): void {
+    /** Host injects how the active document is saved, where it has a file to save to. */
+    setDocumentSaver(saver: { isDirty(): boolean; save(): Promise<boolean> }): void {
+        this._documentSaver = saver;
+    }
+
+    /** Host injects a sink for the Properties tab's unsaved-draft flags, per form and document. */
+    setMetadataDirtySink(fn: (docKey: string, dirty: boolean, form: DraftForm) => void): void {
         this._metadataDirtySink = fn;
     }
 
@@ -250,6 +264,19 @@ export abstract class BaseMessageBridge {
             enableUi: render.enableUi,
             uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
         };
+    }
+
+    /** Send the active document's file info and saved #UI values to the Properties tab. */
+    refreshDocumentMetadata(): void {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        const text = model?.getValue();
+        this.postToVue({
+            type: 'documentMetadata',
+            info: text !== undefined ? readFileInfo(text.split(/\r?\n/)) : null,
+            uiOverrides: text !== undefined ? readUiOverrides(text) ?? {} : {},
+            hasDocument: !!model,
+            docKey: model ? this.getMetadataDocKey() : '',
+        });
     }
 
     /** Send updated TOC headings to the Vue sidebar. */
@@ -324,6 +351,14 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('previewUiOverrides', String(message.enabled));
                 this.postToVue({ type: 'previewUiOverridesChanged', enabled: !!message.enabled });
                 break;
+            case 'updatePreviewPdf':
+                this.setExtraSetting('previewPdf', String(!!message.enabled));
+                this.postToVue({ type: 'previewPdfChanged', enabled: !!message.enabled });
+                break;
+            case 'updateShowFileMetadata':
+                this.setExtraSetting('showFileMetadata', String(!!message.enabled));
+                this.postToVue({ type: 'showFileMetadataChanged', enabled: !!message.enabled });
+                break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
@@ -356,13 +391,13 @@ export abstract class BaseMessageBridge {
                 this.handleGetPdfSettings();
                 break;
             case 'generatePdf':
-                this.handleGeneratePdf(message.variant);
+                this.handleGeneratePdf(message.variant, message.openDirectly);
                 break;
             case 'saveSourceHtml':
                 this.handleSaveSourceHtml(message.variant);
                 break;
             case 'saveDocx':
-                this.handleSaveDocx(message.variant);
+                this.handleSaveDocx(message.variant, message.openDirectly);
                 break;
             case 'saveCompiled':
                 this.saveCompiled();
@@ -396,10 +431,26 @@ export abstract class BaseMessageBridge {
                 this.handleUpdateMetadata(message);
                 break;
             case 'metadataDraftDirty':
-                this._metadataDirtySink?.(String(message.docKey ?? ''), !!message.dirty);
+                this._metadataDirtySink?.(String(message.docKey ?? ''), !!message.dirty,
+                    message.form === 'info' || message.form === 'uiOverrides' ? message.form : 'properties');
                 break;
             case 'getUiControls':
                 this.handleGetUiControls();
+                break;
+            case 'getDocumentMetadata':
+                this.refreshDocumentMetadata();
+                break;
+            case 'updateFileInfo':
+                this.handleUpdateFileInfo(message.patch);
+                break;
+            case 'updateUiOverrides':
+                this.handleUpdateUiOverrides(message.overrides);
+                break;
+            case 'markFileReviewed':
+                void this.handleMarkFileReviewed();
+                break;
+            case 'updateUserName':
+                this.setExtraSetting('userName', String(message.value ?? '').trim());
                 break;
             case 'goToLine':
                 this.handleGoToLine(message.line);
@@ -416,6 +467,10 @@ export abstract class BaseMessageBridge {
             case 'updateEditorFontFamily':
                 this.setExtraSetting('editorFontFamily', message.family ?? '');
                 this.postToVue({ type: 'editorFontFamilyChanged', family: message.family ?? '' });
+                break;
+            case 'updateCompletionDelayMs':
+                this.setExtraSetting('completionDelayMs', String(message.completionDelayMs));
+                this.postToVue({ type: 'completionDelayMsChanged', completionDelayMs: message.completionDelayMs });
                 break;
             // Only the calcpad-web/desktop host has a collapsible sidebar, and it is
             // what listens for this event.
@@ -552,6 +607,8 @@ export abstract class BaseMessageBridge {
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
+            enablePreviewPdf: this.getExtraSetting('previewPdf') === 'true',
+            showFileMetadata: this.getExtraSetting('showFileMetadata') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
@@ -559,6 +616,8 @@ export abstract class BaseMessageBridge {
             maxPreviewConsoleMessages: Number(this.getExtraSetting('maxPreviewConsoleMessages'))
                 || DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT,
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
+            completionDelayMs: Number(this.getExtraSetting('completionDelayMs') ?? DEFAULT_COMPLETION_DELAY_MS),
+            userName: this.getExtraSetting('userName') ?? '',
             writeMode: this.writeMode(),
             ...extras,
         });
@@ -654,23 +713,29 @@ export abstract class BaseMessageBridge {
      * same way the export Save dialog prefills its filename, so the two always agree.
      */
     protected getExportFallbackTitle(): string {
-        const tabs = (window as { calcpadTabs?: { activeTab?: { filePath?: string; title?: string } } }).calcpadTabs;
-        const source = tabs?.activeTab?.filePath || tabs?.activeTab?.title || '';
+        const source = this.activeDocumentName();
         const base = source.slice(Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\')) + 1);
         return base.replace(/\.[^./\\]+$/, '');
+    }
+
+    /** The active tab's path, or its title when it has never been saved. */
+    private activeDocumentName(): string {
+        const tabs = (window as { calcpadTabs?: { activeTab?: { filePath?: string; title?: string } } }).calcpadTabs;
+        return tabs?.activeTab?.filePath || tabs?.activeTab?.title || '';
     }
 
     /**
      * The PDF options an export should actually use: the stored defaults with the
      * document's own `pdf` metadata comment layered over them, key by key. The
      * Settings tab keeps editing the stored set alone — this merge is only for the
-     * request that generates a PDF.
+     * request that generates a PDF. The header title is the file info's title.
      */
-    protected getEffectivePdfOptions(content: string): PdfSettings {
+    getEffectivePdfOptions(content: string): PdfSettings {
+        const lines = content.split(/\r?\n/);
         return resolveEffectivePdfSettings(
             this.getStoredPdfOptions(),
-            pdfSettingsFromDocument(content.split('\n')),
-            this.getExportFallbackTitle(),
+            pdfSettingsFromDocument(lines),
+            pdfDocumentTitle(lines, this.getExportFallbackTitle()),
         );
     }
 
@@ -771,7 +836,7 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleSaveDocx(variant: ExportVariant = 'report'): Promise<void> {
+    private async handleSaveDocx(variant: ExportVariant = 'report', openDirectly = false): Promise<void> {
         const render = variantRender(variant, this.previewAppliesUiOverrides());
         // A form and a code listing have no meaningful Word rendering, so the Export tab
         // doesn't offer them; guard anyway rather than emit a nonsense document.
@@ -791,6 +856,7 @@ export abstract class BaseMessageBridge {
             mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             extensions: ['docx'],
             dialogTitle: exportDialogTitle('Save', 'Word Document', variant),
+            openDirectly,
         });
     }
 
@@ -813,7 +879,11 @@ export abstract class BaseMessageBridge {
         // than thrown at whatever invoked the save.
         let compiled: string;
         try {
-            compiled = await this.buildCompiledSource(bundled.content);
+            compiled = await this.buildCompiledSource(stampFileInfoText(bundled.content, {
+                userName: this.getExtraSetting('userName') ?? '',
+                programVersion: this.programVersion,
+                fileName: this.activeDocumentName(),
+            }));
         } catch (error) {
             await this.onExportError(
                 `This worksheet cannot be compiled:\n${error instanceof Error ? error.message : String(error)}`);
@@ -956,7 +1026,7 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleGeneratePdf(variant: ExportVariant = 'report'): Promise<void> {
+    private async handleGeneratePdf(variant: ExportVariant = 'report', openDirectly = false): Promise<void> {
         if (!(await this.runPdfPreflight())) return;
 
         const content = this.getActiveEditorContent();
@@ -975,6 +1045,7 @@ export abstract class BaseMessageBridge {
                     mime: 'application/pdf',
                     extensions: ['pdf'],
                     dialogTitle: exportDialogTitle('Export', 'PDF', variant),
+                    openDirectly,
                 });
                 if (savedPath) await this.onPdfSaved(savedPath);
                 return;
@@ -990,7 +1061,7 @@ export abstract class BaseMessageBridge {
         const editor = this.getActiveMonacoEditor();
         if (editor) {
             editor.revealLineInCenter(line);
-            editor.setPosition({ lineNumber: line, column: 1 });
+            editor.setPosition({ lineNumber: line, column: 1 }, 'code.navigation');
             editor.focus();
         }
     }
@@ -1133,6 +1204,59 @@ export abstract class BaseMessageBridge {
         this.postToVue({ type: 'metadataContext', block });
     }
 
+    /** Applies footer edits through the model, since a compiled worksheet's editor is read-only. */
+    private applyFooterEdits(edits: LineEdit[]): void {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model || !edits.length) return;
+        const ranges = toRangeEdits(edits, model.getLineCount(), i => model.getLineMaxColumn(i + 1) - 1, model.getEOL());
+        model.pushStackElement();
+        model.pushEditOperations([], ranges.map(r => ({
+            range: {
+                startLineNumber: r.startLine + 1,
+                startColumn: r.startCharacter + 1,
+                endLineNumber: r.endLine + 1,
+                endColumn: r.endCharacter + 1,
+            },
+            text: r.text,
+        })), () => null);
+        model.pushStackElement();
+    }
+
+    /** Applies the Properties tab's file-info edit; a document without one has nothing to edit yet. */
+    private handleUpdateFileInfo(patch: unknown): void {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model) return;
+        const lines = model.getValue().split(/\r?\n/);
+        const current = readFileInfo(lines);
+        if (!current) return;
+        this.applyFooterEdits(planFileInfoEdit(lines, { ...current, ...sanitizeFileInfoPatch(patch) }));
+        this.refreshDocumentMetadata();
+    }
+
+    /** Writes the Properties tab's saved #UI values, and hands them to the in-memory store. */
+    private handleUpdateUiOverrides(raw: unknown): void {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model || !raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+        const overrides = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, String(v)]));
+        this.applyFooterEdits(planMetadataFooter(model.getValue().split(/\r?\n/), { uiOverrides: overrides }));
+        this._uiOverridesSink?.(overrides);
+        this.refreshDocumentMetadata();
+    }
+
+    /**
+     * Records the user as reviewer and saves. Pending edits are saved first, so the review
+     * is dated after them and its own save, changing nothing else, leaves last-updated alone.
+     */
+    private async handleMarkFileReviewed(): Promise<void> {
+        const userName = this.getExtraSetting('userName') ?? '';
+        if (!userName) return;
+        const saver = this._documentSaver;
+        if (saver?.isDirty() && !await saver.save()) return;
+        this.handleUpdateFileInfo({ reviewedBy: userName, reviewedAt: new Date().toISOString() });
+        await saver?.save();
+        this.refreshDocumentMetadata();
+    }
+
     /** 0-based index of the line equal to `text`, closest to `near`; null if none. */
     private nearestLineMatching(lines: string[], text: string, near: number): number | null {
         let best: number | null = null;
@@ -1157,6 +1281,9 @@ interface MonacoModelLike {
     getValue(): string;
     getLineCount(): number;
     getLineMaxColumn(line: number): number;
+    getEOL(): string;
+    pushStackElement(): void;
+    pushEditOperations(before: [], edits: { range: MonacoRangeLike; text: string }[], cursorComputer: () => null): unknown;
 }
 interface MonacoRangeLike {
     startLineNumber: number;
@@ -1168,7 +1295,7 @@ interface MonacoEditorLike {
     getModel(): MonacoModelLike | null;
     getPosition(): { lineNumber: number; column: number } | null;
     revealLineInCenter(line: number): void;
-    setPosition(pos: { lineNumber: number; column: number }): void;
+    setPosition(pos: { lineNumber: number; column: number }, source?: string): void;
     executeEdits(source: string, edits: { range: MonacoRangeLike; text: string }[]): void;
     focus(): void;
 }

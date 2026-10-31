@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a regular hexagon: area, $I_x = I_y$, section moduli and radii of gyration in closed form. -->
- <h3>Geometrical Properties of Regular Hexagon</h3>
+ <h1>Geometrical Properties of Regular Hexagon</h1>
  <div style="max-width:120mm">
   <img alt="hexagon.png" class="side" src="Images/mechanics/sections/hexagon.png" style="height:135pt;"/>
  </div>

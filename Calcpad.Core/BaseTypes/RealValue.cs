@@ -87,13 +87,15 @@ namespace Calcpad.Core
             return D.CompareTo(other.D * d);
         }
 
-        public override string ToString()
+        public override string ToString() => ToString(null);
+
+        internal string ToString(IFormatProvider provider)
         {
             if (IsUnit)
                 return Units.Text;
 
             var s = Units is null ? string.Empty : Units.Text;
-            return $"{D}{s}";
+            return D.ToString(provider) + s;
         }
 
         internal static RealValue Abs(RealValue value) => new(Math.Abs(value.D), value.Units);

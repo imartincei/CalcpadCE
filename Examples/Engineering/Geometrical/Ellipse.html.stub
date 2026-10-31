@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a solid ellipse: area, $I_x = \tfrac{\pi}{4} a b^3$, $I_y = \tfrac{\pi}{4} a^3 b$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Ellipse</h3>
+ <h1>Geometrical Properties of Ellipse</h1>
  <div style="max-width:120mm">
   <img alt="ellipse.png" class="side" src="Images/mechanics/sections/ellipse.png" style="height:112pt;"/>
  </div>

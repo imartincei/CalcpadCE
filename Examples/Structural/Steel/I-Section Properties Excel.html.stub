@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Excel-driven variant: the rolled-section dimensions are read from [Steel Sections EN.xlsx](https://github.com/imartincei/CalcpadCE/blob/main/Examples/Structural/Steel/Steel%20Sections%20EN.xlsx) by the `read` directive, selected by an integer identifier that maps to a row in the IPE or HE database. -->
- <h3>
+ <h1>
   Design of steel I-Section
   <hr/>
   <small>
@@ -8,7 +8,7 @@
    <strong>Eurocode</strong>
    : EN 1993-1-1
   </small>
- </h3>
+ </h1>
  <div style="max-width:180mm">
   <p>
   </p>

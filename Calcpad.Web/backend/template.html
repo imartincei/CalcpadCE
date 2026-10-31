@@ -27,12 +27,12 @@
             padding: 0;
             line-height: 150%;
         }
-        h1 { font-size: 2.1em; } /* Default is ~2em */
-        h2 { font-size: 1.7em; } /* Default is ~1.5em */
-        h3 { font-size: 1.4em; } /* Default is ~1.17em */
-        h4 { font-size: 1.2em; } /* Default is ~1em */
-        h5 { font-size: 1.1em; } /* Default is ~0.83em */
-        h6 { font-size: 1em; }   /* Default is ~0.67em */
+        h1 { font-size: 1.4em; }
+        h2 { font-size: 1.32em; }
+        h3 { font-size: 1.24em; }
+        h4 { font-size: 1.16em; }
+        h5 { font-size: 1.08em; }
+        h6 { font-size: 1em; }
 
         p, li {
             margin: 0.3em 0 0.3em 0;
@@ -742,15 +742,15 @@
         }
 
         .code .keyword {
-            color: #AF00DB;
+            color: #CF00CF;
         }
 
         .code .operator {
-            color: #8A6A00;
+            color: #947016;
         }
 
         .code .bracket {
-            color: #D6006E;
+            color: #E01281;
         }
 
         .code .const {
@@ -758,15 +758,16 @@
         }
 
         .code .lineContinuation {
-            color: #8A6A00;
+            color: #947016;
         }
 
         .code .variable {
-            color: #0033CC;
+            color: #0000FF;
         }
 
         .code .localVariable {
-            color: #2060CC;
+            color: #4169E1;
+            font-weight: bold;
         }
 
         .code .function {
@@ -784,7 +785,7 @@
         }
 
         .code .units {
-            color: #007D7D;
+            color: #007FA8;
         }
 
         .code .setting {
@@ -796,15 +797,15 @@
         }
 
         .code .controlBlockKeyword {
-            color: #AF00DB;
+            color: #CF00CF;
         }
 
         .code .endKeyword {
-            color: #AF00DB;
+            color: #CF00CF;
         }
 
         .code .command {
-            color: #AF00DB;
+            color: #CF00CF;
         }
 
         .code .include {
@@ -816,7 +817,7 @@
         }
 
         .code .dataExchangeKeyword {
-            color: #AF00DB;
+            color: #CF00CF;
         }
 
         .code .htmlComment {
@@ -825,7 +826,7 @@
         }
 
         .code .tag {
-            color: #9400B8;
+            color: #9932CC;
         }
 
         .code .htmlContent {
@@ -833,19 +834,19 @@
         }
 
         .code .javascript {
-            color: #8A6A00;
+            color: #947016;
         }
 
         .code .css {
-            color: #0033CC;
+            color: #0000FF;
         }
 
         .code .svg {
-            color: #007D7D;
+            color: #008383;
         }
 
         .code .input {
-            color: #DB0000;
+            color: #EC0000;
         }
 
         .code .format {
@@ -881,6 +882,64 @@
 
         .dark-theme .nary {
             color: #C991F2;
+        }
+
+        .dark-theme .dvl,
+        .dark-theme .matrix .td,
+        .dark-theme .matrix .tr:first-child .td,
+        .dark-theme .matrix .tr:last-child .td {
+            border-color: #d4d4d4;
+        }
+
+        /* Root SVGs stroke black; invert(0.83) maps it to #d4d4d4. */
+        .dark-theme .r0, .dark-theme .r1,
+        .dark-theme .r2, .dark-theme .r3 {
+            filter: invert(0.83);
+        }
+
+        .dark-theme table.bordered th {
+            background-color: #2d2d30;
+            border-color: #5a5a5a;
+        }
+
+        .dark-theme table.bordered td {
+            border-color: #3e3e42;
+        }
+
+        .dark-theme .indent {
+            border-left-color: #3e3e42;
+        }
+
+        .dark-theme .fold > :first-child:hover,
+        .dark-theme .unfold > :first-child:hover {
+            color: #4fc1ff;
+        }
+
+        .dark-theme .value:after {
+            background: #d4d4d4;
+            color: #1e1e1e;
+        }
+
+        .dark-theme .plot text {
+            fill: #d4d4d4;
+        }
+
+        .dark-theme .plot .Grid {
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+
+        .dark-theme .plot .Frame {
+            stroke: rgba(255, 255, 255, 0.24);
+        }
+
+        .dark-theme .plot .Axis {
+            stroke: #d4d4d4;
+        }
+
+        /* Raster plots have black axes and text baked in on a transparent background. */
+        .dark-theme img.plot {
+            background-color: #fff;
+            border-radius: 3pt;
         }
 
         .dark-theme .cond {
@@ -1001,6 +1060,7 @@
 
         .dark-theme .code .localVariable {
             color: #8BB4FF;
+            font-weight: normal;
         }
 
         .dark-theme .code .function {
@@ -1112,6 +1172,14 @@
         mark.cpd-find.cpd-find-current { background: rgba(249,115,22,0.95); color: #000; }
         .lineLink { left: -3em !important; top: 0 !important; bottom: 0 !important; width: 3em !important; height: auto !important; font-size: 16pt !important; padding-right: 4pt !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; opacity: 0 !important; transition: opacity 0.15s !important; }
         .lineLink:hover { opacity: 1 !important; }
+        @media (prefers-reduced-motion: reduce) {
+            :root,
+            :root *,
+            :root *::before,
+            :root *::after {
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body>

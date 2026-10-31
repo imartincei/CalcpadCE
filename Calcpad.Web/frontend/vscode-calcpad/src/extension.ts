@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, hasConvertTrace, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt} from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor, getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml, hasConvertTrace } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
@@ -27,6 +27,7 @@ import { DotnetRuntimeManager } from './dotnetRuntimeManager';
 import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
+import { MetadataFooterView } from './metadataFooterView';
 import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml, copyPreviewSelection } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
@@ -185,6 +186,49 @@ async function saveUiValuesFor(document: vscode.TextDocument): Promise<number | 
     }
     uiOverridesDirty.delete(docKey);
     return Object.keys(overrides).length;
+}
+
+// Version stamped into file info on save; set on activation.
+let extensionVersion = '';
+/** Injected by rollup.config.js from tools/version.mjs; absent when compiled by tsc alone. */
+declare const __CALCPAD_VERSION__: string | undefined;
+
+function fileInfoStamper(): { userName: string; programVersion: string } {
+    return { userName: CalcpadSettingsManager.getInstance().getExtra('userName', ''), programVersion: extensionVersion };
+}
+
+/**
+ * Whether a document about to be saved gets its file-info comment stamped. An unchanged file
+ * is not an update, and an untitled one leaves the title for its first save under a real name.
+ */
+function stampsFileInfo(document: vscode.TextDocument): boolean {
+    return document.languageId === 'calcpad' && document.isDirty && !isCompiledPath(document.fileName);
+}
+
+/** The file as it is on disk, which tells a review-only save from a real update. */
+async function savedTextOf(document: vscode.TextDocument): Promise<string | undefined> {
+    if (document.isUntitled) return undefined;
+    try {
+        return new TextDecoder().decode(await vscode.workspace.fs.readFile(document.uri));
+    } catch {
+        return undefined;
+    }
+}
+
+async function fileInfoStampEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
+    const saved = await savedTextOf(document);
+    const edits = planFileInfoStamp(document.getText().split(/\r?\n/), {
+        ...fileInfoStamper(),
+        fileName: document.isUntitled ? '' : document.fileName,
+        reviewOnly: saved !== undefined && onlyReviewChanged(saved, document.getText()),
+    });
+    return metadataTextEdits(document, edits);
+}
+
+function metadataTextEdits(document: vscode.TextDocument, edits: LineEdit[]): vscode.TextEdit[] {
+    const eol = document.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n';
+    return toRangeEdits(edits, document.lineCount, i => document.lineAt(i).text.length, eol).map(r =>
+        vscode.TextEdit.replace(new vscode.Range(r.startLine, r.startCharacter, r.endLine, r.endCharacter), r.text));
 }
 
 /**
@@ -383,21 +427,50 @@ function showPreviewLoading(panel: vscode.WebviewPanel): () => void {
 
 /**
  * The PDF options for an export: the stored host defaults, overridden per key by the
- * document's own `pdf` metadata comment. The header title falls back to `sourceFileUri`'s
- * base name — the document being exported, not whichever editor happens to be focused.
+ * document's own `pdf` metadata comment. The header title is the file info's title, falling
+ * back to `sourceFileUri`'s base name — the document being exported, not whichever editor
+ * happens to be focused.
  */
 function getPdfSettings(documentContent?: string, sourceFileUri?: vscode.Uri): FrontendPdfSettings {
     const settingsManager = CalcpadSettingsManager.getInstance();
     const stored = settingsManager.getExtraObject('pdfSettings', {} as Partial<FrontendPdfSettings>);
-    const fromDocument = documentContent
-        ? pdfSettingsFromDocument(documentContent.split('\n'))
-        : {};
+    const lines = documentContent?.split(/\r?\n/) ?? [];
     const source = sourceFileUri ?? vscode.window.activeTextEditor?.document.uri;
     const fileName = source
         ? path.basename(source.fsPath, path.extname(source.fsPath))
         : '';
 
-    return resolveEffectivePdfSettings(stored, fromDocument, fileName);
+    return resolveEffectivePdfSettings(stored, pdfSettingsFromDocument(lines), pdfDocumentTitle(lines, fileName));
+}
+
+let pdfjsSources: Promise<{ libSource: string; workerSource: string }> | undefined;
+
+/** pdf.js, copied into dist/pdfjs by the rollup build. */
+function loadPdfjsSources(): Promise<{ libSource: string; workerSource: string }> {
+    const dir = vscode.Uri.joinPath(extensionContext.extensionUri, 'dist', 'pdfjs');
+    const read = async (name: string) =>
+        new TextDecoder().decode(await vscode.workspace.fs.readFile(vscode.Uri.joinPath(dir, name)));
+    pdfjsSources ??= Promise.all([read('pdf.min.mjs'), read('pdf.worker.min.mjs')])
+        .then(([libSource, workerSource]) => ({ libSource, workerSource }))
+        .catch((err) => { pdfjsSources = undefined; throw err; });
+    return pdfjsSources;
+}
+
+/** The PDF export of `html` in a pdf.js viewer, or null when a newer render superseded it. */
+async function pdfPreviewHtml(html: string, content: string, sourceFileUri: vscode.Uri, docKey: string): Promise<string | null> {
+    const theme = getEffectivePreviewTheme();
+    try {
+        if (!sharedApiClient) throw new Error(NO_SERVER_MESSAGE);
+        const [pdf, sources] = await Promise.all([
+            sharedApiClient.pdf(html, getPdfSettings(content, sourceFileUri), { key: `previewPdf:${docKey}` }),
+            loadPdfjsSources(),
+        ]);
+        return pdf ? pdfViewerHtml({ pdf, theme, ...sources }) : null;
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        outputChannel.appendLine(`[PDF preview] ${message}`, 'warning');
+        return pdfPreviewErrorHtml(message, theme);
+    }
 }
 
 function getEffectivePreviewTheme(): 'light' | 'dark' {
@@ -874,14 +947,14 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
                 <title>CalcpadCE Preview${unwrapped ? ' Unwrapped' : ''}</title>
                 <style>
-                    body { color: ${c.fg}; background: ${c.bg}; padding: 20px; font-family: var(--vscode-font-family); }
-                    h3 { text-align: center; }
+                    body { color: ${c.fg}; background: ${c.bg}; padding: 20px; font: var(--vscode-font-size)/1.5 var(--vscode-font-family); }
+                    h3 { text-align: center; font-size: inherit; }
                     p { text-align: center; }
-                    table { margin: 1em auto; border-collapse: collapse; text-align: left; font-size: 0.9em; }
+                    table { margin: 1em auto; border-collapse: collapse; text-align: left; }
                     th, td { padding: 4px 12px; }
-                    th { text-align: right; font-weight: normal; opacity: 0.7; }
-                    td { font-family: var(--vscode-editor-font-family, monospace); }
-                    h4 { text-align: center; margin-top: 1.5em; margin-bottom: 0.3em; }
+                    th { text-align: right; font-weight: normal; }
+                    kbd { font-family: var(--vscode-editor-font-family, monospace); font-size: inherit; padding: 1px 4px; border: 1px solid; border-radius: 3px; }
+                    h4 { text-align: center; font-size: inherit; margin-top: 1.5em; margin-bottom: 0.3em; }
                     a { color: ${c.link}; }
                 </style>
             </head>
@@ -890,17 +963,17 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
                 <p>Start typing to see the preview.</p>
                 <h4>Formatting Hotkeys</h4>
                 <table>
-                    <tr><th>Bold</th><td>Ctrl+B</td></tr>
-                    <tr><th>Italic</th><td>Ctrl+I</td></tr>
-                    <tr><th>Underline</th><td>Ctrl+U</td></tr>
-                    <tr><th>Subscript</th><td>Ctrl+=</td></tr>
-                    <tr><th>Superscript</th><td>Ctrl+Shift+=</td></tr>
-                    <tr><th>Heading 1-6</th><td>Ctrl+1 ... Ctrl+6</td></tr>
-                    <tr><th>Paragraph</th><td>Ctrl+L</td></tr>
-                    <tr><th>Line Break</th><td>Ctrl+R</td></tr>
-                    <tr><th>Bulleted List</th><td>Ctrl+Shift+L</td></tr>
-                    <tr><th>Numbered List</th><td>Ctrl+Shift+N</td></tr>
-                    <tr><th>Toggle Comment</th><td>Ctrl+Q</td></tr>
+                    <tr><th>Bold</th><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td></tr>
+                    <tr><th>Italic</th><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td></tr>
+                    <tr><th>Underline</th><td><kbd>Ctrl</kbd>+<kbd>U</kbd></td></tr>
+                    <tr><th>Subscript</th><td><kbd>Ctrl</kbd>+<kbd>=</kbd></td></tr>
+                    <tr><th>Superscript</th><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>=</kbd></td></tr>
+                    <tr><th>Heading 1-6</th><td><kbd>Ctrl</kbd>+<kbd>1</kbd> ... <kbd>Ctrl</kbd>+<kbd>6</kbd></td></tr>
+                    <tr><th>Paragraph</th><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                    <tr><th>Line Break</th><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td></tr>
+                    <tr><th>Bulleted List</th><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td></tr>
+                    <tr><th>Numbered List</th><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td></tr>
+                    <tr><th>Toggle Comment</th><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td></tr>
                 </table>
                 <h4>Resources</h4>
                 <p><a href="https://github.com/imartincei/CalcpadCE">CalcpadCE on GitHub</a></p>
@@ -927,10 +1000,12 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         outputChannel.appendLine(`Making API call to ${endpoint}...`, 'verbose');
 
         const theme = getEffectivePreviewTheme();
+        // Rendered as an export would be, so the pages match the exported PDF.
+        const pdfView = !enableUi && !unwrapped && settingsManager.getExtraBool('previewPdf', false);
         const requestBody = JSON.stringify({
             content: content,
             settings: settings,
-            theme: theme,
+            theme: pdfView ? undefined : theme,
             forceUnwrappedCode: unwrapped,
             sourceFilePath: sourceFileUri.fsPath,
             enableUi: enableUi,
@@ -938,10 +1013,10 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
             uiOverrides: applyOverrides ? uiOverridesFor(docKey, content) : undefined,
             // The report is a print layout, but on screen beside the editor, so it
             // keeps the line links that forPrint would otherwise suppress.
-            includeLineAnchors: forPrint ? true : undefined,
+            includeLineAnchors: pdfView ? false : forPrint ? true : undefined,
             // The input form has no source editor for "on line [N]" to point at, and
             // neither does the report while it's shown behind that form.
-            hideErrorLines: forPrint && uiPanel !== undefined ? true : undefined,
+            hideErrorLines: !pdfView && forPrint && uiPanel !== undefined ? true : undefined,
             stepPauses: enableUi,
             pauseAfter: enableUi ? uiPause.pauseAfter(docKey) : undefined,
             write: settingsManager.mayWrite(forPrint, enableUi)
@@ -1031,6 +1106,15 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         const documentDir = activeEditor && !activeEditor.document.isUntitled
             ? path.dirname(activeEditor.document.uri.fsPath) : '';
         const imageCache = await buildImageCache(apiResponse, documentDir, MAX_INLINE_IMAGE_TOTAL_BYTES);
+
+        if (pdfView) {
+            const viewerHtml = await pdfPreviewHtml(applyImageCache(apiResponse, imageCache), content, sourceFileUri, docKey);
+            if (viewerHtml === null) return;
+            const pdfFrameState = frameStateFor(panel, docKey);
+            renderIntoShell(panel, viewerHtml.replace('</head>', getFrameAgentScript({ scroll: pdfFrameState.scroll }) + '</head>'),
+                { background: previewBackground() });
+            return;
+        }
 
         // Inject JavaScript for error link navigation and console interception. The relay cap
         // goes to both blocks that install the guard, since only the first to run sets it.
@@ -1517,10 +1601,11 @@ async function saveAsCompiled() {
         // {library} reference to an absolute path — so this resolver only needs to expand
         // env vars in whatever plain relative/absolute src the author wrote directly.
         const resolve = createReferenceResolver(bundled.content, documentDir, expandEnvVars, path.resolve, os.homedir);
+        const stamped = stampFileInfoText(bundled.content, { ...fileInfoStamper(), fileName: saveUri.fsPath });
         // Refused rather than trimmed: the images become the file, so a compiled worksheet
         // that quietly dropped them would be a lossy save. The catch below turns it into
         // the failure message.
-        const compiled = await inlineImageSources(bundled.content, new VSCodeFileSystem(), resolve, {
+        const compiled = await inlineImageSources(stamped, new VSCodeFileSystem(), resolve, {
             maxTotalBytes: MAX_COMPILED_IMAGE_TOTAL_BYTES,
             onExceeded: 'fail',
         });
@@ -1805,6 +1890,10 @@ export async function activate(context: vscode.ExtensionContext) {
     try {
         // Store extension context for global access
         extensionContext = context;
+        // The build's version, matching the Settings tab; package.json's is stale outside a packaged .vsix.
+        extensionVersion = typeof __CALCPAD_VERSION__ === 'string'
+            ? __CALCPAD_VERSION__
+            : String(context.extension.packageJSON.version ?? '');
 
         // Create output channel for debugging
         outputChannel = new VSCodeLogger(vscode.window.createOutputChannel('CalcpadCE Extension'));
@@ -2082,6 +2171,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 panel, text, uri, false, undefined, kind === 'form', kind === 'report', true),
             outputChannel,
         );
+        compiledEditor.fileInfoStamp = fileInfoStamper;
+        compiledEditor.onDidWrite = () => vueUiProvider?.refreshDocumentMetadata();
 
     // Unified document processing function
     let isProcessingDocument = false;
@@ -2253,6 +2344,22 @@ export async function activate(context: vscode.ExtensionContext) {
         uiOverrides.replace(documentUri, overrides);
         uiOverridesDirty.delete(documentUri);
     };
+    vueUiProvider.getCompiledSource = () => {
+        const uri = activeCompiledUri() ?? compiledSourceUri;
+        const text = uri && compiledEditor?.sourceFor(uri);
+        return uri && text !== undefined ? { uri, text } : undefined;
+    };
+    vueUiProvider.updateCompiledFileInfo = (uri, patch) => { compiledEditor?.updateFileInfo(uri, patch); };
+    // VS Code 1.82 can't save a custom document by uri, so only the active worksheet can be saved, via the workbench.
+    vueUiProvider.saveCompiled = async (uri) => {
+        if (!compiledEditor?.isDirty(uri)) return true;
+        if (activeCompiledUri()?.toString() !== uri.toString()) return false;
+        await vscode.commands.executeCommand('workbench.action.files.save');
+        return !compiledEditor.isDirty(uri);
+    };
+    const metadataFooterView = new MetadataFooterView(() => CalcpadSettingsManager.getInstance().getExtraBool('showFileMetadata', false));
+    vueUiProvider.onShowFileMetadataChanged = () => metadataFooterView.refresh();
+    context.subscriptions.push(metadataFooterView);
     const vueUiProviderDisposable = vscode.window.registerWebviewViewProvider(
         CalcpadVueUIProvider.viewType,
         vueUiProvider
@@ -2353,8 +2460,9 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    const showInsertCommand = vscode.commands.registerCommand('vscode-calcpad.showInsert', () => {
-        vscode.commands.executeCommand('workbench.view.extension.calcpad-ui');
+    const showInsertCommand = vscode.commands.registerCommand('vscode-calcpad.showInsert', async () => {
+        await vscode.commands.executeCommand('calcpadVueUI.focus');
+        vueUiProvider?.focusInsertSearch();
     });
 
     const editMetadataPropertiesCommand = vscode.commands.registerCommand('vscode-calcpad.editMetadataProperties', async () => {
@@ -2633,9 +2741,14 @@ export async function activate(context: vscode.ExtensionContext) {
         vueUiProvider?.discardMetadataDraft(document.uri.toString());
     });
 
+    const onWillSaveTextDocument = vscode.workspace.onWillSaveTextDocument(event => {
+        if (stampsFileInfo(event.document)) event.waitUntil(fileInfoStampEdits(event.document));
+    });
+
     // Process document on save
     const onDidSaveTextDocument = vscode.workspace.onDidSaveTextDocument(document => {
         processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+        vueUiProvider?.refreshDocumentMetadata();
     });
 
     // Lint on document change (with debouncing)
@@ -2648,6 +2761,7 @@ export async function activate(context: vscode.ExtensionContext) {
             lintTimeout = setTimeout(() => {
                 invalidateUiControls(event.document);
                 processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+                vueUiProvider?.refreshDocumentMetadata();
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the
             // preview updates only when the panel is (re)opened or the user
@@ -2661,12 +2775,18 @@ export async function activate(context: vscode.ExtensionContext) {
     // A compiled worksheet is a custom editor, not a text one, so activating or closing
     // its tab never reaches onDidChangeActiveTextEditor — the tab events are what tell
     // the side panel a form has taken over.
-    const onDidChangeTabs = vscode.window.tabGroups.onDidChangeTabs(() => syncInputMode());
-    const onDidChangeTabGroups = vscode.window.tabGroups.onDidChangeTabGroups(() => syncInputMode());
+    // Also where a compiled worksheet coming to the front reaches the Info tab.
+    const onTabsChanged = () => {
+        syncInputMode();
+        vueUiProvider?.refreshDocumentMetadata();
+    };
+    const onDidChangeTabs = vscode.window.tabGroups.onDidChangeTabs(onTabsChanged);
+    const onDidChangeTabGroups = vscode.window.tabGroups.onDidChangeTabGroups(onTabsChanged);
 
     // Update preview and variables when active editor changes
     const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(async editor => {
         updateMetadataContext(editor);
+        vueUiProvider?.refreshDocumentMetadata();
         // A text editor taking over is what ends a compiled worksheet's claim on the
         // export commands; a webview taking focus is not, which is the point of both
         // this and previewSourceEditor.
@@ -2774,6 +2894,7 @@ export async function activate(context: vscode.ExtensionContext) {
             onDidChangeTextDocument,
             onDidOpenTextDocument,
             onDidCloseTextDocument,
+            onWillSaveTextDocument,
             onDidSaveTextDocument,
             onDidChangeActiveTextEditor,
             onDidChangeTabs,

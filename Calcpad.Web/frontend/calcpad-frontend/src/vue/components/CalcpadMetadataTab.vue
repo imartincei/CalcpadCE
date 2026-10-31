@@ -1,338 +1,393 @@
 <template>
-  <div class="metadata-tab">
-    <div class="metadata-container p-3">
-      <h3 class="section-title">Properties</h3>
+  <div class="metadata-tab" :class="{ 'search-active': searchActive }">
+    <div class="metadata-toolbar">
+      <CalcpadSearchField
+        v-model="searchQuery"
+        class="metadata-search"
+        :placeholder="t('Search properties...')"
+      />
+      <CollapseAllButton v-if="!searchActive" :expand="allCollapsed" @click="setAll(!allCollapsed)" />
+    </div>
 
-      <div v-if="boundBlock" class="bound-target" :class="kindClass">
-        <button
-          class="line-chip"
-          title="Go to this line"
-          @click="emit('go-to-line', boundBlock.line + 1)"
-        >Line {{ boundBlock.line + 1 }}</button>
-        <span v-if="targetKind" class="target-kind">{{ targetKind }}</span>
-        <span class="target-name" :title="targetName">{{ targetName }}</span>
-        <span v-if="dirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+    <div ref="container" class="metadata-container">
+      <section v-show="sectionVisible('fileInfo')" data-anchor="fileInfo" class="metadata-section">
+        <h3 class="section-header" @click="toggle('fileInfo')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('fileInfo') }">&#x25BC;</span>
+          <CalcpadSearchHighlight :text="t('File Info')" :query="query" />
+          <span v-if="fileInfoDirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
+        </h3>
+        <div v-show="bodyVisible('fileInfo')" class="section-body">
+          <CalcpadFileInfoSection
+            :info="fileInfo"
+            :has-document="hasDocument"
+            :doc-key="docKey"
+            :user-name="userName"
+            :query="query"
+            :row-visible="(key: string) => rowVisible('fileInfo', key)"
+            @update="emit('update-file-info', $event)"
+            @mark-reviewed="emit('mark-reviewed')"
+            @open-settings="emit('open-settings')"
+            @draft-dirty="onFileInfoDirty"
+          />
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('uiOverrides')" data-anchor="uiOverrides" class="metadata-section">
+        <h3 class="section-header" @click="toggle('uiOverrides')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('uiOverrides') }">&#x25BC;</span>
+          <CalcpadSearchHighlight :text="t('UI Overrides')" :query="query" />
+          <span v-if="uiOverridesDirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
+        </h3>
+        <div v-show="bodyVisible('uiOverrides')" class="section-body">
+          <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
+          <CalcpadUiOverridesSection
+            v-else
+            :overrides="savedUiOverrides"
+            :has-document="hasDocument"
+            :doc-key="docKey"
+            :ui-controls="uiControls"
+            :visible="bodyVisible('uiOverrides')"
+            :query="query"
+            :filter="uiOverridesFilter"
+            @update="emit('update-ui-overrides', $event)"
+            @go-to-line="emit('go-to-line', $event)"
+            @refresh-ui-controls="emit('refresh-ui-controls')"
+            @draft-dirty="onUiOverridesDirty"
+          />
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('fields')" data-anchor="fields" class="metadata-section">
+        <h3 class="section-header" @click="toggle('fields')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('fields') }">&#x25BC;</span>
+          <CalcpadSearchHighlight :text="t('Fields')" :query="query" />
+          <span v-if="dirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
+        </h3>
+        <div v-show="bodyVisible('fields')" class="section-body">
+          <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
+          <p v-else-if="!boundBlock" class="note">{{ t('Place the cursor on a line to edit its properties.') }}</p>
+          <template v-else>
+            <div class="bound-target" :class="kindClass">
+              <button
+                class="line-chip"
+                :title="t('Go to this line')"
+                @click="emit('go-to-line', boundBlock.line + 1)"
+              >Line {{ boundBlock.line + 1 }}</button>
+              <span v-if="targetKind" class="target-kind">{{ targetKind }}</span>
+              <span class="target-name" :title="targetName">{{ targetName }}</span>
+            </div>
+
+            <p v-if="!boundBlock.valid" class="warning">
+              This comment contains invalid JSON. Applying will replace it with the
+              values below.
+            </p>
+
+            <div v-if="showDesc" v-show="rowVisible('fields', 'desc')" class="field">
+              <label><CalcpadSearchHighlight :text="t('Description')" :query="query" /></label>
+              <textarea
+                v-model="model.desc"
+                rows="2"
+                :placeholder="t('What this definition does')"
+              ></textarea>
+            </div>
+
+            <div v-if="showParams" v-show="rowVisible('fields', 'params')" class="field">
+              <label><CalcpadSearchHighlight :text="t('Parameter types')" :query="query" /></label>
+              <div v-for="(_, i) in model.paramTypes" :key="'pt' + i" class="list-row">
+                <select v-model="model.paramTypes[i]">
+                  <option value="">(none)</option>
+                  <optgroup v-if="showFunctionTypes" :label="t('Function')">
+                    <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
+                  </optgroup>
+                  <optgroup v-if="showMacroTypes" :label="t('Macro (TokenType)')">
+                    <option v-for="t in macroTypes" :key="t" :value="t">{{ t }}</option>
+                  </optgroup>
+                </select>
+                <button class="icon" :title="t('Remove')" @click="model.paramTypes.splice(i, 1)">✕</button>
+              </div>
+              <button class="tertiary" @click="model.paramTypes.push('')">+ Add type</button>
+            </div>
+
+            <div v-if="showParams" v-show="rowVisible('fields', 'params')" class="field">
+              <label><CalcpadSearchHighlight :text="t('Parameter descriptions')" :query="query" /></label>
+              <div v-for="(_, i) in model.paramDesc" :key="'pd' + i" class="list-row">
+                <input type="text" v-model="model.paramDesc[i]" :placeholder="t('Description')" />
+                <button class="icon" :title="t('Remove')" @click="model.paramDesc.splice(i, 1)">✕</button>
+              </div>
+              <button class="tertiary" @click="model.paramDesc.push('')">+ Add description</button>
+            </div>
+
+            <div v-if="showReturnType" v-show="rowVisible('fields', 'returnType')" class="field">
+              <label><CalcpadSearchHighlight :text="t('Return type')" :query="query" /></label>
+              <select v-model="model.returnType">
+                <option value="">(none)</option>
+                <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
+              </select>
+            </div>
+
+            <div v-if="showUi" v-show="rowVisible('fields', 'ui')" class="field">
+              <label><CalcpadSearchHighlight text="#UI Control" :query="query" /></label>
+              <p v-if="uiBlock && !uiBlock.valid" class="warning">{{ t('This #UI directive contains invalid JSON. Applying will replace it with the values below.') }}</p>
+
+              <div class="sub-row">
+                <span class="sub-label">{{ t('Type') }}</span>
+                <select v-model="model.ui.type">
+                  <option v-for="opt in uiTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                </select>
+              </div>
+              <div class="sub-row">
+                <span class="sub-label">{{ t('Mode') }}</span>
+                <select v-model="model.ui.mode">
+                  <option v-for="opt in uiModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                </select>
+              </div>
+              <div class="sub-row">
+                <span class="sub-label">{{ t('Style class') }}</span>
+                <input type="text" v-model="model.ui.style" />
+              </div>
+              <div class="sub-row">
+                <span class="sub-label">{{ t('Report style class') }}</span>
+                <input type="text" v-model="model.ui.reportStyle" />
+              </div>
+              <div class="sub-row">
+                <span class="sub-label" :title="t('Off puts the unit in the control instead of leaving it in the document.')">{{ t('Keep the unit') }}</span>
+                <select v-model="model.ui.forceUnits">
+                  <option :value="''">(default: on)</option>
+                  <option :value="true">On</option>
+                  <option :value="false">{{ t('Off') }}</option>
+                </select>
+              </div>
+              <div class="sub-row">
+                <span class="sub-label" :title="t('Accept any expression, written to the document verbatim. Turns \'Keep the unit\' off.')">{{ t('Allow expressions') }}</span>
+                <select v-model="model.ui.allowExpression">
+                  <option :value="''">(default: off)</option>
+                  <option :value="true">On</option>
+                  <option :value="false">{{ t('Off') }}</option>
+                </select>
+              </div>
+
+              <template v-if="model.ui.type === 'datagrid'">
+                <div class="sub-row">
+                  <span class="sub-label">{{ t('Rows') }}</span>
+                  <input type="number" min="0" v-model.number="model.ui.rows" />
+                </div>
+                <div class="sub-row">
+                  <span class="sub-label">{{ t('Columns') }}</span>
+                  <input type="number" min="0" v-model.number="model.ui.columns" />
+                </div>
+
+                <label>{{ t('Column headers') }}</label>
+                <div v-for="(_, i) in model.ui.columnHeaders" :key="'ch' + i" class="list-row">
+                  <input type="text" v-model="model.ui.columnHeaders[i]" />
+                  <button class="icon" :title="t('Remove')" @click="model.ui.columnHeaders.splice(i, 1)">✕</button>
+                </div>
+                <button class="tertiary" @click="model.ui.columnHeaders.push('')">+ Add column header</button>
+
+                <label>{{ t('Row headers') }}</label>
+                <div v-for="(_, i) in model.ui.rowHeaders" :key="'rh' + i" class="list-row">
+                  <input type="text" v-model="model.ui.rowHeaders[i]" />
+                  <button class="icon" :title="t('Remove')" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
+                </div>
+                <button class="tertiary" @click="model.ui.rowHeaders.push('')">+ Add row header</button>
+
+                <div class="sub-row">
+                  <span class="sub-label" :title="t('Pixels, or a percentage of the line such as 75%. Natural width when empty.')">{{ t('Grid width') }}</span>
+                  <input type="text" placeholder="100%" v-model="model.ui.width" />
+                </div>
+                <div class="sub-row">
+                  <span class="sub-label">{{ t('Row header width') }}</span>
+                  <input type="number" min="1" v-model.number="model.ui.rowHeaderWidth" />
+                </div>
+
+                <label>{{ t('Column widths') }}</label>
+                <div v-for="(_, i) in model.ui.columnWidths" :key="'cw' + i" class="list-row">
+                  <input type="number" min="1" v-model.number="model.ui.columnWidths[i]" />
+                  <button class="icon" :title="t('Remove')" @click="model.ui.columnWidths.splice(i, 1)">✕</button>
+                </div>
+                <button class="tertiary" @click="model.ui.columnWidths.push('')">+ Add column width</button>
+              </template>
+
+              <template v-if="model.ui.type === 'dropdown' || model.ui.type === 'radio'">
+                <label>Options (key / value)</label>
+                <div v-for="(_, i) in model.ui.keys" :key="'kv' + i" class="list-row">
+                  <input type="text" placeholder="Key" v-model="model.ui.keys[i]" />
+                  <input type="text" placeholder="Value" v-model="model.ui.values[i]" />
+                  <button class="icon" title="Remove" @click="removeUiOption(i)">✕</button>
+                </div>
+                <button class="tertiary" @click="model.ui.keys.push(''); model.ui.values.push('')">+ Add option</button>
+                <div v-if="uiKeysValuesError" class="setting-error">{{ uiKeysValuesError }}</div>
+              </template>
+            </div>
+
+            <div v-if="addableFields.length" v-show="addFieldVisible('fields', addableFields)" class="field add-field">
+              <div class="sub-row">
+                <select
+                  class="add-field-select"
+                  @change="addField(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''"
+                >
+                  <option value="">(select a field to add…)</option>
+                  <option v-for="f in addableFields" :key="f.id" :value="f.id">{{ f.label }}</option>
+                </select>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('settings')" data-anchor="settings" class="metadata-section">
+        <h3 class="section-header" @click="toggle('settings')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('settings') }">&#x25BC;</span>
+          <CalcpadSearchHighlight text="Settings" :query="query" />
+          <span v-if="dirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+        </h3>
+        <div v-show="bodyVisible('settings')" class="section-body">
+          <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
+          <p v-else-if="!boundBlock" class="note">Place the cursor on a line to edit its settings.</p>
+          <template v-else>
+            <div v-if="showPdf" v-show="rowVisible('settings', 'pdf')" data-anchor="pdf" class="field">
+              <label><CalcpadSearchHighlight text="PDF export" :query="query" /></label>
+              <p class="section-desc">
+                Applies to the whole document when it is exported to PDF, overriding the
+                defaults on the Settings tab key by key.
+              </p>
+              <div v-for="(row, i) in model.pdf" :key="'p' + i" class="setting-row">
+                <div class="list-row">
+                  <select v-model="row.key" @change="pdf.seedDefault(row)">
+                    <option value="">(select)</option>
+                    <option v-for="s in pdfKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+                  </select>
+                  <select v-if="pdf.type(row.key) === 'boolean'" v-model="row.value">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                  </select>
+                  <select v-else-if="pdf.type(row.key) === 'enum'" v-model="row.value">
+                    <option v-for="opt in pdf.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                  </select>
+                  <input
+                    v-else
+                    :type="pdf.type(row.key) === 'number' ? 'number' : 'text'"
+                    :class="{ 'input-invalid': !!pdf.error(row) }"
+                    :min="pdf.min(row.key)"
+                    :max="pdf.max(row.key)"
+                    :step="pdf.step(row.key)"
+                    v-model="row.value"
+                  />
+                  <span v-if="row.key" class="setting-info" :title="pdf.detail(row.key)">ⓘ</span>
+                  <button class="icon" title="Remove" @click="model.pdf.splice(i, 1)">✕</button>
+                </div>
+                <div v-if="pdf.error(row)" class="setting-error">{{ pdf.error(row) }}</div>
+              </div>
+              <button class="tertiary" @click="model.pdf.push({ key: '', value: '' })">+ Add PDF setting</button>
+            </div>
+
+            <div v-if="showSettings" v-show="rowVisible('settings', 'settingsDirective')" data-anchor="settingsDirective" class="field">
+              <label><CalcpadSearchHighlight text="Settings (#settings directive)" :query="query" /></label>
+              <div v-for="(row, i) in model.settings" :key="'s' + i" class="setting-row">
+                <div class="list-row">
+                  <select v-model="row.key" @change="setting.seedDefault(row)">
+                    <option value="">(select)</option>
+                    <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+                  </select>
+                  <select v-if="setting.type(row.key) === 'boolean'" v-model="row.value">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                  </select>
+                  <select v-else-if="setting.type(row.key) === 'enum'" v-model="row.value">
+                    <option v-for="opt in setting.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                  </select>
+                  <input
+                    v-else
+                    :type="setting.type(row.key) === 'number' ? 'number' : 'text'"
+                    :class="{ 'input-invalid': !!setting.error(row) }"
+                    :min="setting.min(row.key)"
+                    :max="setting.max(row.key)"
+                    :step="setting.step(row.key)"
+                    v-model="row.value"
+                  />
+                  <span v-if="row.key" class="setting-info" :title="setting.detail(row.key)">ⓘ</span>
+                  <button class="icon" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+                </div>
+                <div v-if="setting.error(row)" class="setting-error">{{ setting.error(row) }}</div>
+              </div>
+              <button class="tertiary" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
+            </div>
+
+            <div v-if="showLint" v-show="rowVisible('settings', 'lint')" data-anchor="lint" class="field">
+              <label><CalcpadSearchHighlight text="Lint ignore" :query="query" /></label>
+
+              <div class="sub-row">
+                <span class="sub-label">Start region</span>
+                <select v-model="model.startLintMode">
+                  <option value="off">Off</option>
+                  <option value="all">Ignore all</option>
+                  <option value="specific">Ignore specific…</option>
+                </select>
+              </div>
+              <select
+                v-if="model.startLintMode === 'specific'"
+                class="code-multiselect"
+                multiple
+                size="8"
+                v-model="model.startLintCodes"
+              >
+                <option v-for="c in lintCodes" :key="c.code" :value="c.code" :title="c.description">
+                  {{ c.code }} — {{ c.description }}
+                </option>
+              </select>
+
+              <template v-if="showEndLint">
+                <div class="sub-row">
+                  <span class="sub-label">End region</span>
+                  <select v-model="model.endLintMode">
+                    <option value="off">Off</option>
+                    <option value="all">End all</option>
+                    <option value="specific">End specific…</option>
+                  </select>
+                </div>
+                <select
+                  v-if="model.endLintMode === 'specific'"
+                  class="code-multiselect"
+                  multiple
+                  size="8"
+                  v-model="model.endLintCodes"
+                >
+                  <option v-for="c in lintCodes" :key="c.code" :value="c.code" :title="c.description">
+                    {{ c.code }} — {{ c.description }}
+                  </option>
+                </select>
+              </template>
+            </div>
+
+            <div v-if="addableSettings.length" v-show="addFieldVisible('settings', addableSettings)" class="field add-field">
+              <div class="sub-row">
+                <select
+                  class="add-field-select"
+                  @change="addField(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''"
+                >
+                  <option value="">(select a field to add…)</option>
+                  <option v-for="f in addableSettings" :key="f.id" :value="f.id">{{ f.label }}</option>
+                </select>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <div v-if="searchActive && !anyVisible" class="no-results">
+        No properties found for "{{ searchQuery.trim() }}"
       </div>
 
-      <template v-if="boundBlock">
-        <p v-if="!boundBlock.valid" class="warning">
-          This comment contains invalid JSON. Applying will replace it with the
-          values below.
-        </p>
-
-        <div v-if="showDesc" class="field">
-          <label>Description</label>
-          <textarea
-            v-model="model.desc"
-            rows="2"
-            placeholder="What this definition does"
-          ></textarea>
-        </div>
-
-        <div v-if="showParams" class="field">
-          <label>Parameter types</label>
-          <div v-for="(_, i) in model.paramTypes" :key="'pt' + i" class="list-row">
-            <select v-model="model.paramTypes[i]">
-              <option value="">(none)</option>
-              <optgroup v-if="showFunctionTypes" label="Function">
-                <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
-              </optgroup>
-              <optgroup v-if="showMacroTypes" label="Macro (TokenType)">
-                <option v-for="t in macroTypes" :key="t" :value="t">{{ t }}</option>
-              </optgroup>
-            </select>
-            <button class="icon-button" title="Remove" @click="model.paramTypes.splice(i, 1)">✕</button>
-          </div>
-          <button class="add-button" @click="model.paramTypes.push('')">+ Add type</button>
-        </div>
-
-        <div v-if="showParams" class="field">
-          <label>Parameter descriptions</label>
-          <div v-for="(_, i) in model.paramDesc" :key="'pd' + i" class="list-row">
-            <input type="text" v-model="model.paramDesc[i]" placeholder="Description" />
-            <button class="icon-button" title="Remove" @click="model.paramDesc.splice(i, 1)">✕</button>
-          </div>
-          <button class="add-button" @click="model.paramDesc.push('')">+ Add description</button>
-        </div>
-
-        <div v-if="showReturnType" class="field">
-          <label>Return type</label>
-          <select v-model="model.returnType">
-            <option value="">(none)</option>
-            <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
-          </select>
-        </div>
-
-        <div v-if="showSettings" class="field">
-          <label>Settings (#settings directive)</label>
-          <div v-for="(row, i) in model.settings" :key="'s' + i" class="setting-row">
-            <div class="list-row">
-              <select v-model="row.key" @change="setting.seedDefault(row)">
-                <option value="">(select)</option>
-                <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
-              </select>
-              <select v-if="setting.type(row.key) === 'boolean'" v-model="row.value">
-                <option value="true">true</option>
-                <option value="false">false</option>
-              </select>
-              <select v-else-if="setting.type(row.key) === 'enum'" v-model="row.value">
-                <option v-for="opt in setting.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
-              <input
-                v-else
-                :type="setting.type(row.key) === 'number' ? 'number' : 'text'"
-                :class="{ 'input-invalid': !!setting.error(row) }"
-                :min="setting.min(row.key)"
-                :max="setting.max(row.key)"
-                :step="setting.step(row.key)"
-                v-model="row.value"
-              />
-              <span v-if="row.key" class="setting-info" :title="setting.detail(row.key)">ⓘ</span>
-              <button class="icon-button" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
-            </div>
-            <div v-if="setting.error(row)" class="setting-error">{{ setting.error(row) }}</div>
-          </div>
-          <button class="add-button" @click="model.settings.push({ key: '', value: '' })">+ Add setting</button>
-        </div>
-
-        <div v-if="showPdf" class="field">
-          <label>PDF export</label>
-          <p class="section-desc">
-            Applies to the whole document when it is exported to PDF, overriding the
-            defaults on the Settings tab key by key.
-          </p>
-          <div v-for="(row, i) in model.pdf" :key="'p' + i" class="setting-row">
-            <div class="list-row">
-              <select v-model="row.key" @change="pdf.seedDefault(row)">
-                <option value="">(select)</option>
-                <option v-for="s in pdfKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
-              </select>
-              <select v-if="pdf.type(row.key) === 'boolean'" v-model="row.value">
-                <option value="true">true</option>
-                <option value="false">false</option>
-              </select>
-              <select v-else-if="pdf.type(row.key) === 'enum'" v-model="row.value">
-                <option v-for="opt in pdf.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-              </select>
-              <input
-                v-else
-                :type="pdf.type(row.key) === 'number' ? 'number' : 'text'"
-                :class="{ 'input-invalid': !!pdf.error(row) }"
-                :min="pdf.min(row.key)"
-                :max="pdf.max(row.key)"
-                :step="pdf.step(row.key)"
-                v-model="row.value"
-              />
-              <span v-if="row.key" class="setting-info" :title="pdf.detail(row.key)">ⓘ</span>
-              <button class="icon-button" title="Remove" @click="model.pdf.splice(i, 1)">✕</button>
-            </div>
-            <div v-if="pdf.error(row)" class="setting-error">{{ pdf.error(row) }}</div>
-          </div>
-          <button class="add-button" @click="model.pdf.push({ key: '', value: '' })">+ Add PDF setting</button>
-        </div>
-
-        <div v-if="showUi" class="field">
-          <label>#UI Control</label>
-          <p v-if="uiBlock && !uiBlock.valid" class="warning">
-            This #UI directive contains invalid JSON. Applying will replace it with the values below.
-          </p>
-
-          <div class="sub-row">
-            <span class="sub-label">Type</span>
-            <select v-model="model.ui.type">
-              <option v-for="opt in uiTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-          <div class="sub-row">
-            <span class="sub-label">Mode</span>
-            <select v-model="model.ui.mode">
-              <option v-for="opt in uiModeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-          <div class="sub-row">
-            <span class="sub-label">Style class</span>
-            <input type="text" v-model="model.ui.style" />
-          </div>
-          <div class="sub-row">
-            <span class="sub-label">Report style class</span>
-            <input type="text" v-model="model.ui.reportStyle" />
-          </div>
-          <div class="sub-row">
-            <span class="sub-label" title="Off puts the unit in the control instead of leaving it in the document.">Keep the unit</span>
-            <select v-model="model.ui.forceUnits">
-              <option :value="''">(default: on)</option>
-              <option :value="true">On</option>
-              <option :value="false">Off</option>
-            </select>
-          </div>
-          <div class="sub-row">
-            <span class="sub-label" title="Accept any expression, written to the document verbatim. Turns 'Keep the unit' off.">Allow expressions</span>
-            <select v-model="model.ui.allowExpression">
-              <option :value="''">(default: off)</option>
-              <option :value="true">On</option>
-              <option :value="false">Off</option>
-            </select>
-          </div>
-
-          <template v-if="model.ui.type === 'datagrid'">
-            <div class="sub-row">
-              <span class="sub-label">Rows</span>
-              <input type="number" min="0" v-model.number="model.ui.rows" />
-            </div>
-            <div class="sub-row">
-              <span class="sub-label">Columns</span>
-              <input type="number" min="0" v-model.number="model.ui.columns" />
-            </div>
-
-            <label>Column headers</label>
-            <div v-for="(_, i) in model.ui.columnHeaders" :key="'ch' + i" class="list-row">
-              <input type="text" v-model="model.ui.columnHeaders[i]" />
-              <button class="icon-button" title="Remove" @click="model.ui.columnHeaders.splice(i, 1)">✕</button>
-            </div>
-            <button class="add-button" @click="model.ui.columnHeaders.push('')">+ Add column header</button>
-
-            <label>Row headers</label>
-            <div v-for="(_, i) in model.ui.rowHeaders" :key="'rh' + i" class="list-row">
-              <input type="text" v-model="model.ui.rowHeaders[i]" />
-              <button class="icon-button" title="Remove" @click="model.ui.rowHeaders.splice(i, 1)">✕</button>
-            </div>
-            <button class="add-button" @click="model.ui.rowHeaders.push('')">+ Add row header</button>
-
-            <div class="sub-row">
-              <span class="sub-label" title="Pixels, or a percentage of the line such as 75%. Natural width when empty.">Grid width</span>
-              <input type="text" placeholder="100%" v-model="model.ui.width" />
-            </div>
-            <div class="sub-row">
-              <span class="sub-label">Row header width</span>
-              <input type="number" min="1" v-model.number="model.ui.rowHeaderWidth" />
-            </div>
-
-            <label>Column widths</label>
-            <div v-for="(_, i) in model.ui.columnWidths" :key="'cw' + i" class="list-row">
-              <input type="number" min="1" v-model.number="model.ui.columnWidths[i]" />
-              <button class="icon-button" title="Remove" @click="model.ui.columnWidths.splice(i, 1)">✕</button>
-            </div>
-            <button class="add-button" @click="model.ui.columnWidths.push('')">+ Add column width</button>
-          </template>
-
-          <template v-if="model.ui.type === 'dropdown' || model.ui.type === 'radio'">
-            <label>Options (key / value)</label>
-            <div v-for="(_, i) in model.ui.keys" :key="'kv' + i" class="list-row">
-              <input type="text" placeholder="Key" v-model="model.ui.keys[i]" />
-              <input type="text" placeholder="Value" v-model="model.ui.values[i]" />
-              <button class="icon-button" title="Remove" @click="removeUiOption(i)">✕</button>
-            </div>
-            <button class="add-button" @click="model.ui.keys.push(''); model.ui.values.push('')">+ Add option</button>
-            <div v-if="uiKeysValuesError" class="setting-error">{{ uiKeysValuesError }}</div>
-          </template>
-        </div>
-
-        <div v-if="showUiOverrides" class="field">
-          <label>Saved #UI values</label>
-          <p class="section-desc">
-            Values entered into the input form. Click a name to go to the #UI line that
-            declares it.
-          </p>
-          <p v-if="!uiControlsResolved" class="section-desc">
-            Checking which controls still exist…
-          </p>
-          <p v-else-if="unusedOverrides.length" class="warning">
-            {{ unusedOverrides.length }} value{{ unusedOverrides.length === 1 ? '' : 's' }}
-            no longer match a #UI control.
-          </p>
-
-          <div v-for="(row, i) in overrideRows" :key="'uo' + row.key" class="list-row">
-            <button
-              class="key-button"
-              :disabled="row.line === null"
-              :title="row.line === null ? 'No #UI control uses this value' : `Go to line ${row.line}`"
-              @click="goToOverride(row)"
-            >{{ row.key }}</button>
-            <input type="text" v-model="model.uiOverrides[i].value" />
-            <span v-if="uiControlsResolved && !row.used" class="unused-badge">unused</span>
-            <button class="icon-button" title="Remove" @click="model.uiOverrides.splice(i, 1)">✕</button>
-          </div>
-
-          <div class="sub-row">
-            <button
-              class="add-button"
-              :disabled="!unusedOverrides.length"
-              :title="uiControlsResolved ? undefined : 'Waiting for the document to be rendered'"
-              @click="purgeUnused"
-            >Purge unused</button>
-          </div>
-        </div>
-
-        <div v-if="showLint" class="field">
-          <label>Lint ignore</label>
-
-          <div class="sub-row">
-            <span class="sub-label">Start region</span>
-            <select v-model="model.startLintMode">
-              <option value="off">Off</option>
-              <option value="all">Ignore all</option>
-              <option value="specific">Ignore specific…</option>
-            </select>
-          </div>
-          <select
-            v-if="model.startLintMode === 'specific'"
-            class="code-multiselect"
-            multiple
-            size="8"
-            v-model="model.startLintCodes"
-          >
-            <option v-for="c in lintCodes" :key="c.code" :value="c.code" :title="c.description">
-              {{ c.code }} — {{ c.description }}
-            </option>
-          </select>
-
-          <template v-if="showEndLint">
-            <div class="sub-row">
-              <span class="sub-label">End region</span>
-              <select v-model="model.endLintMode">
-                <option value="off">Off</option>
-                <option value="all">End all</option>
-                <option value="specific">End specific…</option>
-              </select>
-            </div>
-            <select
-              v-if="model.endLintMode === 'specific'"
-              class="code-multiselect"
-              multiple
-              size="8"
-              v-model="model.endLintCodes"
-            >
-              <option v-for="c in lintCodes" :key="c.code" :value="c.code" :title="c.description">
-                {{ c.code }} — {{ c.description }}
-              </option>
-            </select>
-          </template>
-        </div>
-
-        <div v-if="addableFields.length" class="field add-field">
-          <label>Add field</label>
-          <div class="sub-row">
-            <select
-              class="add-field-select"
-              @change="addField(($event.target as HTMLSelectElement).value); ($event.target as HTMLSelectElement).value = ''"
-            >
-              <option value="">(select a field to add…)</option>
-              <option v-for="f in addableFields" :key="f.id" :value="f.id">{{ f.label }}</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="primary-button" :disabled="hasErrors" :title="hasErrors ? 'Fix the highlighted fields before applying' : undefined" @click="onApply">Apply</button>
-          <button class="secondary-button" @click="clearDraft">Reset</button>
-        </div>
-      </template>
+      <div v-if="boundBlock && !sourceUnavailable && ((sectionVisible('fields') && bodyVisible('fields')) || (sectionVisible('settings') && bodyVisible('settings')))" class="actions line-actions">
+        <button :disabled="hasErrors" :title="hasErrors ? 'Fix the highlighted fields before applying' : `Apply the Fields and Settings to line ${boundBlock.line + 1}`" @click="onApply">Apply</button>
+        <button class="secondary" @click="clearDraft">Reset</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { reactive, ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import {
   FUNCTION_PARAM_TYPES,
   MACRO_PARAM_TYPES,
@@ -344,25 +399,187 @@ import { PDF_SETTING_KEYS } from '../../types/pdf-settings'
 import { specForKey, validateCatalogValue } from '../../types/catalog'
 import type { MetadataSettingKey } from '../../types/catalog'
 import { UI_PROPERTY_KEYS } from '../../text/ui-directive'
+import { FILE_INFO_KEY, UI_OVERRIDES_KEY } from '../../services/metadata-footer'
 import type { UiDirectiveData } from '../../text/ui-directive'
-import { classifyUiOverrides } from '../../services/ui-overrides'
 import { getMetadataDraft, setMetadataDraft, clearMetadataDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { MetadataDraft } from '../metadata-drafts'
-import type { UiControl, UiOverrideRow } from '../../services/ui-overrides'
+import type { UiControl, UiOverrides } from '../../services/ui-overrides'
+import type { FileInfo } from '../../services/file-info'
+import CollapseAllButton from './CollapseAllButton.vue'
+import CalcpadSearchField from './CalcpadSearchField.vue'
+import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
+import CalcpadFileInfoSection from './CalcpadFileInfoSection.vue'
+import CalcpadUiOverridesSection from './CalcpadUiOverridesSection.vue'
+
+const { t } = useI18n()
 
 interface Props {
   block?: MetadataCommentBlock | null
   /** Controls of the last input-form render, or null until the host resolves them. */
   uiControls?: UiControl[] | null
+  fileInfo?: FileInfo | null
+  savedUiOverrides?: UiOverrides
+  hasDocument?: boolean
+  /** Document the file info and saved #UI values came from. */
+  docKey?: string
+  userName?: string
+  /** Input mode: only File Info stays editable. */
+  sourceUnavailable?: boolean
+  sourceUnavailableNote?: string
 }
-const props = withDefaults(defineProps<Props>(), { block: null, uiControls: null })
+const props = withDefaults(defineProps<Props>(), {
+  block: null,
+  uiControls: null,
+  fileInfo: null,
+  savedUiOverrides: () => ({}),
+  hasDocument: false,
+  docKey: '',
+  userName: '',
+  sourceUnavailable: false,
+  sourceUnavailableNote: '',
+})
 
 const emit = defineEmits<{
   'apply': [payload: { data: MetadataCommentData; settings: SettingsValues; ui?: UiDirectiveData; block: MetadataCommentBlock }]
   'go-to-line': [line: number]
   'refresh-ui-controls': []
   'draft-dirty': [payload: { docKey: string; dirty: boolean }]
+  'update-file-info': [patch: Partial<FileInfo>]
+  'mark-reviewed': []
+  'open-settings': []
+  'file-info-draft-dirty': [payload: { docKey: string; dirty: boolean }]
+  'update-ui-overrides': [overrides: UiOverrides]
+  'ui-overrides-draft-dirty': [payload: { docKey: string; dirty: boolean }]
 }>()
+
+const SECTIONS = ['fileInfo', 'uiOverrides', 'fields', 'settings']
+
+const searchQuery = ref('')
+const query = computed(() => searchQuery.value.trim().toLowerCase())
+const searchActive = computed(() => query.value.length > 0)
+
+const keyLabels = (keys: { key: string; label: string }[]) => keys.map(k => `${k.key} ${k.label}`).join(' ')
+
+// Section titles and per-row search keywords, as in the Settings tab.
+const SECTION_META: Record<string, { title: string; rows: Record<string, string> }> = {
+  fileInfo: {
+    title: 'File Info',
+    rows: {
+      title: 'title pdf header name',
+      project: 'project',
+      details: 'author created last updated by program version date',
+      review: 'review reviewed reviewer set as reviewed clear',
+    },
+  },
+  uiOverrides: {
+    title: 'UI Overrides',
+    rows: { values: 'saved #ui values input form entered purge unused' },
+  },
+  fields: {
+    title: 'Fields',
+    rows: {
+      desc: 'description desc documentation',
+      params: 'parameter types descriptions paramtypes paramdesc arguments',
+      returnType: 'return type returntype',
+      ui: '#ui control type mode style class report keep unit allow expressions dropdown radio checkbox datagrid entry options rows columns headers widths',
+      addField: 'add field',
+    },
+  },
+  settings: {
+    title: 'Settings',
+    rows: {
+      pdf: `pdf export ${keyLabels(PDF_SETTING_KEYS)}`.toLowerCase(),
+      settingsDirective: `#settings directive ${keyLabels(METADATA_SETTINGS_KEYS)}`.toLowerCase(),
+      lint: 'lint ignore lintignore endlintignore diagnostics region codes',
+      addField: 'add field',
+    },
+  },
+}
+
+const titleMatches = (id: string) => SECTION_META[id].title.toLowerCase().includes(query.value)
+
+const rowVisible = (id: string, key: string) =>
+  !searchActive.value || titleMatches(id) || (SECTION_META[id].rows[key] || '').includes(query.value)
+
+// Saved override names and values are searchable too.
+const overridesMatch = computed(() => Object.entries(props.savedUiOverrides)
+  .some(([k, v]) => k.toLowerCase().includes(query.value) || v.toLowerCase().includes(query.value)))
+
+const sectionVisible = (id: string) => {
+  if (!searchActive.value || titleMatches(id)) return true
+  if (id === 'uiOverrides' && overridesMatch.value) return true
+  return Object.values(SECTION_META[id].rows).some(r => r.includes(query.value))
+}
+
+// A field the cursor's line doesn't show is still reachable through "add field".
+const addFieldVisible = (id: string, options: { label: string }[]) =>
+  rowVisible(id, 'addField') || options.some(o => o.label.toLowerCase().includes(query.value))
+
+const anyVisible = computed(() => SECTIONS.some(id => sectionVisible(id)))
+
+// Narrows the override rows unless the search matched the section itself.
+const uiOverridesFilter = computed(() =>
+  !searchActive.value || titleMatches('uiOverrides') || rowVisible('uiOverrides', 'values') ? '' : query.value)
+const COLLAPSED_KEY = 'calcpad.properties.collapsed'
+const collapsed = reactive<Record<string, boolean>>({})
+try {
+  Object.assign(collapsed, JSON.parse(localStorage.getItem(COLLAPSED_KEY) || '{}'))
+} catch {
+  // ignore unavailable/corrupt storage
+}
+watch(collapsed, () => {
+  try {
+    localStorage.setItem(COLLAPSED_KEY, JSON.stringify(collapsed))
+  } catch {
+    // ignore unavailable storage
+  }
+}, { deep: true })
+
+const isCollapsed = (id: string) => !!collapsed[id]
+const toggle = (id: string) => { collapsed[id] = !collapsed[id] }
+const bodyVisible = (id: string) => searchActive.value || !collapsed[id]
+const setAll = (value: boolean) => { for (const id of SECTIONS) collapsed[id] = value }
+const allCollapsed = computed(() => SECTIONS.every(id => collapsed[id]))
+
+// Each section's draft reports itself; only the current document's flag shows in its header.
+const fileInfoDirtyByDoc = reactive<Record<string, boolean>>({})
+const uiOverridesDirtyByDoc = reactive<Record<string, boolean>>({})
+const fileInfoDirty = computed(() => !!fileInfoDirtyByDoc[props.docKey])
+const uiOverridesDirty = computed(() => !!uiOverridesDirtyByDoc[props.docKey])
+
+function onFileInfoDirty(payload: { docKey: string; dirty: boolean }) {
+  fileInfoDirtyByDoc[payload.docKey] = payload.dirty
+  emit('file-info-draft-dirty', payload)
+}
+
+function onUiOverridesDirty(payload: { docKey: string; dirty: boolean }) {
+  uiOverridesDirtyByDoc[payload.docKey] = payload.dirty
+  emit('ui-overrides-draft-dirty', payload)
+}
+
+const container = ref<HTMLElement | null>(null)
+
+interface RevealTarget { section: string; anchor: string }
+
+/** The section a cursor target is edited in, or null for a plain line. */
+function revealTargetFor(b: MetadataCommentBlock | null): RevealTarget | null {
+  if (!b) return null
+  const data = b.isNew ? {} : b.data ?? {}
+  if (FILE_INFO_KEY in data) return { section: 'fileInfo', anchor: 'fileInfo' }
+  if (UI_OVERRIDES_KEY in data) return { section: 'uiOverrides', anchor: 'uiOverrides' }
+  if (b.settingsLine != null) return { section: 'settings', anchor: 'settingsDirective' }
+  if (data.pdf) return { section: 'settings', anchor: 'pdf' }
+  if (data.LintIgnore || data.EndLintIgnore) return { section: 'settings', anchor: 'lint' }
+  if (b.uiDirective || b.context?.defName) return { section: 'fields', anchor: 'fields' }
+  return null
+}
+
+function reveal(target: RevealTarget) {
+  collapsed[target.section] = false
+  void nextTick(() => container.value
+    ?.querySelector(`[data-anchor="${target.anchor}"]`)
+    ?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
+}
 
 /** The block the form is editing - not the one under the cursor while edits are held. */
 const boundBlock = ref<MetadataCommentBlock | null>(null)
@@ -375,7 +592,7 @@ const lintCodes = LINT_CODES
 
 type LintMode = 'off' | 'all' | 'specific'
 
-const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'pdf', 'uiOverrides'])
+const KNOWN_KEYS = new Set(['desc', 'paramTypes', 'paramDesc', 'returnType', 'LintIgnore', 'EndLintIgnore', 'pdf'])
 
 interface SettingRow { key: string; value: string }
 
@@ -390,7 +607,6 @@ const model = reactive({
   startLintCodes: [] as string[],
   endLintMode: 'off' as LintMode,
   endLintCodes: [] as string[],
-  uiOverrides: [] as SettingRow[],
   extra: {} as Record<string, unknown>,
   ui: {
     type: '',
@@ -486,31 +702,6 @@ function removeUiOption(i: number) {
   model.ui.values.splice(i, 1)
 }
 
-// Entered #UI values live in a document-level comment, so the section shows up exactly
-// where that comment does: the cursor is on the object being edited. It stays up once
-// shown, so emptying the list leaves somewhere to press Apply from.
-const showUiOverrides = ref(false)
-
-// Until the host reports what the document actually renders, nothing can be called
-// stale — an unrendered document would otherwise look like every value is orphaned.
-const uiControlsResolved = computed(() => props.uiControls !== null)
-
-const overrideRows = computed(() => classifyUiOverrides(
-  Object.fromEntries(model.uiOverrides.map(r => [r.key, r.value])),
-  props.uiControls ?? []))
-
-const unusedOverrides = computed(() =>
-  uiControlsResolved.value ? overrideRows.value.filter(r => !r.used) : [])
-
-function purgeUnused() {
-  const stale = new Set(unusedOverrides.value.map(r => r.key))
-  model.uiOverrides = model.uiOverrides.filter(r => !stale.has(r.key))
-}
-
-function goToOverride(row: UiOverrideRow) {
-  if (row.line !== null) emit('go-to-line', row.line)
-}
-
 const showLint = computed(() =>
   noContext.value
   || !isDefinition.value
@@ -537,8 +728,14 @@ const addableFields = computed(() => {
   if (!showDesc.value) out.push({ id: 'desc', label: 'Description' })
   if (!showParams.value) out.push({ id: 'params', label: 'Parameter types & descriptions' })
   if (!showReturnType.value) out.push({ id: 'returnType', label: 'Return type' })
-  if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
+  return out
+})
+
+const addableSettings = computed(() => {
+  const out: { id: string; label: string }[] = []
+  if (isDefinition.value) return out
   if (!showPdf.value) out.push({ id: 'pdf', label: 'PDF export' })
+  if (!showLint.value) out.push({ id: 'lint', label: 'Lint ignore' })
   return out
 })
 
@@ -608,7 +805,7 @@ const hasErrors = computed(() => hasSettingErrors.value || hasPdfErrors.value ||
 
 /** Everything the user can change; compared as text to tell edited from untouched. */
 function snapshot(): string {
-  return JSON.stringify({ model, added: [...added], showUiOverrides: showUiOverrides.value })
+  return JSON.stringify({ model, added: [...added] })
 }
 
 const baseline = ref('')
@@ -655,7 +852,6 @@ function restoreDraft(draft: MetadataDraft) {
   Object.assign(model, state.model)
   added.clear()
   for (const id of state.added as string[]) added.add(id)
-  showUiOverrides.value = state.showUiOverrides
   boundBlock.value = draft.block
   baseline.value = draft.baseline
   lastSignature = blockSignature(draft.block)
@@ -708,10 +904,6 @@ function populate() {
   model.pdf = data.pdf && typeof data.pdf === 'object' && !Array.isArray(data.pdf)
     ? Object.entries(data.pdf).map(([key, value]) => ({ key, value: String(value) }))
     : []
-  model.uiOverrides = data.uiOverrides && typeof data.uiOverrides === 'object' && !Array.isArray(data.uiOverrides)
-    ? Object.entries(data.uiOverrides).map(([key, value]) => ({ key, value: String(value) }))
-    : []
-  showUiOverrides.value = model.uiOverrides.length > 0
   ;[model.startLintMode, model.startLintCodes] = readLintField(data.LintIgnore)
   ;[model.endLintMode, model.endLintCodes] = readLintField(data.EndLintIgnore)
   const extra: Record<string, unknown> = {}
@@ -779,11 +971,6 @@ function onApply() {
   const pdfValues = pdf.collect(model.pdf)
   // cleanMetadata drops an empty object, so clearing every row removes the key.
   if (Object.keys(pdfValues).length) data.pdf = pdfValues as PdfCommentValues
-
-  // Sent even when emptied: cleanMetadata drops the empty object from the comment, but
-  // the host still needs to hear that the values are gone so its in-memory ones follow.
-  if (showUiOverrides.value)
-    data.uiOverrides = Object.fromEntries(model.uiOverrides.map(r => [r.key, r.value]))
 
   const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore
@@ -870,17 +1057,14 @@ watch(
 
     const sig = blockSignature(block)
     if (sig === lastSignature) return
+    const previous = revealTargetFor(boundBlock.value)
+    const previousLine = boundBlock.value?.line
     bind(block)
+    const target = revealTargetFor(block)
+    if (target && (target.anchor !== previous?.anchor || block?.line !== previousLine)) reveal(target)
   },
   { immediate: true },
 )
-
-// Resolving the controls means rendering the document, so it waits until a comment
-// carrying values is actually under the cursor. The host retires the list when the
-// document is edited, which is what re-checks the values against a renamed #UI line.
-watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
-  if (shown && !resolved) emit('refresh-ui-controls')
-}, { immediate: true })
 </script>
 
 <style scoped>
@@ -890,17 +1074,74 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   flex-direction: column;
 }
 
+.metadata-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  background: var(--vscode-editor-background);
+}
+
 .metadata-container {
   overflow-y: auto;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 12px;
 }
 
-.section-title {
-  margin: 0 0 8px 0;
-  font-size: var(--calcpad-font-size-lg);
-  font-weight: 600;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 8px 0;
+  color: var(--vscode-sideBarSectionHeader-foreground);
+  font-weight: bold;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  padding-bottom: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.metadata-section:first-child .section-header {
+  margin-top: 0;
+}
+
+.section-header:hover {
   color: var(--vscode-foreground);
+}
+
+.expand-icon {
+  transition: transform 0.2s;
+}
+
+.expand-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.search-active .expand-icon {
+  visibility: hidden;
+}
+
+.metadata-search {
+  flex: 1;
+}
+
+.no-results {
+  padding: 16px 4px;
+  color: var(--vscode-descriptionForeground);
+  text-align: center;
+}
+
+.note {
+  margin: 0 0 12px 0;
+  color: var(--vscode-descriptionForeground);
+  line-height: 1.5;
+}
+
+.line-actions {
+  margin-top: 16px;
 }
 
 .bound-target {
@@ -914,7 +1155,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   border-radius: 4px;
   border-left: 2px solid var(--target-color);
   background: var(--vscode-textCodeBlock-background);
-  font-size: var(--calcpad-font-size-md);
   transition: border-color 150ms ease;
 }
 
@@ -936,7 +1176,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   border: none;
   padding: 0;
   color: var(--vscode-descriptionForeground);
-  font-size: var(--calcpad-font-size-sm);
   cursor: pointer;
 }
 
@@ -949,7 +1188,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   flex: none;
   color: var(--target-color);
   opacity: 0.85;
-  font-size: var(--calcpad-font-size-sm);
   font-style: italic;
   transition: color 150ms ease;
 }
@@ -973,7 +1211,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
 }
 
 .section-desc {
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-descriptionForeground);
   margin: 0 0 16px 0;
   line-height: 1.5;
@@ -983,11 +1220,9 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   background: var(--vscode-textCodeBlock-background);
   padding: 1px 4px;
   border-radius: 2px;
-  font-size: var(--calcpad-font-size-sm);
 }
 
 .warning {
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-editorWarning-foreground, #cca700);
   margin: 0 0 12px 0;
   line-height: 1.5;
@@ -999,7 +1234,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
 
 .field > label {
   display: block;
-  font-size: var(--calcpad-font-size-md);
   font-weight: 600;
   color: var(--vscode-foreground);
   margin-bottom: 6px;
@@ -1023,12 +1257,10 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
 .setting-info {
   cursor: help;
   color: var(--vscode-descriptionForeground);
-  font-size: var(--calcpad-font-size-sm);
 }
 
 .setting-error {
   color: var(--vscode-errorForeground, #f14c4c);
-  font-size: var(--calcpad-font-size-sm);
   margin-top: 2px;
   margin-left: 2px;
 }
@@ -1047,7 +1279,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
 
 .sub-label {
   min-width: 80px;
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-foreground);
 }
 
@@ -1058,7 +1289,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border, transparent);
   padding: 4px 6px;
-  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
   border-radius: 2px;
 }
@@ -1069,7 +1299,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   background: var(--vscode-input-background);
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border, transparent);
-  font-size: var(--calcpad-font-size-sm);
   font-family: var(--vscode-font-family);
   border-radius: 2px;
   padding: 2px;
@@ -1091,7 +1320,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border, transparent);
   padding: 4px 6px;
-  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-font-family);
   border-radius: 2px;
 }
@@ -1101,39 +1329,239 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   resize: vertical;
 }
 
-.icon-button {
-  background: transparent;
+.checkbox-label {
+  margin-top: 0;
+}
+
+.metadata-container {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 8px 0;
+  color: var(--vscode-sideBarSectionHeader-foreground);
+  font-weight: bold;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  padding-bottom: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.metadata-section:first-child .section-header {
+  margin-top: 0;
+}
+
+.section-header:hover {
+  color: var(--vscode-foreground);
+}
+
+.expand-icon {
+  transition: transform 0.2s;
+}
+
+.expand-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.note {
+  margin: 0 0 12px 0;
+  color: var(--vscode-descriptionForeground);
+  line-height: 1.5;
+}
+
+.line-actions {
+  margin-top: 16px;
+}
+
+.bound-target {
+  --target-color: var(--vscode-descriptionForeground);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin: 0 0 12px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 2px solid var(--target-color);
+  background: var(--vscode-textCodeBlock-background);
+  transition: border-color 150ms ease;
+}
+
+.bound-target.kind-variable {
+  --target-color: var(--vscode-symbolIcon-variableForeground);
+}
+
+.bound-target.kind-function {
+  --target-color: var(--vscode-symbolIcon-functionForeground);
+}
+
+.bound-target.kind-macro {
+  --target-color: var(--vscode-symbolIcon-classForeground);
+}
+
+.line-chip {
+  flex: none;
+  background: none;
   border: none;
+  padding: 0;
   color: var(--vscode-descriptionForeground);
   cursor: pointer;
+}
+
+.line-chip:hover {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: underline;
+}
+
+.target-kind {
+  flex: none;
+  color: var(--target-color);
+  opacity: 0.85;
+  font-style: italic;
+  transition: color 150ms ease;
+}
+
+.target-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--vscode-editor-font-family);
+  font-weight: 600;
+  color: var(--target-color);
+  transition: color 150ms ease;
+}
+
+.dirty-mark {
+  flex: none;
+  margin-left: auto;
+  color: var(--vscode-gitDecoration-modifiedResourceForeground);
+  font-weight: 700;
+}
+
+.section-desc {
+  color: var(--vscode-descriptionForeground);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.section-desc code {
+  background: var(--vscode-textCodeBlock-background);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.warning {
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field > label {
+  display: block;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  margin-bottom: 6px;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.setting-row {
+  margin-bottom: 6px;
+}
+
+.setting-row .list-row {
+  margin-bottom: 0;
+}
+
+.setting-info {
+  cursor: help;
+  color: var(--vscode-descriptionForeground);
+}
+
+.setting-error {
+  color: var(--vscode-errorForeground, #f14c4c);
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
+.input-invalid {
+  border-color: var(--vscode-inputValidation-errorBorder, #f14c4c) !important;
+  outline: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
+}
+
+.sub-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.sub-label {
+  min-width: 80px;
+  color: var(--vscode-foreground);
+}
+
+.sub-row select {
+  flex: 1;
+  min-width: 0;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  padding: 4px 6px;
+  font-family: var(--vscode-font-family);
+  border-radius: 2px;
+}
+
+.code-multiselect {
+  width: 100%;
+  margin-bottom: 8px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  font-family: var(--vscode-font-family);
+  border-radius: 2px;
+  padding: 2px;
+}
+
+.code-multiselect option {
   padding: 2px 4px;
-  font-size: var(--calcpad-font-size-sm);
-  border-radius: 2px;
-  flex: 0 0 auto;
 }
 
-.icon-button:hover {
-  background: var(--vscode-toolbar-hoverBackground);
-  color: var(--vscode-foreground);
-}
-
-.add-button {
-  background: transparent;
-  border: 1px dashed var(--vscode-input-border, var(--vscode-widget-border));
-  color: var(--vscode-foreground);
-  cursor: pointer;
-  padding: 3px 8px;
-  font-size: var(--calcpad-font-size-sm);
+.field textarea,
+.field input[type="text"],
+.field input[type="number"],
+.field > select,
+.list-row input,
+.list-row select {
+  flex: 1;
+  min-width: 0;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  padding: 4px 6px;
+  font-family: var(--vscode-font-family);
   border-radius: 2px;
 }
 
-.add-button:hover:not(:disabled) {
-  background: var(--vscode-toolbar-hoverBackground);
-}
-
-.add-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.field textarea {
+  width: 100%;
+  resize: vertical;
 }
 
 .key-button {
@@ -1147,7 +1575,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   border: none;
   padding: 2px 4px;
   border-radius: 2px;
-  font-size: var(--calcpad-font-size-md);
   font-family: var(--vscode-editor-font-family, monospace);
   color: var(--vscode-textLink-foreground);
   cursor: pointer;
@@ -1165,7 +1592,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
 
 .unused-badge {
   flex: 0 0 auto;
-  font-size: var(--calcpad-font-size-xs);
   padding: 1px 4px;
   border-radius: 2px;
   color: var(--vscode-editorWarning-foreground, #cca700);
@@ -1177,7 +1603,6 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: var(--calcpad-font-size-md);
   color: var(--vscode-foreground);
   margin-top: 8px;
 }
@@ -1190,40 +1615,5 @@ watch([showUiOverrides, uiControlsResolved], ([shown, resolved]) => {
   display: flex;
   gap: 8px;
   margin-top: 8px;
-}
-
-.primary-button {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  padding: 6px 14px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.primary-button:hover:not(:disabled) {
-  background: var(--vscode-button-hoverBackground);
-}
-
-.primary-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.secondary-button {
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
-  border: none;
-  padding: 6px 14px;
-  font-size: var(--calcpad-font-size-md);
-  font-family: var(--vscode-font-family);
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.secondary-button:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
 }
 </style>

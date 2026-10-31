@@ -63,7 +63,7 @@ namespace Calcpad.Core
                     switch (t.Type)
                     {
                         case TokenTypes.Constant:
-                            var value = ((ValueToken)t).Value;
+                            var value = _parser.CheckConstant(((ValueToken)t).Value);
                             StackPush(value);
                             continue;
                         case TokenTypes.Unit:
@@ -222,6 +222,15 @@ namespace Calcpad.Core
                 return MatrixCalculator.LUDecomposition(a, hpVector);
             }
 
+            internal IValue GetVariableValue(Variable v, string name)
+            {
+                var value = v.Value;
+                if (value is ComplexValue c && !c.IsReal && !_parser._settings.IsComplex)
+                    throw Exceptions.ComplexVariableInRealMode(name);
+
+                return value;
+            }
+
             private IValue EvaluateVariableToken(VariableToken t)
             {
                 var type = t.Type;
@@ -229,7 +238,7 @@ namespace Calcpad.Core
                 if (v.IsInitialized ||
                     type == TokenTypes.Vector ||
                     type == TokenTypes.Matrix)
-                    return v.Value;
+                    return GetVariableValue(v, t.Content);
 
                 var s = t.Content;
                 try
@@ -459,65 +468,100 @@ namespace Calcpad.Core
 
             internal IValue EvaluateFunction(CustomFunction cf, int[] map, IValue[] supplied)
             {
-                if (cf.Function is null)
+                try
                 {
-                    cf.Function = _parser.CompileRpn(cf.Rpn);
-                    if (cf.DefaultFunctions is not null)
-                        Array.Clear(cf.DefaultFunctions);
-                }
-                var arguments = new IValue[cf.ParameterCount];
-                for (var k = 0; k < map.Length; ++k)
-                    arguments[map[k]] = supplied[k];
-
-                var parameters = cf.Parameters;
-                for (var i = 0; i < arguments.Length; ++i)
-                {
-                    if (arguments[i] is null)
+                    if (cf.Function is null)
                     {
-                        var rpn = cf.Defaults?[i] ?? throw Exceptions.InvalidNumberOfArguments();
-                        arguments[i] = (cf.DefaultFunctions[i] ??= _parser.CompileRpn(rpn))();
+                        cf.Function = _parser.CompileRpn(cf.Rpn);
+                        if (cf.DefaultFunctions is not null)
+                            Array.Clear(cf.DefaultFunctions);
                     }
-                    parameters[i].SetValue(arguments[i]);
+                    var arguments = new IValue[cf.ParameterCount];
+                    for (var k = 0; k < map.Length; ++k)
+                        arguments[map[k]] = supplied[k];
+
+                    var parameters = cf.Parameters;
+                    for (var i = 0; i < arguments.Length; ++i)
+                    {
+                        if (arguments[i] is null)
+                        {
+                            var rpn = cf.Defaults?[i] ?? throw Exceptions.InvalidNumberOfArguments();
+                            arguments[i] = (cf.DefaultFunctions[i] ??= _parser.CompileRpn(rpn))();
+                        }
+                        parameters[i].SetValue(arguments[i]);
+                    }
+                    return cf switch
+                    {
+                        CustomFunction1 cf1 => EvaluateFunction(cf1, arguments[0]),
+                        CustomFunction2 cf2 => EvaluateFunction(cf2, arguments[0], arguments[1]),
+                        CustomFunction3 cf3 => EvaluateFunction(cf3, arguments[0], arguments[1], arguments[2]),
+                        _ => EvaluateFunction((CustomFunctionN)cf, arguments)
+                    };
                 }
-                return cf switch
+                catch (ComplexInRealModeException)
                 {
-                    CustomFunction1 cf1 => EvaluateFunction(cf1, arguments[0]),
-                    CustomFunction2 cf2 => EvaluateFunction(cf2, arguments[0], arguments[1]),
-                    CustomFunction3 cf3 => EvaluateFunction(cf3, arguments[0], arguments[1], arguments[2]),
-                    _ => EvaluateFunction((CustomFunctionN)cf, arguments)
-                };
+                    throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunction1 cf, in IValue x)
             {
-                cf.Function ??= _parser.CompileRpn(cf.Rpn);
-                var result = cf.Calculate(x);
-                _parser.Units = ApplyUnits(ref result, cf.Units);
-                return result;
+                try
+                {
+                    cf.Function ??= _parser.CompileRpn(cf.Rpn);
+                    var result = cf.Calculate(x);
+                    _parser.Units = ApplyUnits(ref result, cf.Units);
+                    return result;
+                }
+                catch (ComplexInRealModeException)
+                {
+                    throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunction2 cf, in IValue x, in IValue y)
             {
-                cf.Function ??= _parser.CompileRpn(cf.Rpn);
-                var result = cf.Calculate(x, y);
-                _parser.Units = ApplyUnits(ref result, cf.Units);
-                return result;
+                try
+                {
+                    cf.Function ??= _parser.CompileRpn(cf.Rpn);
+                    var result = cf.Calculate(x, y);
+                    _parser.Units = ApplyUnits(ref result, cf.Units);
+                    return result;
+                }
+                catch (ComplexInRealModeException)
+                {
+                    throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunction3 cf, in IValue x, in IValue y, in IValue z)
             {
-                cf.Function ??= _parser.CompileRpn(cf.Rpn);
-                var result = cf.Calculate(x, y, z);
-                _parser.Units = ApplyUnits(ref result, cf.Units);
-                return result;
+                try
+                {
+                    cf.Function ??= _parser.CompileRpn(cf.Rpn);
+                    var result = cf.Calculate(x, y, z);
+                    _parser.Units = ApplyUnits(ref result, cf.Units);
+                    return result;
+                }
+                catch (ComplexInRealModeException)
+                {
+                    throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunctionN cf, IValue[] arguments)
             {
-                cf.Function ??= _parser.CompileRpn(cf.Rpn);
-                var result = cf.Calculate(arguments);
-                _parser.Units = ApplyUnits(ref result, cf.Units);
-                return result;
+                try
+                {
+                    cf.Function ??= _parser.CompileRpn(cf.Rpn);
+                    var result = cf.Calculate(arguments);
+                    _parser.Units = ApplyUnits(ref result, cf.Units);
+                    return result;
+                }
+                catch (ComplexInRealModeException)
+                {
+                    throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
             }
 
             private IValue EvaluateMatrixToken(Token t)

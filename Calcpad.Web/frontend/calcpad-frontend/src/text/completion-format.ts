@@ -2,7 +2,6 @@ import type {
     MacroDefinition,
     FunctionDefinition,
     VariableDefinition,
-    CustomUnitDefinition,
 } from '../types/api';
 import type { InsertItem } from '../types/snippets';
 import {
@@ -17,7 +16,7 @@ import {
  * presence of `isSnippet` to its own CompletionItem / CompletionItemKind /
  * SnippetString equivalents.
  */
-export type CompletionKind = 'macro' | 'function' | 'variable' | 'unit' | 'snippet';
+export type CompletionKind = 'macro' | 'function' | 'variable' | 'snippet';
 
 export interface CompletionData {
     label: string;
@@ -164,20 +163,9 @@ export function getVariableTypeAt(variable: VariableDefinition, line: number): s
     return type;
 }
 
-export function formatCustomUnitCompletion(unit: CustomUnitDefinition): CompletionData {
-    let doc = '**Custom unit**\n\nDefinition: `' + (unit.expression || '') + '`';
-    if (unit.source !== 'local' && unit.sourceFile) {
-        doc += '\n\nSource: `' + unit.sourceFile + '`';
-    }
-    return {
-        label: unit.name,
-        kind: 'unit',
-        insertText: unit.name,
-        isSnippet: false,
-        detail: 'Custom Unit = ' + (unit.expression || ''),
-        documentation: doc,
-        sortText: SORT_USER + unit.name,
-    };
+/** Built-ins offered as completions: keyword-defining snippets, excluding units. */
+export function isCompletableBuiltin(item: InsertItem): boolean {
+    return !!item.keywordType && item.keywordType !== 'Unit';
 }
 
 export function formatBuiltinSnippetCompletion(item: InsertItem): CompletionData {

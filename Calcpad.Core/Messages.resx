@@ -445,6 +445,15 @@
   <data name="Cross_product_is_definedonly_for_vectors_with_2_and_3_elements" xml:space="preserve">
     <value>Cross product is defined only for vectors with 2 and 3 elements.</value>
   </data>
+  <data name="Complex_numbers_are_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Complex numbers are not supported outside of complex mode.</value>
+  </data>
+  <data name="Function_0_with_complex_values_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Function "{0}" with complex values is not supported outside of complex mode.</value>
+  </data>
+  <data name="Complex_variable_0_is_not_supported_outside_of_complex_mode" xml:space="preserve">
+    <value>Complex variable "{0}" is not supported outside of complex mode.</value>
+  </data>
   <data name="Function_0_is_not_defined_in_complex_mode" xml:space="preserve">
     <value>Function {0} is not defined in complex mode.</value>
   </data>
@@ -626,7 +635,7 @@
     <value>#UI '{0}' has {1} entries but the grid has {2} {3}.</value>
   </data>
   <data name="The_UI_0_does_not_apply_to_1" xml:space="preserve">
-    <value>#UI '{0}' does not apply to a {1}, which always replaces the whole value.</value>
+    <value>#UI '{0}' does not apply to a {1}, which substitutes its own values.</value>
   </data>
   <data name="The_UI_datagrid_requires_a_vector_or_matrix_value" xml:space="preserve">
     <value>#UI 'datagrid' requires a vector or matrix value.</value>

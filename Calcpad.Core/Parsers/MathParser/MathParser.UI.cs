@@ -61,6 +61,31 @@ namespace Calcpad.Core
         private static string FormatUiCell(double d) =>
             d.ToString("0.###############", CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// Whether a dropdown/radio option equals the unrounded result. An option without a unit
+        /// takes the result's, as <c>ApplyUiOverride</c> gives it the declared one.
+        /// </summary>
+        internal bool ResultMatchesOption(string option)
+        {
+            RealValue value;
+            try
+            {
+                value = ParseValue(option.Replace(" ", string.Empty));
+            }
+            catch (MathParserException)
+            {
+                return false;
+            }
+            if (value.IsUnit)
+                return false;
+
+            if (value.Units is null)
+                return value.D.AlmostEquals(Real);
+
+            return Unit.IsConsistent(Units, value.Units) &&
+                Real.AlmostEquals(value.D * Unit.Convert(Units, value.Units, ','));
+        }
+
         /// <summary>The result's unit as the parser reads it back in, empty when it has none.</summary>
         internal string ResultUnitsInputText => UnitInputText(Units);
 

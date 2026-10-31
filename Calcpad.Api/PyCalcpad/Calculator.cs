@@ -30,6 +30,7 @@ namespace PyCalcpad
             {
                 Decimals = settings.Decimals,
                 Degrees = settings.Degrees,
+                ReturnAngleUnits = settings.ReturnAngleUnits,
                 IsComplex = settings.IsComplex,
                 Substitute = settings.Substitute,
                 FormatEquations = settings.FormatEquations,

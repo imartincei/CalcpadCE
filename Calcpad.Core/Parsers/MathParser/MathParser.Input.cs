@@ -519,7 +519,7 @@ namespace Calcpad.Core
                         if (n < len)
                         {
                             var unit = expression[n..];
-                            // Inside an unclosed command block ':' separates its limits
+                            // Inside an unclosed command block, ':' separates its limits
                             if (unit.Contains('}') || expression[..n].Count('{') > expression[..n].Count('}'))
                             {
                                 n = len;

@@ -58,7 +58,7 @@ A relative value resolves against the folder of the file that declares it — so
 
 ## `#UI` overrides and includes
 
-A saved `uiOverrides` comment only takes effect on the **first line of the file that carries it** — a second one anywhere in the same file is ignored.
+A saved `uiOverrides` comment only takes effect in **the file that carries it**, at the end of that file — a second one anywhere in the same file is ignored.
 
 - **A `uiOverrides` comment inside an included file never reaches the document that includes it.** The calculation engine treats any `uiOverrides` comment in an included file's content as if it sat inside that file's own `#local` block: it is stripped out.
 - **Only the includer's own `uiOverrides` comment can override it instead**, by targeting the rendered element after the preview is generated.

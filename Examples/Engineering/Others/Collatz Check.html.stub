@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Verifies the [Collatz (3n + 1) conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture) over a user-chosen range using both inline and recursive iteration. -->
- <h3>Sample Program to Check the Collatz Conjecture</h3>
+ <h1>Sample Program to Check the Collatz Conjecture</h1>
  <p>
   For more information see
   <a href="https://en.wikipedia.org/wiki/Collatz_conjecture">https://en.wikipedia.org/wiki/Collatz_conjecture</a>

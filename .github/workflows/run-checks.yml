@@ -1,0 +1,135 @@
+name: Run Checks
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  dotnet:
+    name: .NET lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Lint (style and analyzers)
+        run: |
+          rc=0
+          for p in Calcpad.Core/Calcpad.Core.csproj Calcpad.Highlighter/Calcpad.Highlighter.csproj Calcpad.Web/backend/Calcpad.Server.csproj Calcpad.Tests/Calcpad.Tests.csproj; do
+            for c in style analyzers; do
+              dotnet format $c "$p" --verify-no-changes || rc=1
+            done
+          done
+          exit $rc
+
+      - name: Build with warnings as errors
+        run: dotnet build Calcpad.Tests/Calcpad.Tests.csproj --no-incremental -warnaserror
+
+  typescript:
+    name: TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Calcpad.Web/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            Calcpad.Web/frontend/calcpad-frontend/package-lock.json
+            Calcpad.Web/frontend/calcpad-web/package-lock.json
+            Calcpad.Web/frontend/vscode-calcpad/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci --prefix calcpad-frontend
+          npm ci --prefix calcpad-web
+          npm ci --prefix vscode-calcpad
+
+      - name: Test Monaco language
+        working-directory: .
+        run: node --test tools/monaco-language.test.mjs
+
+      - name: Monaco zh map is up to date
+        if: ${{ !cancelled() }}
+        run: |
+          node scripts/generate-monaco-zh-map.mjs
+          git diff --exit-code -- calcpad-web/src/editor/monaco-zh-map.json
+      - name: Test navigation history
+        working-directory: .
+        run: node --test tools/navigation-history.test.mjs
+
+      - name: Frontend lib
+        if: ${{ !cancelled() }}
+        working-directory: Calcpad.Web/frontend/calcpad-frontend
+        # Emits dist/, which the extension resolves calcpad-frontend types from
+        run: |
+          npm run build -- --pretty false
+          npx tsc --pretty false -p tsconfig.scripts.json
+
+      - name: Web
+        if: ${{ !cancelled() }}
+        working-directory: Calcpad.Web/frontend/calcpad-web
+        run: |
+          npx vue-tsc --noEmit --pretty false -p .
+          npx tsc --pretty false -p tsconfig.node.json
+
+      - name: Extension
+        if: ${{ !cancelled() }}
+        working-directory: Calcpad.Web/frontend/vscode-calcpad
+        run: |
+          npx tsc --noEmit --pretty false -p .
+          npx vue-tsc --noEmit --pretty false -p tsconfig.vue.json
+          npx tsc --pretty false -p tsconfig.node.json
+
+  rust:
+    name: Rust (fmt, clippy)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Calcpad.Web/frontend/calcpad-desktop/src-tauri
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: Calcpad.Web/frontend/calcpad-desktop/src-tauri
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            librsvg2-dev \
+            libayatana-appindicator3-dev \
+            libxdo-dev \
+            libssl-dev
+
+      # Clippy doesn't need the built frontend or sidecar, only paths that exist
+      - name: Clippy
+        env:
+          TAURI_CONFIG: '{"bundle":{"resources":null}}'
+        run: |
+          mkdir -p ../../calcpad-web/dist
+          cargo clippy --all-targets -- -D warnings

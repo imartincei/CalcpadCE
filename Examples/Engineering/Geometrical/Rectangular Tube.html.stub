@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a rectangular hollow section (RHS): area, $I_x$, $I_y$, section moduli and radii of gyration from outer and inner dimensions. -->
- <h3>Geometrical Properties of Rectangular Tube</h3>
+ <h1>Geometrical Properties of Rectangular Tube</h1>
  <div style="max-width:150mm">
   <img alt="rectangular-tube.png" class="side" src="Images/mechanics/sections/rectangular-tube.png" style="height:150pt;"/>
  </div>

@@ -1,2 +1,3 @@
 - Use code comments sparingly.
 - Do not write long code comments. Take the comment you were going to write and reduce it by 75%.
+- Before finishing a task, run `cargo clippy --all-targets -- -D warnings` from `Calcpad.Web/frontend/calcpad-desktop/src-tauri`.

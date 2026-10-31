@@ -12,7 +12,8 @@ import {
     mkdir,
     exists,
 } from '@tauri-apps/plugin-fs';
-import { open as dialogOpen, save as dialogSave, message as dialogMessage, ask as dialogAsk } from '@tauri-apps/plugin-dialog';
+import { message as dialogMessage, ask as dialogAsk } from '@tauri-apps/plugin-dialog';
+import { open as dialogOpen, save as dialogSave } from './file-dialog';
 import { openPath, revealItemInDir } from '@tauri-apps/plugin-opener';
 import { Store } from '@tauri-apps/plugin-store';
 import { platform } from '@tauri-apps/plugin-os';
@@ -45,11 +46,11 @@ import {
     installPdfBrowser,
     isBrowserNotFound,
     isBrowserLaunchFailed,
-    pdfResponseError,
     type PickedImage,
     type InlineImageBudget,
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
+import { UNTITLED_TITLE } from '../tabs/tab-manager';
 
 const SETTINGS_DIR_NAME = 'settings';
 const FONTS_DIR_NAME = 'fonts';
@@ -309,6 +310,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
     }
 
     protected async saveExportedFile(req: ExportRequest): Promise<string | null> {
+        if (req.openDirectly) {
+            const filename = pathBasename(this.getExportDefaultPath(req) ?? req.defaultName);
+            const filePath = await invoke<string>('create_export_path', { filename });
+            const bytes = req.data instanceof Uint8Array ? req.data : new Uint8Array(req.data as ArrayBuffer);
+            await fsWriteFile(filePath, bytes);
+            await this.openPathSafe(filePath);
+            return filePath;
+        }
         const chosen = await dialogSave({
             title: req.dialogTitle,
             defaultPath: this.getExportDefaultPath(req),
@@ -326,16 +335,6 @@ export class TauriMessageBridge extends BaseMessageBridge {
             await fsWriteFile(filePath, bytes);
         }
         return filePath;
-    }
-
-    protected async onPdfSaved(filePath: string): Promise<void> {
-        const open = await dialogAsk(`PDF saved to ${filePath}`, {
-            title: 'PDF export complete',
-            kind: 'info',
-            okLabel: 'Open PDF',
-            cancelLabel: 'Close',
-        });
-        if (open) await this.openPathSafe(filePath);
     }
 
     protected async buildFileContext(_content: string): Promise<{ sourceFilePath?: string }> {
@@ -376,14 +375,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         // as data URIs.
         const html = await this.inlineDocumentImages(rendered);
 
-        const pdfResp = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
-            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
-            signal: AbortSignal.timeout(60000),
-        });
-        if (!pdfResp.ok) throw await pdfResponseError(pdfResp);
-        return await pdfResp.arrayBuffer();
+        return this.apiClient.pdf(html, this.getEffectivePdfOptions(content));
     }
 
     protected async onPdfError(err: unknown): Promise<boolean> {
@@ -520,7 +512,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
     private getSaveDialogDefaultPath(): string | undefined {
         const activePath = this.activeTabFilePath();
         if (activePath) return activePath;
-        const title = this.activeTabTitle() || 'Untitled';
+        const title = this.activeTabTitle() || UNTITLED_TITLE;
         const name = /\.[^./\\]+$/.test(title) ? title : `${title}.cpd`;
         const dir = this._lastDialogDir;
         return dir ? pathResolve(dir, name) : name;
@@ -662,7 +654,8 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await this.syncRecentFilesMenu([]);
     }
 
-    async saveFileAs(content: string): Promise<string | null> {
+    /** `content` may be a function of the chosen path, for content that depends on the file name. */
+    async saveFileAs(content: string | ((filePath: string) => string)): Promise<string | null> {
         const filePath = await dialogSave({
             title: 'Save File',
             defaultPath: this.getSaveDialogDefaultPath(),
@@ -675,7 +668,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         if (!filePath) return null;
         this.rememberDialogDir(filePath);
         await this.allowDocumentDir(filePath);
-        await this.saveFile(filePath, content);
+        await this.saveFile(filePath, typeof content === 'function' ? content(filePath) : content);
         return filePath;
     }
 
@@ -966,7 +959,14 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
         let accepted = false;
         try {
-            accepted = await dialogAsk(question, {
+            accepted = this._platform === 'linux' ? await this.quickPick!({
+                title: 'Chromium browser required for PDF export',
+                placeholder: question,
+                options: [
+                    { label: 'Download Chromium', value: true },
+                    { label: 'Not now', value: false },
+                ],
+            }) === true : await dialogAsk(question, {
                 title: 'Chromium browser required for PDF export',
                 kind: 'warning',
                 okLabel: 'Download Chromium',

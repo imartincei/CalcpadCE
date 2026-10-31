@@ -15,7 +15,7 @@ namespace Calcpad.Highlighter.HtmlComment
         MarginLeft,
         ShowPageNumbers,
         ShowDate,
-        DocumentTitle,
+        ShowTitle,
         DateTimeFormat,
         HeaderFooterLines,
         LineColor
@@ -44,6 +44,7 @@ namespace Calcpad.Highlighter.HtmlComment
         public const string MarginLeft = "0.5in";
         public const bool ShowPageNumbers = true;
         public const bool ShowDate = true;
+        public const bool ShowTitle = true;
         public const string HeaderFooterLines = "both";
         public const string LineColor = "#b3b3b3";
     }
@@ -83,6 +84,7 @@ namespace Calcpad.Highlighter.HtmlComment
         public string MarginLeft { get; set; }
         public bool? ShowPageNumbers { get; set; }
         public bool? ShowDate { get; set; }
+        public bool? ShowTitle { get; set; }
         public string DocumentTitle { get; set; }
         public string DateTimeFormat { get; set; }
         public string HeaderFooterLines { get; set; }

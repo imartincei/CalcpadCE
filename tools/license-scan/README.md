@@ -65,8 +65,9 @@ clean diff means nothing new needs a human.
 Needs `docker`, plus the `dotnet` SDK, `npm` and `cargo` on the host — the
 harvest resolves each closure with the real package managers.
 
-**Use the SDK `global.json` pins**, not merely a compatible one. The patch level decides which packages resolve standalone and which collapse into the shared framework: on 10.0.111 the server's closure carries `Microsoft.Extensions.{DependencyInjection,Logging,Options,Primitives}`
-as separate packages, and on 10.0.112 it does not, because the newer runtime pack subsumes them. It also fixes the runtime pack versions the notices record. Harvest with the wrong SDK and the file describes a build nobody ships.
+**Use the SDK `global.json` pins**, not merely a compatible one. It fixes the runtime pack versions the notices record. Harvest with the wrong SDK and the file describes a build nobody ships.
+
+**The SDK needs the ASP.NET Core targeting pack** (`packs/Microsoft.AspNetCore.App.Ref`). Restore reads its pruning data from there; without it, the server's closure gains `Microsoft.Extensions.{DependencyInjection,Logging,Options,Primitives}` 10.0.0, which never ship because the runtime pack's copies win. Microsoft's installer includes it; on Arch, install `aspnet-targeting-pack` alongside `dotnet-sdk`.
 
 ```bash
 cd tools/license-scan
@@ -289,7 +290,7 @@ copyright line can legitimately change between releases.
 
 ### Not distributed
 
-28 rows resolve into the dependency tree but ship in nothing. Verified against
+32 rows resolve into the dependency tree but ship in nothing. Verified against
 the artifacts `build-desktop.sh` actually produces, not inferred from metadata,
 so `harvest.sh` marks them `not-shipped:` and the notices file omits them.
 
@@ -318,8 +319,19 @@ the compiler is ~9MB), not the npm package. The extension is packaged
 `--no-dependencies` with `node_modules/**` in `.vscodeignore`, so the on-disk
 peer copy is not redistributed either.
 
-Re-run both checks after any dependency bump that could move a build-dependency
+**4 npm `@napi-rs/canvas` rows** (the package and its host platform binary, in
+`calcpad-web-frontend` and `vscode-calcpad`). An optional dependency of
+`pdfjs-dist`, loaded only by a runtime `require` behind pdf.js's Node check; the
+browser bundles never reach it. `NODE_ONLY_OPTIONAL` in `harvest_lib.py` marks it.
+
+Re-run these checks after any dependency bump that could move a build-dependency
 into the normal graph.
+
+Within a shipped package, `UNSHIPPED_PATHS` in `notices_lib.py` drops the licence
+files of subtrees no build copies. Only the two `legacy/build/*.min.mjs` files of
+`pdfjs-dist` ship, so its `wasm/`, `standard_fonts/`, `cmaps/` and `iccs/`
+licences are left out. core-js, compiled into those two files, is credited in the
+preamble.
 
 ## Components
 

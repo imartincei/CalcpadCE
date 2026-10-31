@@ -1,4 +1,4 @@
-# Desktop app testing on a hidden desktop
+# Desktop app testing
 
 Runs an isolated copy of the CalcpadCE desktop app (Tauri) where nothing shows on the developer's screen, and drives it from scripts. The developer can keep working while an agent exercises menus, native dialogs and server failures.
 
@@ -30,7 +30,44 @@ cd tools\desktop-test
 
 Rust-side `eprintln!` output goes to `.work\app-out.txt`. Crash reports go to `%APPDATA%\com.calcpadce.desktop.test\logs`.
 
-## Gotchas
+## Window regression tests
+
+Run the window tests on Windows:
+
+```powershell
+.\window-tests.ps1
+```
+
+Use `-Stage` after backend changes, or `-SkipBuild` to reuse the test build.
+The tests cover repeated launches, file routing, titles, independent window closing, backend recovery, session saving, and window geometry.
+Focus notifications and unsaved-change prompt responses are simulated.
+
+## Linux regression tests
+
+Run the GTK tests on Linux or inside WSL with Linux-installed Node.js, Rust, and .NET.
+Install the desktop build dependencies and these additional test tools on Ubuntu:
+
+```bash
+sudo apt install webkit2gtk-driver xvfb openbox xdotool x11-utils dbus-x11 sway wtype python3
+cargo install tauri-driver --version 2.0.6 --locked
+```
+
+From the repository root:
+
+```bash
+bash tools/desktop-test/linux-tests.sh
+```
+
+Use `--skip-build` to reuse the test build.
+Tests use an isolated application profile and a separate display.
+They exercise real pointer dragging, tab reordering, cancellation, split groups, and transfers between GTK windows.
+Navigation tests cover keyboard shortcuts, mouse side buttons, previews, selections, tabs, split groups, and windows.
+Run `GDK_SCALE=2 bash tools/desktop-test/linux-tests.sh --skip-build` to check display scaling.
+Run `bash tools/desktop-test/linux-tests.sh --wayland --skip-build` to test native Wayland.
+Logs and test diagnostics are saved under `tools/desktop-test/.work/linux-tests/`.
+Linux CI tests X11 and Wayland on both supported architectures.
+
+## Windows gotchas
 
 - **No screenshots.** A hidden desktop is never painted, so `CopyFromScreen` returns nothing. Use `ui.ps1` and `cdp.mjs` instead.
 - **Keep the desktop alive.** The desktop is destroyed when its last handle closes. A process started there after that dies at startup with no output. `launch.ps1` keeps `deskrun` waiting on the app for this reason.

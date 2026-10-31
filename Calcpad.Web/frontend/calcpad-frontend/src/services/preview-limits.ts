@@ -91,9 +91,9 @@ export function previewLimitNoticeHtml(o: PreviewLimitNotice): string {
     <title>CalcpadCE Preview</title>
     <style>
         body { color: ${c.fg}; background: ${c.bg}; margin: 0; padding: 40px 24px;
-               font: 14px/1.5 var(--vscode-font-family, system-ui, sans-serif); }
+               font: var(--vscode-font-size, 13px)/1.5 var(--vscode-font-family, system-ui, sans-serif); }
         main { max-width: 34em; margin: 0 auto; }
-        h3 { margin: 0 0 0.4em; font-size: 1.15em; }
+        h3 { margin: 0 0 0.4em; font-size: inherit; }
         .size { padding: 10px 14px; margin: 1em 0; border: 1px solid ${c.border}; border-radius: 4px;
                 font-family: var(--vscode-editor-font-family, monospace); }
         .dim { color: ${c.dim}; }

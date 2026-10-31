@@ -601,18 +601,26 @@ namespace Calcpad.Core
             }
 
             // Only the default mode rewrites the number in place, leaving the unit as written.
-            if (ui.Type is "dropdown" or "radio" || !ui.KeepsUnits)
+            // A bare-number option does too, so choosing it cannot drop the declared unit.
+            var isOption = ui.Type is "dropdown" or "radio";
+            if (!ui.KeepsUnits || isOption && !IsBareNumber(value))
                 return $"{lhs} {value}";
 
             var i = 0;
             while (i < rhs.Length && IsNumericChar(rhs[i]))
                 ++i;
 
-            return i == 0 ? null : $"{lhs} {value}{rhs[i..]}";
+            if (i > 0)
+                return $"{lhs} {value}{rhs[i..]}";
+
+            return isOption ? $"{lhs} {value}" : null;
         }
 
         private static bool IsNumericChar(char c) =>
             c is >= '0' and <= '9' or '.' or '-' or '+' or 'e' or 'E';
+
+        private static bool IsBareNumber(string s) =>
+            s.Any(char.IsAsciiDigit) && s.All(c => IsNumericChar(c) || c == ' ');
 
         private string GetUiAttributes(UiPropertyMetadata ui)
         {
@@ -644,8 +652,9 @@ namespace Calcpad.Core
         private string InjectUiInput(UiPropertyMetadata ui, string equationHtml) =>
             ui.Type switch
             {
-                "dropdown" => ReplaceEquation(equationHtml, (v, u) => BuildUiDropdown(ui, SelectedValue(v, u))),
-                "radio" => ReplaceEquation(equationHtml, (v, u) => BuildUiRadio(ui, SelectedValue(v, u))),
+                // Matched on the unrounded result: the rendered text is rounded and localized.
+                "dropdown" => ReplaceEquation(equationHtml, (_, _) => BuildUiDropdown(ui, _parser.ResultMatchesOption)),
+                "radio" => ReplaceEquation(equationHtml, (_, _) => BuildUiRadio(ui, _parser.ResultMatchesOption)),
                 "checkbox" => ReplaceEquation(equationHtml, (v, _) => BuildUiCheckbox(ui, v)),
                 // The box holds the right hand side, so the substituted form repeats it.
                 _ when ui.AllowsExpression => ReplaceRhs(equationHtml, BuildUiEntry(ui, ui.SourceValue)),
@@ -658,10 +667,11 @@ namespace Calcpad.Core
         private string BuildUiControlFromSource(UiPropertyMetadata ui)
         {
             var value = ui.SourceValue ?? string.Empty;
+            bool isSource(string option) => StripSpaces(option) == StripSpaces(value);
             return ui.Type switch
             {
-                "dropdown" => BuildUiDropdown(ui, StripSpaces(value)),
-                "radio" => BuildUiRadio(ui, StripSpaces(value)),
+                "dropdown" => BuildUiDropdown(ui, isSource),
+                "radio" => BuildUiRadio(ui, isSource),
                 "checkbox" => BuildUiCheckbox(ui, value),
                 _ => BuildUiEntry(ui, value)
             };
@@ -701,20 +711,14 @@ namespace Calcpad.Core
             return lastAssign < 0 ? -1 : lastAssign + assignOp.Length;
         }
 
-        private static string SelectedValue(string value, string unitHtml)
+        /// <summary>Only the first match, as a browser shows the last of several.</summary>
+        private static int SelectedOption(UiPropertyMetadata ui, Func<string, bool> isSelected)
         {
-            var sb = new StringBuilder(StripSpaces(value));
-            var inTag = false;
-            foreach (var c in unitHtml)
-            {
-                if (c == '<')
-                    inTag = true;
-                else if (c == '>')
-                    inTag = false;
-                else if (!inTag && c is not (' ' or ThinSpace))
-                    sb.Append(c);
-            }
-            return sb.ToString();
+            for (int i = 0, len = ui.Values.Length; i < len; ++i)
+                if (isSelected(ui.Values[i]))
+                    return i;
+
+            return -1;
         }
 
         private static string StripSpaces(string s) => s.Replace(" ", string.Empty);
@@ -732,27 +736,29 @@ namespace Calcpad.Core
         private string BuildUiEntry(UiPropertyMetadata ui, string value) =>
             $"<input type=\"text\" class=\"{UiClass(ui, "calcpad-ui-input")}\" value=\"{HttpUtility.HtmlAttributeEncode(value)}\"{UiInputBinding(ui)}>";
 
-        private string BuildUiDropdown(UiPropertyMetadata ui, string value)
+        private string BuildUiDropdown(UiPropertyMetadata ui, Func<string, bool> isSelected)
         {
+            var selectedIndex = SelectedOption(ui, isSelected);
             var sb = new StringBuilder()
                 .Append($"<select class=\"{UiClass(ui, "calcpad-ui-dropdown")}\"{UiBinding(ui)}>");
             for (int i = 0, len = ui.Keys.Length; i < len; ++i)
             {
-                var selected = StripSpaces(ui.Values[i]) == value ? " selected" : string.Empty;
+                var selected = i == selectedIndex ? " selected" : string.Empty;
                 sb.Append($"<option value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{selected}>")
                   .Append($"{HttpUtility.HtmlEncode(ui.Keys[i])}</option>");
             }
             return sb.Append("</select>").ToString();
         }
 
-        private string BuildUiRadio(UiPropertyMetadata ui, string value)
+        private string BuildUiRadio(UiPropertyMetadata ui, Func<string, bool> isSelected)
         {
+            var selectedIndex = SelectedOption(ui, isSelected);
             var group = HttpUtility.HtmlAttributeEncode($"ui-radio-{ui.Key}");
             var sb = new StringBuilder()
                 .Append($"<span class=\"{UiClass(ui, "calcpad-ui-radio")}\"{UiBinding(ui)}>");
             for (int i = 0, len = ui.Keys.Length; i < len; ++i)
             {
-                var isChecked = StripSpaces(ui.Values[i]) == value ? " checked" : string.Empty;
+                var isChecked = i == selectedIndex ? " checked" : string.Empty;
                 sb.Append("<label class=\"calcpad-ui-radio-label\">")
                   .Append($"<input type=\"radio\" name=\"{group}\" value=\"{HttpUtility.HtmlAttributeEncode(ui.Values[i])}\"{isChecked}>")
                   .Append($" {HttpUtility.HtmlEncode(ui.Keys[i])}</label>");

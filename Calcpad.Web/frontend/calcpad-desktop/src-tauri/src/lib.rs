@@ -7,13 +7,22 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use tauri::menu::{IsMenuItem, Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::menu::{IsMenuItem, Menu, MenuItem, MenuItemKind, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_fs::FsExt;
+use tauri_plugin_window_state::StateFlags;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
+
+mod navigation_history;
+use navigation_history::{
+    complete_navigation, navigate_history, record_navigation, remove_navigation,
+    NavigationHistoryState,
+};
+#[cfg(target_os = "linux")]
+mod linux_file_dialog;
 
 // Populated at setup(); read from the panic hook (which has no AppHandle).
 static CRASH_DIR: OnceLock<PathBuf> = OnceLock::new();
@@ -23,6 +32,7 @@ static DRAFTS_DIR: OnceLock<PathBuf> = OnceLock::new();
 static SIDECAR_TAIL: OnceLock<Arc<Mutex<String>>> = OnceLock::new();
 // Per-launch bearer for the sidecar's /api routes. See api_token().
 static API_TOKEN: OnceLock<String> = OnceLock::new();
+static NEXT_WINDOW_NUMBER: AtomicU64 = AtomicU64::new(2);
 
 // Name of the .NET apphost inside the resource dir. All ~200 sibling
 // DLLs / native libs / deps.json / runtimeconfig.json land next to it so
@@ -50,15 +60,32 @@ impl Default for FocusedWindow {
     }
 }
 
-/// What the menu shows that the frontend owns. A menu item carries no mutable
-/// state of its own, so every change rebuilds the whole menu — which means each
-/// setter has to be able to read back the parts it isn't changing.
-///
-/// The result-mode entries follow whichever document a window has open, so they are
-/// keyed by window label; the recent-file list is genuinely shared.
+struct PrimaryWindow(Mutex<String>);
+
+#[derive(Default)]
+struct OpenFiles(Mutex<HashMap<String, Vec<String>>>);
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct EditorPosition {
+    line_number: u32,
+    column: u32,
+}
+
+#[derive(Clone, Serialize)]
+struct FileNavigation {
+    path: String,
+    position: Option<EditorPosition>,
+}
+
+impl Default for PrimaryWindow {
+    fn default() -> Self {
+        Self(Mutex::new(MAIN_WINDOW_LABEL.to_string()))
+    }
+}
+
 #[derive(Default)]
 struct MenuState {
-    source_result_modes: Mutex<HashMap<String, bool>>,
     recent_files: Mutex<Vec<String>>,
 }
 
@@ -145,14 +172,15 @@ fn extract_launch_files<I: IntoIterator<Item = String>>(args: I) -> Vec<PathBuf>
         .skip(1)
         .filter(|a| !a.starts_with('-'))
         .map(PathBuf::from)
-        .filter(|p| {
-            p.extension()
-                .and_then(|e| e.to_str())
-                .map(|e| e.eq_ignore_ascii_case("cpd") || e.eq_ignore_ascii_case("cpdz"))
-                .unwrap_or(false)
-        })
+        .filter(|p| is_worksheet_path(p))
         .filter(|p| p.exists())
         .collect()
+}
+
+fn is_worksheet_path(path: &Path) -> bool {
+    path.extension()
+        .and_then(|e| e.to_str())
+        .is_some_and(|e| e.eq_ignore_ascii_case("cpd") || e.eq_ignore_ascii_case("cpdz"))
 }
 
 /// Per-launch shared secret the sidecar requires on every `/api` request, without which any
@@ -297,8 +325,7 @@ fn draft_write(
         file_path,
         saved_at: unix_millis(),
     };
-    let meta_json =
-        serde_json::to_vec_pretty(&meta).map_err(|e| format!("serialize meta: {e}"))?;
+    let meta_json = serde_json::to_vec_pretty(&meta).map_err(|e| format!("serialize meta: {e}"))?;
     atomic_write(&content_path, content.as_bytes())
         .map_err(|e| format!("write draft content: {e}"))?;
     atomic_write(&meta_path, &meta_json).map_err(|e| format!("write draft meta: {e}"))?;
@@ -348,7 +375,7 @@ fn draft_list() -> Result<Vec<DraftInfo>, String> {
             size,
         });
     }
-    out.sort_by(|a, b| b.saved_at.cmp(&a.saved_at));
+    out.sort_by_key(|d| std::cmp::Reverse(d.saved_at));
     Ok(out)
 }
 
@@ -358,8 +385,8 @@ fn draft_read(id: String) -> Result<Option<DraftContent>, String> {
     if !content_path.exists() {
         return Ok(None);
     }
-    let content = std::fs::read_to_string(&content_path)
-        .map_err(|e| format!("read draft content: {e}"))?;
+    let content =
+        std::fs::read_to_string(&content_path).map_err(|e| format!("read draft content: {e}"))?;
     let meta = read_draft_meta(&meta_path).unwrap_or(DraftMeta {
         filename: format!("{id}.cpd"),
         file_path: None,
@@ -411,7 +438,11 @@ fn server_token() -> &'static str {
 
 #[tauri::command]
 fn take_pending_launch_files(state: State<'_, PendingLaunchFiles>) -> Vec<String> {
-    state.0.lock().map(|mut g| std::mem::take(&mut *g)).unwrap_or_default()
+    state
+        .0
+        .lock()
+        .map(|mut g| std::mem::take(&mut *g))
+        .unwrap_or_default()
 }
 
 /// Grants read access to `path` and the directory holding it, which is what worksheets need
@@ -434,7 +465,10 @@ fn allow_file_and_parent(app: &AppHandle, path: &Path) {
 fn allow_document_dir(app: AppHandle, path: String) -> Result<(), String> {
     let path = PathBuf::from(&path);
     if !app.fs_scope().is_allowed(&path) {
-        return Err(format!("outside the current read scope: {}", path.display()));
+        return Err(format!(
+            "outside the current read scope: {}",
+            path.display()
+        ));
     }
     let parent = path
         .parent()
@@ -496,9 +530,92 @@ fn refresh_menu(app: &AppHandle, label: &str) -> Result<(), String> {
     let Some(window) = app.get_webview_window(label) else {
         return Ok(());
     };
-    let menu = build_menu(app, label).map_err(|e| e.to_string())?;
+    let menu = build_menu(app).map_err(|e| e.to_string())?;
     window.set_menu(menu).map_err(|e| e.to_string())?;
+    window.hide_menu().map_err(|e| e.to_string())?;
     Ok(())
+}
+
+#[tauri::command]
+fn show_app_menu(window: tauri::WebviewWindow, x: f64, y: f64) -> Result<(), String> {
+    window
+        .popup_menu_at(
+            &window.menu().expect("window menu exists"),
+            tauri::LogicalPosition::new(x, y),
+        )
+        .map_err(|e| e.to_string())
+}
+
+#[derive(Serialize)]
+struct AppMenuEntry {
+    id: String,
+    text: String,
+    enabled: bool,
+    children: Vec<AppMenuEntry>,
+}
+
+fn app_menu_entries(items: Vec<MenuItemKind<tauri::Wry>>) -> tauri::Result<Vec<AppMenuEntry>> {
+    items
+        .into_iter()
+        .map(|item| {
+            let id = item.id().0.clone();
+            let (text, enabled, children) = match item {
+                MenuItemKind::MenuItem(item) => (item.text()?, item.is_enabled()?, vec![]),
+                MenuItemKind::Submenu(item) => (
+                    item.text()?,
+                    item.is_enabled()?,
+                    app_menu_entries(item.items()?)?,
+                ),
+                MenuItemKind::Predefined(_) => (String::new(), false, vec![]),
+                MenuItemKind::Check(item) => (item.text()?, item.is_enabled()?, vec![]),
+                MenuItemKind::Icon(item) => (item.text()?, item.is_enabled()?, vec![]),
+            };
+            Ok(AppMenuEntry {
+                id,
+                text,
+                enabled,
+                children,
+            })
+        })
+        .collect()
+}
+
+#[tauri::command]
+fn get_app_menu(window: tauri::WebviewWindow) -> Result<Vec<AppMenuEntry>, String> {
+    let menu = window.menu().expect("window menu exists");
+    app_menu_entries(menu.items().map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn create_export_path(app: AppHandle, filename: String) -> Result<String, String> {
+    let filename = Path::new(&filename)
+        .file_name()
+        .ok_or("export filename is required")?;
+    let extension = Path::new(filename).extension().and_then(|e| e.to_str());
+    if !matches!(extension, Some("pdf" | "docx")) {
+        return Err("unsupported temporary export format".into());
+    }
+    let mut random = [0u8; 16];
+    getrandom::getrandom(&mut random).map_err(|e| e.to_string())?;
+    let id: String = random.iter().map(|b| format!("{b:02x}")).collect();
+    let directory = std::env::temp_dir().join(format!("calcpad-export-{id}"));
+    std::fs::create_dir(&directory).map_err(|e| e.to_string())?;
+    let path = directory.join(filename);
+    app.fs_scope()
+        .allow_file(&path)
+        .map_err(|e| e.to_string())?;
+    Ok(path.to_string_lossy().into_owned())
+}
+
+/// Menu labels for the active UI language, keyed by their English text.
+static MENU_LABELS: Mutex<Option<HashMap<String, String>>> = Mutex::new(None);
+
+fn menu_tr(text: &str) -> String {
+    MENU_LABELS
+        .lock()
+        .ok()
+        .and_then(|labels| labels.as_ref().and_then(|map| map.get(text).cloned()))
+        .unwrap_or_else(|| text.to_string())
 }
 
 fn refresh_all_menus(app: &AppHandle) -> Result<(), String> {
@@ -508,21 +625,10 @@ fn refresh_all_menus(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-/// Shows or hides the result-mode entries that need a document with readable source —
-/// dropped while a compiled worksheet is open, since the results toolbar drops their
-/// buttons too.
 #[tauri::command]
-fn set_source_result_modes_visible(
-    app: AppHandle,
-    window: tauri::WebviewWindow,
-    visible: bool,
-) -> Result<(), String> {
-    app.state::<MenuState>()
-        .source_result_modes
-        .lock()
-        .expect("menu state mutex poisoned")
-        .insert(window.label().to_string(), visible);
-    refresh_menu(&app, window.label())
+fn set_menu_labels(app: AppHandle, labels: HashMap<String, String>) -> Result<(), String> {
+    *MENU_LABELS.lock().map_err(|e| e.to_string())? = Some(labels);
+    refresh_all_menus(&app)
 }
 
 /// Replaces the File → Open Recent entries, most recent first. The list itself is
@@ -536,11 +642,222 @@ fn set_recent_files(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
     refresh_all_menus(&app)
 }
 
-/// Labels of every open window. The frontend needs the count to tell whether it is the
-/// last window (and so owes the full exit), and the list to ask the others to close.
+/// Labels of every open window.
 #[tauri::command]
 fn window_labels(app: AppHandle) -> Vec<String> {
     app.webview_windows().into_keys().collect()
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TabDragTarget {
+    window_id: String,
+    x: f64,
+    y: f64,
+}
+
+#[cfg(feature = "window-tests")]
+static TEST_TAB_DRAG_TARGET: Mutex<Option<Option<TabDragTarget>>> = Mutex::new(None);
+
+#[cfg(feature = "window-tests")]
+#[tauri::command]
+fn test_set_tab_drag_target(target: Option<TabDragTarget>) {
+    *TEST_TAB_DRAG_TARGET.lock().unwrap() = Some(target);
+}
+
+#[tauri::command]
+async fn use_system_tab_drag(window: tauri::WebviewWindow) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let (sender, receiver) = tokio::sync::oneshot::channel();
+        window
+            .with_webview(move |platform| {
+                use gtk::prelude::*;
+                let wayland = platform.inner().display().type_().name() == "GdkWaylandDisplay";
+                let _ = sender.send(wayland);
+            })
+            .map_err(|error| error.to_string())?;
+        receiver.await.map_err(|error| error.to_string())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = window;
+        Ok(false)
+    }
+}
+
+#[tauri::command]
+async fn tab_drag_target(app: AppHandle) -> Result<Option<TabDragTarget>, String> {
+    #[cfg(feature = "window-tests")]
+    if let Some(target) = &*TEST_TAB_DRAG_TARGET.lock().unwrap() {
+        return Ok(target.clone());
+    }
+    let windows: Vec<_> = app.webview_windows().into_values().collect();
+    #[cfg(not(any(windows, target_os = "linux")))]
+    let windows = {
+        let mut windows = windows;
+        let focused = app.state::<FocusedWindow>();
+        let label = focused.0.lock().expect("focused window mutex poisoned");
+        windows.sort_by_key(|window| window.label() != *label);
+        windows
+    };
+
+    #[cfg(windows)]
+    let (cursor, root) = {
+        use windows_sys::Win32::Foundation::POINT;
+        use windows_sys::Win32::UI::WindowsAndMessaging::{
+            GetAncestor, GetCursorPos, WindowFromPoint, GA_ROOT,
+        };
+        let mut point = POINT { x: 0, y: 0 };
+        unsafe {
+            if GetCursorPos(&mut point) == 0 {
+                return Err(std::io::Error::last_os_error().to_string());
+            }
+            (point, GetAncestor(WindowFromPoint(point), GA_ROOT))
+        }
+    };
+
+    for window in windows {
+        if !window.is_visible().map_err(|e| e.to_string())?
+            || window.is_minimized().map_err(|e| e.to_string())?
+        {
+            continue;
+        }
+        #[cfg(target_os = "linux")]
+        {
+            let (sender, receiver) = tokio::sync::oneshot::channel();
+            let label = window.label().to_string();
+            window
+                .with_webview(move |platform| {
+                    use gtk::prelude::*;
+                    let view = platform.inner();
+                    let target = (|| {
+                        if !view.is_drawable() {
+                            return None;
+                        }
+                        let pointer = view.display().default_seat().unwrap().pointer().unwrap();
+                        let hit = pointer.window_at_position_double().0?;
+                        let toplevel = view.toplevel().unwrap();
+                        let native = toplevel.window().unwrap();
+                        if hit.effective_toplevel() != native.effective_toplevel() {
+                            return None;
+                        }
+                        let (_, root_x, root_y) = pointer.position_double();
+                        let (_, origin_x, origin_y) = native.origin();
+                        let (offset_x, offset_y) =
+                            view.translate_coordinates(&toplevel, 0, 0).unwrap();
+                        let x = root_x - f64::from(origin_x + offset_x);
+                        let y = root_y - f64::from(origin_y + offset_y);
+                        let allocation = view.allocation();
+                        (x >= 0.0
+                            && y >= 0.0
+                            && x < f64::from(allocation.width())
+                            && y < f64::from(allocation.height()))
+                        .then_some(TabDragTarget {
+                            window_id: label,
+                            x,
+                            y,
+                        })
+                    })();
+                    let _ = sender.send(target);
+                })
+                .map_err(|error| error.to_string())?;
+            if let Some(target) = receiver.await.map_err(|error| error.to_string())? {
+                return Ok(Some(target));
+            }
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            #[cfg(windows)]
+            if !std::ptr::eq(window.hwnd().map_err(|e| e.to_string())?.0, root) {
+                continue;
+            }
+            #[cfg(not(windows))]
+            let cursor = window.cursor_position().map_err(|e| e.to_string())?;
+            let origin = window.inner_position().map_err(|e| e.to_string())?;
+            let size = window.inner_size().map_err(|e| e.to_string())?;
+            let x = cursor.x as f64 - origin.x as f64;
+            let y = cursor.y as f64 - origin.y as f64;
+            if x >= 0.0 && y >= 0.0 && x < size.width as f64 && y < size.height as f64 {
+                let scale = window.scale_factor().map_err(|e| e.to_string())?;
+                return Ok(Some(TabDragTarget {
+                    window_id: window.label().to_string(),
+                    x: x / scale,
+                    y: y / scale,
+                }));
+            }
+        }
+    }
+    Ok(None)
+}
+
+#[tauri::command]
+fn primary_window(state: State<'_, PrimaryWindow>) -> String {
+    state
+        .0
+        .lock()
+        .expect("primary window mutex poisoned")
+        .clone()
+}
+
+#[tauri::command]
+fn set_open_files(window: tauri::WebviewWindow, state: State<'_, OpenFiles>, paths: Vec<String>) {
+    state
+        .0
+        .lock()
+        .expect("open files mutex poisoned")
+        .insert(window.label().to_string(), paths);
+}
+
+fn file_path_key(path: &str) -> String {
+    #[cfg(windows)]
+    {
+        path.replace('\\', "/").to_lowercase()
+    }
+    #[cfg(not(windows))]
+    {
+        path.to_string()
+    }
+}
+
+#[tauri::command]
+fn navigate_to_open_file(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+    state: State<'_, OpenFiles>,
+    path: String,
+    position: Option<EditorPosition>,
+) -> Result<bool, String> {
+    let key = file_path_key(&path);
+    let target = state
+        .0
+        .lock()
+        .expect("open files mutex poisoned")
+        .iter()
+        .filter_map(|(label, paths)| {
+            paths
+                .iter()
+                .find(|path| file_path_key(path) == key)
+                .map(|path| (label.clone(), path.clone()))
+        })
+        .min_by_key(|(label, _)| (label != window.label(), label.clone()));
+    let Some((label, path)) = target else {
+        return Ok(false);
+    };
+    let target = app
+        .get_webview_window(&label)
+        .expect("open file window exists");
+    target
+        .emit_to(
+            &label,
+            "navigate-to-file",
+            FileNavigation { path, position },
+        )
+        .map_err(|e| e.to_string())?;
+    target.unminimize().map_err(|e| e.to_string())?;
+    target.set_focus().map_err(|e| e.to_string())?;
+    target.as_ref().set_focus().map_err(|e| e.to_string())?;
+    Ok(true)
 }
 
 /// Opens another window in this process — one sidecar, one store, one drafts dir. Cloning
@@ -556,19 +873,44 @@ async fn new_window(app: AppHandle) -> Result<String, String> {
         .ok_or("no window configured")?
         .clone();
 
-    let label = (2..)
-        .map(|n| format!("{MAIN_WINDOW_LABEL}-{n}"))
-        .find(|l| app.get_webview_window(l).is_none())
-        .expect("an unused window label exists");
+    let label = format!(
+        "{MAIN_WINDOW_LABEL}-{}",
+        NEXT_WINDOW_NUMBER.fetch_add(1, Ordering::Relaxed)
+    );
     config.label = label.clone();
 
-    let menu = build_menu(&app, &label).map_err(|e| e.to_string())?;
-    tauri::WebviewWindowBuilder::from_config(&app, &config)
+    let menu = build_menu(&app).map_err(|e| e.to_string())?;
+    let window = tauri::WebviewWindowBuilder::from_config(&app, &config)
         .map_err(|e| e.to_string())?
         .menu(menu)
+        .focused(true)
         .build()
         .map_err(|e| e.to_string())?;
+    window.set_focus().map_err(|e| e.to_string())?;
+    window.as_ref().set_focus().map_err(|e| e.to_string())?;
     Ok(label)
+}
+
+// Windows may prevent the existing instance from taking focus after a repeat launch.
+// The user-launched process grants it foreground permission before exiting.
+#[cfg(windows)]
+fn allow_existing_instance_foreground(identifier: &str) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        AllowSetForegroundWindow, FindWindowW, GetWindowThreadProcessId,
+    };
+
+    let class: Vec<u16> = format!("{identifier}-sic")
+        .encode_utf16()
+        .chain(Some(0))
+        .collect();
+    unsafe {
+        let window = FindWindowW(class.as_ptr(), std::ptr::null());
+        if !window.is_null() {
+            let mut process_id = 0;
+            GetWindowThreadProcessId(window, &mut process_id);
+            AllowSetForegroundWindow(process_id);
+        }
+    }
 }
 
 /// Native Save / Don't Save / Cancel prompt. The dialog plugin's JS API tops out at two
@@ -693,7 +1035,11 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     let _ = std::fs::remove_file(&port_file);
     let port_file_str = port_file.to_string_lossy().into_owned();
 
-    let exe_name = if cfg!(windows) { SIDECAR_EXE_WINDOWS } else { SIDECAR_EXE_UNIX };
+    let exe_name = if cfg!(windows) {
+        SIDECAR_EXE_WINDOWS
+    } else {
+        SIDECAR_EXE_UNIX
+    };
     let exe_path = app
         .path()
         .resolve(exe_name, BaseDirectory::Resource)
@@ -704,7 +1050,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
         .to_path_buf();
 
     let spawn_started = Instant::now();
-    eprintln!("[sidecar-timing] spawning {:?}", exe_path);
+    eprintln!("[sidecar-timing] spawning {exe_path:?}");
     let log_dir = resolve_log_dir(app);
     let mut command = tokio::process::Command::new(&exe_path);
     #[cfg(windows)]
@@ -886,76 +1232,79 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
     // buffer while scanning for Kestrel's "Now listening on:" marker, and both are type-erased to
     // `Box<dyn AsyncRead + Send + Unpin>` since they are different concrete types.
     use tokio::io::AsyncRead;
-    fn spawn_stream_reader(
-        stream: Box<dyn AsyncRead + Send + Unpin>,
-        label: &'static str,
+    type UrlSender = Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<String, String>>>>>;
+
+    #[derive(Clone)]
+    struct ReaderContext {
         spawn_started: Instant,
-        tx_url: Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<String, String>>>>>,
+        tx_url: UrlSender,
         app: AppHandle,
         tail: Arc<Mutex<String>>,
         saw_first: Arc<std::sync::atomic::AtomicBool>,
         log_tx: mpsc::Sender<ServerLogLine>,
+    }
+
+    fn spawn_stream_reader(
+        stream: Box<dyn AsyncRead + Send + Unpin>,
+        label: &'static str,
+        ctx: ReaderContext,
     ) -> tauri::async_runtime::JoinHandle<()> {
         tauri::async_runtime::spawn(async move {
             let mut lines = BufReader::new(stream).lines();
-            loop {
-                match lines.next_line().await {
-                    Ok(Some(line)) => {
-                        if !saw_first.swap(true, std::sync::atomic::Ordering::Relaxed) {
-                            eprintln!(
-                                "[sidecar-timing] first stdio byte ({}) after {}ms",
-                                label,
-                                spawn_started.elapsed().as_millis()
-                            );
-                        }
-                        if let Ok(mut t) = tail.lock() {
-                            append_tail(&mut t, &line);
-                            append_tail(&mut t, "\n");
-                        }
-                        // try_send, never send: blocking here is what wedges the sidecar.
-                        let _ = log_tx.try_send(ServerLogLine {
-                            stream: label,
-                            line: line.clone(),
-                        });
-                        if let Some(url) = extract_listening_url(&line) {
-                            let state: State<'_, ServerState> = app.state();
-                            if let Ok(mut g) = state.url.lock() {
-                                *g = Some(url.clone());
-                            }
-                            if let Some(tx) = tx_url.lock().ok().and_then(|mut g| g.take()) {
-                                let _ = tx.send(Ok(url.clone()));
-                            }
-                            let _ = app.emit("server-url", url);
-                        }
+            while let Ok(Some(line)) = lines.next_line().await {
+                if !ctx
+                    .saw_first
+                    .swap(true, std::sync::atomic::Ordering::Relaxed)
+                {
+                    eprintln!(
+                        "[sidecar-timing] first stdio byte ({}) after {}ms",
+                        label,
+                        ctx.spawn_started.elapsed().as_millis()
+                    );
+                }
+                if let Ok(mut t) = ctx.tail.lock() {
+                    append_tail(&mut t, &line);
+                    append_tail(&mut t, "\n");
+                }
+                // try_send, never send: blocking here is what wedges the sidecar.
+                let _ = ctx.log_tx.try_send(ServerLogLine {
+                    stream: label,
+                    line: line.clone(),
+                });
+                if let Some(url) = extract_listening_url(&line) {
+                    let state: State<'_, ServerState> = ctx.app.state();
+                    if let Ok(mut g) = state.url.lock() {
+                        *g = Some(url.clone());
                     }
-                    Ok(None) | Err(_) => break,
+                    if let Some(tx) = ctx.tx_url.lock().ok().and_then(|mut g| g.take()) {
+                        let _ = tx.send(Ok(url.clone()));
+                    }
+                    let _ = ctx.app.emit("server-url", url);
                 }
             }
         })
     }
+    let reader_ctx = ReaderContext {
+        spawn_started,
+        tx_url: tx_url.clone(),
+        app: app.clone(),
+        tail: tail.clone(),
+        saw_first: saw_first_output.clone(),
+        log_tx: log_tx.clone(),
+    };
     let mut readers = Vec::new();
     if let Some(s) = stdout {
         readers.push(spawn_stream_reader(
             Box::new(s),
             "stdout",
-            spawn_started,
-            tx_url.clone(),
-            app.clone(),
-            tail.clone(),
-            saw_first_output.clone(),
-            log_tx.clone(),
+            reader_ctx.clone(),
         ));
     }
     if let Some(s) = stderr {
         readers.push(spawn_stream_reader(
             Box::new(s),
             "stderr",
-            spawn_started,
-            tx_url.clone(),
-            app.clone(),
-            tail.clone(),
-            saw_first_output.clone(),
-            log_tx.clone(),
+            reader_ctx.clone(),
         ));
     }
 
@@ -1000,11 +1349,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                     }
                 })
                 .await;
-                let tail_snapshot = tail
-                    .lock()
-                    .ok()
-                    .map(|t| t.clone())
-                    .unwrap_or_default();
+                let tail_snapshot = tail.lock().ok().map(|t| t.clone()).unwrap_or_default();
                 // The .NET server writes its own crash log via FileLogger, but
                 // duplicate here anyway — if the sidecar died before .NET's
                 // AppDomain.UnhandledException could fire (SIGKILL, StackOverflow,
@@ -1038,8 +1383,7 @@ async fn spawn_sidecar(app: &AppHandle) -> Result<String, String> {
                 let _ = app_for_wait.emit("server-crashed", payload);
                 if let Some(tx) = tx_url.lock().ok().and_then(|mut g| g.take()) {
                     let _ = tx.send(Err(format!(
-                        "sidecar exited before port ready (code {:?})",
-                        exit_code
+                        "sidecar exited before port ready (code {exit_code:?})"
                     )));
                 } else if is_current {
                     // Ran, then died: no spawn caller is left to record it.
@@ -1105,9 +1449,9 @@ fn assign_to_job_object(pid: u32) {
     use std::sync::OnceLock;
     use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
     use windows_sys::Win32::System::JobObjects::{
-        AssignProcessToJobObject, CreateJobObjectW, SetInformationJobObject,
-        JobObjectExtendedLimitInformation,
-        JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+        AssignProcessToJobObject, CreateJobObjectW, JobObjectExtendedLimitInformation,
+        SetInformationJobObject, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
+        JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
     };
     use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_ALL_ACCESS};
 
@@ -1151,84 +1495,14 @@ fn recent_label(app: &AppHandle, path: &str) -> String {
     }
 }
 
-/// Builds a window's menu from `MenuState`: the shared recent-file list, and whether
-/// that window keeps the View entries that need a document with readable source.
-fn build_menu(app: &AppHandle, window_label: &str) -> tauri::Result<Menu<tauri::Wry>> {
+fn build_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let state = app.state::<MenuState>();
-    let source_result_modes = state
-        .source_result_modes
-        .lock()
-        .expect("menu state mutex poisoned")
-        .get(window_label)
-        .copied()
-        .unwrap_or(true);
     let recent = state
         .recent_files
         .lock()
         .expect("menu state mutex poisoned")
         .clone();
     let sep = || PredefinedMenuItem::separator(app);
-
-    // Grouped by what gets rendered: the unsuffixed ids are the report — the default variant
-    // everywhere — while `:preview`, `:input` and `:unwrapped` name one explicitly, and the
-    // frontend parses `export-<format>[:<variant>]`. A form and a code listing have no meaningful
-    // Word form, so neither offers one.
-    let export = Submenu::with_items(
-        app,
-        "Export",
-        true,
-        &[
-            &MenuItem::with_id(app, "export-pdf", "Report PDF...", true, Some("CmdOrCtrl+E"))?,
-            &MenuItem::with_id(app, "export-html", "Report HTML...", true, None::<&str>)?,
-            &MenuItem::with_id(app, "export-docx", "Report Word...", true, None::<&str>)?,
-            &sep()?,
-            &MenuItem::with_id(app, "export-pdf:preview", "Preview PDF...", true, None::<&str>)?,
-            &MenuItem::with_id(
-                app,
-                "export-html:preview",
-                "Preview HTML...",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "export-docx:preview",
-                "Preview Word...",
-                true,
-                None::<&str>,
-            )?,
-            &sep()?,
-            &MenuItem::with_id(
-                app,
-                "export-pdf:input",
-                "Input Form PDF...",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "export-html:input",
-                "Input Form HTML...",
-                true,
-                None::<&str>,
-            )?,
-            &sep()?,
-            &MenuItem::with_id(
-                app,
-                "export-pdf:unwrapped",
-                "Unwrapped PDF...",
-                true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "export-html:unwrapped",
-                "Unwrapped HTML...",
-                true,
-                None::<&str>,
-            )?,
-        ],
-    )?;
 
     // Each entry carries its own path in the id rather than a list index, so a click
     // can never land on a different file than the one whose label was read. The
@@ -1245,234 +1519,143 @@ fn build_menu(app: &AppHandle, window_label: &str) -> tauri::Result<Menu<tauri::
             )
         })
         .collect::<tauri::Result<Vec<_>>>()?;
-    let no_recent = MenuItem::with_id(app, "no-recent", "No Recent Files", false, None::<&str>)?;
-    let clear_recent = MenuItem::with_id(app, "clear-recent", "Clear Recent", true, None::<&str>)?;
+    let no_recent = MenuItem::with_id(
+        app,
+        "no-recent",
+        menu_tr("No Recent Files"),
+        false,
+        None::<&str>,
+    )?;
+    let clear_recent = MenuItem::with_id(
+        app,
+        "clear-recent",
+        menu_tr("Clear Recent"),
+        true,
+        None::<&str>,
+    )?;
     let recent_sep = sep()?;
     let mut recent_refs: Vec<&dyn IsMenuItem<tauri::Wry>> = Vec::new();
     if recent_items.is_empty() {
         recent_refs.push(&no_recent);
     } else {
-        recent_refs.extend(recent_items.iter().map(|i| i as &dyn IsMenuItem<tauri::Wry>));
+        recent_refs.extend(
+            recent_items
+                .iter()
+                .map(|i| i as &dyn IsMenuItem<tauri::Wry>),
+        );
         recent_refs.push(&recent_sep);
         recent_refs.push(&clear_recent);
     }
-    let open_recent = Submenu::with_items(app, "Open Recent", true, &recent_refs)?;
+    let open_recent = Submenu::with_items(app, menu_tr("Open Recent"), true, &recent_refs)?;
 
-    let file = Submenu::with_items(
+    Menu::with_items(
         app,
-        "File",
-        true,
         &[
-            &MenuItem::with_id(app, "new", "New Tab", true, Some("CmdOrCtrl+N"))?,
+            &MenuItem::with_id(app, "new", menu_tr("New Tab"), true, Some("CmdOrCtrl+N"))?,
             // Ctrl+Shift+N and Ctrl+Q are the editor's Numbered List and Toggle Comment,
             // and a menu accelerator beats Monaco — so neither is bound here.
             &MenuItem::with_id(
                 app,
                 "new-window",
-                "New Window",
+                menu_tr("New Window"),
                 true,
                 Some("CmdOrCtrl+Alt+W"),
             )?,
-            &MenuItem::with_id(app, "open", "Open...", true, Some("CmdOrCtrl+O"))?,
+            &MenuItem::with_id(app, "open", menu_tr("Open..."), true, Some("CmdOrCtrl+O"))?,
             &open_recent,
             &sep()?,
-            &MenuItem::with_id(app, "save", "Save", true, Some("CmdOrCtrl+S"))?,
+            &MenuItem::with_id(app, "save", menu_tr("Save"), true, Some("CmdOrCtrl+S"))?,
             &MenuItem::with_id(
                 app,
                 "save-as",
-                "Save As...",
+                menu_tr("Save As..."),
                 true,
                 Some("CmdOrCtrl+Shift+S"),
             )?,
-            // Compiling is an export: it writes a .cpdz alongside, leaving the open
-            // document on its own path, so it sits apart from the Save entries. Packaging
-            // is the same kind of thing, for a recipient who has to read the source.
+            &sep()?,
             &MenuItem::with_id(
                 app,
-                "save-as-compiled",
-                "Save As Compiled Worksheet...",
+                "close-tab",
+                menu_tr("Close Tab"),
                 true,
-                None::<&str>,
-            )?,
-            &MenuItem::with_id(
-                app,
-                "save-as-portable",
-                "Export Portable Package...",
-                true,
-                None::<&str>,
+                Some("CmdOrCtrl+W"),
             )?,
             &sep()?,
-            &MenuItem::with_id(app, "close-tab", "Close Tab", true, Some("CmdOrCtrl+W"))?,
-            &sep()?,
-            &export,
-            &sep()?,
-            &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
-        ],
-    )?;
-
-    let edit = Submenu::with_items(
-        app,
-        "Edit",
-        true,
-        &[
-            &MenuItem::with_id(app, "undo", "Undo", true, Some("CmdOrCtrl+Z"))?,
-            &MenuItem::with_id(app, "redo", "Redo", true, Some("CmdOrCtrl+Shift+Z"))?,
-            &sep()?,
-            &MenuItem::with_id(app, "cut", "Cut", true, Some("CmdOrCtrl+X"))?,
-            &MenuItem::with_id(app, "copy", "Copy", true, Some("CmdOrCtrl+C"))?,
-            &MenuItem::with_id(app, "paste", "Paste", true, Some("CmdOrCtrl+V"))?,
-            &sep()?,
-            &MenuItem::with_id(app, "select-all", "Select All", true, Some("CmdOrCtrl+A"))?,
-            &MenuItem::with_id(app, "find", "Find", true, Some("CmdOrCtrl+F"))?,
-            &MenuItem::with_id(app, "replace", "Replace", true, Some("CmdOrCtrl+H"))?,
-        ],
-    )?;
-
-    let toggle_sidebar = MenuItem::with_id(
-        app,
-        "toggle-sidebar",
-        "Toggle Sidebar",
-        true,
-        Some("CmdOrCtrl+Shift+B"),
-    )?;
-    let go_to_settings = MenuItem::with_id(
-        app,
-        "go-to-settings",
-        "Go to Settings",
-        true,
-        Some("CmdOrCtrl+,"),
-    )?;
-    let toggle_preview = MenuItem::with_id(
-        app,
-        "toggle-preview",
-        "Toggle Preview",
-        true,
-        Some("CmdOrCtrl+P"),
-    )?;
-    let toggle_word_wrap =
-        MenuItem::with_id(app, "toggle-word-wrap", "Toggle Word Wrap", true, Some("Alt+Z"))?;
-    let split_editor = MenuItem::with_id(
-        app,
-        "split-editor",
-        "Split Editor Down",
-        true,
-        Some("CmdOrCtrl+\\"),
-    )?;
-    let unsplit_editor = MenuItem::with_id(
-        app,
-        "unsplit-editor",
-        "Merge Editor Groups",
-        true,
-        None::<&str>,
-    )?;
-    // Same order as the results toolbar. "Preview" shows #pre and #post with the
-    // document's own values; "Report" hides #pre and applies entered #UI values.
-    let mode_preview = MenuItem::with_id(
-        app,
-        "result-mode:preview",
-        "Result Mode: Preview",
-        true,
-        None::<&str>,
-    )?;
-    let mode_unwrapped = MenuItem::with_id(
-        app,
-        "result-mode:unwrapped",
-        "Result Mode: Unwrapped",
-        true,
-        None::<&str>,
-    )?;
-    let mode_input =
-        MenuItem::with_id(app, "result-mode:ui", "Result Mode: Input", true, None::<&str>)?;
-    let mode_report = MenuItem::with_id(
-        app,
-        "result-mode:report",
-        "Result Mode: Report",
-        true,
-        None::<&str>,
-    )?;
-    let view_sep_1 = sep()?;
-    let view_sep_2 = sep()?;
-    let mut view_items: Vec<&dyn IsMenuItem<tauri::Wry>> = vec![
-        &toggle_sidebar,
-        &go_to_settings,
-        &toggle_preview,
-        &toggle_word_wrap,
-        &view_sep_1,
-        &split_editor,
-        &unsplit_editor,
-        &view_sep_2,
-    ];
-    // A compiled worksheet is only ever filled in: it has no source for preview or
-    // unwrapped to render, and its report is read beside the form rather than in place
-    // of it. Input is all that is left, so the rest are omitted from the menu the way
-    // the results toolbar omits their buttons.
-    if source_result_modes {
-        view_items.push(&mode_preview);
-        view_items.push(&mode_unwrapped);
-    }
-    view_items.push(&mode_input);
-    if source_result_modes {
-        view_items.push(&mode_report);
-    }
-    let view = Submenu::with_items(app, "View", true, &view_items)?;
-
-    let server = Submenu::with_items(
-        app,
-        "Server",
-        true,
-        &[
-            &MenuItem::with_id(app, "refresh", "Refresh", true, Some("CmdOrCtrl+Alt+X"))?,
             &MenuItem::with_id(
                 app,
                 "show-server-log",
-                "Show Server Log",
+                menu_tr("Show Server Log"),
                 true,
                 None::<&str>,
             )?,
-            &MenuItem::with_id(app, "stop-server", "Stop Server", true, None::<&str>)?,
+            &MenuItem::with_id(
+                app,
+                "stop-server",
+                menu_tr("Stop Server"),
+                true,
+                None::<&str>,
+            )?,
             &MenuItem::with_id(
                 app,
                 "restart-server",
-                "Restart Server",
+                menu_tr("Restart Server"),
                 true,
                 None::<&str>,
             )?,
+            &sep()?,
+            &MenuItem::with_id(app, "quit", menu_tr("Quit"), true, None::<&str>)?,
         ],
-    )?;
-
-    let help = Submenu::with_items(
-        app,
-        "Help",
-        true,
-        &[&MenuItem::with_id(
-            app,
-            "help-documentation",
-            "Documentation",
-            true,
-            None::<&str>,
-        )?],
-    )?;
-
-    MenuBuilder::new(app)
-        .items(&[&file, &edit, &view, &server, &help])
-        .build()
+    )
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     install_panic_hook();
+    let context = tauri::generate_context!();
+    #[cfg(all(windows, feature = "window-tests"))]
+    let context = {
+        let mut context = context;
+        let port = std::env::var("CALCPAD_TEST_DEBUG_PORT").expect("test debug port is required");
+        for window in &mut context.config_mut().app.windows {
+            let args = window
+                .additional_browser_args
+                .get_or_insert_with(String::new);
+            args.push_str(&format!(" --remote-debugging-port={port}"));
+        }
+        context
+    };
+    #[cfg(windows)]
+    allow_existing_instance_foreground(&context.config().identifier);
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            if let Some(w) = app.get_webview_window(MAIN_WINDOW_LABEL) {
-                let _ = w.show();
-                let _ = w.set_focus();
-                let _ = w.unminimize();
+            let files = extract_launch_files(argv);
+            if files.is_empty() {
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    new_window(app)
+                        .await
+                        .expect("failed to open window for application launch");
+                });
+                return;
             }
-            for path in extract_launch_files(argv) {
+
+            let target = app
+                .state::<FocusedWindow>()
+                .0
+                .lock()
+                .expect("focused window mutex poisoned")
+                .clone();
+            let window = app
+                .get_webview_window(&target)
+                .expect("last focused window is unavailable");
+            let _ = window.show();
+            let _ = window.unminimize();
+            let _ = window.set_focus();
+            for path in files {
                 // The OS handing us this path is the user's consent; no dialog ran.
                 allow_file_and_parent(app, &path);
                 let _ = app.emit_to(
-                    MAIN_WINDOW_LABEL,
+                    &target,
                     "open-file-request",
                     path.to_string_lossy().to_string(),
                 );
@@ -1501,24 +1684,29 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
-        // Applies the saved geometry after the window is created, so it wins over the
-        // config's `center: true`. StateFlags is spelled out rather than defaulted to
-        // all(): VISIBLE makes the plugin hide-then-show the window on restore, which is
-        // what the GNOME note in setup() below forbids and leaves the webview blank.
+        .plugin(
+            tauri::plugin::Builder::<tauri::Wry>::new("custom-titlebar")
+                .on_window_ready(|window| {
+                    window.hide_menu().expect("failed to hide native menu");
+                })
+                .build(),
+        )
         .plugin(
             tauri_plugin_window_state::Builder::default()
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::SIZE
-                        | tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
-                )
+                .with_filter(|label| label == MAIN_WINDOW_LABEL)
+                .with_state_flags(StateFlags::SIZE | StateFlags::POSITION | StateFlags::MAXIMIZED)
                 .build(),
         )
         .manage(ServerState::default())
         .manage(PendingLaunchFiles::default())
         .manage(FocusedWindow::default())
+        .manage(PrimaryWindow::default())
+        .manage(OpenFiles::default())
         .manage(MenuState::default())
+        .manage(NavigationHistoryState::default())
+        .menu(build_menu)
         .invoke_handler(tauri::generate_handler![
+            set_menu_labels,
             server_url,
             server_failure,
             server_token,
@@ -1533,13 +1721,40 @@ pub fn run() {
             log_dir,
             take_pending_launch_files,
             allow_document_dir,
-            set_source_result_modes_visible,
             set_recent_files,
             confirm_three_way,
             window_labels,
+            tab_drag_target,
+            use_system_tab_drag,
+            #[cfg(feature = "window-tests")]
+            test_set_tab_drag_target,
+            primary_window,
+            set_open_files,
+            navigate_to_open_file,
             new_window,
+            record_navigation,
+            remove_navigation,
+            navigate_history,
+            complete_navigation,
+            show_app_menu,
+            get_app_menu,
+            create_export_path,
+            #[cfg(target_os = "linux")]
+            linux_file_dialog::linux_file_dialog,
         ])
         .on_window_event(|window, event| match event {
+            tauri::WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) => {
+                for path in paths.iter().filter(|p| is_worksheet_path(p) && p.is_file()) {
+                    allow_file_and_parent(window.app_handle(), path);
+                    window
+                        .emit_to(
+                            window.label(),
+                            "open-file-request",
+                            path.to_string_lossy().to_string(),
+                        )
+                        .expect("failed to emit dropped file request");
+                }
+            }
             tauri::WindowEvent::Focused(true) => {
                 *window
                     .state::<FocusedWindow>()
@@ -1547,19 +1762,46 @@ pub fn run() {
                     .lock()
                     .expect("focused window mutex poisoned") = window.label().to_string();
             }
-            // `new_window` reuses the lowest free `main-N`, so a stale entry would
-            // otherwise seed the next window with the old one's View state.
             tauri::WindowEvent::Destroyed => {
                 window
-                    .state::<MenuState>()
-                    .source_result_modes
+                    .state::<OpenFiles>()
+                    .0
                     .lock()
-                    .expect("menu state mutex poisoned")
+                    .expect("open files mutex poisoned")
                     .remove(window.label());
+                window
+                    .state::<NavigationHistoryState>()
+                    .remove_window(window.label());
+                let app = window.app_handle();
+                let next = app
+                    .webview_windows()
+                    .into_keys()
+                    .filter(|label| label != window.label())
+                    .min();
+                if let Some(next) = next {
+                    let primary = app.state::<PrimaryWindow>();
+                    let mut primary = primary.0.lock().expect("primary window mutex poisoned");
+                    let changed = *primary == window.label();
+                    if changed {
+                        *primary = next;
+                    }
+                    let focused = app.state::<FocusedWindow>();
+                    let mut focused = focused.0.lock().expect("focused window mutex poisoned");
+                    if *focused == window.label() {
+                        *focused = primary.clone();
+                    }
+                    if changed {
+                        let _ = app.emit("primary-window-changed", primary.clone());
+                    }
+                }
             }
             _ => {}
         })
         .setup(|app| {
+            app.get_webview_window(MAIN_WINDOW_LABEL)
+                .expect("main window exists during setup")
+                .unmaximize()?;
+
             // Pin the on-disk locations the panic hook + draft commands need.
             // app_data_dir is per-user and writable on all supported platforms.
             if let Ok(data_dir) = app.path().app_data_dir() {
@@ -1574,8 +1816,6 @@ pub fn run() {
                 let _ = DRAFTS_DIR.set(drafts);
             }
 
-            let menu = build_menu(app.handle(), MAIN_WINDOW_LABEL)?;
-            app.set_menu(menu)?;
             let handle_for_menu = app.handle().clone();
             // Addressed to the focused window: this handler fires for every window's menu,
             // so a broadcast would run each click and accelerator in all of them at once.
@@ -1623,8 +1863,11 @@ pub fn run() {
                 tokio::time::sleep(Duration::from_millis(50)).await;
                 if let Ok(drafts) = draft_list() {
                     if !drafts.is_empty() {
-                        let _ =
-                            handle_for_drafts.emit_to(MAIN_WINDOW_LABEL, "drafts-recovered", drafts);
+                        let _ = handle_for_drafts.emit_to(
+                            MAIN_WINDOW_LABEL,
+                            "drafts-recovered",
+                            drafts,
+                        );
                     }
                 }
             });
@@ -1636,7 +1879,10 @@ pub fn run() {
             let launch_files = extract_launch_files(std::env::args());
             if !launch_files.is_empty() {
                 let pending: State<'_, PendingLaunchFiles> = app.state();
-                let mut guard = pending.0.lock().expect("pending launch files mutex poisoned");
+                let mut guard = pending
+                    .0
+                    .lock()
+                    .expect("pending launch files mutex poisoned");
                 for path in launch_files {
                     allow_file_and_parent(app.handle(), &path);
                     guard.push(path.to_string_lossy().to_string());
@@ -1652,7 +1898,7 @@ pub fn run() {
         })
         // No CloseRequested handler: the frontend preventDefaults it, so killing there
         // leaves an open window with a dead server.
-        .build(tauri::generate_context!())
+        .build(context)
         .expect("error while building tauri application")
         .run(|app, event| {
             if let RunEvent::ExitRequested { .. } = event {

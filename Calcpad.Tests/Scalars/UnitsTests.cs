@@ -2140,6 +2140,87 @@
 
         #endregion
 
+        #region Angle Units
+        private static string RunAngle(MathSettings settings, params string[] lines)
+        {
+            var calc = new TestCalc(settings);
+            calc.Run(lines);
+            return calc.ToString();
+        }
+
+        [Theory]
+        [InlineData(0, "45°")]
+        [InlineData(1, "0.785rad")]
+        [InlineData(2, "50grad")]
+        [Trait("Category", "Angle Units")]
+        public static void Phase_Matches_Atan2(int degrees, string expected)
+        {
+            var settings = new MathSettings { Degrees = degrees, IsComplex = true };
+            Assert.Equal(expected, RunAngle(settings, "phase(1 + 1i)"));
+            Assert.Equal(expected, RunAngle(settings, "atan2(1; 1)"));
+        }
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void Phase_Real_Deg() =>
+            Assert.Equal("180°", RunAngle(new(), "phase(-1)"));
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void Phase_ReturnAngleUnits_Off() =>
+            Assert.Equal("45", RunAngle(new() { IsComplex = true }, "ReturnAngleUnits = 0", "phase(1 + 1i)"));
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void ReturnAngleUnits_Setting_Off() =>
+            Assert.Equal("45", RunAngle(new() { ReturnAngleUnits = false }, "atan(1)"));
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void Phasor_Unitless_Angle_Uses_Current_Units()
+        {
+            var settings = new MathSettings { IsComplex = true };
+            Assert.Equal("0.707", RunAngle(settings, "re(1∠45)"));
+            Assert.Equal("0.707", RunAngle(settings, "re(1∠(π/4*rad))"));
+            Assert.Equal("0.707", RunAngle(new MathSettings { IsComplex = true, Degrees = 1 }, "re(1∠(π/4))"));
+        }
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void Phasor_In_Compiled_Function()
+        {
+            var settings = new MathSettings { IsComplex = true };
+            Assert.Equal("2i", RunAngle(settings, "f(r; t) = r∠t", "f(2; 90)"));
+            Assert.Equal("5.2", RunAngle(settings, "$Sum{re(k∠30) @ k = 1 : 3}"));
+        }
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void Acsc_Zero_Keeps_Units() =>
+            Assert.Equal("[+∞° 30°]", RunAngle(new(), "acsc([0; 2])"));
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void HpVector_Sparse_Asin() =>
+            Assert.Equal("[30° 0° 0° 0°]", RunAngle(new(), "v = vector(4)", "v.1 = 0.5", "asin(hp(v))"));
+
+        [Fact]
+        [Trait("Category", "Angle Units")]
+        public static void HpVector_Asec_Zero() =>
+            Assert.Equal("[+∞° 60°]", RunAngle(new(), "asec(hp([0; 2]))"));
+
+        [Theory]
+        [InlineData("atan(hp(D)) + 1°")]
+        [InlineData("atan2(hp(D); hp(D)) + 1°")]
+        [Trait("Category", "Angle Units")]
+        public static void HpDiagonal_InverseTrig_Uniform_Units(string expression)
+        {
+            var result = RunAngle(new(), "D = diagonal(2; 1)", expression);
+            Assert.DoesNotContain("unitless", result);
+            Assert.Equal(4, result.Split('°').Length - 1);
+        }
+        #endregion
+
         #region Custom Units
         [Fact]
         [Trait("Category", "Custom Units")]

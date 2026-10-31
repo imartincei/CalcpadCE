@@ -99,6 +99,9 @@ The **Write / Append** section controls the document's own file output:
 
 The input form and unwrapped never write, and which `#UI` values (default or overrides) reach the file depends on the preview mode and settings.
 
+Numbers in CSV are always written with a `.` decimal separator, so a file reads back the same on any machine.
+To read a CSV saved by Excel with a decimal comma, use sep=';'. To write that spreadsheet, use .xlsx.
+
 ## Portable exports
 
 Beyond saving a document as `.cpd`, CalcpadCE can produce two self-contained outputs meant to be handed to someone else: a compiled worksheet, which runs anywhere but keeps its source locked, and a portable package, which stays readable and editable.

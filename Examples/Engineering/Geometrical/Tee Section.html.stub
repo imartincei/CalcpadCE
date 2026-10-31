@@ -1,6 +1,6 @@
 <div class="calcpad-output">
  <!-- Section properties of a Tee profile: area, centroid, second moments of area $I_x$, $I_y$, section moduli and radii of gyration. -->
- <h3>Geometrical Properties of Tee Section</h3>
+ <h1>Geometrical Properties of Tee Section</h1>
  <div style="max-width:120mm">
   <img alt="tee.png" class="side" src="Images/mechanics/sections/tee.png" style="height:150pt;"/>
  </div>
