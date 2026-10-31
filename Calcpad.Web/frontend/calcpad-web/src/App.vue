@@ -1717,14 +1717,15 @@ function commitToBuffer(frameId: string, html: string): Promise<void> {
 
 // srcdoc forces a fresh browsing context; reusing one document via doc.open()/write()
 // desynced WebKit's scrolling state and lost the preview's scrollbar.
-function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = ''): Promise<void> {
+// `frameHtml`, when given, is shown in place of `html`, which stays the worksheet's own render.
+function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, docKey = '', frameHtml?: string): Promise<void> {
   if (!previewEls.has(groupId)) return Promise.resolve()
   const isUi = resultMode.value === 'ui'
   docKeyByFrame.set(groupId, docKey)
   // An explicit line target outranks restoring the old position.
   const seed = scrollToLine === undefined ? scrollByFrameDoc.get(scrollKey(groupId, docKey)) : undefined
   let out = injectPreviewAgent(
-    injectLineLinks(html, scrollToLine, groupId, undefined, !isUi),
+    injectLineLinks(frameHtml ?? html, scrollToLine, groupId, undefined, !isUi),
     groupId,
     !!onClipboardReadRequest.value,
     seed,

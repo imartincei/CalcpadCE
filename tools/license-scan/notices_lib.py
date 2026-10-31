@@ -26,6 +26,10 @@ LICENSE_FILE = re.compile(
     r")$"
 )
 COPYRIGHT_LINE = re.compile(r"(?im)^.*copyright.*$")
+# Package subtrees no build copies, so their licences describe nothing we ship.
+UNSHIPPED_PATHS = re.compile(
+    r"(^|/)node_modules/pdfjs-dist/(wasm|standard_fonts|cmaps|iccs)/"
+)
 MAX_LICENSE_BYTES = 200_000
 
 # Lines that mention copyright but are licence body -- disclaimers, grant
@@ -143,7 +147,7 @@ def scan_corpus(corpus_dir):
                                     take(("nuget", nupkg["name"].lower()), z.read(info))
                     except (zipfile.BadZipFile, OSError, KeyError):
                         pass
-                elif LICENSE_FILE.search(path):
+                elif LICENSE_FILE.search(path) and not UNSHIPPED_PATHS.search(path):
                     try:
                         take(_package_key(path), tar.extractfile(member).read())
                     except (OSError, KeyError):

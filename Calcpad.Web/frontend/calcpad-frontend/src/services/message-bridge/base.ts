@@ -347,6 +347,14 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('previewUiOverrides', String(message.enabled));
                 this.postToVue({ type: 'previewUiOverridesChanged', enabled: !!message.enabled });
                 break;
+            case 'updatePreviewPageBreaks':
+                this.setExtraSetting('previewPageBreaks', String(!!message.enabled));
+                this.postToVue({ type: 'previewPageBreaksChanged', enabled: !!message.enabled });
+                break;
+            case 'updatePreviewPdf':
+                this.setExtraSetting('previewPdf', String(!!message.enabled));
+                this.postToVue({ type: 'previewPdfChanged', enabled: !!message.enabled });
+                break;
             case 'updateShowFileMetadata':
                 this.setExtraSetting('showFileMetadata', String(!!message.enabled));
                 this.postToVue({ type: 'showFileMetadataChanged', enabled: !!message.enabled });
@@ -599,6 +607,8 @@ export abstract class BaseMessageBridge {
             enableAutoRun: this.getExtraSetting('autoRun') !== 'false',
             enableAutoInputMode: this.getExtraSetting('autoInputMode') !== 'false',
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
+            enablePreviewPageBreaks: this.getExtraSetting('previewPageBreaks') === 'true',
+            enablePreviewPdf: this.getExtraSetting('previewPdf') === 'true',
             showFileMetadata: this.getExtraSetting('showFileMetadata') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
@@ -723,7 +733,7 @@ export abstract class BaseMessageBridge {
      * Settings tab keeps editing the stored set alone — this merge is only for the
      * request that generates a PDF. The header title is the file info's title.
      */
-    protected getEffectivePdfOptions(content: string): PdfSettings {
+    getEffectivePdfOptions(content: string): PdfSettings {
         const lines = content.split(/\r?\n/);
         return resolveEffectivePdfSettings(
             this.getStoredPdfOptions(),
