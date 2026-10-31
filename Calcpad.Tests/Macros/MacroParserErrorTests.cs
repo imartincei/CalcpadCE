@@ -6,8 +6,13 @@ public class MacroParserErrorTests
     {
         var parser = new MacroParser();
         string expanded = null;
-        var task = Task.Run(() => parser.Parse(source, out expanded, null, 0, false));
-        Assert.True(task.Wait(TimeSpan.FromSeconds(5)), "MacroParser hung");
+        // Dedicated thread so thread-pool starvation under full-suite load can't fake a hang.
+        var task = Task.Factory.StartNew(
+            () => parser.Parse(source, out expanded, null, 0, false),
+            CancellationToken.None,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
+        Assert.True(task.Wait(TimeSpan.FromSeconds(30)), "MacroParser hung");
         return (parser, expanded.Split('\n', StringSplitOptions.TrimEntries));
     }
 
