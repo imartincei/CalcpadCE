@@ -1,0 +1,17 @@
+' QA basic worksheet
+a = 3
+b = 4
+c = sqrt(a^2 + b^2)
+c
+' units
+L = 2m
+W = 3m
+A = L*W
+A|m^2
+' matrix
+M = [1; 2|3; 4]
+D = det(M)
+D
+' function
+f(x) = x^2 + 1
+f(2)

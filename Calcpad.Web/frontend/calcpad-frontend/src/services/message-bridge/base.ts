@@ -32,6 +32,8 @@ export interface ExportRequest {
     extensions: string[];
     dialogTitle: string;
     openDirectly?: boolean;
+    /** Write here instead of opening the host's save dialog. */
+    targetPath?: string;
 }
 
 /** A sidebar form whose unapplied edits the host prompts about before closing a document. */
@@ -132,6 +134,7 @@ export abstract class BaseMessageBridge {
     private _metadataDirtySink: ((docKey: string, dirty: boolean, form: DraftForm) => void) | null = null;
     private _documentSaver: { isDirty(): boolean; save(): Promise<boolean> } | null = null;
     private _cachedPlots: ExtractedPlot[] = [];
+    private _plotsContent = '';
     /** App version stamped into file info; set by the host, which knows it. */
     programVersion = '';
 
@@ -518,7 +521,7 @@ export abstract class BaseMessageBridge {
     ): Promise<ArrayBuffer | null>;
 
     protected buildSettingsResponseExtras(): Record<string, unknown> | Promise<Record<string, unknown>> { return {}; }
-    protected async runPdfPreflight(): Promise<boolean> { return true; }
+    protected async runPdfPreflight(_interactive = true): Promise<boolean> { return true; }
     /** Return `true` to retry the export. Only do so on a user action (Retry, installing a browser). */
     protected async onPdfError(_err: unknown): Promise<boolean> { return false; }
     /** Called after a PDF is successfully written, with the saved path (platforms that have one). */
@@ -814,26 +817,31 @@ export abstract class BaseMessageBridge {
         return mode;
     }
 
-    private async handleSaveSourceHtml(variant: ExportVariant = 'report'): Promise<void> {
+    private async handleSaveSourceHtml(variant: ExportVariant = 'report', targetPath?: string): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
         const rendered = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
-        if (rendered == null) return;
-        await this.saveExportedFile({
+        if (rendered == null) return null;
+        return await this.saveExportedFile({
             defaultName: 'calcpad-output.html',
             data: rendered,
             mime: 'text/html;charset=utf-8',
             extensions: ['html', 'htm'],
             dialogTitle: exportDialogTitle('Save', 'HTML', variant),
+            targetPath,
         });
     }
 
-    private async handleSaveDocx(variant: ExportVariant = 'report', openDirectly = false): Promise<void> {
+    private async handleSaveDocx(
+        variant: ExportVariant = 'report',
+        openDirectly = false,
+        targetPath?: string,
+    ): Promise<string | null> {
         const render = variantRender(variant, this.previewAppliesUiOverrides());
         // A form and a code listing have no meaningful Word rendering, so the Export tab
         // doesn't offer them; guard anyway rather than emit a nonsense document.
-        if (render.enableUi || render.unwrap) return;
+        if (render.enableUi || render.unwrap) return null;
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
@@ -842,14 +850,15 @@ export abstract class BaseMessageBridge {
             uiOverrides: render.useOverrides ? this.activeUiOverrides() : undefined,
             write: this.mayWrite(render.forPrint, render.enableUi),
         });
-        if (!buf) return;
-        await this.saveExportedFile({
+        if (!buf) return null;
+        return await this.saveExportedFile({
             defaultName: 'calcpad-output.docx',
             data: buf,
             mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             extensions: ['docx'],
             dialogTitle: exportDialogTitle('Save', 'Word Document', variant),
             openDirectly,
+            targetPath,
         });
     }
 
@@ -859,12 +868,14 @@ export abstract class BaseMessageBridge {
      * is bundled before its images are embedded, since an included file's images only resolve
      * once the server has rewritten their paths.
      */
-    async saveCompiled(): Promise<string | null> {
+    async saveCompiled(targetPath?: string, interactive = true): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const bundled = await this.apiClient.bundlePortable(content, sourceFilePath);
         if (bundled.content == null) {
-            await this.onExportError(`This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`);
+            const message = `This worksheet cannot be compiled:\n${bundled.errors.join('\n')}`;
+            if (!interactive) throw new Error(message);
+            await this.onExportError(message);
             return null;
         }
         // Embedding the images can refuse the whole export, the same way the server refuses
@@ -878,8 +889,10 @@ export abstract class BaseMessageBridge {
                 fileName: this.activeDocumentName(),
             }));
         } catch (error) {
-            await this.onExportError(
-                `This worksheet cannot be compiled:\n${error instanceof Error ? error.message : String(error)}`);
+            const message =
+                `This worksheet cannot be compiled:\n${error instanceof Error ? error.message : String(error)}`;
+            if (!interactive) throw new Error(message);
+            await this.onExportError(message);
             return null;
         }
         const bytes = await this.apiClient.encodeCpdz(compiled);
@@ -890,6 +903,7 @@ export abstract class BaseMessageBridge {
             mime: COMPILED_MIME,
             extensions: ['cpdz'],
             dialogTitle: 'Save Compiled Worksheet',
+            targetPath,
         });
     }
 
@@ -899,13 +913,14 @@ export abstract class BaseMessageBridge {
      * written, with only its paths pointing at the folder of references packed beside it — and
      * the server does the packing, since resolving the references means reading them.
      */
-    async savePortable(): Promise<string | null> {
+    async savePortable(targetPath?: string, interactive = true): Promise<string | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const packaged = await this.apiClient.packagePortable(content, sourceFilePath);
         if (!packaged.zip) {
-            await this.onExportError(
-                `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`);
+            const message = `This worksheet cannot be packaged:\n${packaged.errors.join('\n')}`;
+            if (!interactive) throw new Error(message);
+            await this.onExportError(message);
             return null;
         }
         return this.saveExportedFile({
@@ -914,6 +929,7 @@ export abstract class BaseMessageBridge {
             mime: 'application/zip',
             extensions: ['zip'],
             dialogTitle: 'Export Portable Package',
+            targetPath,
         });
     }
 
@@ -966,26 +982,75 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleGetPlots(): Promise<void> {
+    /** Re-render the active document and cache the plots it emits. */
+    async collectPlots(): Promise<ExtractedPlot[]> {
         const content = this.getActiveEditorContent();
+        this._plotsContent = content;
         if (!content.trim()) {
             this._cachedPlots = [];
-            this.postToVue({ type: 'plotsResponse', plots: [] });
-            return;
+            return this._cachedPlots;
         }
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
         const result = await this.apiClient.convert(content, apiSettings, 'html', false, sourceFilePath);
         const html = result && !(result instanceof ArrayBuffer) ? result.html : '';
         this._cachedPlots = extractPlotsFromHtml(html);
+        return this._cachedPlots;
+    }
+
+    /** Reuse the cache after `plots`, but never save plots from a different edit. */
+    private async plotsForSave(): Promise<ExtractedPlot[]> {
+        if (this._cachedPlots.length > 0 && this._plotsContent === this.getActiveEditorContent()) {
+            return this._cachedPlots;
+        }
+        return await this.collectPlots();
+    }
+
+    private async handleGetPlots(): Promise<void> {
+        const plots = await this.collectPlots();
         this.postToVue({
             type: 'plotsResponse',
-            plots: this._cachedPlots.map(p => ({
+            plots: plots.map(p => ({
                 index: p.index,
                 ext: p.ext,
                 dataUri: p.dataUri,
                 sizeBytes: p.bytes.length,
             })),
+        });
+    }
+
+    /** Write one cached plot without a save dialog. */
+    async savePlotTo(index: number, targetPath: string): Promise<string | null> {
+        const plots = await this.plotsForSave();
+        const plot = plots[index];
+        if (!plot) throw new Error(`no plot at index ${index}`);
+        return await this.saveExportedFile({
+            defaultName: `plot-${index + 1}.${plot.ext}`,
+            data: plot.bytes,
+            mime: plot.mime,
+            extensions: [plot.ext],
+            dialogTitle: 'Save Plot',
+            targetPath,
+        });
+    }
+
+    /** Write every cached plot as one ZIP without a save dialog. */
+    async savePlotsZipTo(targetPath: string): Promise<string | null> {
+        const plots = await this.plotsForSave();
+        if (plots.length === 0) throw new Error('the document has no plots');
+        const zipBytes = buildZip(
+            plots.map(p => ({
+                name: `plot-${p.index + 1}.${p.ext}`,
+                bytes: p.bytes,
+            })),
+        );
+        return await this.saveExportedFile({
+            defaultName: 'calcpad-plots.zip',
+            data: zipBytes,
+            mime: 'application/zip',
+            extensions: ['zip'],
+            dialogTitle: 'Save Plots ZIP',
+            targetPath,
         });
     }
 
@@ -1019,19 +1084,24 @@ export abstract class BaseMessageBridge {
         });
     }
 
-    private async handleGeneratePdf(variant: ExportVariant = 'report', openDirectly = false): Promise<void> {
-        if (!(await this.runPdfPreflight())) return;
+    private async handleGeneratePdf(
+        variant: ExportVariant = 'report',
+        openDirectly = false,
+        targetPath?: string,
+        interactive = true,
+    ): Promise<string | null> {
+        if (!(await this.runPdfPreflight(interactive))) return null;
 
         const content = this.getActiveEditorContent();
         const apiSettings = buildApiSettings(this.settings);
         const { sourceFilePath } = await this.buildFileContext(content);
 
         // onPdfError returns true only after the user chose to retry or install a browser,
-        // so this never loops on its own.
+        // so this never loops on its own. Automation gets the error instead of a dialog.
         for (;;) {
             try {
                 const pdfBytes = await this.generatePdfBytes(content, apiSettings, sourceFilePath, variant);
-                if (!pdfBytes) return;
+                if (!pdfBytes) return null;
                 const savedPath = await this.saveExportedFile({
                     defaultName: 'calcpad-output.pdf',
                     data: pdfBytes,
@@ -1039,13 +1109,29 @@ export abstract class BaseMessageBridge {
                     extensions: ['pdf'],
                     dialogTitle: exportDialogTitle('Export', 'PDF', variant),
                     openDirectly,
+                    targetPath,
                 });
-                if (savedPath) await this.onPdfSaved(savedPath);
-                return;
+                if (savedPath && interactive) await this.onPdfSaved(savedPath);
+                return savedPath;
             } catch (err) {
-                if (!(await this.onPdfError(err))) return;
+                if (!interactive) throw err;
+                if (!(await this.onPdfError(err))) return null;
             }
         }
+    }
+
+    /** Export the active document without a save dialog, for the desktop control channel. */
+    async exportActive(
+        format: 'pdf' | 'html' | 'docx' | 'cpdz' | 'zip',
+        variant: ExportVariant,
+        targetPath: string,
+    ): Promise<string | null> {
+        if (format === 'pdf') return await this.handleGeneratePdf(variant, false, targetPath, false);
+        if (format === 'html') return await this.handleSaveSourceHtml(variant, targetPath);
+        if (format === 'docx') return await this.handleSaveDocx(variant, false, targetPath);
+        if (format === 'cpdz') return await this.saveCompiled(targetPath, false);
+        if (format === 'zip') return await this.savePortable(targetPath, false);
+        throw new Error(`unsupported export format: ${format}`);
     }
 
     private handleGoToLine(line: number): void {
