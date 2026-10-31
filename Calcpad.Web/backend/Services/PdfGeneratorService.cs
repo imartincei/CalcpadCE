@@ -786,7 +786,8 @@ namespace Calcpad.Server.Services
         private static bool NeedsCjk(string text)
         {
             foreach (var c in text)
-                if (c > '\u007F') return true;
+                if (c is >= '\u2E80' and <= '\u9FFF' or >= '\uF900' and <= '\uFAFF' or >= '\uFF00' and <= '\uFFEF')
+                    return true;
             return false;
         }
 
