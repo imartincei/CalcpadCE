@@ -3219,8 +3219,8 @@ In the next example, speed is calculated in m/s, but is converted and stored as 
 <li>Power: hp, hpE, hpS.</li>
 </ul>
 <p>Angle units are accepted by trigonometric functions, and they override all other settings.
-Inverse trigonometric functions return unitless values by default.
-If you want them to return the result in the current units, you have to define a variable: <em>ReturnAngleUnits</em> = 1.</p>
+Inverse trigonometric functions and <code>phase</code> return the result in the current angle units by default.
+To return unitless values instead, turn off <strong>Return Angle Units</strong> in the <a href="new-settings.html#math">Settings</a> or define a variable: <em>ReturnAngleUnits</em> = 0.</p>
 <p>Literals that follow numbers immediately are parsed as units, e.g. "2 m". Standalone literals can be either units or variables, e.g. "N*m". The rules for parsing are as follows: If a literal has not been defined as a variable, it is parsed as a unit.
 Otherwise, it is parsed as a variable, even if a unit with the same name exists.
 If you put a dot before the literal, you will force it to be parsed as a unit, even if a variable with the same name exists, e.g. ".N*.m".</p>

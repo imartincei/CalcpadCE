@@ -3742,11 +3742,11 @@
 <span class="k">#if</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nv">r</span>
 <span class="w">    </span><span class="c1">'&lt;--&gt;</span>
 <span class="w">    </span><span class="c1">'Angle</span>
-<span class="w">    </span><span class="nv">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nb">asin</span><span class="p">(</span><span class="nv">a</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">r</span><span class="p">))</span><span class="c1">'&amp;deg;</span>
+<span class="w">    </span><span class="nv">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nb">asin</span><span class="p">(</span><span class="nv">a</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">r</span><span class="p">))</span>
 <span class="w">    </span><span class="c1">'Area</span>
-<span class="w">    </span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">^</span><span class="m">2</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">360</span>
+<span class="w">    </span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">^</span><span class="m">2</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">360</span><span class="na">°</span>
 <span class="w">    </span><span class="c1">'Arch length</span>
-<span class="w">    </span><span class="nv">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span>
+<span class="w">    </span><span class="nv">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span><span class="na">°</span>
 <span class="w">    </span><span class="c1">'&lt;!--</span>
 <span class="k">#else</span>
 <span class="w">    </span><span class="c1">'&lt;--&gt;</span>
@@ -3768,11 +3768,11 @@
 <!-- 
 <--> 
 <p>Angle </p>
-<p><span class="eq"><var>α</var> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc"><var>a</var><span class="dvl"></span>2 · <var>r</var></span><span class="b1">)</span> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span>2 · 1</span><span class="b1">)</span> = 60</span> &deg; </p>
+<p><span class="eq"><var>α</var> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc"><var>a</var><span class="dvl"></span>2 · <var>r</var></span><span class="b1">)</span> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc">1<span class="dvl"></span>2 · 1</span><span class="b1">)</span> = 60°</span></p>
 <p>Area </p>
-<p><span class="eq"><var>A</var> = <span class="dvc"><var>π</var> · <var>r</var><sup>2</sup> · <var>α</var><span class="dvl"></span>360</span> = <span class="dvc">3.14 · 1<sup>2</sup> · 60<span class="dvl"></span>360</span> = 0.524</span></p>
+<p><span class="eq"><var>A</var> = <span class="dvc"><var>π</var> · <var>r</var><sup>2</sup> · <var>α</var><span class="dvl"></span>360°</span> = <span class="dvc">3.14 · 1<sup>2</sup> · 60°<span class="dvl"></span>360°</span> = 0.524</span></p>
 <p>Arch length </p>
-<p><span class="eq"><var>S</var> = <span class="dvc"><var>π</var> · <var>r</var> · <var>α</var><span class="dvl"></span>180</span> = <span class="dvc">3.14 · 1 · 60<span class="dvl"></span>180</span> = 1.05</span></p>
+<p><span class="eq"><var>S</var> = <span class="dvc"><var>π</var> · <var>r</var> · <var>α</var><span class="dvl"></span>180°</span> = <span class="dvc">3.14 · 1 · 60°<span class="dvl"></span>180°</span> = 1.05</span></p>
 <!-- 
 <--> 
 </div>
@@ -3839,11 +3839,11 @@
 <span class="w">    </span><span class="c1">'Radius</span>
 <span class="w">    </span><span class="nv">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">b</span><span class="o">/</span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">a</span><span class="o">^</span><span class="m">2</span><span class="o">/</span><span class="p">(</span><span class="m">8</span><span class="o">*</span><span class="nv">b</span><span class="p">)</span>
 <span class="w">    </span><span class="c1">'Angle</span>
-<span class="w">    </span><span class="nv">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nb">asin</span><span class="p">(</span><span class="nv">a</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">r</span><span class="p">))</span><span class="c1">'&amp;deg;</span>
+<span class="w">    </span><span class="nv">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="o">*</span><span class="nb">asin</span><span class="p">(</span><span class="nv">a</span><span class="o">/</span><span class="p">(</span><span class="m">2</span><span class="o">*</span><span class="nv">r</span><span class="p">))</span>
 <span class="w">    </span><span class="c1">'Area</span>
-<span class="w">    </span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="o">*</span><span class="p">(</span><span class="nv">π</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="nv">α</span><span class="p">))</span><span class="o">*</span><span class="nv">r</span><span class="o">^</span><span class="m">2</span>
+<span class="w">    </span><span class="nv">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="o">*</span><span class="p">(</span><span class="nv">π</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span><span class="na">°</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="nv">α</span><span class="p">))</span><span class="o">*</span><span class="nv">r</span><span class="o">^</span><span class="m">2</span>
 <span class="w">    </span><span class="c1">'Arc length</span>
-<span class="w">    </span><span class="nv">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span>
+<span class="w">    </span><span class="nv">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">π</span><span class="o">*</span><span class="nv">r</span><span class="o">*</span><span class="nv">α</span><span class="o">/</span><span class="m">180</span><span class="na">°</span>
 <span class="w">    </span><span class="c1">'&lt;!--</span>
 <span class="k">#else</span>
 <span class="w">    </span><span class="c1">'&lt;--&gt;</span>
@@ -3866,11 +3866,11 @@
 <p>Radius </p>
 <p><span class="eq"><var>r</var> = <span class="dvc"><var>b</var><span class="dvl"></span>2</span> + <span class="dvc"><var>a</var><sup>2</sup><span class="dvl"></span>8 · <var>b</var></span> = <span class="dvc">1<span class="dvl"></span>2</span> + <span class="dvc">2<sup>2</sup><span class="dvl"></span>8 · 1</span> = 1</span></p>
 <p>Angle </p>
-<p><span class="eq"><var>α</var> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc"><var>a</var><span class="dvl"></span>2 · <var>r</var></span><span class="b1">)</span> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc">2<span class="dvl"></span>2 · 1</span><span class="b1">)</span> = 180</span> &deg; </p>
+<p><span class="eq"><var>α</var> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc"><var>a</var><span class="dvl"></span>2 · <var>r</var></span><span class="b1">)</span> = 2 · <b>asin</b><span class="b1">(</span><span class="dvc">2<span class="dvl"></span>2 · 1</span><span class="b1">)</span> = 180°</span></p>
 <p>Area </p>
-<p><span class="eq"><var>A</var> = 0.5 · <span class="b1">(</span><span class="dvc"><var>π</var> · <var>α</var><span class="dvl"></span>180</span> − <b>sin</b> ( <var>α</var> ) <span class="b1">)</span> · <var>r</var><sup>2</sup> = 0.5 · <span class="b1">(</span><span class="dvc">3.14 · 180<span class="dvl"></span>180</span> − <b>sin</b> ( 180 ) <span class="b1">)</span> · 1<sup>2</sup> = 1.57</span></p>
+<p><span class="eq"><var>A</var> = 0.5 · <span class="b1">(</span><span class="dvc"><var>π</var> · <var>α</var><span class="dvl"></span>180°</span> − <b>sin</b> ( <var>α</var> ) <span class="b1">)</span> · <var>r</var><sup>2</sup> = 0.5 · <span class="b1">(</span><span class="dvc">3.14 · 180°<span class="dvl"></span>180°</span> − <b>sin</b> ( 180° ) <span class="b1">)</span> · 1<sup>2</sup> = 1.57</span></p>
 <p>Arc length </p>
-<p><span class="eq"><var>S</var> = <span class="dvc"><var>π</var> · <var>r</var> · <var>α</var><span class="dvl"></span>180</span> = <span class="dvc">3.14 · 1 · 180<span class="dvl"></span>180</span> = 3.14</span></p>
+<p><span class="eq"><var>S</var> = <span class="dvc"><var>π</var> · <var>r</var> · <var>α</var><span class="dvl"></span>180°</span> = <span class="dvc">3.14 · 1 · 180°<span class="dvl"></span>180°</span> = 3.14</span></p>
 <!-- 
 <--> 
 </div>

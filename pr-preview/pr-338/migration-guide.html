@@ -1855,6 +1855,45 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#inverse-trig-functions-return-angle-units-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inverse trig functions return angle units by default
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inverse trig functions return angle units by default">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3445,6 +3484,45 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#inverse-trig-functions-return-angle-units-by-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inverse trig functions return angle units by default
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inverse trig functions return angle units by default">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-breaks_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What breaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-update_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3639,6 +3717,59 @@ This produced unpredictable behavior in certain cases, which is why this change 
 <div class="language-calcpad highlight"><pre><span></span><code><span class="nv">F_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span>
 <span class="nv">a,1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4</span>
 </code></pre></div>
+<h3 id="inverse-trig-functions-return-angle-units-by-default">Inverse trig functions return angle units by default<a class="headerlink" href="#inverse-trig-functions-return-angle-units-by-default" title="Permanent link">&para;</a></h3>
+<p><code>asin</code>, <code>acos</code>, <code>atan</code>, <code>acsc</code>, <code>asec</code>, <code>acot</code>, <code>atan2</code> and <code>phase</code> now attach the current angle unit to their result (<code>°</code>, <code>rad</code> or <code>grad</code>).
+Previously this required <code>ReturnAngleUnits = 1</code>, and the result was a unitless number otherwise.
+The default is now the <strong>Return Angle Units</strong> setting, which is on.</p>
+<p>Two related fixes change results under <code>#deg</code> and <code>#gra</code>:</p>
+<ul>
+<li><code>phase</code> now follows <code>#deg</code>/<code>#rad</code>/<code>#gra</code> like <code>atan2</code> does. It always returned radians before.</li>
+<li>In <code>A∠φ</code>, a unitless <code>φ</code> is now read in the current angle units. It was always read as radians before, so under <code>#deg</code>, <code>1∠45</code> was 1∠(45 rad).</li>
+</ul>
+<h4 id="what-breaks_6">What breaks<a class="headerlink" href="#what-breaks_6" title="Permanent link">&para;</a></h4>
+<p>Mixing an inverse trig result with a unitless number is an error:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Before</th>
+<th>Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>atan(1)</code></td>
+<td><code>45</code></td>
+<td><code>45°</code></td>
+</tr>
+<tr>
+<td><code>atan(x) - 1</code></td>
+<td>a number</td>
+<td><code>Inconsistent units: "° - unitless".</code></td>
+</tr>
+<tr>
+<td><code>phase(1 + 1i)</code> under <code>#deg</code></td>
+<td><code>0.785</code></td>
+<td><code>45°</code></td>
+</tr>
+<tr>
+<td><code>re(1∠45)</code> under <code>#deg</code></td>
+<td><code>0.525</code></td>
+<td><code>0.707</code></td>
+</tr>
+</tbody>
+</table>
+<p>Workarounds such as <code>phase(z)*180/π</code> now give the wrong answer under <code>#deg</code>.</p>
+<p>Inverse trig on a diagonal or triangular matrix leaves its off-diagonal zeros unitless, so combining the result with an angle is an error, e.g. <code>atan(diagonal(3; 1)) + 1°</code>.
+This is a known limitation that will be fixed in a future update.
+Use <code>hp()</code> matrices, which share one unit across all elements, or set <code>#settings {"returnAngleUnits": false}</code> before running these calculations.</p>
+<h4 id="how-to-update_6">How to update<a class="headerlink" href="#how-to-update_6" title="Permanent link">&para;</a></h4>
+<p>Remove manual conversions like <code>*180/π</code> after <code>phase</code>, and add angle units where a result is combined with unitless numbers, e.g. <code>atan(x) - 1rad</code>.</p>
+<p>To keep the old unitless results instead, turn off <strong>Return Angle Units</strong> in the <a href="new-settings.html#math">Settings</a> tab, or add either line at the top of the document:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="nv">ReturnAngleUnits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="k">#</span><span class="nv">settings</span><span class="w"> </span><span class="p">{</span><span class="cs">"returnAngleUnits"</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p">}</span>
+</code></pre></div>
+<p>Write <code>1∠(45rad)</code> to keep a radian phasor angle under <code>#deg</code>.</p>
 
 
 
