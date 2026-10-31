@@ -14,34 +14,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -7
-      <i>L</i>
-     </span>
-     <span class="td">
-      8.88
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.4
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.1
-      <i>L</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-7</span>
+     <span class="td">8.88</span>
+     <span class="td">2.4</span>
+     <span class="td">-1.1</span>
      <span class="td">
      </span>
     </span>
@@ -49,30 +28,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      6
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      4
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.3
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.3
-      <i>L</i>
-     </span>
+     <span class="td">6</span>
+     <span class="td">-5.5</span>
+     <span class="td">4</span>
+     <span class="td">1.3</span>
+     <span class="td">-2.7</span>
+     <span class="td">3.3</span>
      <span class="td">
      </span>
     </span>
@@ -81,26 +42,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.22
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      4.1
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.6
-      <i>L</i>
-     </span>
+     <span class="td">-2.22</span>
+     <span class="td">2.5</span>
+     <span class="td">-2.2</span>
+     <span class="td">4.1</span>
+     <span class="td">-0.6</span>
      <span class="td">
      </span>
     </span>
@@ -110,22 +56,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.8
-      <i>L</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">1.7</span>
+     <span class="td">-1.5</span>
+     <span class="td">2.8</span>
      <span class="td">
      </span>
     </span>
@@ -136,18 +70,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      9.9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">9.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -159,14 +84,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.6
-      <i>L</i>
-     </span>
+     <span class="td">-6</span>
+     <span class="td">1.6</span>
      <span class="td">
      </span>
     </span>
@@ -179,14 +98,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      11
-      <i>L</i>
-     </span>
+     <span class="td">11</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -201,34 +118,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      4.5
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -3.2
-      <i>mL</i>
-     </span>
-     <span class="td">
-      2.8
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -1.6
-      <i>mL</i>
-     </span>
-     <span class="td">
-      0.9
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -7.1
-      <i>mL</i>
-     </span>
-     <span class="td">
-      5.2
-      <i>mL</i>
-     </span>
+     <span class="td">4.5</span>
+     <span class="td">-3.2</span>
+     <span class="td">2.8</span>
+     <span class="td">-1.6</span>
+     <span class="td">0.9</span>
+     <span class="td">-7.1</span>
+     <span class="td">5.2</span>
      <span class="td">
      </span>
     </span>
@@ -236,30 +132,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      -5.7
-      <i>mL</i>
-     </span>
-     <span class="td">
-      3.9
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -4.8
-      <i>mL</i>
-     </span>
-     <span class="td">
-      6.3
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -2.4
-      <i>mL</i>
-     </span>
-     <span class="td">
-      8.1
-      <i>mL</i>
-     </span>
+     <span class="td">-5.7</span>
+     <span class="td">3.9</span>
+     <span class="td">-4.8</span>
+     <span class="td">6.3</span>
+     <span class="td">-2.4</span>
+     <span class="td">8.1</span>
      <span class="td">
      </span>
     </span>
@@ -268,26 +146,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7.6
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -6.2
-      <i>mL</i>
-     </span>
-     <span class="td">
-      1.1
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -9.5
-      <i>mL</i>
-     </span>
-     <span class="td">
-      4.3
-      <i>mL</i>
-     </span>
+     <span class="td">7.6</span>
+     <span class="td">-6.2</span>
+     <span class="td">1.1</span>
+     <span class="td">-9.5</span>
+     <span class="td">4.3</span>
      <span class="td">
      </span>
     </span>
@@ -297,22 +160,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.9
-      <i>mL</i>
-     </span>
-     <span class="td">
-      5.8
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>mL</i>
-     </span>
-     <span class="td">
-      9.6
-      <i>mL</i>
-     </span>
+     <span class="td">-2.9</span>
+     <span class="td">5.8</span>
+     <span class="td">-3.7</span>
+     <span class="td">9.6</span>
      <span class="td">
      </span>
     </span>
@@ -323,18 +174,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      0.4
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -1.3
-      <i>mL</i>
-     </span>
-     <span class="td">
-      2.2
-      <i>mL</i>
-     </span>
+     <span class="td">0.4</span>
+     <span class="td">-1.3</span>
+     <span class="td">2.2</span>
      <span class="td">
      </span>
     </span>
@@ -346,14 +188,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      6.4
-      <i>mL</i>
-     </span>
-     <span class="td">
-      -8.7
-      <i>mL</i>
-     </span>
+     <span class="td">6.4</span>
+     <span class="td">-8.7</span>
      <span class="td">
      </span>
     </span>
@@ -366,14 +202,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      3.3
-      <i>mL</i>
-     </span>
+     <span class="td">3.3</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>mL</i>
   </span>
  </p>
  <p>
@@ -398,34 +232,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -7
-      <i>L</i>
-     </span>
-     <span class="td">
-      8.88
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.39
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.09
-      <i>L</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-7</span>
+     <span class="td">8.88</span>
+     <span class="td">2.39</span>
+     <span class="td">-1.09</span>
      <span class="td">
      </span>
     </span>
@@ -433,30 +246,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      5.99
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      4
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.31
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.31
-      <i>L</i>
-     </span>
+     <span class="td">5.99</span>
+     <span class="td">-5.5</span>
+     <span class="td">4</span>
+     <span class="td">1.31</span>
+     <span class="td">-2.7</span>
+     <span class="td">3.31</span>
      <span class="td">
      </span>
     </span>
@@ -465,26 +260,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.21
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.49
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      4.09
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.596
-      <i>L</i>
-     </span>
+     <span class="td">-2.21</span>
+     <span class="td">2.49</span>
+     <span class="td">-2.2</span>
+     <span class="td">4.09</span>
+     <span class="td">-0.596</span>
      <span class="td">
      </span>
     </span>
@@ -494,22 +274,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.71
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.81
-      <i>L</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">1.71</span>
+     <span class="td">-1.5</span>
+     <span class="td">2.81</span>
      <span class="td">
      </span>
     </span>
@@ -520,18 +288,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      9.9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">9.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -543,14 +302,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -5.99
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.59
-      <i>L</i>
-     </span>
+     <span class="td">-5.99</span>
+     <span class="td">1.59</span>
      <span class="td">
      </span>
     </span>
@@ -563,14 +316,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      11
-      <i>L</i>
-     </span>
+     <span class="td">11</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -606,34 +357,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -7
-      <i>L</i>
-     </span>
-     <span class="td">
-      8.88
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.39
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.09
-      <i>L</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-7</span>
+     <span class="td">8.88</span>
+     <span class="td">2.39</span>
+     <span class="td">-1.09</span>
      <span class="td">
      </span>
     </span>
@@ -641,30 +371,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      5.99
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      4
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.31
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.31
-      <i>L</i>
-     </span>
+     <span class="td">5.99</span>
+     <span class="td">-5.5</span>
+     <span class="td">4</span>
+     <span class="td">1.31</span>
+     <span class="td">-2.7</span>
+     <span class="td">3.31</span>
      <span class="td">
      </span>
     </span>
@@ -673,26 +385,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.21
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.49
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      4.09
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.596
-      <i>L</i>
-     </span>
+     <span class="td">-2.21</span>
+     <span class="td">2.49</span>
+     <span class="td">-2.2</span>
+     <span class="td">4.09</span>
+     <span class="td">-0.596</span>
      <span class="td">
      </span>
     </span>
@@ -702,22 +399,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.71
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.81
-      <i>L</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">1.71</span>
+     <span class="td">-1.5</span>
+     <span class="td">2.81</span>
      <span class="td">
      </span>
     </span>
@@ -728,18 +413,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      9.9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">9.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -751,14 +427,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -5.99
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.59
-      <i>L</i>
-     </span>
+     <span class="td">-5.99</span>
+     <span class="td">1.59</span>
      <span class="td">
      </span>
     </span>
@@ -771,14 +441,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      11
-      <i>L</i>
-     </span>
+     <span class="td">11</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -803,34 +471,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -7
-      <i>L</i>
-     </span>
-     <span class="td">
-      8.88
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.41
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.11
-      <i>L</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-7</span>
+     <span class="td">8.88</span>
+     <span class="td">2.41</span>
+     <span class="td">-1.11</span>
      <span class="td">
      </span>
     </span>
@@ -838,30 +485,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      6.01
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      4
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.29
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.29
-      <i>L</i>
-     </span>
+     <span class="td">6.01</span>
+     <span class="td">-5.5</span>
+     <span class="td">4</span>
+     <span class="td">1.29</span>
+     <span class="td">-2.7</span>
+     <span class="td">3.29</span>
      <span class="td">
      </span>
     </span>
@@ -870,26 +499,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.23
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.51
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      4.11
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.604
-      <i>L</i>
-     </span>
+     <span class="td">-2.23</span>
+     <span class="td">2.51</span>
+     <span class="td">-2.2</span>
+     <span class="td">4.11</span>
+     <span class="td">-0.604</span>
      <span class="td">
      </span>
     </span>
@@ -899,22 +513,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.69
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.79
-      <i>L</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">1.69</span>
+     <span class="td">-1.5</span>
+     <span class="td">2.79</span>
      <span class="td">
      </span>
     </span>
@@ -925,18 +527,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      9.9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">9.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -948,14 +541,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6.01
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.61
-      <i>L</i>
-     </span>
+     <span class="td">-6.01</span>
+     <span class="td">1.61</span>
      <span class="td">
      </span>
     </span>
@@ -968,14 +555,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      11
-      <i>L</i>
-     </span>
+     <span class="td">11</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -1011,34 +596,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -7
-      <i>L</i>
-     </span>
-     <span class="td">
-      8.88
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.41
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.11
-      <i>L</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-7</span>
+     <span class="td">8.88</span>
+     <span class="td">2.41</span>
+     <span class="td">-1.11</span>
      <span class="td">
      </span>
     </span>
@@ -1046,30 +610,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      6.01
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      4
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.29
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.29
-      <i>L</i>
-     </span>
+     <span class="td">6.01</span>
+     <span class="td">-5.5</span>
+     <span class="td">4</span>
+     <span class="td">1.29</span>
+     <span class="td">-2.7</span>
+     <span class="td">3.29</span>
      <span class="td">
      </span>
     </span>
@@ -1078,26 +624,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.23
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.51
-      <i>L</i>
-     </span>
-     <span class="td">
-      -2.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      4.11
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.604
-      <i>L</i>
-     </span>
+     <span class="td">-2.23</span>
+     <span class="td">2.51</span>
+     <span class="td">-2.2</span>
+     <span class="td">4.11</span>
+     <span class="td">-0.604</span>
      <span class="td">
      </span>
     </span>
@@ -1107,22 +638,10 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.69
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.79
-      <i>L</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">1.69</span>
+     <span class="td">-1.5</span>
+     <span class="td">2.79</span>
      <span class="td">
      </span>
     </span>
@@ -1133,18 +652,9 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      9.9
-      <i>L</i>
-     </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">9.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -1156,14 +666,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6.01
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.61
-      <i>L</i>
-     </span>
+     <span class="td">-6.01</span>
+     <span class="td">1.61</span>
      <span class="td">
      </span>
     </span>
@@ -1176,14 +680,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      11
-      <i>L</i>
-     </span>
+     <span class="td">11</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -2145,34 +1647,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.48
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.6
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.1
-      <i>L</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-1</span>
+     <span class="td">0.48</span>
+     <span class="td">0.6</span>
+     <span class="td">-1.1</span>
      <span class="td">
      </span>
     </span>
@@ -2180,30 +1661,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      2
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.3
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.3
-      <i>L</i>
-     </span>
+     <span class="td">2</span>
+     <span class="td">-5.5</span>
+     <span class="td">1.5</span>
+     <span class="td">1.3</span>
+     <span class="td">-0.5</span>
+     <span class="td">0.3</span>
      <span class="td">
      </span>
     </span>
@@ -2212,51 +1675,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.22
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.1
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.6
-      <i>L</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">0</span>
-     <span class="td">0</span>
-     <span class="td">0</span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.8
-      <i>L</i>
-     </span>
+     <span class="td">-2.22</span>
+     <span class="td">2.5</span>
+     <span class="td">-0.2</span>
+     <span class="td">1.1</span>
+     <span class="td">-0.6</span>
      <span class="td">
      </span>
     </span>
@@ -2267,18 +1690,22 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
+     <span class="td">1.7</span>
+     <span class="td">0</span>
+     <span class="td">0.8</span>
      <span class="td">
-      5.5
-      <i>L</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      1.9
-      <i>L</i>
      </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">5.5</span>
+     <span class="td">1.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -2290,14 +1717,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -1.56
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.6
-      <i>L</i>
-     </span>
+     <span class="td">-1.56</span>
+     <span class="td">1.6</span>
      <span class="td">
      </span>
     </span>
@@ -2310,14 +1731,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      1
-      <i>L</i>
-     </span>
+     <span class="td">1</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>
@@ -2356,34 +1775,13 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      -4
-      <i>L</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.48
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.6
-      <i>L</i>
-     </span>
-     <span class="td">
-      -1.1
-      <i>L</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">-4</span>
+     <span class="td">3.14</span>
+     <span class="td">-1</span>
+     <span class="td">0.48</span>
+     <span class="td">0.6</span>
+     <span class="td">-1.1</span>
      <span class="td">
      </span>
     </span>
@@ -2391,30 +1789,12 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      2
-      <i>L</i>
-     </span>
-     <span class="td">
-      -5.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.3
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.3
-      <i>L</i>
-     </span>
+     <span class="td">2</span>
+     <span class="td">-5.5</span>
+     <span class="td">1.5</span>
+     <span class="td">1.3</span>
+     <span class="td">-0.5</span>
+     <span class="td">0.3</span>
      <span class="td">
      </span>
     </span>
@@ -2423,51 +1803,11 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2.22
-      <i>L</i>
-     </span>
-     <span class="td">
-      2.5
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.2
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.1
-      <i>L</i>
-     </span>
-     <span class="td">
-      -0.6
-      <i>L</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">0</span>
-     <span class="td">0</span>
-     <span class="td">0</span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.7
-      <i>L</i>
-     </span>
-     <span class="td">
-      0
-      <i>L</i>
-     </span>
-     <span class="td">
-      0.8
-      <i>L</i>
-     </span>
+     <span class="td">-2.22</span>
+     <span class="td">2.5</span>
+     <span class="td">-0.2</span>
+     <span class="td">1.1</span>
+     <span class="td">-0.6</span>
      <span class="td">
      </span>
     </span>
@@ -2478,18 +1818,22 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
+     <span class="td">1.7</span>
+     <span class="td">0</span>
+     <span class="td">0.8</span>
      <span class="td">
-      5.5
-      <i>L</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      1.9
-      <i>L</i>
      </span>
-     <span class="td">
-      -3.7
-      <i>L</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">0</span>
+     <span class="td">5.5</span>
+     <span class="td">1.9</span>
+     <span class="td">-3.7</span>
      <span class="td">
      </span>
     </span>
@@ -2501,14 +1845,8 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -1.56
-      <i>L</i>
-     </span>
-     <span class="td">
-      1.6
-      <i>L</i>
-     </span>
+     <span class="td">-1.56</span>
+     <span class="td">1.6</span>
      <span class="td">
      </span>
     </span>
@@ -2521,14 +1859,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      1
-      <i>L</i>
-     </span>
+     <span class="td">1</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>L</i>
   </span>
  </p>
  <p>

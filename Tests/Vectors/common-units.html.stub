@@ -1,0 +1,194 @@
+<div class="calcpad-output">
+ <h1>Common units in vectors and matrices</h1>
+ <p>Same units: shown once after the bracket</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    a
+   </var>
+   =
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   ·
+   <i>mm</i>
+   =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    b
+   </var>
+   =
+   <span class="b0">[</span>
+   1000; 2000
+   <span class="b0">]</span>
+   ·
+   <i>mm</i>
+   =
+   <b class="b0">[</b>
+   1 2
+   <b class="b0">]</b>
+   <i>m</i>
+  </span>
+ </p>
+ <p>Unitless zero together with units</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    c
+   </var>
+   =
+   <span class="b0">[</span>
+   0; 2
+   <i>mm</i>
+   ; 3
+   <i>mm</i>
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   0 2 3
+   <b class="b0">]</b>
+   <i>mm</i>
+  </span>
+ </p>
+ <p>Mixed units: shown per element</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    d
+   </var>
+   =
+   <span class="b0">[</span>
+   1
+   <i>kg</i>
+   ; 2
+   <i>s</i>
+   <span class="b0">]</span>
+   =
+   <b class="b0">[</b>
+   1
+   <i>kg</i>
+   2
+   <i>s</i>
+   <b class="b0">]</b>
+  </span>
+ </p>
+ <p>hp vector (unchanged)</p>
+ <p>
+  <span class="eq">
+   <var>
+    <span class="vec">⃗</span>
+    e
+   </var>
+   =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   1; 2; 3
+   <span class="b0">]</span>
+   ·
+   <i>mm</i>
+   )  =
+   <b class="b0">[</b>
+   1 2 3
+   <b class="b0">]</b>
+   <i>mm</i>
+  </span>
+ </p>
+ <p>Matrices</p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>M</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1; 2
+   <span class="b0">|</span>
+   3; 4
+   <span class="b0">]</span>
+   ·
+   <i>kN</i>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">1</span>
+     <span class="td">2</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">3</span>
+     <span class="td">4</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>N</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   1
+   <i>kg</i>
+   ; 2
+   <i>s</i>
+   <span class="b0">|</span>
+   3
+   <i>kg</i>
+   ; 4
+   <i>s</i>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1
+      <i>kg</i>
+     </span>
+     <span class="td">
+      2
+      <i>s</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3
+      <i>kg</i>
+     </span>
+     <span class="td">
+      4
+      <i>s</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+</div>

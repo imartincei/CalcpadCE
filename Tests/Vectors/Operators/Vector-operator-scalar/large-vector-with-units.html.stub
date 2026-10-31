@@ -9,28 +9,11 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>cm</i>
-   -3.04
-   <i>cm</i>
-   -0.812
-   <i>cm</i>
-   -1.08
-   <i>cm</i>
-   2.15
-   <i>cm</i>
-   2.88
-   <i>cm</i>
-   7.12
-   <i>cm</i>
-   8.85
-   <i>cm</i>
-   14.09
-   <i>cm</i>
-   0 0 0 0 0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>cm</i>
   </span>
  </p>
  <p>
@@ -203,28 +186,11 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>cm</i>
-   -3.04
-   <i>cm</i>
-   -0.812
-   <i>cm</i>
-   -1.08
-   <i>cm</i>
-   2.15
-   <i>cm</i>
-   2.88
-   <i>cm</i>
-   7.12
-   <i>cm</i>
-   8.85
-   <i>cm</i>
-   14.09
-   <i>cm</i>
-   0 0 0 0 0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>cm</i>
   </span>
  </p>
  <p>
@@ -397,34 +363,11 @@
    </var>
    =
    <b class="b0">[</b>
-   8.98
-   <i>m</i>
-   7.21
-   <i>m</i>
-   2.94
-   <i>m</i>
-   2.17
-   <i>m</i>
-   -1.1
-   <i>m</i>
-   -0.867
-   <i>m</i>
-   -3.13
-   <i>m</i>
-   -1.9
-   <i>m</i>
-   -3.16
-   <i>m</i>
-   -0.929
-   <i>m</i>
-   -1.19
-   <i>m</i>
-   2.04
-   <i>m</i>
-   0 0 0 0 0 0 0 0
+   8.98 7.21 2.94 2.17 -1.1 -0.867 -3.13 -1.9 -3.16 -0.929 -1.19 2.04 0 0 0 0 0 0 0 0
    <span title="479 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -666,34 +609,11 @@
    </var>
    =
    <b class="b0">[</b>
-   8.98
-   <i>m</i>
-   7.21
-   <i>m</i>
-   2.94
-   <i>m</i>
-   2.17
-   <i>m</i>
-   -1.1
-   <i>m</i>
-   -0.867
-   <i>m</i>
-   -3.13
-   <i>m</i>
-   -1.9
-   <i>m</i>
-   -3.16
-   <i>m</i>
-   -0.929
-   <i>m</i>
-   -1.19
-   <i>m</i>
-   2.04
-   <i>m</i>
-   0 0 0 0 0 0 0 0
+   8.98 7.21 2.94 2.17 -1.1 -0.867 -3.13 -1.9 -3.16 -0.929 -1.19 2.04 0 0 0 0 0 0 0 0
    <span title="479 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -927,40 +847,11 @@
    </var>
    =
    <b class="b0">[</b>
-   2.23
-   <i>mm</i>
-   -1.04
-   <i>mm</i>
-   -0.812
-   <i>mm</i>
-   -3.08
-   <i>mm</i>
-   -1.85
-   <i>mm</i>
-   -3.12
-   <i>mm</i>
-   -0.884
-   <i>mm</i>
-   -1.15
-   <i>mm</i>
-   2.09
-   <i>mm</i>
-   2.82
-   <i>mm</i>
-   7.06
-   <i>mm</i>
-   8.79
-   <i>mm</i>
-   14.03
-   <i>mm</i>
-   16.77
-   <i>mm</i>
-   23.01
-   <i>mm</i>
-   0 0 0 0 0
+   2.23 -1.04 -0.812 -3.08 -1.85 -3.12 -0.884 -1.15 2.09 2.82 7.06 8.79 14.03 16.77 23.01 0 0 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>mm</i>
   </span>
  </p>
  <p>
@@ -1153,40 +1044,11 @@
    </var>
    =
    <b class="b0">[</b>
-   2.23
-   <i>mm</i>
-   -1.04
-   <i>mm</i>
-   -0.812
-   <i>mm</i>
-   -3.08
-   <i>mm</i>
-   -1.85
-   <i>mm</i>
-   -3.12
-   <i>mm</i>
-   -0.884
-   <i>mm</i>
-   -1.15
-   <i>mm</i>
-   2.09
-   <i>mm</i>
-   2.82
-   <i>mm</i>
-   7.06
-   <i>mm</i>
-   8.79
-   <i>mm</i>
-   14.03
-   <i>mm</i>
-   16.77
-   <i>mm</i>
-   23.01
-   <i>mm</i>
-   0 0 0 0 0
+   2.23 -1.04 -0.812 -3.08 -1.85 -3.12 -0.884 -1.15 2.09 2.82 7.06 8.79 14.03 16.77 23.01 0 0 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>mm</i>
   </span>
  </p>
  <p>
@@ -1423,28 +1285,11 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>cm</i>
-   -3.04
-   <i>cm</i>
-   -0.812
-   <i>cm</i>
-   -1.08
-   <i>cm</i>
-   2.15
-   <i>cm</i>
-   2.88
-   <i>cm</i>
-   7.12
-   <i>cm</i>
-   8.85
-   <i>cm</i>
-   14.09
-   <i>cm</i>
-   0 0 0 0 0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>cm</i>
   </span>
  </p>
  <p>
@@ -1476,44 +1321,12 @@
    <i>m</i>
    =
    <b class="b0">[</b>
-   0 0 0 0 0 0 0 0 0 0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
+   <b class="b0">]</b>
    <i>m</i>
    <sup class="unit">-1</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -1554,44 +1367,12 @@
    <i>m</i>
    )  =
    <b class="b0">[</b>
-   0 0 0 0 0 0 0 0 0 0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
-   0
-   <i>m</i>
-   <sup class="unit">-1</sup>
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
+   <b class="b0">]</b>
    <i>m</i>
    <sup class="unit">-1</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -1605,28 +1386,11 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>cm</i>
-   -3.04
-   <i>cm</i>
-   -0.812
-   <i>cm</i>
-   -1.08
-   <i>cm</i>
-   2.15
-   <i>cm</i>
-   2.88
-   <i>cm</i>
-   7.12
-   <i>cm</i>
-   8.85
-   <i>cm</i>
-   14.09
-   <i>cm</i>
-   0 0 0 0 0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 0 0 0 0 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>cm</i>
   </span>
  </p>
  <p>
@@ -1855,40 +1619,12 @@
    </var>
    =
    <b class="b0">[</b>
-   2.98
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.21
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.06
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.831
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.1
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.87
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.13
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.16
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.07
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0 0 0 0
+   2.98 2.21 -1.06 -0.831 -3.1 -1.87 -3.13 -0.9 -1.16 2.07 0 0 0 0 0 0 0 0 0 0
    <span title="479 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>min</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -1984,61 +1720,12 @@
    </var>
    =
    <b class="b0">[</b>
-   7.23
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.96
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.19
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.849
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.12
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.88
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.15
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.915
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.18
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.06
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.79
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   7.03
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   8.77
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   14.01
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   16.75
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   22.99
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   0 0 0
+   7.23 2.96 2.19 -1.08 -0.849 -3.12 -1.88 -3.15 -0.915 -1.18 2.06 2.79 7.03 8.77 14.01 16.75 22.99 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>h</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2134,61 +1821,12 @@
    </var>
    =
    <b class="b0">[</b>
-   7.23
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.96
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.19
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.849
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.12
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.88
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.15
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.915
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.18
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.06
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.79
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   7.03
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   8.77
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   14.01
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   16.75
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   22.99
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   0 0 0
+   7.23 2.96 2.19 -1.08 -0.849 -3.12 -1.88 -3.15 -0.915 -1.18 2.06 2.79 7.03 8.77 14.01 16.75 22.99 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>h</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2284,49 +1922,12 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -3.04
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.812
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.15
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.88
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   7.12
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   8.85
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   14.09
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   16.82
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   23.06
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   26.79
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   34.03
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 16.82 23.06 26.79 34.03 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>s</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2422,49 +2023,12 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -3.04
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.812
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.15
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.88
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   7.12
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   8.85
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   14.09
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   16.82
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   23.06
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   26.79
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   34.03
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 16.82 23.06 26.79 34.03 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>s</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2560,40 +2124,12 @@
    </var>
    =
    <b class="b0">[</b>
-   2.98
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.21
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.06
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.831
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.1
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.87
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.13
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.16
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.07
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0 0 0 0
+   2.98 2.21 -1.06 -0.831 -3.1 -1.87 -3.13 -0.9 -1.16 2.07 0 0 0 0 0 0 0 0 0 0
    <span title="479 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>min</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2690,40 +2226,12 @@
    </var>
    =
    <b class="b0">[</b>
-   2.98
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.21
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.06
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.831
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.1
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.87
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -3.13
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   -1.16
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   2.07
-   <i>min</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0 0 0 0
+   2.98 2.21 -1.06 -0.831 -3.1 -1.87 -3.13 -0.9 -1.16 2.07 0 0 0 0 0 0 0 0 0 0
    <span title="479 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>min</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2819,61 +2327,12 @@
    </var>
    =
    <b class="b0">[</b>
-   7.23
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.96
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.19
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.849
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.12
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.88
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.15
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.915
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.18
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.06
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.79
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   7.03
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   8.77
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   14.01
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   16.75
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   22.99
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   0 0 0
+   7.23 2.96 2.19 -1.08 -0.849 -3.12 -1.88 -3.15 -0.915 -1.18 2.06 2.79 7.03 8.77 14.01 16.75 22.99 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>h</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -2969,61 +2428,12 @@
    </var>
    =
    <b class="b0">[</b>
-   7.23
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.96
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.19
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.849
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.12
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.88
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -3.15
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -0.915
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   -1.18
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.06
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   2.79
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   7.03
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   8.77
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   14.01
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   16.75
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   22.99
-   <i>h</i>
-   <sup class="unit">-1</sup>
-   0 0 0
+   7.23 2.96 2.19 -1.08 -0.849 -3.12 -1.88 -3.15 -0.915 -1.18 2.06 2.79 7.03 8.77 14.01 16.75 22.99 0 0 0
    <span title="9999978 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>h</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -3119,49 +2529,12 @@
    </var>
    =
    <b class="b0">[</b>
-   -1.77
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -3.04
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.812
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -1.08
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.15
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.88
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   7.12
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   8.85
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   14.09
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   16.82
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   23.06
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   26.79
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   34.03
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   0 0 0 0 0 0 0
+   -1.77 -3.04 -0.812 -1.08 2.15 2.88 7.12 8.85 14.09 16.82 23.06 26.79 34.03 0 0 0 0 0 0 0
    <span title="129 elements skipped.">...</span>
    0
    <b class="b0">]</b>
+   <i>s</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -3247,71 +2620,12 @@
    <sup class="unit">-1</sup>
    )  =
    <b class="b0">[</b>
-   3.63
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   2.36
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   4.59
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   4.32
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   7.55
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   8.28
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   12.52
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   14.25
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   19.49
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   22.22
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   28.46
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   32.19
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   39.43
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
+   3.63 2.36 4.59 4.32 7.55 8.28 12.52 14.25 19.49 22.22 28.46 32.19 39.43 5.4 5.4 5.4 5.4 5.4 5.4 5.4
    <span title="129 elements skipped.">...</span>
    5.4
+   <b class="b0">]</b>
    <i>s</i>
    <sup class="unit">-1</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -3406,71 +2720,12 @@
    <sup class="unit">-1</sup>
    )  =
    <b class="b0">[</b>
-   -2.67
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -3.94
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -1.71
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -1.98
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   1.25
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   1.98
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   6.22
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   7.95
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   13.19
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   15.92
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   22.16
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   25.89
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   33.13
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -0.9
-   <i>s</i>
-   <sup class="unit">-1</sup>
+   -2.67 -3.94 -1.71 -1.98 1.25 1.98 6.22 7.95 13.19 15.92 22.16 25.89 33.13 -0.9 -0.9 -0.9 -0.9 -0.9 -0.9 -0.9
    <span title="129 elements skipped.">...</span>
    -0.9
+   <b class="b0">]</b>
    <i>s</i>
    <sup class="unit">-1</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -3540,71 +2795,12 @@
    <sup class="unit">-1</sup>
    )  =
    <b class="b0">[</b>
-   -2.09
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   -7.17
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   1.75
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   0.676
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   13.6
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   16.53
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   33.47
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   40.4
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   61.34
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   72.28
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   97.23
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   112.18
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   141.13
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   5
-   <i>s</i>
-   <sup class="unit">-1</sup>
+   -2.09 -7.17 1.75 0.676 13.6 16.53 33.47 40.4 61.34 72.28 97.23 112.18 141.13 5 5 5 5 5 5 5
    <span title="129 elements skipped.">...</span>
    5
+   <b class="b0">]</b>
    <i>s</i>
    <sup class="unit">-1</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -3667,71 +2863,12 @@
    <sup class="unit">-2</sup>
    =
    <b class="b0">[</b>
-   4.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   10.25
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1.66
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   2.17
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   5.62
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   9.31
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   51.64
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   79.33
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   199.39
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   283.94
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   532.64
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   718.96
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1159.24
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1
-   <i>s</i>
-   <sup class="unit">-2</sup>
+   4.14 10.25 1.66 2.17 5.62 9.31 51.64 79.33 199.39 283.94 532.64 718.96 1159.24 1 1 1 1 1 1 1
    <span title="129 elements skipped.">...</span>
    1
+   <b class="b0">]</b>
    <i>s</i>
    <sup class="unit">-2</sup>
-   <b class="b0">]</b>
   </span>
  </p>
  <p>
@@ -3778,71 +2915,12 @@
    <sup class="unit">-1</sup>
    )  =
    <b class="b0">[</b>
-   56.28
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   62.4
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.8
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   54.31
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   57.77
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   61.46
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   103.79
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   131.47
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   251.54
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   336.09
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   584.79
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   771.1
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   1211.38
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
-   53.14
-   <i>s</i>
-   <sup class="unit">-2</sup>
+   56.28 62.4 53.8 54.31 57.77 61.46 103.79 131.47 251.54 336.09 584.79 771.1 1211.38 53.14 53.14 53.14 53.14 53.14 53.14 53.14
    <span title="129 elements skipped.">...</span>
    53.14
+   <b class="b0">]</b>
    <i>s</i>
    <sup class="unit">-2</sup>
-   <b class="b0">]</b>
   </span>
  </p>
 </div>

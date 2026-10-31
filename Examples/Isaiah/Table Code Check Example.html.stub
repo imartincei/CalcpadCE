@@ -61,23 +61,19 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">10</span>
+     <span class="td">20</span>
+     <span class="td">30</span>
      <span class="td">
-      10
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      20
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+     <span class="td">40</span>
+     <span class="td">57</span>
      <span class="td">
-      30
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
      </span>
@@ -85,52 +81,20 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">70</span>
      <span class="td">
-      40
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      57
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
       <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">
-      70
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>kip</i>
+   <i>·</i>
+   <i>ft</i>
   </span>
  </p>
  <p>
@@ -175,23 +139,19 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">15</span>
+     <span class="td">25</span>
+     <span class="td">35</span>
      <span class="td">
-      15
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      25
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+     <span class="td">35</span>
+     <span class="td">57</span>
      <span class="td">
-      35
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
      </span>
@@ -199,52 +159,20 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">60</span>
      <span class="td">
-      35
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      57
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
       <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">
-      60
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>kip</i>
+   <i>·</i>
+   <i>ft</i>
   </span>
  </p>
  <div style="display:none">
@@ -443,23 +371,19 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">10</span>
+     <span class="td">20</span>
+     <span class="td">30</span>
      <span class="td">
-      10
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      20
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+     <span class="td">40</span>
+     <span class="td">57</span>
      <span class="td">
-      30
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
      </span>
@@ -467,52 +391,20 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">70</span>
      <span class="td">
-      40
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      57
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
       <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">
-      70
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>kip</i>
+   <i>·</i>
+   <i>ft</i>
   </span>
  </p>
  <p>
@@ -557,23 +449,19 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">15</span>
+     <span class="td">25</span>
+     <span class="td">35</span>
      <span class="td">
-      15
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+    </span>
+    <span class="tr">
      <span class="td">
-      25
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
+     <span class="td">35</span>
+     <span class="td">57</span>
      <span class="td">
-      35
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
      </span>
@@ -581,52 +469,20 @@
     <span class="tr">
      <span class="td">
      </span>
+     <span class="td">60</span>
      <span class="td">
-      35
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      57
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
+      <span class="err">Undefined</span>
      </span>
      <span class="td">
       <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-     </span>
-    </span>
-    <span class="tr">
-     <span class="td">
-     </span>
-     <span class="td">
-      60
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
-     </span>
-     <span class="td">
-      <span class="err">Undefined</span>
-      <i>kip</i>
-      <i>·</i>
-      <i>ft</i>
      </span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>kip</i>
+   <i>·</i>
+   <i>ft</i>
   </span>
  </p>
  <div style="display:none">

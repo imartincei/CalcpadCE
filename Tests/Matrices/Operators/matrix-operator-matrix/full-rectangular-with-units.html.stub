@@ -10,70 +10,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      17
-      <i>min</i>
-     </span>
-     <span class="td">
-      -5
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.5
-      <i>min</i>
-     </span>
-     <span class="td">
-      -3.14
-      <i>min</i>
-     </span>
+     <span class="td">17</span>
+     <span class="td">-5</span>
+     <span class="td">0.5</span>
+     <span class="td">-3.14</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      8
-      <i>min</i>
-     </span>
-     <span class="td">
-      -7.89
-      <i>min</i>
-     </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.3
-      <i>min</i>
-     </span>
+     <span class="td">8</span>
+     <span class="td">-7.89</span>
+     <span class="td">0</span>
+     <span class="td">3.3</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -12
-      <i>min</i>
-     </span>
-     <span class="td">
-      6.28
-      <i>min</i>
-     </span>
-     <span class="td">
-      4
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.23
-      <i>min</i>
-     </span>
+     <span class="td">-12</span>
+     <span class="td">6.28</span>
+     <span class="td">4</span>
+     <span class="td">-1.23</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
   ,
   <span class="eq">
@@ -85,70 +50,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>s</i>
-     </span>
-     <span class="td">
-      -4
-      <i>s</i>
-     </span>
-     <span class="td">
-      1.5
-      <i>s</i>
-     </span>
-     <span class="td">
-      -2.71
-      <i>s</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">1.5</span>
+     <span class="td">-2.71</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      7
-      <i>s</i>
-     </span>
-     <span class="td">
-      -6.54
-      <i>s</i>
-     </span>
-     <span class="td">
-      -1
-      <i>s</i>
-     </span>
-     <span class="td">
-      2.2
-      <i>s</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">-6.54</span>
+     <span class="td">-1</span>
+     <span class="td">2.2</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -10
-      <i>s</i>
-     </span>
-     <span class="td">
-      5.67
-      <i>s</i>
-     </span>
-     <span class="td">
-      3
-      <i>s</i>
-     </span>
-     <span class="td">
-      -0.99
-      <i>s</i>
-     </span>
+     <span class="td">-10</span>
+     <span class="td">5.67</span>
+     <span class="td">3</span>
+     <span class="td">-0.99</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>s</i>
   </span>
  </p>
  <p>
@@ -169,70 +99,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      17.15
-      <i>min</i>
-     </span>
-     <span class="td">
-      -5.07
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.525
-      <i>min</i>
-     </span>
-     <span class="td">
-      -3.19
-      <i>min</i>
-     </span>
+     <span class="td">17.15</span>
+     <span class="td">-5.07</span>
+     <span class="td">0.525</span>
+     <span class="td">-3.19</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      8.12
-      <i>min</i>
-     </span>
-     <span class="td">
-      -8
-      <i>min</i>
-     </span>
-     <span class="td">
-      -0.0167
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.34
-      <i>min</i>
-     </span>
+     <span class="td">8.12</span>
+     <span class="td">-8</span>
+     <span class="td">-0.0167</span>
+     <span class="td">3.34</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -12.17
-      <i>min</i>
-     </span>
-     <span class="td">
-      6.37
-      <i>min</i>
-     </span>
-     <span class="td">
-      4.05
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.25
-      <i>min</i>
-     </span>
+     <span class="td">-12.17</span>
+     <span class="td">6.37</span>
+     <span class="td">4.05</span>
+     <span class="td">-1.25</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -267,70 +162,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      17.15
-      <i>min</i>
-     </span>
-     <span class="td">
-      -5.07
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.525
-      <i>min</i>
-     </span>
-     <span class="td">
-      -3.19
-      <i>min</i>
-     </span>
+     <span class="td">17.15</span>
+     <span class="td">-5.07</span>
+     <span class="td">0.525</span>
+     <span class="td">-3.19</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      8.12
-      <i>min</i>
-     </span>
-     <span class="td">
-      -8
-      <i>min</i>
-     </span>
-     <span class="td">
-      -0.0167
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.34
-      <i>min</i>
-     </span>
+     <span class="td">8.12</span>
+     <span class="td">-8</span>
+     <span class="td">-0.0167</span>
+     <span class="td">3.34</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -12.17
-      <i>min</i>
-     </span>
-     <span class="td">
-      6.37
-      <i>min</i>
-     </span>
-     <span class="td">
-      4.05
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.25
-      <i>min</i>
-     </span>
+     <span class="td">-12.17</span>
+     <span class="td">6.37</span>
+     <span class="td">4.05</span>
+     <span class="td">-1.25</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -351,70 +211,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      16.85
-      <i>min</i>
-     </span>
-     <span class="td">
-      -4.93
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.475
-      <i>min</i>
-     </span>
-     <span class="td">
-      -3.09
-      <i>min</i>
-     </span>
+     <span class="td">16.85</span>
+     <span class="td">-4.93</span>
+     <span class="td">0.475</span>
+     <span class="td">-3.09</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      7.88
-      <i>min</i>
-     </span>
-     <span class="td">
-      -7.78
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.0167
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.26
-      <i>min</i>
-     </span>
+     <span class="td">7.88</span>
+     <span class="td">-7.78</span>
+     <span class="td">0.0167</span>
+     <span class="td">3.26</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -11.83
-      <i>min</i>
-     </span>
-     <span class="td">
-      6.19
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.95
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.21
-      <i>min</i>
-     </span>
+     <span class="td">-11.83</span>
+     <span class="td">6.19</span>
+     <span class="td">3.95</span>
+     <span class="td">-1.21</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -449,70 +274,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      16.85
-      <i>min</i>
-     </span>
-     <span class="td">
-      -4.93
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.475
-      <i>min</i>
-     </span>
-     <span class="td">
-      -3.09
-      <i>min</i>
-     </span>
+     <span class="td">16.85</span>
+     <span class="td">-4.93</span>
+     <span class="td">0.475</span>
+     <span class="td">-3.09</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      7.88
-      <i>min</i>
-     </span>
-     <span class="td">
-      -7.78
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.0167
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.26
-      <i>min</i>
-     </span>
+     <span class="td">7.88</span>
+     <span class="td">-7.78</span>
+     <span class="td">0.0167</span>
+     <span class="td">3.26</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -11.83
-      <i>min</i>
-     </span>
-     <span class="td">
-      6.19
-      <i>min</i>
-     </span>
-     <span class="td">
-      3.95
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.21
-      <i>min</i>
-     </span>
+     <span class="td">-11.83</span>
+     <span class="td">6.19</span>
+     <span class="td">3.95</span>
+     <span class="td">-1.21</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -526,70 +316,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>min</i>
-     </span>
-     <span class="td">
-      -4
-      <i>min</i>
-     </span>
-     <span class="td">
-      1.5
-      <i>min</i>
-     </span>
-     <span class="td">
-      -2.71
-      <i>min</i>
-     </span>
+     <span class="td">9</span>
+     <span class="td">-4</span>
+     <span class="td">1.5</span>
+     <span class="td">-2.71</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      7
-      <i>min</i>
-     </span>
-     <span class="td">
-      -6.54
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1
-      <i>min</i>
-     </span>
-     <span class="td">
-      2.2
-      <i>min</i>
-     </span>
+     <span class="td">7</span>
+     <span class="td">-6.54</span>
+     <span class="td">-1</span>
+     <span class="td">2.2</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -10
-      <i>min</i>
-     </span>
-     <span class="td">
-      5.67
-      <i>min</i>
-     </span>
-     <span class="td">
-      3
-      <i>min</i>
-     </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
+     <span class="td">-10</span>
+     <span class="td">5.67</span>
+     <span class="td">3</span>
+     <span class="td">0</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -603,76 +358,41 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      12
-      <i>s</i>
-     </span>
-     <span class="td">
-      -3.5
-      <i>s</i>
-     </span>
-     <span class="td">
-      0
-      <i>s</i>
-     </span>
+     <span class="td">12</span>
+     <span class="td">-3.5</span>
+     <span class="td">0</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -6
-      <i>s</i>
-     </span>
-     <span class="td">
-      3.14
-      <i>s</i>
-     </span>
-     <span class="td">
-      7
-      <i>s</i>
-     </span>
+     <span class="td">-6</span>
+     <span class="td">3.14</span>
+     <span class="td">7</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      4
-      <i>s</i>
-     </span>
-     <span class="td">
-      -1.23
-      <i>s</i>
-     </span>
-     <span class="td">
-      -9.8
-      <i>s</i>
-     </span>
+     <span class="td">4</span>
+     <span class="td">-1.23</span>
+     <span class="td">-9.8</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      5.5
-      <i>s</i>
-     </span>
-     <span class="td">
-      -7
-      <i>s</i>
-     </span>
-     <span class="td">
-      2.71
-      <i>s</i>
-     </span>
+     <span class="td">5.5</span>
+     <span class="td">-7</span>
+     <span class="td">2.71</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>s</i>
   </span>
  </p>
  <p>
@@ -695,67 +415,33 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      2.05
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.449
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.834
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">2.05</span>
+     <span class="td">-0.449</span>
+     <span class="td">-0.834</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      2.19
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.987
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.5
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">2.19</span>
+     <span class="td">-0.987</span>
+     <span class="td">-0.5</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -2.37
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      0.819
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      0.171
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">-2.37</span>
+     <span class="td">0.819</span>
+     <span class="td">0.171</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -798,67 +484,33 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      2.05
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.449
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.834
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">2.05</span>
+     <span class="td">-0.449</span>
+     <span class="td">-0.834</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      2.19
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.987
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      -0.5
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">2.19</span>
+     <span class="td">-0.987</span>
+     <span class="td">-0.5</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -2.37
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      0.819
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
-     <span class="td">
-      0.171
-      <i>min</i>
-      <sup class="unit">2</sup>
-     </span>
+     <span class="td">-2.37</span>
+     <span class="td">0.819</span>
+     <span class="td">0.171</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -1250,70 +902,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      8
-      <i>min</i>
-     </span>
-     <span class="td">
-      -5
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.5
-      <i>min</i>
-     </span>
-     <span class="td">
-      -0.14
-      <i>min</i>
-     </span>
+     <span class="td">8</span>
+     <span class="td">-5</span>
+     <span class="td">0.5</span>
+     <span class="td">-0.14</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
-     <span class="td">
-      -7.89
-      <i>min</i>
-     </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
-     <span class="td">
-      1.6
-      <i>min</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">-7.89</span>
+     <span class="td">0</span>
+     <span class="td">1.6</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -2.58
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.78
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.4
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.23
-      <i>min</i>
-     </span>
+     <span class="td">-2.58</span>
+     <span class="td">0.78</span>
+     <span class="td">0.4</span>
+     <span class="td">-1.23</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>
@@ -1351,70 +968,35 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      8
-      <i>min</i>
-     </span>
-     <span class="td">
-      -5
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.5
-      <i>min</i>
-     </span>
-     <span class="td">
-      -0.14
-      <i>min</i>
-     </span>
+     <span class="td">8</span>
+     <span class="td">-5</span>
+     <span class="td">0.5</span>
+     <span class="td">-0.14</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
-     <span class="td">
-      -7.89
-      <i>min</i>
-     </span>
-     <span class="td">
-      0
-      <i>min</i>
-     </span>
-     <span class="td">
-      1.6
-      <i>min</i>
-     </span>
+     <span class="td">0</span>
+     <span class="td">-7.89</span>
+     <span class="td">0</span>
+     <span class="td">1.6</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -2.58
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.78
-      <i>min</i>
-     </span>
-     <span class="td">
-      0.4
-      <i>min</i>
-     </span>
-     <span class="td">
-      -1.23
-      <i>min</i>
-     </span>
+     <span class="td">-2.58</span>
+     <span class="td">0.78</span>
+     <span class="td">0.4</span>
+     <span class="td">-1.23</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>min</i>
   </span>
  </p>
  <p>

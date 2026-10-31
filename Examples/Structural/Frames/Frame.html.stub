@@ -11,17 +11,9 @@
    <sub>J</sub>
    =
    <b class="b0">[</b>
-   0
-   <i>m</i>
-   0
-   <i>m</i>
-   8
-   <i>m</i>
-   16
-   <i>m</i>
-   16
-   <i>m</i>
+   0 0 8 16 16
    <b class="b0">]</b>
+   <i>m</i>
   </span>
   ,
   <span class="eq">
@@ -32,17 +24,9 @@
    <sub>J</sub>
    =
    <b class="b0">[</b>
-   0
-   <i>m</i>
-   8
-   <i>m</i>
-   10
-   <i>m</i>
-   8
-   <i>m</i>
-   0
-   <i>m</i>
+   0 8 10 8 0
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -499,23 +483,11 @@
    <sub>x</sub>
    =
    <b class="b0">[</b>
-   10
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   0
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   0
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   0
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
+   10 0 0 0
    <b class="b0">]</b>
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -527,23 +499,11 @@
    <sub>y</sub>
    =
    <b class="b0">[</b>
-   0
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   -20
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   -10
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   0
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
+   0 -20 -10 0
    <b class="b0">]</b>
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
   </span>
  </p>
  <h4>Scheme of the structure</h4>
@@ -654,11 +614,9 @@
    <i>GPa</i>
    =
    <b class="b0">[</b>
-   45
-   <i>GPa</i>
-   35
-   <i>GPa</i>
+   45 35
    <b class="b0">]</b>
+   <i>GPa</i>
   </span>
  </p>
  <p>
@@ -702,11 +660,9 @@
    </span>
    =
    <b class="b0">[</b>
-   18.75
-   <i>GPa</i>
-   14.58
-   <i>GPa</i>
+   18.75 14.58
    <b class="b0">]</b>
+   <i>GPa</i>
   </span>
  </p>
  <p>
@@ -1093,11 +1049,9 @@
    <span class="b0">]</span>
    =
    <b class="b0">[</b>
-   250
-   <i>mm</i>
-   350
-   <i>mm</i>
+   250 350
    <b class="b0">]</b>
+   <i>mm</i>
   </span>
  </p>
  <p>
@@ -1116,13 +1070,10 @@
    <span class="b0">]</span>
    =
    <b class="b0">[</b>
-   196350
-   <i>mm</i>
-   <sup class="unit">2</sup>
-   175000
-   <i>mm</i>
-   <sup class="unit">2</sup>
+   196350 175000
    <b class="b0">]</b>
+   <i>mm</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -1144,13 +1095,10 @@
    <span class="b0">]</span>
    =
    <b class="b0">[</b>
-   176715
-   <i>mm</i>
-   <sup class="unit">2</sup>
-   145833
-   <i>mm</i>
-   <sup class="unit">2</sup>
+   176715 145833
    <b class="b0">]</b>
+   <i>mm</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -1169,13 +1117,10 @@
    <span class="b0">]</span>
    =
    <b class="b0">[</b>
-   3067961576
-   <i>mm</i>
-   <sup class="unit">4</sup>
-   7145833333
-   <i>mm</i>
-   <sup class="unit">4</sup>
+   3067961576 7145833333
    <b class="b0">]</b>
+   <i>mm</i>
+   <sup class="unit">4</sup>
   </span>
  </p>
  <p>
@@ -2768,12 +2713,9 @@
    <var>z</var>
    ( 5 )  =
    <b class="b0">[</b>
-   0
-   <i>mm</i>
-   0
-   <i>mm</i>
-   0
+   0 0 0
    <b class="b0">]</b>
+   <i>mm</i>
   </span>
  </p>
  <p>

@@ -72,6 +72,70 @@ namespace Calcpad.Core
         internal abstract string FormatMatrixValue(RealValue value, double zeroThreshold);
         internal abstract string FormatBlock(string[] sa);
         internal abstract string CloseCurlyBrackets(string sa, int level);
+
+        // Standard vectors and matrices store units per element. When all displayed
+        // elements share the same units, they are printed once after the closing
+        // bracket, as for hp vectors and matrices. Only the elements that are shown
+        // (the first maxCount and the last) are checked, so large arrays stay cheap.
+        // Zeros without units (unfilled elements of large vectors) fit any units.
+        protected Unit GetCommonUnits(Vector vector)
+        {
+            var len = vector.Length;
+            var n = Math.Min(len, maxCount);
+            Unit common = null;
+            for (int i = 0; i < n; ++i)
+                if (!FitsCommonUnits(vector[i], ref common))
+                    return null;
+
+            if (len > n && !FitsCommonUnits(vector[len - 1], ref common))
+                return null;
+
+            return common;
+        }
+
+        protected Unit GetCommonUnits(Matrix matrix)
+        {
+            Unit common = null;
+            foreach (var i in VisibleIndexes(matrix.RowCount))
+                foreach (var j in VisibleIndexes(matrix.ColCount))
+                    if (!FitsCommonUnits(matrix[i, j], ref common))
+                        return null;
+
+            return common;
+        }
+
+        // Indexes of the rows/columns that are displayed: the first maxCount and the last one.
+        private IEnumerable<int> VisibleIndexes(int count)
+        {
+            var n = Math.Min(count, maxCount);
+            for (int i = 0; i < n; ++i)
+                yield return i;
+
+            if (count > n)
+                yield return count - 1;
+        }
+
+        private static bool FitsCommonUnits(in RealValue value, ref Unit common)
+        {
+            var units = value.Units;
+            if (units is null)
+                return value.D == 0d;
+
+            if (common is null)
+            {
+                common = units;
+                return true;
+            }
+            return ReferenceEquals(units, common) ||
+                units.Equals(common) && units.FormatString == common.FormatString;
+        }
+
+        // Formats an element of a standard array whose units are printed once for the whole array.
+        protected string FormatValueWithoutUnits(in RealValue value, Unit units, double zeroThreshold)
+        {
+            var d = value.D;
+            return FormatReal(d, units.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold);
+        }
         internal string FormatUnitsText(string text)
         {
             _stringBuilder.Clear();

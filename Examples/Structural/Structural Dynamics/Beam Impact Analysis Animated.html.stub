@@ -3159,21 +3159,9 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>Hz</i>
    =
    <b class="b0">[</b>
-   3.11
-   <i>Hz</i>
-   13.61
-   <i>Hz</i>
-   27.62
-   <i>Hz</i>
-   52.09
-   <i>Hz</i>
-   72.83
-   <i>Hz</i>
-   108.03
-   <i>Hz</i>
-   129.68
-   <i>Hz</i>
+   3.11 13.61 27.62 52.09 72.83 108.03 129.68
    <b class="b0">]</b>
+   <i>Hz</i>
   </span>
  </p>
  <p>
@@ -3195,21 +3183,9 @@ circle.Series3 {fill:CornflowerBlue;}
    </span>
    =
    <b class="b0">[</b>
-   0.321
-   <i>s</i>
-   0.0734
-   <i>s</i>
-   0.0362
-   <i>s</i>
-   0.0192
-   <i>s</i>
-   0.0137
-   <i>s</i>
-   0.00926
-   <i>s</i>
-   0.00771
-   <i>s</i>
+   0.321 0.0734 0.0362 0.0192 0.0137 0.00926 0.00771
    <b class="b0">]</b>
+   <i>s</i>
   </span>
  </p>
  <p>Eigenvectors</p>
@@ -3917,21 +3893,9 @@ circle.Series3 {fill:CornflowerBlue;}
    <i>t</i>
    =
    <b class="b0">[</b>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
-   1
-   <i>t</i>
+   1 1 1 1 1 1 1
    <b class="b0">]</b>
+   <i>t</i>
   </span>
  </p>
  <p>Rayleigh damping model is assumed</p>
@@ -4166,28 +4130,10 @@ circle.Series7 {fill:BlueViolet;}
    <sup class="unit">-1</sup>
    =
    <b class="b0">[</b>
-   19.54
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   85.44
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   172.87
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   323.2
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   446.43
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   642.14
-   <i>s</i>
-   <sup class="unit">-1</sup>
-   750.77
-   <i>s</i>
-   <sup class="unit">-1</sup>
+   19.54 85.44 172.87 323.2 446.43 642.14 750.77
    <b class="b0">]</b>
+   <i>s</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>Dynamic load vector</p>

@@ -433,7 +433,7 @@ namespace Calcpad.Core
             if (matrix is not HpMatrix hp_m)
                 hp_m = null;
 
-            var units = hp_m?.Units;
+            var units = hp_m?.Units ?? GetCommonUnits(matrix);
             var count = nc > maxCount ? maxCount + 2 : nc;
             var sb = new StringBuilder(
             @"<m:d>
@@ -476,7 +476,9 @@ namespace Calcpad.Core
                     }
                     string s;
                     if (hp_m is null)
-                        s = FormatMatrixValue(matrix[i, j], zeroThreshold);
+                        s = units is null ?
+                            FormatMatrixValue(matrix[i, j], zeroThreshold) :
+                            FormatValueWithoutUnits(matrix[i, j], units, zeroThreshold);
                     else
                     {
                         var d = hp_m.GetValue(i, j);
@@ -529,7 +531,7 @@ namespace Calcpad.Core
             if (vector is not HpVector hp_v)
                 hp_v = null;
 
-            var units = hp_v?.Units;
+            var units = hp_v?.Units ?? GetCommonUnits(vector);
             var len = vector.Length;
             for (int i = 0; i < len; ++i)
             {
@@ -557,7 +559,9 @@ namespace Calcpad.Core
             void AppendElement(int index)
             {
                 if (hp_v is null)
-                    sb.Append(FormatMatrixValue(vector[index], zeroThreshold));
+                    sb.Append(units is null ?
+                        FormatMatrixValue(vector[index], zeroThreshold) :
+                        FormatValueWithoutUnits(vector[index], units, zeroThreshold));
                 else
                 {
                     var d = hp_v.GetValue(index);

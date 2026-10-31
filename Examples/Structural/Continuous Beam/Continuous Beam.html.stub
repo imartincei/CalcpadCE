@@ -16,15 +16,9 @@
    <i>m</i>
    =
    <b class="b0">[</b>
-   4
-   <i>m</i>
-   7
-   <i>m</i>
-   3
-   <i>m</i>
-   5
-   <i>m</i>
+   4 7 3 5
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -50,15 +44,9 @@
    </var>
    =
    <b class="b0">[</b>
-   4
-   <i>m</i>
-   11
-   <i>m</i>
-   14
-   <i>m</i>
-   19
-   <i>m</i>
+   4 11 14 19
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -1221,76 +1209,34 @@ circle.Series1 {fill:Tomato;}
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0.000811
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.00101
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.000719
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
+     <span class="td">0.000811</span>
+     <span class="td">0.00101</span>
+     <span class="td">0.000719</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0.00101
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.00174
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.00133
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
+     <span class="td">0.00101</span>
+     <span class="td">0.00174</span>
+     <span class="td">0.00133</span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      0.000719
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.00133
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
-     <span class="td">
-      0.0011
-      <i>m</i>
-      <i class="unit">∕</i>
-      <i>kN</i>
-     </span>
+     <span class="td">0.000719</span>
+     <span class="td">0.00133</span>
+     <span class="td">0.0011</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>m</i>
+   <i class="unit">∕</i>
+   <i>kN</i>
   </span>
   ,
   <span class="eq">
@@ -1301,13 +1247,9 @@ circle.Series1 {fill:Tomato;}
    <sub>F</sub>
    =
    <b class="b0">[</b>
-   -0.135
-   <i>m</i>
-   -0.211
-   <i>m</i>
-   -0.161
-   <i>m</i>
+   -0.135 -0.211 -0.161
    <b class="b0">]</b>
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -1335,13 +1277,9 @@ circle.Series1 {fill:Tomato;}
    <sub>F</sub>
    )  =
    <b class="b0">[</b>
-   64.86
-   <i>kN</i>
-   53.48
-   <i>kN</i>
-   39.33
-   <i>kN</i>
+   64.86 53.48 39.33
    <b class="b0">]</b>
+   <i>kN</i>
   </span>
  </p>
  <h4>Results</h4>
@@ -1496,15 +1434,9 @@ circle.Series1 {fill:Tomato;}
    <sub>max</sub>
    =
    <b class="b0">[</b>
-   5.97
-   <i>kNm</i>
-   27.74
-   <i>kNm</i>
-   -12.23
-   <i>kNm</i>
-   22.9
-   <i>kNm</i>
+   5.97 27.74 -12.23 22.9
    <b class="b0">]</b>
+   <i>kNm</i>
   </span>
  </p>
  <p>
@@ -1516,13 +1448,9 @@ circle.Series1 {fill:Tomato;}
    <sub>min</sub>
    =
    <b class="b0">[</b>
-   -36.29
-   <i>kNm</i>
-   -30.79
-   <i>kNm</i>
-   -17.99
-   <i>kNm</i>
+   -36.29 -30.79 -17.99
    <b class="b0">]</b>
+   <i>kNm</i>
   </span>
  </p>
  <p>
@@ -1679,15 +1607,9 @@ circle.Series1 {fill:Tomato;}
    <sub>max</sub>
    =
    <b class="b0">[</b>
-   10.93
-   <i>kN</i>
-   35.79
-   <i>kN</i>
-   19.26
-   <i>kN</i>
-   28.6
-   <i>kN</i>
+   10.93 35.79 19.26 28.6
    <b class="b0">]</b>
+   <i>kN</i>
   </span>
  </p>
  <p>
@@ -1699,15 +1621,9 @@ circle.Series1 {fill:Tomato;}
    <sub>min</sub>
    =
    <b class="b0">[</b>
-   -29.07
-   <i>kN</i>
-   -34.21
-   <i>kN</i>
-   -10.74
-   <i>kN</i>
-   -21.4
-   <i>kN</i>
+   -29.07 -34.21 -10.74 -21.4
    <b class="b0">]</b>
+   <i>kN</i>
   </span>
  </p>
  <p>Deflections</p>

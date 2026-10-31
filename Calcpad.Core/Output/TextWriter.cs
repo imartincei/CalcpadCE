@@ -104,13 +104,15 @@ namespace Calcpad.Core
             var sb = new StringBuilder("[");
             var nc = matrix.ColCount - 1;
             var zeroThreshold = GetMaxVisibleMatrixValue(matrix, out int row, out int col) * 1e-14;
-            var len = FormatMatrixValue(matrix[row, col], zeroThreshold).Length;
-            var format = $"{{0,{len}}}";
-            var cont = string.Format(format, "...");
             if (matrix is not HpMatrix hp_m)
                 hp_m = null;
 
-            var units = hp_m?.Units;
+            var units = hp_m?.Units ?? GetCommonUnits(matrix);
+            var len = (hp_m is null && units is not null ?
+                FormatValueWithoutUnits(matrix[row, col], units, zeroThreshold) :
+                FormatMatrixValue(matrix[row, col], zeroThreshold)).Length;
+            var format = $"{{0,{len}}}";
+            var cont = string.Format(format, "...");
             for (int i = 0, nr = matrix.RowCount - 1; i <= nr; ++i)
             {
                 if (i == maxCount)
@@ -127,7 +129,9 @@ namespace Calcpad.Core
                     }
                     string s;
                     if (hp_m is null)
-                        s = FormatMatrixValue(matrix[i, j], zeroThreshold);
+                        s = units is null ?
+                            FormatMatrixValue(matrix[i, j], zeroThreshold) :
+                            FormatValueWithoutUnits(matrix[i, j], units, zeroThreshold);
                     else
                     {
                         var d = hp_m.GetValue(i, j);
@@ -158,7 +162,7 @@ namespace Calcpad.Core
             if (vector is not HpVector hp_v)
                 hp_v = null;
 
-            var units = hp_v?.Units;
+            var units = hp_v?.Units ?? GetCommonUnits(vector);
             var len = vector.Length;
             for (int i = 0; i < len; ++i)
             {
@@ -185,7 +189,9 @@ namespace Calcpad.Core
             void AppendElement(int index)
             {
                 if (hp_v is null)
-                    sb.Append(FormatMatrixValue(vector[index], zeroThreshold));
+                    sb.Append(units is null ?
+                        FormatMatrixValue(vector[index], zeroThreshold) :
+                        FormatValueWithoutUnits(vector[index], units, zeroThreshold));
                 else
                 {
                     var d = hp_v.GetValue(index);

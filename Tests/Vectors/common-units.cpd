@@ -1,0 +1,13 @@
+"Common units in vectors and matrices
+'Same units: shown once after the bracket
+a = [1; 2; 3]*mm
+b = [1000; 2000]*mm|m
+'Unitless zero together with units
+c = [0; 2mm; 3mm]
+'Mixed units: shown per element
+d = [1kg; 2s]
+'hp vector (unchanged)
+e = hp([1; 2; 3]*mm)
+'Matrices
+M = [1; 2|3; 4]*kN
+N = [1kg; 2s|3kg; 4s]

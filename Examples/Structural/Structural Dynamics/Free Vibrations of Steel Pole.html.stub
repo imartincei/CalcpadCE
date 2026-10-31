@@ -2293,13 +2293,9 @@ circle.Series6 {fill:MediumSpringGreen;}
    <i>Hz</i>
    =
    <b class="b0">[</b>
-   0.361
-   <i>Hz</i>
-   1.21
-   <i>Hz</i>
-   2.73
-   <i>Hz</i>
+   0.361 1.21 2.73
    <b class="b0">]</b>
+   <i>Hz</i>
   </span>
  </p>
  <p>Vibration periods</p>
@@ -2321,13 +2317,9 @@ circle.Series6 {fill:MediumSpringGreen;}
    </span>
    =
    <b class="b0">[</b>
-   2.77
-   <i>s</i>
-   0.826
-   <i>s</i>
-   0.367
-   <i>s</i>
+   2.77 0.826 0.367
    <b class="b0">]</b>
+   <i>s</i>
   </span>
  </p>
  <p>Mode shapes</p>

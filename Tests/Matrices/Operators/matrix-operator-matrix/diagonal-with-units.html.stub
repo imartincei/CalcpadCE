@@ -10,10 +10,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      10
-      <i>Hz</i>
-     </span>
+     <span class="td">10</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -25,10 +22,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      -5.5
-      <i>Hz</i>
-     </span>
+     <span class="td">-5.5</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -40,10 +34,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      3.14
-      <i>Hz</i>
-     </span>
+     <span class="td">3.14</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -55,10 +46,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -7
-      <i>Hz</i>
-     </span>
+     <span class="td">-7</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -70,14 +58,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      8.88
-      <i>Hz</i>
-     </span>
+     <span class="td">8.88</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>Hz</i>
   </span>
   ,
   <span class="eq">
@@ -89,10 +75,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9
-      <i>kHz</i>
-     </span>
+     <span class="td">9</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -104,10 +87,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      -4.4
-      <i>kHz</i>
-     </span>
+     <span class="td">-4.4</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -119,10 +99,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      2.71
-      <i>kHz</i>
-     </span>
+     <span class="td">2.71</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -134,10 +111,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6
-      <i>kHz</i>
-     </span>
+     <span class="td">-6</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -149,14 +123,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7.77
-      <i>kHz</i>
-     </span>
+     <span class="td">7.77</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>kHz</i>
   </span>
  </p>
  <p>
@@ -177,10 +149,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9010
-      <i>Hz</i>
-     </span>
+     <span class="td">9010</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -192,10 +161,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      -4405.5
-      <i>Hz</i>
-     </span>
+     <span class="td">-4405.5</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -207,10 +173,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      2713.14
-      <i>Hz</i>
-     </span>
+     <span class="td">2713.14</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -222,10 +185,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6007
-      <i>Hz</i>
-     </span>
+     <span class="td">-6007</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -237,14 +197,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7778.88
-      <i>Hz</i>
-     </span>
+     <span class="td">7778.88</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>Hz</i>
   </span>
  </p>
  <p>
@@ -279,10 +237,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      9010
-      <i>Hz</i>
-     </span>
+     <span class="td">9010</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -294,10 +249,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      -4405.5
-      <i>Hz</i>
-     </span>
+     <span class="td">-4405.5</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -309,10 +261,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      2713.14
-      <i>Hz</i>
-     </span>
+     <span class="td">2713.14</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -324,10 +273,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -6007
-      <i>Hz</i>
-     </span>
+     <span class="td">-6007</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -339,14 +285,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      7778.88
-      <i>Hz</i>
-     </span>
+     <span class="td">7778.88</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>Hz</i>
   </span>
  </p>
  <p>
@@ -367,10 +311,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -8990
-      <i>Hz</i>
-     </span>
+     <span class="td">-8990</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -382,10 +323,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      4394.5
-      <i>Hz</i>
-     </span>
+     <span class="td">4394.5</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -397,10 +335,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2706.86
-      <i>Hz</i>
-     </span>
+     <span class="td">-2706.86</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -412,10 +347,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5993
-      <i>Hz</i>
-     </span>
+     <span class="td">5993</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -427,14 +359,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -7761.12
-      <i>Hz</i>
-     </span>
+     <span class="td">-7761.12</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>Hz</i>
   </span>
  </p>
  <p>
@@ -469,10 +399,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      -8990
-      <i>Hz</i>
-     </span>
+     <span class="td">-8990</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -484,10 +411,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      4394.5
-      <i>Hz</i>
-     </span>
+     <span class="td">4394.5</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -499,10 +423,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -2706.86
-      <i>Hz</i>
-     </span>
+     <span class="td">-2706.86</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -514,10 +435,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      5993
-      <i>Hz</i>
-     </span>
+     <span class="td">5993</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -529,14 +447,12 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      -7761.12
-      <i>Hz</i>
-     </span>
+     <span class="td">-7761.12</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>Hz</i>
   </span>
  </p>
  <p>
@@ -557,11 +473,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      90000
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">90000</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -573,11 +485,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      24200
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">24200</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -589,11 +497,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      8509.4
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">8509.4</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -605,11 +509,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      42000
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">42000</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -621,15 +521,13 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      68997.6
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">68997.6</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>s</i>
+   <sup class="unit">-2</sup>
   </span>
  </p>
  <p>
@@ -664,11 +562,7 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">
-      90000
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">90000</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -680,11 +574,7 @@
      <span class="td">
      </span>
      <span class="td">0</span>
-     <span class="td">
-      24200
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">24200</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
@@ -696,11 +586,7 @@
      </span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      8509.4
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">8509.4</span>
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">
@@ -712,11 +598,7 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      42000
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">42000</span>
      <span class="td">0</span>
      <span class="td">
      </span>
@@ -728,15 +610,13 @@
      <span class="td">0</span>
      <span class="td">0</span>
      <span class="td">0</span>
-     <span class="td">
-      68997.6
-      <i>s</i>
-      <sup class="unit">-2</sup>
-     </span>
+     <span class="td">68997.6</span>
      <span class="td">
      </span>
     </span>
    </span>
+   <i>s</i>
+   <sup class="unit">-2</sup>
   </span>
  </p>
  <p>
