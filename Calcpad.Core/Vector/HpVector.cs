@@ -1380,8 +1380,8 @@ namespace Calcpad.Core
             }
             if (nb > na)
             {
-                var zero = new RealValue(0d, ua);
-                var d = f(zero).D * Unit.Convert(ub, zero.Units, ',');
+                var fz = f(new RealValue(0d, ua));
+                var d = fz.D * Unit.Convert(ub, fz.Units, ',');
                 if (!d.Equals(0d))
                     b.Fill(d, na, nb - na);
             }

@@ -35,6 +35,7 @@ The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrap
 &emsp;&emsp;```MathSettings()``` - creates a new 'MathSettings' object. Default values are assigned to all fields as specified further.  
 &emsp;&emsp;```Decimals : int``` = 2 - the number of digits after the decimal point (0-15).  
 &emsp;&emsp;```Degrees : TrigUnits``` = TrigUnits.Deg - the default units trigonometric functions (0-2): 0=Degrees, 1=Radians, 2=Grades.  
+&emsp;&emsp;```ReturnAngleUnits : bool``` = True - inverse trigonometric functions return results with the current angle units attached (False returns unitless numbers).  
 &emsp;&emsp;```IsComplex : bool``` = False - 'True' enables calculations in complex numbers domain, and 'False' - in real numbers domain only.  
 &emsp;&emsp;```Substitute : bool``` = True - switches variable substitution in the output on (True) and off (False).  
 &emsp;&emsp;```FormatEquations : bool``` = True - specifies if the equations are formatted in professional or linear styles in the output.  

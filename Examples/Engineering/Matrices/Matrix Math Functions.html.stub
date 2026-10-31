@@ -4171,18 +4171,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">-0.524</span>
-     <span class="td">0</span>
-     <span class="td">0.524</span>
+     <span class="td">
+      -0.524
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.524
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.785</span>
-     <span class="td">1.05</span>
-     <span class="td">1.57</span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.05
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4202,18 +4220,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">2.09</span>
-     <span class="td">1.57</span>
-     <span class="td">1.05</span>
+     <span class="td">
+      2.09
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.05
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.785</span>
-     <span class="td">0.524</span>
-     <span class="td">0</span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.524
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4233,18 +4269,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">-0.464</span>
-     <span class="td">0</span>
-     <span class="td">0.464</span>
+     <span class="td">
+      -0.464
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.464
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.615</span>
-     <span class="td">0.714</span>
-     <span class="td">0.785</span>
+     <span class="td">
+      0.615
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.714
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4268,18 +4322,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">2.03</span>
-     <span class="td">1.57</span>
-     <span class="td">0.955</span>
+     <span class="td">
+      2.03
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.955
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.615</span>
-     <span class="td">0</span>
-     <span class="td">-0.464</span>
+     <span class="td">
+      0.615
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
+     <span class="td">
+      -0.464
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4305,18 +4377,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">-0.524</span>
-     <span class="td">0</span>
-     <span class="td">0.524</span>
+     <span class="td">
+      -0.524
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.524
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.785</span>
-     <span class="td">1.05</span>
-     <span class="td">1.57</span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.05
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4342,18 +4432,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">2.09</span>
-     <span class="td">1.57</span>
-     <span class="td">1.05</span>
+     <span class="td">
+      2.09
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.05
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.785</span>
-     <span class="td">0.524</span>
-     <span class="td">0</span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.524
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
@@ -4373,18 +4481,36 @@
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">-1.11</span>
-     <span class="td">1.57</span>
-     <span class="td">1.11</span>
+     <span class="td">
+      -1.11
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.57
+      <i>rad</i>
+     </span>
+     <span class="td">
+      1.11
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>
     <span class="tr">
      <span class="td">
      </span>
-     <span class="td">0.955</span>
-     <span class="td">0.857</span>
-     <span class="td">0.785</span>
+     <span class="td">
+      0.955
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.857
+      <i>rad</i>
+     </span>
+     <span class="td">
+      0.785
+      <i>rad</i>
+     </span>
      <span class="td">
      </span>
     </span>

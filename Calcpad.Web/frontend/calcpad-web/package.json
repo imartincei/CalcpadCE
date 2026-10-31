@@ -25,6 +25,7 @@
     "@tauri-apps/plugin-store": "^2",
     "calcpad-frontend": "file:../calcpad-frontend",
     "monaco-editor": "^0.52.0",
+    "pdfjs-dist": "6.4.299",
     "vue": "^3.5.39",
     "vue-i18n": "^11.4.16"
   },

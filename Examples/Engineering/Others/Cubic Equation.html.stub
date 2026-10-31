@@ -149,6 +149,7 @@
    </span>
    <span class="b1">)</span>
    = 1.57
+   <i>rad</i>
   </span>
  </p>
  <p>
@@ -187,6 +188,7 @@
    <span class="b1">(</span>
    <span class="dvc">
     1.57
+    <i>rad</i>
     <span class="dvl">
     </span>
     3
@@ -218,6 +220,8 @@
     <var>θ</var>
     − 2 ·
     <var>π</var>
+    ·
+    <i>rad</i>
     <span class="dvl">
     </span>
     3
@@ -239,7 +243,10 @@
    <b>cos</b>
    <span class="b1">(</span>
    <span class="dvc">
-    1.57 − 2 · 3.14
+    1.57
+    <i>rad</i>
+    − 2 · 3.14 ·
+    <i>rad</i>
     <span class="dvl">
     </span>
     3
@@ -271,6 +278,8 @@
     <var>θ</var>
     + 2 ·
     <var>π</var>
+    ·
+    <i>rad</i>
     <span class="dvl">
     </span>
     3
@@ -292,7 +301,10 @@
    <b>cos</b>
    <span class="b1">(</span>
    <span class="dvc">
-    1.57 + 2 · 3.14
+    1.57
+    <i>rad</i>
+    + 2 · 3.14 ·
+    <i>rad</i>
     <span class="dvl">
     </span>
     3

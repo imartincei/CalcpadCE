@@ -48,7 +48,7 @@ Run the GTK tests on Linux or inside WSL with Linux-installed Node.js, Rust, and
 Install the desktop build dependencies and these additional test tools on Ubuntu:
 
 ```bash
-sudo apt install webkit2gtk-driver xvfb openbox xdotool dbus-x11 sway wtype python3
+sudo apt install webkit2gtk-driver xvfb openbox xdotool x11-utils dbus-x11 sway wtype python3
 cargo install tauri-driver --version 2.0.6 --locked
 ```
 

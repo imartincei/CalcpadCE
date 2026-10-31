@@ -98,7 +98,7 @@ enum CalcpadTypeId {
 ## CalcpadSettings (types/settings.ts)
 ```typescript
 interface CalcpadSettings {
-    math: { decimals; degrees; isComplex; substitute; formatEquations; zeroSmallMatrixElements;
+    math: { decimals; degrees; returnAngleUnits; isComplex; substitute; formatEquations; zeroSmallMatrixElements;
             showHiddenOutput; maxOutputCount; formatString; precision; tol };
     plot: { isAdaptive; screenScaleFactor; imageUri; vectorGraphics; colorScale; smoothScale;
             shadows; lightDirection; width; height; step };

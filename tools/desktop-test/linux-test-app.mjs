@@ -23,6 +23,8 @@ export class LinuxTestApp {
     directory = fileURLToPath(new URL('.work/linux-tests/', import.meta.url));
     executable = path.join(this.directory, 'app/bin/calcpad-linux-tests');
     isWayland = process.env.CALCPAD_TEST_BACKEND === 'wayland';
+    supportsWindowActivation = !this.isWayland || execFileSync('pkg-config', ['--modversion', 'gtk+-3.0'],
+        {encoding: 'utf8'}).trim().localeCompare('3.24.35', 'en', {numeric: true}) >= 0;
 
     async start() {
         this.profile = mkdtempSync(path.join(this.directory, 'profile-'));

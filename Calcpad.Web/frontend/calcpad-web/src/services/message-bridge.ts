@@ -2,7 +2,7 @@ import { BaseMessageBridge, type ExportRequest } from 'calcpad-frontend/services
 import { getDefaultSettings } from 'calcpad-frontend/types/settings';
 import type { CalcpadSettings } from 'calcpad-frontend/types/settings';
 import type { ExportVariant } from 'calcpad-frontend/types/api';
-import { mimeFromExtension, bytesToBase64, pdfResponseError } from 'calcpad-frontend';
+import { mimeFromExtension, bytesToBase64 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
 
 const SETTINGS_KEY = 'calcpad-settings';
@@ -131,14 +131,7 @@ export class MessageBridge extends BaseMessageBridge {
         const html = await this.renderForExport(content, apiSettings, sourceFilePath, variant);
         if (html == null) return null;
 
-        const response = await fetch(`${this.apiClient.getBaseUrl()}/api/calcpad/pdf`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...this.apiClient.authHeaders() },
-            body: JSON.stringify({ html, options: this.getEffectivePdfOptions(content) }),
-            signal: AbortSignal.timeout(60000),
-        });
-        if (!response.ok) throw await pdfResponseError(response);
-        return await response.arrayBuffer();
+        return this.apiClient.pdf(html, this.getEffectivePdfOptions(content));
     }
 
     private loadSettings(): CalcpadSettings {

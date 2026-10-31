@@ -9,11 +9,11 @@
 	'Radius
 	r = b/2 + a^2/(8*b)
 	'Angle
-	α = 2*asin(a/(2*r))'&deg;
+	α = 2*asin(a/(2*r))
 	'Area
-	A = 0.5*(π*α/180 - sin(α))*r^2
+	A = 0.5*(π*α/180° - sin(α))*r^2
 	'Arc length
-	S = π*r*α/180
+	S = π*r*α/180°
 	'<!--
 #else
 	'<-->

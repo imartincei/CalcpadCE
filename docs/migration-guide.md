@@ -180,3 +180,44 @@ Rename with an underscore or a comma, both of which are still valid variable nam
 F_max = 10
 a,1 = 4
 ```
+
+### Inverse trig functions return angle units by default
+
+`asin`, `acos`, `atan`, `acsc`, `asec`, `acot`, `atan2` and `phase` now attach the current angle unit to their result (`°`, `rad` or `grad`).
+Previously this required `ReturnAngleUnits = 1`, and the result was a unitless number otherwise.
+The default is now the **Return Angle Units** setting, which is on.
+
+Two related fixes change results under `#deg` and `#gra`:
+
+- `phase` now follows `#deg`/`#rad`/`#gra` like `atan2` does. It always returned radians before.
+- In `A∠φ`, a unitless `φ` is now read in the current angle units. It was always read as radians before, so under `#deg`, `1∠45` was 1∠(45 rad).
+
+#### What breaks
+
+Mixing an inverse trig result with a unitless number is an error:
+
+| Code | Before | Now |
+| ---- | ------ | --- |
+| `atan(1)` | `45` | `45°` |
+| `atan(x) - 1` | a number | `Inconsistent units: "° - unitless".` |
+| `phase(1 + 1i)` under `#deg` | `0.785` | `45°` |
+| `re(1∠45)` under `#deg` | `0.525` | `0.707` |
+
+Workarounds such as `phase(z)*180/π` now give the wrong answer under `#deg`.
+
+Inverse trig on a diagonal or triangular matrix leaves its off-diagonal zeros unitless, so combining the result with an angle is an error, e.g. `atan(diagonal(3; 1)) + 1°`.
+This is a known limitation that will be fixed in a future update.
+Use `hp()` matrices, which share one unit across all elements, or set `#settings {"returnAngleUnits": false}` before running these calculations.
+
+#### How to update
+
+Remove manual conversions like `*180/π` after `phase`, and add angle units where a result is combined with unitless numbers, e.g. `atan(x) - 1rad`.
+
+To keep the old unitless results instead, turn off **Return Angle Units** in the [Settings](new-settings.md#math) tab, or add either line at the top of the document:
+
+```calcpad
+ReturnAngleUnits = 0
+#settings {"returnAngleUnits": false}
+```
+
+Write `1∠(45rad)` to keep a radian phasor angle under `#deg`.

@@ -189,7 +189,7 @@ r2d = 180/π
 '<h4>Plot results</h4>
  '<table><tr><td>
 'Rotation <var>θ</var> [deg] versus time <var>t</var> [s] plot
-$Plot{t(i)|θ(t(i))/deg & t(i)|θ_e(t(i))*r2d & t(i)|if(abs(θ_fwE.i*r2d) < 150; θ_fwE.i*r2d; 1/0) & t(i)|θ_bwE.i*r2d & t(i)|θ_CN.i*r2d @ i = 1 : n}
+$Plot{t(i)|θ(t(i))/deg & t(i)|θ_e(t(i))/deg & t(i)|if(abs(θ_fwE.i*r2d) < 150; θ_fwE.i*r2d; 1/0) & t(i)|θ_bwE.i*r2d & t(i)|θ_CN.i*r2d @ i = 1 : n}
 '</td><td><br/><br/><br/>
 '<b style="color:Tomato">╺━━</b> Small rotations<br/>
 '<b style="color:YellowGreen">╺━━</b> Large rotations<br/>
@@ -203,14 +203,14 @@ $Plot{0s|0J & t(i)|E_0 & t(i)|E_fwE.i & t(i)|E_bwE.i & t(i)|E_CN.i @ i = 1 : n}
 '<style>.Series2{stroke-dasharray: 30, 10;}</style>
 '<table><tr><td>
 'Rotation <var>θ</var> [deg] versus time <var>t</var> [s] plot
-$Plot{t(i)|θ_e(t(i))*r2d & t(i)|θ_CN.i*r2d & t(i)|θ_RK4.i*r2d @ i = 1 : n}
+$Plot{t(i)|θ_e(t(i))/deg & t(i)|θ_CN.i*r2d & t(i)|θ_RK4.i*r2d @ i = 1 : n}
 '</td><td><br/><br/><br/>
 '<b style="color:Tomato">╺━━</b> Theoretical (large rot.)<br/>
 '<b style="color:YellowGreen">╺╺╺</b> Crank–Nicolson (IMEX)<br/>
 '<b style="color:CornflowerBlue">&nbsp;· · · ·</b> Runge-Kutta 4 (explicit)
 '</td></tr><tr><td>
 'Absolute error Δθ [°] versus time <var>t</var> [s] plot
-$Plot{t(i)|(θ_CN.i - θ_e(t(i)))*r2d & t(i)|(θ_RK4.i - θ_e(t(i)))*r2d @ i = 1 : n}
+$Plot{t(i)|(θ_CN.i - θ_e(t(i))/rad)*r2d & t(i)|(θ_RK4.i - θ_e(t(i))/rad)*r2d @ i = 1 : n}
 '</td><td><br/><br/><br/>
 '<p><b style="color:Tomato">╺━━</b> Crank–Nicolson (IMEX)<br/>
 '<b style="color:YellowGreen">╺╺╺</b> Runge-Kutta 4 (explicit)

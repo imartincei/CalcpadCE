@@ -767,7 +767,7 @@ namespace Calcpad.Tests
             var calc = new TestCalc(new() { IsComplex = true });
             var re = calc.Run($"phase({_sqrt3.ToString(CultureInfo.InvariantCulture)}/2 + i/2)");
             var im = calc.Imaginary;
-            Assert.Equal(Math.PI / 6d, re, Tol);
+            Assert.Equal(30d, re, 1e-12);
             Assert.Equal(0d, im, Tol);
         }
         #endregion

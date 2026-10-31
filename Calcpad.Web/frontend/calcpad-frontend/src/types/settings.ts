@@ -8,6 +8,7 @@ export interface CalcpadSettings {
     math: {
         decimals: number;
         degrees: number;
+        returnAngleUnits: boolean;
         isComplex: boolean;
         substitute: boolean;
         formatEquations: boolean;
@@ -140,6 +141,7 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
         key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=degrees, 1=radians, 2=gradians', type: 'enum', def: 0,
         options: [{ value: '0', label: 'Degrees' }, { value: '1', label: 'Radians' },{ value: '2', label: 'Gradians' }],
     },
+    { key: 'returnAngleUnits', label: 'Return angle units', detail: 'Inverse trig functions (asin, atan2, phase, etc.) return results with the current angle unit attached (°, rad or grad) instead of a unitless number. Can be overridden per-document with a ReturnAngleUnits = 0 line.', type: 'boolean', def: true },
     { key: 'complex', label: 'Complex numbers', detail: 'Enable complex number mode', type: 'boolean', def: false },
     { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
     { key: 'formatEquations', label: 'Format equations', detail: 'Professional (checked) renders equations in stacked math form; Inline (unchecked) renders them on a single line.', type: 'boolean', def: true },
@@ -177,7 +179,7 @@ export function validateSettingValue(key: string, value: string | number | boole
  * one. Shared with CalcpadSettingsTab.vue so the mapping exists exactly once.
  */
 export const SETTINGS_PATH: Partial<Record<string, string>> = {
-    decimals: 'math.decimals', degrees: 'math.degrees', complex: 'math.isComplex',
+    decimals: 'math.decimals', degrees: 'math.degrees', returnAngleUnits: 'math.returnAngleUnits', complex: 'math.isComplex',
     substitute: 'math.substitute', formatEquations: 'math.formatEquations',
     zeroSmallMatrixElements: 'math.zeroSmallMatrixElements', showHiddenOutput: 'math.showHiddenOutput',
     maxOutputCount: 'math.maxOutputCount', precision: 'math.precision', tol: 'math.tol',

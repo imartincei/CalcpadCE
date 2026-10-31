@@ -778,6 +778,13 @@ namespace Calcpad.Core
                         _parser.Degrees = dto.Degrees.Value;
                     }
                     break;
+                case SettingKey.ReturnAngleUnits:
+                    if (dto.ReturnAngleUnits.HasValue)
+                    {
+                        Settings.Math.ReturnAngleUnits = dto.ReturnAngleUnits.Value;
+                        _parser.SetVariable("ReturnAngleUnits", dto.ReturnAngleUnits.Value ? 1d : 0d);
+                    }
+                    break;
                 case SettingKey.Complex:
                     if (dto.Complex.HasValue)
                         _parser.SetComplex(dto.Complex.Value);

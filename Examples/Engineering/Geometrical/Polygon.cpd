@@ -51,7 +51,7 @@ I_o = I_1 + I_2
 #if I_y ≡ I_1
 	α = π/2*rad
 #else
-	α = atan(I_xy/(I_y - I_1))*rad
+	α = atan(I_xy/(I_y - I_1))
 #end if
 #show
 '<h4>Geometrical properties</h4>

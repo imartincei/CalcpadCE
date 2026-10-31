@@ -839,7 +839,7 @@
         [Fact]
         public void Root_F_58()
         {
-            var calc = new TestCalc(new() { Degrees = 1 });
+            var calc = new TestCalc(new() { Degrees = 1, ReturnAngleUnits = false });
             calc.Run(_functions[57]);
             var result = calc.Run(_commands[57]);
             Assert.Equal(_roots[57], result, Tol);

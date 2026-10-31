@@ -66,7 +66,7 @@ svg$
 	y2 = (h - y_2(i))*k
 	q_xi = q_x.i
 	q_yi = q_y.i
-	α = atan2(c(i); s(i))
+	α = atan2(c(i); s(i))/deg
 	#if α ≥ 135
 		α = α - 180
 	#end if
@@ -360,7 +360,7 @@ k = W/w
 			y = v*k_R
 			xd2 = x1 + x*c_e - y*s_e
 			yd2 = y1 - x*s_e - y*c_e
-			α = 90 + atan2(c_e; s_e)
+			α = 90 + atan2(c_e; s_e)/deg
 			#if α ≥ 135
 				α = α - 180
 			#end if

@@ -589,7 +589,7 @@ namespace Calcpad.Core
             if (_functionDefinitionIndex < 0)
             {
                 bool isAssignment = _rpn[0].Type == TokenTypes.Variable && IsAssignment(_rpn[^1].Content);
-                _calc.ReturnAngleUnits = GetSettingsVariable("ReturnAngleUnits", 0) != 0d;
+                _calc.ReturnAngleUnits = GetSettingsVariable("ReturnAngleUnits", _settings.ReturnAngleUnits ? 1d : 0d) != 0d;
                 Func<IValue> f = null;
                 if (!isVisible && cacheId >= 0 && cacheId < _equationCache.Count)
                     f = _equationCache[cacheId].Function;

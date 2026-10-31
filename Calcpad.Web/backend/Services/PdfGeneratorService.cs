@@ -160,22 +160,23 @@ namespace Calcpad.Server.Services
             _config = config;
         }
 
-        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null)
+        public async Task<byte[]> GeneratePdfAsync(string html, PdfSettingsDto? options = null, CancellationToken cancellationToken = default)
         {
             options ??= new PdfSettingsDto();
 
             // Step 1: Generate basic PDF with PuppeteerSharp
-            var basicPdf = await GenerateBasicPdfAsync(html, options).ConfigureAwait(false);
+            var basicPdf = await GenerateBasicPdfAsync(html, options, cancellationToken).ConfigureAwait(false);
 
             // Step 2: Enhance with PDFsharp (headers, footers, backgrounds)
             return EnhancePdf(basicPdf, options);
         }
 
-        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options)
+        private async Task<byte[]> GenerateBasicPdfAsync(string html, PdfSettingsDto options, CancellationToken cancellationToken)
         {
             var browser = await GetOrCreateBrowserAsync().ConfigureAwait(false);
 
-            await _pageLock.WaitAsync().ConfigureAwait(false);
+            // A superseded live preview leaves the queue here instead of rendering unseen.
+            await _pageLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             IPage page;
             try
             {
@@ -271,6 +272,7 @@ namespace Calcpad.Server.Services
                 }").ConfigureAwait(false);
 
                 await WaitForAsyncContentAsync(page).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var pdfOptions = new PuppeteerSharp.PdfOptions
                 {

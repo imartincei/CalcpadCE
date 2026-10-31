@@ -14,8 +14,8 @@ R = (2*a^3 - 9*a*b + 27*c)/54
 	'There are three real roots.
 	θ = acos(R/sqr(Q^3))
 	x_1 = -2*sqr(Q)*cos(θ/3) - a/3
-	x_2 = -2*sqr(Q)*cos((θ - 2*π)/3) - a/3
-	x_3 = -2*sqr(Q)*cos((θ + 2*π)/3) - a/3
+	x_2 = -2*sqr(Q)*cos((θ - 2*π*rad)/3) - a/3
+	x_3 = -2*sqr(Q)*cos((θ + 2*π*rad)/3) - a/3
 	#hide
 	d = max(abs(x_3 - x_1)/4; 0.5)
 	x_min = min(x_1; x_3) - d

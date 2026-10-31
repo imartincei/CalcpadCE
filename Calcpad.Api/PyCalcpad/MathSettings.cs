@@ -20,6 +20,7 @@ namespace PyCalcpad
             }
         }
         public int Degrees { get; set; }
+        public bool ReturnAngleUnits { get; set; }
         public bool IsComplex { get; set; }
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
@@ -42,6 +43,7 @@ namespace PyCalcpad
         {
             Decimals = 2;
             Degrees = (int)TrigUnits.Deg;
+            ReturnAngleUnits = true;
             IsComplex = false;
             Substitute = true;
             FormatEquations = true;

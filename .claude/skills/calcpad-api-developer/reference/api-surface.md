@@ -49,6 +49,7 @@ public class MathSettings
 {
     public int Decimals { get; set; }                  // clamped to 0..15, default 2
     public int Degrees { get; set; }                   // TrigUnits: Deg=0, Rad=1, Grad=2. Default Deg
+    public bool ReturnAngleUnits { get; set; }         // default true
     public bool IsComplex { get; set; }                // default false
     public bool Substitute { get; set; }               // default true
     public bool FormatEquations { get; set; }          // default true
@@ -140,6 +141,7 @@ internal static Calcpad.Core.MathSettings ConvertMathSettings(MathSettings setti
     {
         Decimals = settings.Decimals,
         Degrees = settings.Degrees,
+        ReturnAngleUnits = settings.ReturnAngleUnits,
         IsComplex = settings.IsComplex,
         Substitute = settings.Substitute,
         FormatEquations = settings.FormatEquations,

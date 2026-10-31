@@ -18,7 +18,7 @@ I_yz = -(a^2*b^2)/72'm<sup>4</sup></p>
 I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
 I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
 'Angle of principal axis
-α_1 = atan((I_y - I_1)/I_yz)'<sup>о</sup>
+α_1 = atan((I_y - I_1)/I_yz)
 'Polar moment of area
 I_x = I_y + I_z
 'Radii of gyration

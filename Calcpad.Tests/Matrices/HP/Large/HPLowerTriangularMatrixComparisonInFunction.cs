@@ -401,7 +401,7 @@
         [Trait("Category", "HPLowerTriangularMatrixFunctions")]
         public void HPLowerTriangularMatrixAsin()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("asin"));
             Assert.Equal(0, result);
         }
@@ -419,7 +419,7 @@
         [Trait("Category", "HPLowerTriangularMatrixFunctions")]
         public void HPLowerTriangularMatrixAtan()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run(FunctionTestHelper("atan"));
             Assert.Equal(0, result);
         }
@@ -428,7 +428,7 @@
         [Trait("Category", "HPLowerTriangularMatrixFunctions")]
         public void HPLowerTriangularMatrixAtan2()
         {
-            var calc = new TestCalc(new());
+            var calc = new TestCalc(new() { ReturnAngleUnits = false });
             var result = calc.Run([
                 "n = 500",
                 RandomMatrixA,

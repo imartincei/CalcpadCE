@@ -68,6 +68,14 @@ class MathSettings:
         self._instance.Degrees = value.value
 
     @property
+    def ReturnAngleUnits(self):
+        return self._instance.ReturnAngleUnits
+
+    @ReturnAngleUnits.setter
+    def ReturnAngleUnits(self, value):
+        self._instance.ReturnAngleUnits = value
+
+    @property
     def IsComplex(self):
         return self._instance.IsComplex
 

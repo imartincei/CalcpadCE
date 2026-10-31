@@ -2,6 +2,12 @@
  <h1>Root finding tests</h1>
  <p>
   <span class="eq">
+   <var>ReturnAngleUnits</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
    <var>p</var>
    (
    <var>x</var>

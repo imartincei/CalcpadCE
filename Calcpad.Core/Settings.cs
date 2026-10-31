@@ -7,6 +7,7 @@ namespace Calcpad.Core
     {
         Decimals,
         Degrees,
+        ReturnAngleUnits,
         Complex,
         Substitute,
         FormatEquations,
@@ -33,6 +34,7 @@ namespace Calcpad.Core
     {
         public int? Decimals { get; set; }
         public int? Degrees { get; set; }
+        public bool? ReturnAngleUnits { get; set; }
         public bool? Complex { get; set; }
         public bool? Substitute { get; set; }
         public bool? FormatEquations { get; set; }
@@ -99,6 +101,7 @@ namespace Calcpad.Core
             }
         }
         public int Degrees { get; set; }
+        public bool ReturnAngleUnits { get; set; }
         public bool IsComplex { get; set; }
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
@@ -125,6 +128,7 @@ namespace Calcpad.Core
         {
             Decimals = 2;
             Degrees = 0;
+            ReturnAngleUnits = true;
             IsComplex = false;
             Substitute = true;
             FormatEquations = true;

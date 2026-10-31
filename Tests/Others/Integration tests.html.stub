@@ -1,6 +1,12 @@
 <div class="calcpad-output">
  <p>
   <span class="eq">
+   <var>ReturnAngleUnits</var>
+   = 0
+  </span>
+ </p>
+ <p>
+  <span class="eq">
    <var>Γ</var>
    (
    <var>x</var>
@@ -34335,7 +34341,7 @@
    <td>62</td>
    <td>0.059839860068387</td>
    <td>0.059839860068377</td>
-   <td>1.66E-13</td>
+   <td>1.67E-13</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>63</td>
@@ -34353,7 +34359,7 @@
    <td>65</td>
    <td>-0.209672479661179</td>
    <td>-0.209672479661165</td>
-   <td>6.6E-14</td>
+   <td>6.7E-14</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>66</td>
@@ -35067,7 +35073,7 @@
    <td>184</td>
    <td>0.290880102173724</td>
    <td>0.290880102173725</td>
-   <td>-3E-15</td>
+   <td>-4E-15</td>
   </tr>
   <tr class="err" style="text-align:right;">
    <td>185</td>
@@ -35293,7 +35299,7 @@
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>222</td>
-   <td>15218.321355930431</td>
+   <td>15218.321355930435</td>
    <td>15218.3213559304</td>
    <td>2E-15</td>
   </tr>
@@ -35325,7 +35331,7 @@
    <td>227</td>
    <td>0.0627874004915</td>
    <td>0.062787400491493</td>
-   <td>1.1E-13</td>
+   <td>1.11E-13</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>228</td>
@@ -35409,7 +35415,7 @@
    <td>241</td>
    <td>0.433788002634733</td>
    <td>0.433788002634731</td>
-   <td>5E-15</td>
+   <td>6E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>242</td>
@@ -36627,7 +36633,7 @@
    <td>444</td>
    <td>0.021816209659628</td>
    <td>0.021816209659628</td>
-   <td>3E-15</td>
+   <td>2E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>445</td>
@@ -37005,7 +37011,7 @@
    <td>507</td>
    <td>0.000502654824574</td>
    <td>0.000502654824574</td>
-   <td>8E-15</td>
+   <td>7E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>508</td>
@@ -37329,7 +37335,7 @@
    <td>561</td>
    <td>-0.730181058376557</td>
    <td>-0.73018105837656</td>
-   <td>-3E-15</td>
+   <td>-4E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>562</td>
@@ -37383,7 +37389,7 @@
    <td>570</td>
    <td>-0.176358246030565</td>
    <td>-0.176358246030565</td>
-   <td>1E-15</td>
+   <td>2E-15</td>
   </tr>
   <tr class="err" style="text-align:right;">
    <td>571</td>
@@ -37407,7 +37413,7 @@
    <td>574</td>
    <td>-0.218673123892561</td>
    <td>-0.21867312389256</td>
-   <td>4E-15</td>
+   <td>3E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>575</td>
@@ -37597,9 +37603,9 @@
   </tr>
   <tr class="err" style="text-align:right;">
    <td>606</td>
-   <td>1.570440063849674</td>
+   <td>1.570440063849672</td>
    <td>1.5704400638497</td>
-   <td>-1.7E-14</td>
+   <td>-1.8E-14</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>607</td>
@@ -37819,9 +37825,9 @@
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>643</td>
-   <td>1.539921187451305</td>
+   <td>1.539921187451306</td>
    <td>1.5399211874513</td>
-   <td>3E-15</td>
+   <td>4E-15</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>644</td>
@@ -37935,7 +37941,7 @@
    <td>662</td>
    <td>0.290880102173724</td>
    <td>0.290880102173725</td>
-   <td>-3E-15</td>
+   <td>-4E-15</td>
   </tr>
   <tr class="err" style="text-align:right;">
    <td>663</td>
@@ -38073,13 +38079,13 @@
    <td>685</td>
    <td>2.996056227E-06</td>
    <td>2.996056226E-06</td>
-   <td>1.90913E-10</td>
+   <td>1.8523E-10</td>
   </tr>
   <tr class="err" style="text-align:right;">
    <td>686</td>
-   <td>3.141592653589058</td>
+   <td>3.141592653589072</td>
    <td>3.141592653589793</td>
-   <td>-2.34E-13</td>
+   <td>-2.29E-13</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>687</td>
@@ -38337,7 +38343,7 @@
    <td>729</td>
    <td>0.000315600493623</td>
    <td>0.000315600493623</td>
-   <td>-2.65E-13</td>
+   <td>-2.67E-13</td>
   </tr>
   <tr class="ok" style="text-align:right;">
    <td>730</td>

@@ -138,6 +138,7 @@ describe('Linux GTK editor', {skip: process.platform !== 'linux', concurrency: f
 
     test('navigation history shares selections across GTK windows and removes closed windows', {timeout: 60000}, async t => {
         const {app, main} = await start(t);
+        const focusOptions = {skip: !app.supportsWindowActivation && 'GTK before 3.24.35 cannot activate windows under Sway'};
         const selection = {selectionStartLineNumber: 5, selectionStartColumn: 4, positionLineNumber: 6, positionColumn: 2};
         const first = await app.evaluate(main, `window.calcpadActiveEditor.setValue(${JSON.stringify(content)});
             window.calcpadActiveEditor.setSelection(${JSON.stringify(selection)});
@@ -151,13 +152,21 @@ describe('Linux GTK editor', {skip: process.platform !== 'linux', concurrency: f
         await app.evaluate(main, 'window.calcpadActiveEditor.setPosition({lineNumber: 60, column: 1})');
         await app.historyMouse(second.handle, -1);
         await at(app, main, first, 6, 2);
-        await until(() => app.evaluate(main, 'document.hasFocus()'), 'history focuses first GTK window');
+        await t.test('back navigation focuses the first GTK window', focusOptions, async () => {
+            await until(() => app.evaluate(main, 'document.hasFocus()'), 'history focuses first GTK window');
+            assert.equal(await app.evaluate(second.handle, 'document.hasFocus()'), false);
+        });
         const restored = await app.evaluate(main, 'window.calcpadActiveEditor.getSelection()');
         for (const [key, value] of Object.entries(selection)) assert.equal(restored[key], value);
-        assert.equal(await app.evaluate(second.handle, 'document.hasFocus()'), false);
         await keyboard(app, main, 1);
         await at(app, second.handle, other, 6, 3);
-        await until(() => app.evaluate(second.handle, 'document.hasFocus()'), 'history focuses second GTK window');
+        await t.test('forward navigation focuses the second GTK window', focusOptions, async () => {
+            await until(() => app.evaluate(second.handle, 'document.hasFocus()'), 'history focuses second GTK window');
+        });
+        if (!app.supportsWindowActivation) {
+            app.focus(await app.nativeWindow(second.handle));
+            await until(() => app.evaluate(second.handle, 'document.hasFocus()'), 'second GTK window focused');
+        }
         await app.evaluate(main, 'window.calcpadActiveEditor.setPosition({lineNumber: 60, column: 1})');
         await keyboard(app, second.handle, -1);
         await at(app, main, first, 6, 2);

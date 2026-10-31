@@ -61,6 +61,7 @@ jobs:
             xvfb \
             openbox \
             xdotool \
+            x11-utils \
             dbus-x11 \
             sway \
             wtype \

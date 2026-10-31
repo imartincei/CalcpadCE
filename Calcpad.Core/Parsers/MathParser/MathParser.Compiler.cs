@@ -342,10 +342,6 @@ namespace Calcpad.Core
                     '∨' => Expression.Or(a, b),
                     '⊕' => Expression.ExclusiveOr(a, b),
                     '⦼' => Expression.Modulo(a, b),
-                    '∠' => Expression.Call(
-                            EvaluatePhasorMethod,
-                            Expression.Constant(a),
-                            Expression.Constant(b)),
                     _ => Expression.Call(EvaluateOperatorMethod,
                             Expression.Constant(_matrixCalc),
                             Expression.Constant(t.Index), a, b),

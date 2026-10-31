@@ -4477,6 +4477,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse sine
  </p>
@@ -4508,6 +4509,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse cosine
  </p>
@@ -4539,6 +4541,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse tangent
  </p>
@@ -4574,6 +4577,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - the angle whose tangent is the quotient of y and x
  </p>
@@ -4611,6 +4615,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse cosecant
  </p>
@@ -4648,6 +4653,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse secant
  </p>
@@ -4679,6 +4685,7 @@
      </span>
     </span>
    </span>
+   <i>rad</i>
   </span>
   - inverse cotangent
  </p>

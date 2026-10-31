@@ -1,5 +1,6 @@
 "Root finding tests
 #rad
+ReturnAngleUnits = 0
 p(x) = x + 1.11111
 'Sérgio Galdino: A family of regula falsi root-finding methods
 f_01(x) = x^3 - 1
