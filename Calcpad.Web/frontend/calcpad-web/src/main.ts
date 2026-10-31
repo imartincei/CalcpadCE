@@ -380,6 +380,7 @@ async function bootstrap(): Promise<void> {
         if (!direction) return;
         event.preventDefault();
         event.stopImmediatePropagation();
+        recordNavigation(activeGroup);
         void navigationHistory?.go(direction);
     }, true);
 
@@ -387,7 +388,10 @@ async function bootstrap(): Promise<void> {
         if (event.button !== 3 && event.button !== 4) return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (event.type === 'mousedown') void navigationHistory?.go(event.button === 3 ? -1 : 1);
+        if (event.type === 'mousedown') {
+            recordNavigation(activeGroup);
+            void navigationHistory?.go(event.button === 3 ? -1 : 1);
+        }
     };
     for (const type of ['mousedown', 'mouseup', 'auxclick'] as const) {
         window.addEventListener(type, handleHistoryMouse, true);

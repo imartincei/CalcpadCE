@@ -264,7 +264,9 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
             await until(async () => {
                 const current = await state();
                 return current.tab === tab && current.position.lineNumber === lineNumber && current.position.column === column;
-            }, `history at ${tab}:${lineNumber}:${column}`);
+            }, `history at ${tab}:${lineNumber}:${column}`).catch(async error => {
+                throw new Error(`${error.message}; actual: ${JSON.stringify(await state())}`, {cause: error});
+            });
         };
         await keyboard('ArrowLeft', 'ArrowLeft');
         await at(first, 3, 2);
@@ -312,8 +314,10 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         await at(first, 30, 3);
 
         const second = await app.evaluate(main, `(() => {
+            document.hasFocus = () => false;
             const id = window.calcpadTabs.newUntitled('b = 2\\nc = 3', 'History B');
             window.calcpadActiveEditor.setPosition({lineNumber: 2, column: 3});
+            delete document.hasFocus;
             return id;
         })()`);
         await keyboard('ArrowLeft', 'ArrowLeft');
