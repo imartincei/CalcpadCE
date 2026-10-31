@@ -232,7 +232,7 @@ namespace Calcpad.Core
                     if (lineContent[0] == '#' && ParseKeyword(lineContent, sourceLine))
                         continue;
 
-                    if (macroDefCount == 1)
+                    if (macroDefCount > 0)
                     {
                         macroBuilder.Append(sourceLine).AppendLine();
                         continue;
@@ -426,6 +426,9 @@ namespace Calcpad.Core
 
                     return;
                 }
+                if (_macros.ContainsKey(macroName))
+                    AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, macroName));
+
                 c = EatSpace(lineContent, ref i);
                 if (c == '(')
                 {
@@ -507,7 +510,7 @@ namespace Calcpad.Core
                 if (c == '=')
                 {
                     c = EatSpace(lineContent, ref i);
-                    AddMacro(lineContent, macroName, new Macro(lineContent[i..].ToString(), macroParameters, macroDefaults));
+                    _macros.TryAdd(macroName, new Macro(lineContent[i..].ToString(), macroParameters, macroDefaults));
                     macroName = string.Empty;
                     macroDefaults = null;
                 }
@@ -542,7 +545,7 @@ namespace Calcpad.Core
 
                 macroBuilder.RemoveLastLineIfEmpty();
                 if (macroName.Length > 0)
-                    AddMacro(lineContent, macroName, new Macro(macroBuilder.ToString(), macroParameters, macroDefaults));
+                    _macros.TryAdd(macroName, new Macro(macroBuilder.ToString(), macroParameters, macroDefaults));
 
                 macroName = string.Empty;
                 macroDefaults = null;
@@ -579,11 +582,6 @@ namespace Calcpad.Core
                 });
             }
 
-            void AddMacro(ReadOnlySpan<char> lineContent, string name, Macro macro)
-            {
-                if (!_macros.TryAdd(name, macro))
-                    AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, name));
-            }
             static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
         }
 

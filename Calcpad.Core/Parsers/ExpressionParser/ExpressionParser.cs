@@ -12,7 +12,11 @@ namespace Calcpad.Core
     public partial class ExpressionParser
     {
         private const int MaxHtmlLines = 200000;
+        private const int MaxErrors = 40;
+        private const int MaxErrorOccurrences = 1000;
         private int _errorCount;
+        private int _errorOccurrences;
+        private readonly HashSet<(int Line, string Message)> _errorKeys = [];
         private int _isVal;
         private int _currentLine;
         private int _htmlLines;
@@ -219,14 +223,10 @@ namespace Calcpad.Core
                 FlushMarkdown();
                 if (_currentLine == lineCount)
                 {
-                    var ifNotClosed = _condition.Id > 0 && !_condition.IsLoop;
-                    var loopNotClosed = _loops.Count != 0;
-                    if (ifNotClosed)
-                        _sb.Append(ErrHtml(Messages.if_block_not_closed_Missing_end_if, _currentLine));
-                    if (loopNotClosed)
-                        _sb.Append(ErrHtml(Messages.Iteration_block_not_closed_Missing_loop, _currentLine));
-                    var msg = ifNotClosed ? Messages.if_block_not_closed_Missing_end_if : Messages.Iteration_block_not_closed_Missing_loop;
-                    RecordError(_currentLine, msg, Debug && (ifNotClosed || loopNotClosed));
+                    if (_condition.OpenIf is { } opening)
+                        ReportUnclosed(Messages.if_block_not_closed_Missing_end_if, opening);
+                    if (_loops.Count != 0)
+                        ReportUnclosed(Messages.Iteration_block_not_closed_Missing_loop, (_loops.Peek().StartLine, _loops.Peek().SourceLine));
                 }
             }
             catch (MathParserException ex)
@@ -244,6 +244,12 @@ namespace Calcpad.Core
             {
                 FlushMarkdown();
                 FinalizeOutput();
+            }
+
+            void ReportUnclosed(string message, (int Line, int SourceLine) opening)
+            {
+                _sb.Append(ErrHtml(message, opening.Line));
+                RecordError(opening.Line, message, Debug, opening.SourceLine);
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -361,7 +367,7 @@ namespace Calcpad.Core
 
             bool ParseCondition(ReadOnlySpan<char> s, Keyword keyword)
             {
-                _condition.SetCondition(keyword - Keyword.If);
+                _condition.SetCondition(keyword - Keyword.If, _currentLine, _parser.Line);
                 if (IsEnabled())
                 {
                     if (_condition.KeywordLength == s.Length)
@@ -505,6 +511,8 @@ namespace Calcpad.Core
         {
             _htmlLines = 0;
             _errorCount = 0;
+            _errorOccurrences = 0;
+            _errorKeys.Clear();
             _calculate = calculate;
             _errors = new();
             _errIndex = 0;
@@ -668,9 +676,9 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        RecordError(_currentLine, ex.Message, Debug);
-
-                        if (++_errorCount == 40)
+                        if (RecordError(_currentLine, ex.Message, Debug))
+                            ++_errorCount;
+                        if (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences)
                             throw new MathParserException(Messages.Too_many_errors);
                     }
                 }
@@ -687,12 +695,15 @@ namespace Calcpad.Core
             RecordError(line, text, Debug);
         }
 
-        private void RecordError(int line, string message, bool enabled)
+        // False when this line already reported the same error, e.g. on an earlier loop pass
+        private bool RecordError(int line, string message, bool enabled, int sourceLine = 0)
         {
-            if (!enabled) return;
+            if (!_errorKeys.Add((line, message))) return false;
+            if (!enabled) return true;
             if (_isVisible)
                 _errors.Enqueue(line);
-            var sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
+            if (sourceLine <= 0)
+                sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
@@ -700,6 +711,7 @@ namespace Calcpad.Core
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
             });
+            return true;
         }
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";

@@ -122,7 +122,8 @@ namespace Calcpad.Core
             start + 1 < tokens.Length &&
             (tokens[start] is VariableToken || tokens[start].Type == TokenTypes.Unit) &&
             tokens[start + 1].Type == TokenTypes.Operator &&
-            tokens[start + 1].Content == "=";
+            tokens[start + 1].Content == "=" &&
+            !(start + 2 < tokens.Length && tokens[start + 2].Content == "=");
 
         private static int IndexOfClosingBracket(Token[] tokens, int open)
         {
