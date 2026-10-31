@@ -164,7 +164,6 @@ export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor'
 export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
 
 // --- Print Preview -------------------------------------------------------------
-export { pageBreaksScript, printableArea } from './services/page-breaks';
 export { pdfViewerHtml, pdfPreviewErrorHtml } from './services/pdf-viewer';
 export type { PdfViewerOptions } from './services/pdf-viewer';
 

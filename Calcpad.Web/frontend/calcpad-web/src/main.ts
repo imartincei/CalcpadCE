@@ -29,7 +29,6 @@ import {
     previewSizeLimitChars,
     previewLimitNoticeHtml,
     formatSize,
-    pageBreaksScript,
     pdfViewerHtml,
     pdfPreviewErrorHtml,
     type InlineImageBudget,
@@ -843,18 +842,13 @@ async function bootstrap(): Promise<void> {
                 ? await tauriBridge.inlineDocumentImages(result.html, previewImageBudget(group))
                 : result.html;
             let frameHtml: string | undefined;
-            if (mode === 'preview' || mode === 'report') {
-                if (pdfView) {
-                    const pdfHtml = await pdfPreviewHtml(group, content, finalHtml, theme);
-                    if (pdfHtml === null) {
-                        await hideLoading();
-                        return;
-                    }
-                    frameHtml = pdfHtml;
-                } else if (editorBridge.getExtraSetting('previewPageBreaks') === 'true') {
-                    frameHtml = finalHtml.replace('</body>',
-                        pageBreaksScript(activeBridge.getEffectivePdfOptions(content)) + '</body>');
+            if (pdfView) {
+                const pdfHtml = await pdfPreviewHtml(group, content, finalHtml, theme);
+                if (pdfHtml === null) {
+                    await hideLoading();
+                    return;
                 }
+                frameHtml = pdfHtml;
             }
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group), frameHtml);
             if (mode === 'ui') {
@@ -901,8 +895,6 @@ async function bootstrap(): Promise<void> {
             const pdfHtml = await pdfPreviewHtml(group, content, html, theme, `uiPrintPdf:${group.id}`);
             if (pdfHtml === null) return;
             html = pdfHtml;
-        } else if (editorBridge.getExtraSetting('previewPageBreaks') === 'true') {
-            html = html.replace('</body>', pageBreaksScript(activeBridge.getEffectivePdfOptions(content)) + '</body>');
         }
         await appInstance.setUiPrintHtml(group.id, html, uiDocKeyFor(group));
     }
@@ -1585,8 +1577,7 @@ async function bootstrap(): Promise<void> {
         // Settings announcements are the host talking to itself; a preview must not
         // be able to trigger a full re-render loop by forging one.
         if (data.type === 'previewThemeChanged' || data.type === 'settingsChanged'
-            || data.type === 'previewUiOverridesChanged' || data.type === 'previewPageBreaksChanged'
-            || data.type === 'previewPdfChanged') {
+            || data.type === 'previewUiOverridesChanged' || data.type === 'previewPdfChanged') {
             if (!fromHost) return;
             refreshAllPreviews();
             return;

@@ -83,7 +83,6 @@
         :initial-enable-auto-run="enableAutoRun"
         :initial-enable-auto-input-mode="enableAutoInputMode"
         :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
-        :initial-enable-preview-page-breaks="enablePreviewPageBreaks"
         :initial-enable-preview-pdf="enablePreviewPdf"
         :initial-show-file-metadata="showFileMetadata"
         :initial-dark-background="darkBackground"
@@ -115,7 +114,6 @@
         @update-auto-run="handleUpdateAutoRun"
         @update-auto-input-mode="handleUpdateAutoInputMode"
         @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
-        @update-preview-page-breaks="handleUpdatePreviewPageBreaks"
         @update-preview-pdf="handleUpdatePreviewPdf"
         @update-show-file-metadata="handleUpdateShowFileMetadata"
         @update-dark-background="handleUpdateDarkBackground"
@@ -274,7 +272,6 @@ const enablePreviewCursorSync = ref(false)
 const enableAutoRun = ref(true)
 const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
-const enablePreviewPageBreaks = ref(false)
 const enablePreviewPdf = ref(false)
 const showFileMetadata = ref(false)
 const darkBackground = ref('#1e1e1e')
@@ -610,11 +607,6 @@ const handleUpdatePreviewUiOverrides = (enabled: boolean) => {
   postMessage({ type: 'updatePreviewUiOverrides', enabled })
 }
 
-const handleUpdatePreviewPageBreaks = (enabled: boolean) => {
-  enablePreviewPageBreaks.value = enabled
-  postMessage({ type: 'updatePreviewPageBreaks', enabled })
-}
-
 const handleUpdatePreviewPdf = (enabled: boolean) => {
   enablePreviewPdf.value = enabled
   postMessage({ type: 'updatePreviewPdf', enabled })
@@ -828,7 +820,6 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enableAutoRun === 'boolean') enableAutoRun.value = message.enableAutoRun
       if (typeof message.enableAutoInputMode === 'boolean') enableAutoInputMode.value = message.enableAutoInputMode
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
-      if (typeof message.enablePreviewPageBreaks === 'boolean') enablePreviewPageBreaks.value = message.enablePreviewPageBreaks
       if (typeof message.enablePreviewPdf === 'boolean') enablePreviewPdf.value = message.enablePreviewPdf
       if (typeof message.showFileMetadata === 'boolean') showFileMetadata.value = message.showFileMetadata
       darkBackground.value = message.darkBackground || '#1e1e1e'

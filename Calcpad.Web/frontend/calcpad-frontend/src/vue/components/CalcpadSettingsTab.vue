@@ -371,18 +371,6 @@
             </label>
           </div>
 
-          <div v-show="rowVisible('editor', 'previewPageBreaks')" class="setting-group">
-            <label>
-              <input
-                v-model="enablePreviewPageBreaks"
-                type="checkbox"
-                @change="updatePreviewPageBreaks"
-              />
-              <CalcpadSearchHighlight text="Show Page Breaks in Preview" :query="query" />
-              <span class="setting-info" title="Draws dotted lines where PDF pages are estimated to break, using the PDF paper size and margins. Render Preview as PDF is slower, but more accurate and shows the exact pages.">ⓘ</span>
-            </label>
-          </div>
-
           <div v-show="rowVisible('editor', 'previewPdf')" class="setting-group">
             <label>
               <input
@@ -755,7 +743,6 @@ interface Props {
   initialEnableAutoRun?: boolean
   initialEnableAutoInputMode?: boolean
   initialEnablePreviewUiOverrides?: boolean
-  initialEnablePreviewPageBreaks?: boolean
   initialEnablePreviewPdf?: boolean
   initialShowFileMetadata?: boolean
   initialDarkBackground?: string
@@ -789,7 +776,6 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnableAutoRun: true,
   initialEnableAutoInputMode: true,
   initialEnablePreviewUiOverrides: false,
-  initialEnablePreviewPageBreaks: false,
   initialEnablePreviewPdf: false,
   initialShowFileMetadata: false,
   initialDarkBackground: '#1a1a2e',
@@ -822,7 +808,6 @@ const emit = defineEmits<{
   updateAutoRun: [enabled: boolean]
   updateAutoInputMode: [enabled: boolean]
   updatePreviewUiOverrides: [enabled: boolean]
-  updatePreviewPageBreaks: [enabled: boolean]
   updatePreviewPdf: [enabled: boolean]
   updateShowFileMetadata: [enabled: boolean]
   updateDarkBackground: [color: string]
@@ -914,7 +899,6 @@ const enablePreviewCursorSync = ref(props.initialEnablePreviewCursorSync)
 const enableAutoRun = ref(props.initialEnableAutoRun)
 const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
 const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
-const enablePreviewPageBreaks = ref(props.initialEnablePreviewPageBreaks)
 const enablePreviewPdf = ref(props.initialEnablePreviewPdf)
 const showFileMetadata = ref(props.initialShowFileMetadata)
 const darkBackground = ref(props.initialDarkBackground)
@@ -1012,7 +996,6 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       autoRun: 'auto-run preview render',
       autoInputMode: 'auto input mode ui form first open',
       previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
-      previewPageBreaks: 'show page breaks preview print pdf pages',
       previewPdf: 'render preview as pdf print preview pages viewer',
       showFileMetadata: 'show hide file metadata info ui overrides comment footer',
       fontFamily: 'editor font family juliamono system',
@@ -1168,10 +1151,6 @@ const updateAutoInputMode = () => {
 
 const updatePreviewUiOverrides = () => {
   emit('updatePreviewUiOverrides', enablePreviewUiOverrides.value)
-}
-
-const updatePreviewPageBreaks = () => {
-  emit('updatePreviewPageBreaks', enablePreviewPageBreaks.value)
 }
 
 const updatePreviewPdf = () => {
@@ -1344,13 +1323,6 @@ watch(
   () => props.initialEnablePreviewUiOverrides,
   (newValue) => {
     enablePreviewUiOverrides.value = newValue
-  }
-)
-
-watch(
-  () => props.initialEnablePreviewPageBreaks,
-  (newValue) => {
-    enablePreviewPageBreaks.value = newValue
   }
 )
 

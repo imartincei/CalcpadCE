@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pageBreaksScript, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -1153,9 +1153,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         let frameHtml = repairedResponse.replace('</head>',
             agentScript + errorNavigationScript + scrollbarStyleScript + '</head>');
         // Inject theme override + line links before closing body tag
-        const pageBreaks = !enableUi && !unwrapped && settingsManager.getExtraBool('previewPageBreaks', false)
-            ? pageBreaksScript(getPdfSettings(content, sourceFileUri)) : '';
-        frameHtml = frameHtml.replace('</body>', themeOverrideScript + lineLinkScript + pageBreaks + '</body>');
+        frameHtml = frameHtml.replace('</body>', themeOverrideScript + lineLinkScript + '</body>');
 
         // The rendered document is never the webview's own document: it is sandboxed
         // to an opaque origin inside the shell, which holds the only handle to VS Code.

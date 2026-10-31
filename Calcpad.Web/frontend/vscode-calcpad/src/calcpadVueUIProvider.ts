@@ -207,11 +207,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     void this.onSettingsChanged?.();
                     break;
 
-                case 'updatePreviewPageBreaks':
-                    this._settingsManager.setExtra('previewPageBreaks', !!data.enabled);
-                    void this.onSettingsChanged?.();
-                    break;
-
                 case 'updatePreviewPdf':
                     this._settingsManager.setExtra('previewPdf', !!data.enabled);
                     void this.onSettingsChanged?.();
@@ -539,7 +534,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enableAutoRun: sm.getExtraBool('autoRun', true),
             enableAutoInputMode: sm.getExtraBool('autoInputMode', true),
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
-            enablePreviewPageBreaks: sm.getExtraBool('previewPageBreaks', false),
             enablePreviewPdf: sm.getExtraBool('previewPdf', false),
             showFileMetadata: sm.getExtraBool('showFileMetadata', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
