@@ -65,6 +65,9 @@ jobs:
         run: |
           node scripts/generate-monaco-zh-map.mjs
           git diff --exit-code -- calcpad-web/src/editor/monaco-zh-map.json
+      - name: Test navigation history
+        working-directory: .
+        run: node --test tools/navigation-history.test.mjs
 
       - name: Frontend lib
         if: ${{ !cancelled() }}

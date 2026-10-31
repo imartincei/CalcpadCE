@@ -56,8 +56,8 @@ export async function createDesktopNavigationHistory({ confirm, restore }: Navig
             if (document.hasFocus()) void send('record_navigation', { location, jump });
         },
         remove(groupId, tabId) { void send('remove_navigation', { groupId, tabId }); },
-        go: navigationCommand(async direction => {
+        go: async direction => {
             if (await confirm()) await send('navigate_history', { direction });
-        }),
+        },
     };
 }
