@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Calcpad.Core
@@ -295,7 +296,9 @@ namespace Calcpad.Core
                 hp_m = null;
 
             var units = hp_m?.Units;
-            sb.AppendLine("<span class=\"matrix\">");
+            sb.AppendLine(inlineMatrices ?
+                "<span class=\"matrix\">" :
+                "<span class=\"matrix matrix-grid\">");
             for (int i = 0, nr = matrix.RowCount; i < nr; ++i)
             {
                 sb.Append("<span class=\"tr\"><span class=\"td\"></span>");
@@ -337,7 +340,6 @@ namespace Calcpad.Core
         internal override string FormatVector(Vector vector)
         {
             var div = VectorSpacing;
-            var sb = new StringBuilder();
             const double tol = 1e-14;
             var zeroThreshold = GetMaxVisibleVectorValue(vector) * tol;
             if (zeroThreshold > tol)
@@ -348,41 +350,62 @@ namespace Calcpad.Core
 
             var units = hp_v?.Units;
             var len = vector.Length;
-            sb.Append("<b class=\"b0\">[</b>");
+            var cells = new List<string>(Math.Min(len, maxCount + 2));
+            var isSkipped = false;
             for (int i = 0; i < len; ++i)
             {
-                if (i > 0)
-                    sb.Append(div);
-
                 if (i == maxCount)
                 {
                     var n = len - maxCount;
-                    sb.Append($"<span title=\"{n - Math.Sign(n - 1)} elements skipped.\">...</span>")
-                        .Append(div);
+                    cells.Add($"<span title=\"{n - Math.Sign(n - 1)} elements skipped.\">...</span>");
+                    isSkipped = true;
                     break;
                 }
-                AppendElement(i);
+                cells.Add(Element(i));
             }
             var last = len - 1;
             if (maxCount < last)
-                AppendElement(last);
-            sb.Append("<b class=\"b0\">]</b>");
+                cells.Add(Element(last));
+
+            string s;
+            if (inlineMatrices)
+            {
+                s = string.Join(div, cells);
+                if (isSkipped && cells.Count == maxCount + 1)
+                    s += div;
+
+                s = $"<b class=\"b0\">[</b>{s}<b class=\"b0\">]</b>";
+            }
+            else
+                s = WrapMatrix([cells.ToArray()], cells.Count);
 
             if (units is not null)
-                sb.Append(HairSpace).Append(units.Html);
+                s += HairSpace + units.Html;
 
-            return sb.ToString();
+            return s;
 
-            void AppendElement(int index)
+            string Element(int index)
             {
                 if (hp_v is null)
-                    sb.Append(FormatMatrixValue(vector[index], zeroThreshold));
-                else
-                {
-                    var d = hp_v.GetValue(index);
-                    sb.Append(FormatReal(d, units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold));
-                }
+                    return FormatMatrixValue(vector[index], zeroThreshold);
+
+                var d = hp_v.GetValue(index);
+                return FormatReal(d, units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold);
             }
+        }
+
+        protected override string WrapMatrix(string[][] rows, int columns)
+        {
+            var sb = new StringBuilder("<span class=\"matrix matrix-grid\">");
+            foreach (var cells in rows)
+            {
+                sb.Append("<span class=\"tr\"><span class=\"td\"></span>");
+                foreach (var cell in cells)
+                    sb.Append("<span class=\"td\">").Append(cell).Append("</span>");
+
+                sb.Append("<span class=\"td\"></span></span>");
+            }
+            return sb.Append("</span>").ToString();
         }
 
         internal override string FormatMatrixValue(RealValue value, double zeroThreshold)

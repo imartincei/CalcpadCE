@@ -8,6 +8,7 @@
             "substitute": true,
             "formatEquations": true,
             "zeroSmallMatrixElements": true,
+            "inlineMatrices": true,
             "showHiddenOutput": false,
             "maxOutputCount": 20,
             "precision": 1e-14,

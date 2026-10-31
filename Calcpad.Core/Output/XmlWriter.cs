@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Calcpad.Core
@@ -410,6 +411,8 @@ namespace Calcpad.Core
             </m:mcs>
         </m:mPr>";
 
+        private const string SmallerFontProperty = @"<w:rPr><w:sz w:val=""21"" /></w:rPr>";
+
         internal override string FormatIf(string sc, string sa, string sb, int level = 0) =>
         @$"<m:d>
             <m:dPr>
@@ -426,7 +429,6 @@ namespace Calcpad.Core
 
         internal override string FormatMatrix(Matrix matrix)
         {
-            const string smallerFontProperty = @"<w:rPr><w:sz w:val=""21"" /></w:rPr>";
             var nr = matrix.RowCount;
             var nc = matrix.ColCount;
             var zeroThreshold = GetMaxVisibleMatrixValue(matrix, out int _, out int _) * 1e-14;
@@ -492,27 +494,59 @@ namespace Calcpad.Core
 
             return sb.ToString();
 
-            static string td(string s) => $"<m:e><m:r>{smallerFontProperty}<m:t>{s}</m:t></m:r></m:e>";
+            static string td(string s) => $"<m:e><m:r>{SmallerFontProperty}<m:t>{s}</m:t></m:r></m:e>";
+        }
 
-            static void AppendMatrixElement(StringBuilder sb, string s)
+        private static void AppendMatrixElement(StringBuilder sb, string s)
+        {
+            var k1 = s.IndexOf("<m:r>") + 5;
+            var k2 = s.IndexOf("</m:r>", k1);
+            while (k1 >= 5 && k2 > k1 && s.AsSpan(k1, k2 - k1).Contains(":rPr>", StringComparison.Ordinal))
             {
-                var k1 = s.IndexOf("<m:r>") + 5;
-                var k2 = s.IndexOf("</m:r>", k1);
-                while (k1 >= 5 && k2 > k1 && s.AsSpan(k1, k2 - k1).Contains(":rPr>", StringComparison.Ordinal))
-                {
-                    k1 = s.IndexOf("<m:r>", k2) + 5;
-                    k2 = s.IndexOf("</m:r>", k1);
-                }
-                sb.Append("<m:e>");
-                if (k1 < 5)
-                    sb.Append(s);
-                else if (k1 == 5)
-                    sb.Append("<m:r>").Append(smallerFontProperty).Append(s[5..]);
-                else
-                    sb.Append(s[..k1]).Append(smallerFontProperty).Append(s[k1..]);
-
-                sb.Append("</m:e>");
+                k1 = s.IndexOf("<m:r>", k2) + 5;
+                k2 = s.IndexOf("</m:r>", k1);
             }
+            sb.Append("<m:e>");
+            if (k1 < 5)
+                sb.Append(s);
+            else if (k1 == 5)
+                sb.Append("<m:r>").Append(SmallerFontProperty).Append(s[5..]);
+            else
+                sb.Append(s[..k1]).Append(SmallerFontProperty).Append(s[k1..]);
+
+            sb.Append("</m:e>");
+        }
+
+        protected override string WrapMatrix(string[][] rows, int columns)
+        {
+            var sb = new StringBuilder(
+            @"<m:d>
+                <m:dPr><m:begChr m:val=""[""/><m:endChr m:val=""]""/></m:dPr>
+                <m:e>
+                    <m:m>
+                        <m:mPr>
+                            <m:rSpRule m:val=""3""/>
+                            <m:cGpRule m:val=""3""/>
+                            <m:rSp m:val=""300""/>
+                            <m:cGp m:val=""120""/>
+                            <m:mcs>
+                                <m:mc>
+                                    <m:mcPr>");
+            sb.Append($"<m:count m:val=\"{columns}\"/>");
+            sb.Append(@"<m:mcJc m:val=""center""/>
+                                </m:mcPr>
+                            </m:mc>
+                        </m:mcs>
+                    </m:mPr>");
+            foreach (var cells in rows)
+            {
+                sb.Append("<m:mr>");
+                foreach (var cell in cells)
+                    AppendMatrixElement(sb, cell);
+
+                sb.Append("</m:mr>");
+            }
+            return sb.Append("</m:m></m:e></m:d>").ToString();
         }
 
         private static readonly string RunVectorSpacing = Run(VectorSpacing);
@@ -520,7 +554,6 @@ namespace Calcpad.Core
         internal override string FormatVector(Vector vector)
         {
             var div = RunVectorSpacing;
-            var sb = new StringBuilder();
             const double tol = 1e-14;
             var zeroThreshold = GetMaxVisibleVectorValue(vector) * tol;
             if (zeroThreshold > tol)
@@ -531,38 +564,46 @@ namespace Calcpad.Core
 
             var units = hp_v?.Units;
             var len = vector.Length;
+            var cells = new List<string>(Math.Min(len, maxCount + 2));
+            var isSkipped = false;
             for (int i = 0; i < len; ++i)
             {
-                if (i > 0)
-                    sb.Append(div);
-
                 if (i == maxCount)
                 {
-                    sb.Append(RunDots).Append(div);
+                    cells.Add(RunDots);
+                    isSkipped = true;
                     break;
                 }
-                AppendElement(i);
+                cells.Add(Element(i));
             }
             var last = len - 1;
             if (maxCount < last)
-                AppendElement(last);
+                cells.Add(Element(last));
 
-            string s = AddBrackets(sb.ToString(), 0, '[', ']');
+            string s;
+            if (inlineMatrices)
+            {
+                s = string.Join(div, cells);
+                if (isSkipped && cells.Count == maxCount + 1)
+                    s += div;
+
+                s = AddBrackets(s, 0, '[', ']');
+            }
+            else
+                s = WrapMatrix([cells.ToArray()], cells.Count);
 
             if (units is not null)
                 s += units.Xml;
 
             return s;
 
-            void AppendElement(int index)
+            string Element(int index)
             {
                 if (hp_v is null)
-                    sb.Append(FormatMatrixValue(vector[index], zeroThreshold));
-                else
-                {
-                    var d = hp_v.GetValue(index);
-                    sb.Append(FormatReal(d, units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold));
-                }
+                    return FormatMatrixValue(vector[index], zeroThreshold);
+
+                var d = hp_v.GetValue(index);
+                return FormatReal(d, units?.FormatString, zeroSmallElements && Math.Abs(d) < zeroThreshold);
             }
         }
 
