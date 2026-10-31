@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import ts from '../Calcpad.Web/frontend/calcpad-web/node_modules/typescript/lib/typescript.js';
 import { test } from 'node:test';
 import { NavigationHistory, navigationDirection } from '../Calcpad.Web/frontend/calcpad-web/src/editor/navigation-history.ts';
 
@@ -104,4 +106,53 @@ test('shortcuts match VS Code on each platform without capturing other modifier 
     assert.equal(navigationDirection(key({key: 'ArrowLeft', altKey: true, ctrlKey: true}), 'Win32'), 0);
     assert.equal(navigationDirection(key({metaKey: true}), 'MacIntel'), 0);
     assert.equal(navigationDirection(key({ctrlKey: true, altKey: true, shiftKey: true}), 'Linux'), 0);
+});
+
+const dataModule = source => `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
+const editorSource = readFileSync(new URL('../Calcpad.Web/frontend/calcpad-web/src/editor/navigation-history.ts', import.meta.url), 'utf8');
+const serviceSource = readFileSync(new URL('../Calcpad.Web/frontend/calcpad-web/src/services/navigation-history.ts', import.meta.url), 'utf8');
+const transpile = source => ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const serviceModule = transpile(serviceSource)
+    .replace("'../editor/navigation-history'", JSON.stringify(dataModule(transpile(editorSource))))
+    .replace(/import\('@tauri-apps\/api\/(?:core|event|window)'\)/g, 'Promise.resolve(globalThis.navigationHistoryTest)');
+const { createDesktopNavigationHistory } = await import(dataModule(serviceModule));
+
+test('desktop navigation accepts the next shortcut after restoration while the previous command is still returning', async t => {
+    const started = Promise.withResolvers();
+    const returned = Promise.withResolvers();
+    const restored = Promise.withResolvers();
+    const commands = [];
+    let listener;
+    globalThis.navigationHistoryTest = {
+        invoke(command, args) {
+            commands.push({ command, args });
+            if (commands.length === 1) {
+                started.resolve();
+                return returned.promise;
+            }
+            return Promise.resolve();
+        },
+        listen(_event, handler) { listener = handler; },
+        getCurrentWindow: () => ({ label: 'main' }),
+    };
+    t.after(() => {
+        delete globalThis.navigationHistoryTest;
+    });
+    const history = await createDesktopNavigationHistory({
+        confirm: async () => true,
+        restore() { restored.resolve(); return true; },
+    });
+
+    const first = history.go(-1);
+    await started.promise;
+    const restoration = listener({ payload: { id: 1, location: {} } });
+    await restored.promise;
+    const second = history.go(1);
+    returned.resolve();
+    await Promise.all([first, restoration, second]);
+
+    assert.deepEqual(commands.map(({ command }) => command), [
+        'navigate_history', 'complete_navigation', 'navigate_history',
+    ]);
+    assert.equal(commands[2].args.direction, 1);
 });

@@ -60,6 +60,10 @@ jobs:
         working-directory: .
         run: node --test tools/monaco-language.test.mjs
 
+      - name: Test navigation history
+        working-directory: .
+        run: node --test tools/navigation-history.test.mjs
+
       - name: Frontend lib
         if: ${{ !cancelled() }}
         working-directory: Calcpad.Web/frontend/calcpad-frontend
