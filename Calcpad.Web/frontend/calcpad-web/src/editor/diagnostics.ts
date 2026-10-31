@@ -1,7 +1,7 @@
 import * as monaco from 'monaco-editor';
 import { CalcpadApiClient } from 'calcpad-frontend/api/client';
 import { CalcpadLintService } from 'calcpad-frontend/services/linter';
-import type { LintDiagnostic } from 'calcpad-frontend/types/api';
+import type { CalcpadError, LintDiagnostic } from 'calcpad-frontend/types/api';
 
 export type LintSeverity = 'error' | 'warning' | 'information';
 
@@ -69,7 +69,8 @@ async function lintAndMark(
     const markers: monaco.editor.IMarkerData[] = filtered.map(
         (diag: LintDiagnostic) => ({
             severity: mapSeverity(diag.severityId),
-            message: diag.message,
+            message: `[Linter] ${diag.message}`,
+            code: diag.code,
             startLineNumber: diag.line + 1,
             startColumn: diag.column + 1,
             endLineNumber: diag.line + 1,
@@ -78,6 +79,24 @@ async function lintAndMark(
     );
 
     monaco.editor.setModelMarkers(model, 'calcpad', markers);
+}
+
+/** Shows a run's errors beside lint's, until the next run replaces them. */
+export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: CalcpadError[]): void {
+    if (model.isDisposed()) return;
+    const lineCount = model.getLineCount();
+    monaco.editor.setModelMarkers(model, 'calcpad-run', errors.map(err => {
+        const line = Math.min(Math.max(err.sourceLine, 1), lineCount);
+        return {
+            severity: monaco.MarkerSeverity.Error,
+            message: `[Runtime] ${err.message}`,
+            code: err.code,
+            startLineNumber: line,
+            startColumn: model.getLineFirstNonWhitespaceColumn(line) || 1,
+            endLineNumber: line,
+            endColumn: model.getLineMaxColumn(line),
+        };
+    }));
 }
 
 function mapSeverity(severityId: number): monaco.MarkerSeverity {

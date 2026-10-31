@@ -3099,7 +3099,7 @@ namespace Calcpad.Core
                         break;
                     }
                     if (iter == HpSvdSolver.MaxIterations)
-                        throw new MathParserException($"no convergence in {HpSvdSolver.MaxIterations} svdcmp iterations");
+                        throw new MathParserException($"no convergence in {HpSvdSolver.MaxIterations} svdcmp iterations", "CPD-5536");
 
                     var x = sig[l];
                     nm = k - 1;

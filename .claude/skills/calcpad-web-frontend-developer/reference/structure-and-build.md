@@ -40,7 +40,7 @@ Calcpad.Web/frontend/
 │   │   ├── defaults/               # Generated settings defaults (see generate-settings-defaults.mjs)
 │   │   └── vue/
 │   │       ├── components/         # CalcpadApp.vue + the sidebar tabs (Insert, Settings,
-│   │       │                       #   Export, Files, Formatting, Metadata, Toc, Variables, Errors)
+│   │       │                       #   Export, Files, Formatting, Metadata, Toc, Variables)
 │   │       ├── services/           # Vue messaging service
 │   │       ├── styles/
 │   │       └── types/

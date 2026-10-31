@@ -231,14 +231,14 @@ namespace Calcpad.Core
             }
             catch (MathParserException ex)
             {
-                AppendError(textSpan.ToString(), ex.Message, _currentLine);
+                AppendError(textSpan.ToString(), ex, _currentLine);
             }
             catch (Exception ex)
             {
                 var msg = string.Format(Messages.Unexpected_error_0_Please_check_the_expression_consistency, ex.Message);
                 if (_isVisible)
                     _sb.Append(ErrHtml(msg, _currentLine));
-                RecordError(_currentLine, msg, Debug);
+                RecordError(_currentLine, msg, Debug, "CPD-5900");
             }
             finally
             {
@@ -249,7 +249,7 @@ namespace Calcpad.Core
             void ReportUnclosed(string message, (int Line, int SourceLine) opening)
             {
                 _sb.Append(ErrHtml(message, opening.Line));
-                RecordError(opening.Line, message, Debug, opening.SourceLine);
+                RecordError(opening.Line, message, Debug, "CPD-3105", opening.SourceLine);
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -284,7 +284,7 @@ namespace Calcpad.Core
                         }
                         catch (MathParserException ex)
                         {
-                            AppendError(s.ToString(), ex.Message, _currentLine);
+                            AppendError(s.ToString(), ex, _currentLine);
                         }
                         finally
                         {
@@ -405,7 +405,7 @@ namespace Calcpad.Core
                 {
                     ++_htmlLines;
                     if (_htmlLines == MaxHtmlLines)
-                        AppendError(string.Concat(tokens), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine);
+                        AppendError(string.Concat(tokens), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine, "CPD-5906");
                     else
                     {
                         bool isIndent = keyword == Keyword.Else_If || keyword == Keyword.End_If;
@@ -464,7 +464,7 @@ namespace Calcpad.Core
                                     catch (MathParserException ex)
                                     {
                                         _sb.Append(ErrHtml(ex.Message, _currentLine));
-                                        RecordError(_currentLine, ex.Message, Debug);
+                                        RecordError(_currentLine, ex, Debug);
                                     }
                                 }
                         }
@@ -676,10 +676,10 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        if (RecordError(_currentLine, ex.Message, Debug))
+                        if (RecordError(_currentLine, ex, Debug))
                             ++_errorCount;
                         if (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences)
-                            throw new MathParserException(Messages.Too_many_errors);
+                            throw new MathParserException(Messages.Too_many_errors, "CPD-5904");
                     }
                 }
                 else if (isOutput)
@@ -687,16 +687,22 @@ namespace Calcpad.Core
             }
         }
 
-        void AppendError(string lineContent, string text, int line)
+        void AppendError(string lineContent, MathParserException ex, int line) =>
+            AppendError(lineContent, ex.Message, line, ex.Code);
+
+        void AppendError(string lineContent, string text, int line, string code)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
             if (_isVisible)
                 _sb.Append(ErrHtml(FormatError(s, text, line), line));
-            RecordError(line, text, Debug);
+            RecordError(line, text, Debug, code);
         }
 
+        private bool RecordError(int line, MathParserException ex, bool enabled) =>
+            RecordError(line, ex.Message, enabled, ex.Code);
+
         // False when this line already reported the same error, e.g. on an earlier loop pass
-        private bool RecordError(int line, string message, bool enabled, int sourceLine = 0)
+        private bool RecordError(int line, string message, bool enabled, string code, int sourceLine = 0)
         {
             if (!_errorKeys.Add((line, message))) return false;
             if (!enabled) return true;
@@ -710,6 +716,7 @@ namespace Calcpad.Core
                 OutputLine = line + 1,
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
+                Code = code,
             });
             return true;
         }

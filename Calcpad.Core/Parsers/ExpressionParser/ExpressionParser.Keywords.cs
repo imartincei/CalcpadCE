@@ -339,7 +339,7 @@ namespace Calcpad.Core
             }
             catch (MathParserException ex)
             {
-                AppendError(s.ToString(), ex.Message, _currentLine);
+                AppendError(s.ToString(), ex, _currentLine);
                 return false;
             }
         }
@@ -376,7 +376,7 @@ namespace Calcpad.Core
                     }
                     catch (MathParserException ex)
                     {
-                        AppendError(s.ToString(), ex.Message, _currentLine);
+                        AppendError(s.ToString(), ex, _currentLine);
                     }
                 }
             }
@@ -403,13 +403,13 @@ namespace Calcpad.Core
                             _parser.Parse(expression);
                             _parser.Calculate();
                             if (_parser.Real > Loop.MaxCount)
-                                AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine);
+                                AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine, "CPD-5905");
                             else
                                 count = Math.Round(_parser.Real, MidpointRounding.AwayFromZero);
                         }
                         catch (MathParserException ex)
                         {
-                            AppendError(s.ToString(), ex.Message, _currentLine);
+                            AppendError(s.ToString(), ex, _currentLine);
                         }
                     }
                     else
@@ -431,7 +431,7 @@ namespace Calcpad.Core
                     }
                     catch (MathParserException ex)
                     {
-                        AppendError(s.ToString(), ex.Message, _currentLine);
+                        AppendError(s.ToString(), ex, _currentLine);
                     }
                 }
             }
@@ -484,7 +484,7 @@ namespace Calcpad.Core
                                 var count = Math.Abs((end - start).Re) + 1;
                                 if (count > Loop.MaxCount)
                                 {
-                                    AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine);
+                                    AppendError(s.ToString(), string.Format(Messages.Number_of_iterations_exceeds_the_maximum_0, Loop.MaxCount), _currentLine, "CPD-5905");
                                     return;
                                 }
                                 var counter = _parser.GetVariableRef(varName);
@@ -493,7 +493,7 @@ namespace Calcpad.Core
                             }
                             catch (MathParserException ex)
                             {
-                                AppendError(s.ToString(), ex.Message, _currentLine);
+                                AppendError(s.ToString(), ex, _currentLine);
                             }
                         }
                     }
@@ -510,7 +510,7 @@ namespace Calcpad.Core
                         }
                         catch (MathParserException ex)
                         {
-                            AppendError(s.ToString(), ex.Message, _currentLine);
+                            AppendError(s.ToString(), ex, _currentLine);
                         }
                     }
                 }
@@ -548,7 +548,7 @@ namespace Calcpad.Core
                     }
                     catch (MathParserException ex)
                     {
-                        AppendError(s.ToString(), ex.Message, _currentLine);
+                        AppendError(s.ToString(), ex, _currentLine);
                     }
                 }
             }
@@ -562,7 +562,7 @@ namespace Calcpad.Core
                 }
                 catch (MathParserException ex)
                 {
-                    AppendError(s.ToString(), ex.Message, _currentLine);
+                    AppendError(s.ToString(), ex, _currentLine);
                 }
             }
         }
@@ -574,12 +574,12 @@ namespace Calcpad.Core
                 if (_condition.IsSatisfied)
                 {
                     if (_loops.Count == 0)
-                        AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine);
+                        AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105");
                     else
                     {
                         var next = _loops.Peek();
                         if (next.Id != _condition.Id)
-                            AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine);
+                            AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105");
                         else if (!Iterate(next, true))
                             _loops.Pop();
                     }
@@ -652,7 +652,7 @@ namespace Calcpad.Core
                 if (_condition.IsSatisfied)
                 {
                     if (_loops.Count == 0)
-                        AppendError("#continue", Messages.continue_without_a_corresponding_repeat, _currentLine);
+                        AppendError("#continue", Messages.continue_without_a_corresponding_repeat, _currentLine, "CPD-3105");
                     else
                     {
                         var loop = _loops.Peek();
@@ -703,7 +703,7 @@ namespace Calcpad.Core
                     if (Validator.IsValidFormatString(format))
                         Settings.Math.FormatString = format;
                     else
-                        AppendError("#format " + format, string.Format(Messages.Invalid_format_string_0, format), _currentLine);
+                        AppendError("#format " + format, string.Format(Messages.Invalid_format_string_0, format), _currentLine, "CPD-3601");
                 }
             }
             else
@@ -719,7 +719,7 @@ namespace Calcpad.Core
             if (length == 0)
             {
                 AppendError(s.ToString(), string.Format(Messages.Missing_path_value_0,
-                    isProject ? "#ProjectPath" : "#LibraryPath"), _currentLine);
+                    isProject ? "#ProjectPath" : "#LibraryPath"), _currentLine, "CPD-1106");
                 return;
             }
 
@@ -727,7 +727,7 @@ namespace Calcpad.Core
             var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
                 ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
             if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
-                AppendError(s.ToString(), error, _currentLine);
+                AppendError(s.ToString(), error, _currentLine, "CPD-1106");
         }
 
         private const string SettingsKeyword = "#settings";
@@ -737,7 +737,7 @@ namespace Calcpad.Core
             var json = s[SettingsKeyword.Length..].Trim();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413");
                 return;
             }
             try
@@ -750,7 +750,7 @@ namespace Calcpad.Core
                 foreach (var error in dto.Validate())
                 {
                     (invalid ??= []).Add(error.Key);
-                    AppendError(s.ToString(), error.Message, _currentLine);
+                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3413");
                 }
 
                 foreach (SettingKey key in Enum.GetValues<SettingKey>())
@@ -759,7 +759,7 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine);
+                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413");
             }
         }
 
@@ -901,7 +901,7 @@ namespace Calcpad.Core
                 else if (expr.Equals("off", StringComparison.OrdinalIgnoreCase))
                     _isMarkdownOn = false;
                 else
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, expr.ToString()), _currentLine);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, expr.ToString()), _currentLine, "CPD-3403");
             }
             else
                 _isMarkdownOn = true;

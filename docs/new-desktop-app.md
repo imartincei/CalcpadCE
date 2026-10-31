@@ -128,7 +128,8 @@ The active group drives the sidebar.
 **Linter** — CalcpadCE checks your document as you write and flags problems before they're converted to HTML.
 Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the **Problems** panel with a link to the offending line.
 
-**Preview errors** — errors from the calculation engine (including inside hidden code) are listed in the **Errors** tab of the sidebar, each with a link to its source line.
+**Calculation errors** — when the preview runs, errors from the calculation engine also appear in the **Problems** panel.
+Each entry starts with `[Linter]` or `[Runtime]` to show where it came from.
 
 See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and **[Linter and Diagnostics](new-linter.md)** for the full list of codes.
 
@@ -152,7 +153,7 @@ Use **Show Server Log**, **Stop Server**, or **Restart Server** directly from th
 
 ## Settings and configurations
 
-All calculation, plot, unit, theme, editor, and linter settings live in the **Settings** tab of the sidebar. 
+All calculation, plot, unit, theme, editor, and linter settings live in the **Settings** tab of the sidebar.
 Open it with **Ctrl+,** or click the **Settings** tab.
 Prettify and its options are in **Settings → Formatting**.
 The desktop app also supports **named configurations** — save different sets of settings (e.g. one for metric with 3 decimals, one for imperial with degrees) and switch the active configuration from the Settings tab; configurations persist between sessions.
