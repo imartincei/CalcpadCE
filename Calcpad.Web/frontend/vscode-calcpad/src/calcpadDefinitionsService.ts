@@ -38,12 +38,12 @@ export class CalcpadDefinitionsService {
         return this.definitionsService.getCachedParseMode(documentUri, line);
     }
 
-    public async refreshDefinitions(document: vscode.TextDocument): Promise<DefinitionsResponse | null> {
+    public async refreshDefinitions(document: vscode.TextDocument, useTrace = false): Promise<DefinitionsResponse | null> {
         const content = document.getText();
 
         try {
             return await this.definitionsService.refreshDefinitions(
-                content, document.uri.toString(), document.uri.fsPath, `defs:${document.uri.toString()}`
+                content, document.uri.toString(), document.uri.fsPath, `defs:${document.uri.toString()}`, useTrace
             );
         } catch (error) {
             this.logger.appendLine(

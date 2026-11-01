@@ -52,6 +52,7 @@ namespace Calcpad.Server.Services
             {
                 options.SizeLimit = ContentResolutionCache.ResolveSizeLimit();
             });
+            builder.Services.AddSingleton<RuntimeTraceCache>();
             builder.Services.AddSingleton<ContentResolutionCache>();
 
             builder.Services.AddCors(options =>

@@ -163,8 +163,8 @@ export class CalcpadApiClient {
         })();
     }
 
-    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<LintResponse | null> {
-        const request: LintRequest = { content, sourceFilePath };
+    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean }): Promise<LintResponse | null> {
+        const request: LintRequest = { content, sourceFilePath, useTrace: opts?.useTrace };
         return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint', opts?.key);
     }
 
@@ -174,8 +174,8 @@ export class CalcpadApiClient {
         return response?.tokens ?? null;
     }
 
-    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<DefinitionsResponse | null> {
-        const request: DefinitionsRequest = { content, sourceFilePath };
+    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean }): Promise<DefinitionsResponse | null> {
+        const request: DefinitionsRequest = { content, sourceFilePath, useTrace: opts?.useTrace };
         return this.post<DefinitionsResponse>('/api/calcpad/definitions', request, 'Definitions', opts?.key);
     }
 

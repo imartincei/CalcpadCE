@@ -312,6 +312,14 @@ let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
+// Set in activate(); reruns lint and definitions after a preview run.
+let refreshDocumentAnalysis: ((document: vscode.TextDocument) => void) | undefined;
+
+// Auto-run makes lint and definitions use the run's trace, so they wait for it.
+const useTrace = () => CalcpadSettingsManager.getInstance().getExtraBool('autoRun', true);
+const runFollows = (document: vscode.TextDocument) => useTrace()
+    && !!(wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel)
+    && vscode.window.activeTextEditor?.document === document;
 
 const NO_SERVER_MESSAGE = 'No CalcpadCE server available — the bundled server did not start '
     + 'and no remote server URL is configured.';
@@ -909,7 +917,17 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
  * no `activeTextEditor` whose folder local images could be resolved against (a
  * compiled worksheet carries its images inline anyway).
  */
-async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
+async function updatePreviewContent(...args: Parameters<typeof renderPreviewContent>): Promise<void> {
+    const [, content, sourceFileUri] = args;
+    try {
+        await renderPreviewContent(...args);
+    } finally {
+        const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === sourceFileUri.toString());
+        if (useTrace() && document?.getText() === content) refreshDocumentAnalysis?.(document);
+    }
+}
+
+async function renderPreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
     const docKey = sourceFileUri.toString();
     // The plain preview shows the document as written, unless the setting asks it to
     // render the entered values too — a debugging view of the filled-in form.
@@ -2174,11 +2192,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Unified document processing function
     let isProcessingDocument = false;
+    // A request made mid-run is replayed after it rather than dropped.
+    let pendingDocument: vscode.TextDocument | undefined;
     async function processDocument(document: vscode.TextDocument) {
         if (document.languageId !== 'calcpad' && document.languageId !== 'plaintext') {
             return;
         }
-        if (isProcessingDocument) return;
+        if (isProcessingDocument) {
+            pendingDocument = document;
+            return;
+        }
 
         isProcessingDocument = true;
         try {
@@ -2186,15 +2209,19 @@ export async function activate(context: vscode.ExtensionContext) {
         } finally {
             isProcessingDocument = false;
         }
+        const next = pendingDocument;
+        pendingDocument = undefined;
+        if (next) await processDocument(next);
     }
+    refreshDocumentAnalysis = document => void processDocument(document);
 
     async function _doProcessDocument(document: vscode.TextDocument) {
         outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath, 'verbose');
 
         // Run linting and definitions in parallel
         const [, definitions] = await Promise.all([
-            linter.lintDocument(document),
-            definitionsService.refreshDefinitions(document).catch((error: unknown) => {
+            linter.lintDocument(document, useTrace()),
+            definitionsService.refreshDefinitions(document, useTrace()).catch((error: unknown) => {
                 outputChannel.appendLine('Error fetching definitions: ' + error, 'warning');
                 return null;
             }),
@@ -2212,8 +2239,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: m.sourceFile,
                     description: m.description,
                     paramTypes: m.paramTypes,
-                    paramDescriptions: m.paramDescriptions,
-                    defaults: m.defaults
+                    paramDescriptions: m.paramDescriptions
                 })),
                 variables: definitions.variables.map(v => ({
                     name: v.name,
@@ -2234,8 +2260,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: f.sourceFile,
                     description: f.description,
                     paramTypes: f.paramTypes,
-                    paramDescriptions: f.paramDescriptions,
-                    defaults: f.defaults
+                    paramDescriptions: f.paramDescriptions
                 })),
                 customUnits: definitions.customUnits.map(u => ({
                     name: u.name,
@@ -2311,6 +2336,10 @@ export async function activate(context: vscode.ExtensionContext) {
     };
     vueUiProvider.onLogLevelChanged = (level: string) => {
         applyLogLevel(level);
+    };
+    vueUiProvider.onAutoRunChanged = () => {
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (editor) refreshDocumentAnalysis?.(editor.document);
     };
     // Rendered on demand rather than served from the cache: this is what the Properties
     // tab asks when it has no answer or wants a fresh one, and the cache is only as new
@@ -2749,7 +2778,8 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             lintTimeout = setTimeout(() => {
                 invalidateUiControls(event.document);
-                processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+                if (!runFollows(event.document))
+                    processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
                 vueUiProvider?.refreshDocumentMetadata();
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the
@@ -2800,7 +2830,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 schedulePreviewUpdate();
             }
             // Update Variables tab
-            processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+            if (!runFollows(editor.document))
+                processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
             // Last, and after the cancel path above returns: a switch the user backed out of
             // must not open anything.
             await maybeAutoEnterInputMode(editor.document);
