@@ -291,6 +291,18 @@
         "icon": "$(save)"
       },
       {
+        "command": "vscode-calcpad.uiUndo",
+        "title": "Undo",
+        "category": "CalcpadCE",
+        "enablement": "calcpad.uiCanUndo"
+      },
+      {
+        "command": "vscode-calcpad.uiRedo",
+        "title": "Redo",
+        "category": "CalcpadCE",
+        "enablement": "calcpad.uiCanRedo"
+      },
+      {
         "command": "vscode-calcpad.uiPausePrevious",
         "title": "CalcpadCE: Previous #pause",
         "icon": "$(arrow-left)",
@@ -525,6 +537,16 @@
       ],
       "webview/context": [
         {
+          "command": "vscode-calcpad.uiUndo",
+          "when": "webviewId == htmlPreviewUi || webviewId == calcpad.compiledWorksheet",
+          "group": "0_history@1"
+        },
+        {
+          "command": "vscode-calcpad.uiRedo",
+          "when": "webviewId == htmlPreviewUi || webviewId == calcpad.compiledWorksheet",
+          "group": "0_history@2"
+        },
+        {
           "command": "vscode-calcpad.copySelection",
           "when": "webviewId == htmlPreview || webviewId == htmlPreviewUnwrapped || webviewId == htmlPreviewUi || webviewId == htmlPreviewUiReport || webviewId == calcpadCompiledReport",
           "group": "1_copy"
@@ -583,6 +605,14 @@
         }
       ],
       "commandPalette": [
+        {
+          "command": "vscode-calcpad.uiUndo",
+          "when": "activeWebviewPanelId == htmlPreviewUi || activeCustomEditorId == calcpad.compiledWorksheet"
+        },
+        {
+          "command": "vscode-calcpad.uiRedo",
+          "when": "activeWebviewPanelId == htmlPreviewUi || activeCustomEditorId == calcpad.compiledWorksheet"
+        },
         {
           "command": "calcpad.refreshDocumentConnected",
           "when": "false"
