@@ -67,7 +67,7 @@ namespace Calcpad.Core
                 return null;
 
             src = DecodeLeadingToken(src);
-            var hasToken = PathRoots.HasToken(src.AsSpan()) || PathRoots.IsUserToken(src.AsSpan());
+            var hasToken = PathRoots.IsRootToken(src.AsSpan());
             if (!roots.TryExpand(src, out var expanded, out var error))
             {
                 reportError(error);
@@ -82,7 +82,7 @@ namespace Calcpad.Core
                 var full = string.IsNullOrEmpty(documentDirectory)
                     ? Path.GetFullPath(expanded)
                     : Path.GetFullPath(expanded, documentDirectory);
-                return full.Replace('\\', '/');
+                return FileReferences.Resolve(full).Replace('\\', '/');
             }
             catch
             {

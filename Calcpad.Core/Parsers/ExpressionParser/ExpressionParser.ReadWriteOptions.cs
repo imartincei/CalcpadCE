@@ -64,6 +64,28 @@ namespace Calcpad.Core
             // #append M to filename.csv@R1C1:R2C2 type=[Y|N] sep=,
             // #append M to filename.txt@R1C1:R2C2 type=[Y|N] sep=
 
+            private static string ResolveFullPath(string rawPath, string sourceDir, PathRoots pathRoots)
+            {
+                if (pathRoots != null && !pathRoots.TryExpand(rawPath, out rawPath, out var tokenError))
+                    throw new MathParserException(tokenError);
+
+                var path = Environment.ExpandEnvironmentVariables(rawPath);
+                var fullPath = sourceDir != null
+                    ? System.IO.Path.GetFullPath(path, sourceDir)
+                    : System.IO.Path.GetFullPath(path);
+                return FileReferences.Resolve(fullPath);
+            }
+
+            /// <summary>A source (up to a space, @ or !) whose last path segment is a GUID with no extension.</summary>
+            internal static bool IsIdSource(ReadOnlySpan<char> s, out int end)
+            {
+                end = s.IndexOfAny(' ', '@', '!');
+                if (end < 0)
+                    end = s.Length;
+                var source = s[..end];
+                return Guid.TryParse(source[(source.LastIndexOfAny('/', '\\') + 1)..], out _);
+            }
+
             internal ReadWriteOptions(ReadOnlySpan<char> s, int command, string sourceDir = null, PathRoots pathRoots = null)
             {
                 if (command > 0)
@@ -98,6 +120,7 @@ namespace Calcpad.Core
                 ts.Reset(i0);
                 int i1;
                 ReadOnlySpan<char> dataExt = default;
+                string idPath = null;
                 if (s[i0..].StartsWith(DataUri, StringComparison.OrdinalIgnoreCase))
                 {
                     // Base64 holds none of the characters that delimit what follows the source,
@@ -113,6 +136,15 @@ namespace Calcpad.Core
 
                     dataExt = MimeExtension(uri[DataUri.Length..comma]);
                     Data = uri[(comma + 1)..];
+                    i0 = i1 - 1;
+                }
+                else if (IsIdSource(s[i0..], out var idEnd))
+                {
+                    // The file is named by id, so its extension comes from the file it resolves to.
+                    i1 = i0 + idEnd;
+                    Path = s[i0..i1];
+                    idPath = ResolveFullPath(Path.ToString(), sourceDir, pathRoots);
+                    dataExt = System.IO.Path.GetExtension(idPath).TrimStart('.');
                     i0 = i1 - 1;
                 }
                 else
@@ -159,7 +191,7 @@ namespace Calcpad.Core
                     if (c == ' ')
                         break;
                 }
-                if (!Data.IsEmpty)
+                if (!Data.IsEmpty || idPath is not null)
                     Ext = dataExt;
 
                 IsExcel = Ext.StartsWith("xls", StringComparison.OrdinalIgnoreCase);
@@ -177,17 +209,10 @@ namespace Calcpad.Core
                     Ext = ts.Cut();
                     IsExcel = Ext.StartsWith("xls", StringComparison.OrdinalIgnoreCase);
                 }
-                if (Data.IsEmpty)
-                {
-                    var rawPath = $"{Path}.{Ext}";
-                    if (pathRoots != null && !pathRoots.TryExpand(rawPath, out rawPath, out var tokenError))
-                        throw new MathParserException(tokenError);
-
-                    var path = Environment.ExpandEnvironmentVariables(rawPath);
-                    FullPath = sourceDir != null
-                        ? System.IO.Path.GetFullPath(path, sourceDir)
-                        : System.IO.Path.GetFullPath(path);
-                }
+                if (idPath is not null)
+                    FullPath = idPath;
+                else if (Data.IsEmpty)
+                    FullPath = ResolveFullPath($"{Path}.{Ext}", sourceDir, pathRoots);
                 Append = command == 2;
                 ++i0;
                 for (int i = 0; i < 2; ++i)

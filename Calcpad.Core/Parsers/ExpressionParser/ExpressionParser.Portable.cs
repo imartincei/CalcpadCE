@@ -56,6 +56,13 @@ namespace Calcpad.Core
             if (line[i..].StartsWith(DataUri, StringComparison.OrdinalIgnoreCase))
                 return false;
 
+            if (ReadWriteOptions.IsIdSource(line[i..], out var idEnd))
+            {
+                start = i;
+                length = idEnd;
+                return true;
+            }
+
             var dot = line.LastIndexOf('.');
             if (dot < i)
                 return false;

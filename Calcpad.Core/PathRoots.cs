@@ -8,6 +8,7 @@ namespace Calcpad.Core
         private const string ProjectToken = "{project}";
         private const string LibraryToken = "{library}";
         private const string UserToken = "{user}";
+        private const string S3TokenPrefix = "{s3:";
         private const string ProjectKeyword = "#projectpath";
         private const string LibraryKeyword = "#librarypath";
 
@@ -20,6 +21,52 @@ namespace Calcpad.Core
 
         public static bool IsUserToken(ReadOnlySpan<char> path) =>
             path.StartsWith(UserToken, StringComparison.OrdinalIgnoreCase);
+
+        public static bool IsS3Token(ReadOnlySpan<char> path) =>
+            path.StartsWith(S3TokenPrefix, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Any token that expands to an absolute path: {project}, {library}, {user} or {s3:bucket}.</summary>
+        public static bool IsRootToken(ReadOnlySpan<char> path) =>
+            HasToken(path) || IsUserToken(path) || IsS3Token(path);
+
+        private static string StripLeadingSeparator(string rest) =>
+            rest.Length > 0 && (rest[0] == '/' || rest[0] == '\\') ? rest[1..] : rest;
+
+        /// <summary>S3 bucket naming: 3-63 lowercase letters, digits, dots or hyphens.</summary>
+        public static bool IsValidBucketName(string name)
+        {
+            if (name.Length is < 3 or > 63 || !char.IsAsciiLetterOrDigit(name[0]) || !char.IsAsciiLetterOrDigit(name[^1]))
+                return false;
+            foreach (var c in name)
+                if (!(char.IsAsciiLetterLower(c) || char.IsAsciiDigit(c) || c == '-' || c == '.'))
+                    return false;
+            return !name.Contains("..");
+        }
+
+        /// <summary>{s3:bucket}/rest → {CacheRoot}/bucket/rest, the provider's local mirror of the bucket.</summary>
+        private static bool TryExpandS3Token(string raw, out string expanded, out string error)
+        {
+            expanded = raw;
+            error = null;
+            var close = raw.IndexOf('}');
+            var bucket = close > S3TokenPrefix.Length ? raw[S3TokenPrefix.Length..close].Trim() : "";
+            if (!IsValidBucketName(bucket))
+            {
+                error = string.Format(Messages.Invalid_S3_path_root_0, raw);
+                return false;
+            }
+            var cacheRoot = FileReferences.RemoteProvider?.CacheRoot;
+            if (string.IsNullOrEmpty(cacheRoot))
+            {
+                error = string.Format(Messages.S3_not_connected_0, raw[..(close + 1)]);
+                return false;
+            }
+            var bucketDir = Path.Combine(cacheRoot, bucket);
+            Directory.CreateDirectory(bucketDir);
+            var rest = StripLeadingSeparator(raw[(close + 1)..]);
+            expanded = rest.Length == 0 ? bucketDir : Path.Combine(bucketDir, rest);
+            return true;
+        }
 
         private static string ExpandUserToken(string raw)
         {
@@ -89,7 +136,11 @@ namespace Calcpad.Core
             string resolved;
             try
             {
-                var expanded = IsUserToken(rawValue.AsSpan()) ? ExpandUserToken(rawValue) : rawValue;
+                var expanded = rawValue;
+                if (IsUserToken(rawValue.AsSpan()))
+                    expanded = ExpandUserToken(rawValue);
+                else if (IsS3Token(rawValue.AsSpan()) && !TryExpandS3Token(rawValue, out expanded, out error))
+                    return false;
                 expanded = Environment.ExpandEnvironmentVariables(expanded);
                 resolved = string.IsNullOrEmpty(declaringDirectory)
                     ? Path.GetFullPath(expanded)
@@ -100,6 +151,9 @@ namespace Calcpad.Core
                 error = ex.Message;
                 return false;
             }
+
+            if (FileReferences.IsRemote(resolved))
+                Directory.CreateDirectory(resolved);
 
             if (!Directory.Exists(resolved))
             {
@@ -138,6 +192,9 @@ namespace Calcpad.Core
                 expanded = ExpandUserToken(raw);
                 return true;
             }
+
+            if (IsS3Token(raw.AsSpan()))
+                return TryExpandS3Token(raw, out expanded, out error);
 
             if (!TryGetTokenKind(raw.AsSpan(), out var isProject))
                 return true;

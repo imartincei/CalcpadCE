@@ -359,6 +359,7 @@ namespace Calcpad.Core
                 var resolvedPath = sourceDir != null
                     ? Path.GetFullPath(expanded, sourceDir)
                     : Path.GetFullPath(expanded);
+                resolvedPath = FileReferences.Resolve(resolvedPath);
                 var fileExists = File.Exists(resolvedPath);
 
                 if (!_includeStack.Add(resolvedPath))

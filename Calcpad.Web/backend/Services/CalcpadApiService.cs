@@ -53,6 +53,8 @@ namespace Calcpad.Server.Services
                 options.SizeLimit = ContentResolutionCache.ResolveSizeLimit();
             });
             builder.Services.AddSingleton<ContentResolutionCache>();
+            builder.Services.AddSingleton<S3.S3Session>();
+            builder.Services.AddSingleton<S3.S3RemoteFileProvider>();
 
             builder.Services.AddCors(options =>
             {
@@ -160,6 +162,8 @@ namespace Calcpad.Server.Services
         /// </summary>
         public static WebApplication ConfigureApp(WebApplication app)
         {
+            Calcpad.Core.FileReferences.RemoteProvider = app.Services.GetRequiredService<S3.S3RemoteFileProvider>();
+
             // Outermost, so the in-flight set covers the whole pipeline.
             HangWatchdog.Start();
             app.Use(async (context, next) =>

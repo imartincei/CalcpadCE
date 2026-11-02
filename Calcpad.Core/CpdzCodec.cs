@@ -1,7 +1,9 @@
+using System;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace Calcpad.Server.Services
+namespace Calcpad.Core
 {
     /// <summary>
     /// Reads and writes the compiled <c>.cpdz</c> worksheet format, matching the CLI's
@@ -10,7 +12,7 @@ namespace Calcpad.Server.Services
     /// <c>PK</c> signature) holding a deflated <c>code.cpd</c> entry plus referenced images —
     /// and encoding preserves whichever shape the original had.
     /// </summary>
-    internal static class CpdzCodec
+    public static class CpdzCodec
     {
         private const string CodeEntryName = "code.cpd";
 
@@ -34,7 +36,7 @@ namespace Calcpad.Server.Services
         /// composite archive its other entries are carried over unchanged and only
         /// the code entry is rewritten; otherwise the result is a plain deflate stream.
         /// </summary>
-        public static byte[] Encode(string text, byte[]? original)
+        public static byte[] Encode(string text, byte[] original)
         {
             if (original is null || !IsComposite(original))
             {
@@ -67,7 +69,7 @@ namespace Calcpad.Server.Services
         private static bool IsComposite(byte[] bytes) =>
             bytes.Length >= 2 && bytes[0] == 'P' && bytes[1] == 'K';
 
-        private static ZipArchiveEntry? FindCodeEntry(ZipArchive archive)
+        private static ZipArchiveEntry FindCodeEntry(ZipArchive archive)
         {
             foreach (var entry in archive.Entries)
                 if (IsCodeEntry(entry))

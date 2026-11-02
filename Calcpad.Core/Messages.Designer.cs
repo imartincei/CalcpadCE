@@ -1878,6 +1878,18 @@ namespace Calcpad.Core {
             }
         }
 
+        public static string S3_not_connected_0 {
+            get {
+                return ResourceManager.GetString("S3_not_connected_0", resourceCulture);
+            }
+        }
+
+        public static string Invalid_S3_path_root_0 {
+            get {
+                return ResourceManager.GetString("Invalid_S3_path_root_0", resourceCulture);
+            }
+        }
+
         // / <summary>
         // /   Looks up a localized string similar to {0} is not declared. Add {1} before this line..
         // / </summary>

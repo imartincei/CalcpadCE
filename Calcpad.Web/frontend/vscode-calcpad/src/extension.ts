@@ -2288,6 +2288,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     vueUiProvider = new CalcpadVueUIProvider(context.extensionUri, context, settingsManager, insertManager);
     vueUiProvider.getSourceEditor = () => vscode.window.activeTextEditor ?? previewSourceEditor;
+    vueUiProvider.getApiClient = () => sharedApiClient;
     vueUiProvider.getParseMode = (document, line) =>
         definitionsService?.getCachedParseMode(document.uri.toString(), line)
         ?? getParseModeAt(i => document.lineAt(i).text, line);

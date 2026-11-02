@@ -449,6 +449,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 resolvedPath = sourceDir != null
                     ? Path.GetFullPath(expandedPath, sourceDir)
                     : Path.GetFullPath(expandedPath);
+                resolvedPath = FileReferences.Resolve(resolvedPath);
                 if (File.Exists(resolvedPath))
                     return (File.ReadAllText(resolvedPath), resolvedPath, true);
             }

@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor';
 import {
     getPathRootTokenKind,
     isUserToken,
+    isS3Token,
     resolveCompletionPathRoots,
     extensionsForDirective,
     parseDirectiveLine,
@@ -109,6 +110,8 @@ export function registerIncludeCompletionProvider(
 
             const suggestions: monaco.languages.CompletionItem[] = [];
             const seenAbsolute = new Set<string>();
+
+            if (isS3Token(partialPath)) return { suggestions: [] };
 
             const tokenKind = getPathRootTokenKind(partialPath);
             const isUser = isUserToken(partialPath);

@@ -11,13 +11,19 @@ export type PathRootKind = 'project' | 'library';
 const PROJECT_TOKEN = '{project}';
 const LIBRARY_TOKEN = '{library}';
 const USER_TOKEN = '{user}';
+const S3_TOKEN_PREFIX = '{s3:';
 const PROJECT_KEYWORD = '#projectpath';
 const LIBRARY_KEYWORD = '#librarypath';
 
 /** Whether `raw` starts with a root token, case-insensitively. */
 export function hasPathRootToken(raw: string): boolean {
     const lower = raw.toLowerCase();
-    return lower.startsWith(PROJECT_TOKEN) || lower.startsWith(LIBRARY_TOKEN);
+    return lower.startsWith(PROJECT_TOKEN) || lower.startsWith(LIBRARY_TOKEN) || isS3Token(raw);
+}
+
+/** Whether `raw` starts with a `{s3:bucket}` token, which names a server bucket and has no local path. */
+export function isS3Token(raw: string): boolean {
+    return raw.toLowerCase().startsWith(S3_TOKEN_PREFIX);
 }
 
 /** Which root `raw` starts with, or `null` when it names neither. */
@@ -162,6 +168,8 @@ export function expandPathRootToken(
         if (homeDir === null) return { expanded: raw, ok: false };
         return { expanded: expandUserToken(raw, homeDir), ok: true };
     }
+
+    if (isS3Token(raw)) return { expanded: raw, ok: false };
 
     const kind = getPathRootTokenKind(raw);
     if (kind === null) return { expanded: raw, ok: true };

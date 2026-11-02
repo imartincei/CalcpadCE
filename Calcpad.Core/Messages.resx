@@ -664,6 +664,12 @@
   <data name="Duplicate_path_declaration_0" xml:space="preserve">
     <value>{0} is already declared in this document.</value>
   </data>
+  <data name="S3_not_connected_0" xml:space="preserve">
+    <value>{0} needs an S3 connection. Sign in on the S3 tab.</value>
+  </data>
+  <data name="Invalid_S3_path_root_0" xml:space="preserve">
+    <value>Invalid S3 path root: {0}. Use {{s3:bucket-name}}.</value>
+  </data>
   <data name="Path_root_not_declared_0_1" xml:space="preserve">
     <value>{0} is not declared. Add {1} before this line.</value>
   </data>

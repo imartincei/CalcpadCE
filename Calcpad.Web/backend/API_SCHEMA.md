@@ -1,6 +1,6 @@
 # Calcpad.Web Backend API Schema
 
-> **Localhost-only build.** This branch (`calcpad-web`) only supports loopback bindings. The startup guard in [Program.cs](Program.cs) throws if the bind URL is not `localhost`, `127.0.0.0/8`, or `::1`. Hosted/Docker/auth/storage live on `calcpad-experimental`. The auth, user-management, file-storage, content-resolution, and cache endpoints from the hosted branch are not present here.
+> **Localhost-only build.** This branch (`calcpad-web`) only supports loopback bindings. The startup guard in [Program.cs](Program.cs) throws if the bind URL is not `localhost`, `127.0.0.0/8`, or `::1`. Shared storage with users and access levels is the separate S3 server in [../s3-server](../s3-server/README.md), reached through [`/api/s3`](#s3-server-proxy-apis3).
 
 ## Base URL
 
@@ -50,6 +50,7 @@ Launches that do not set the variable (a `dotnet run` during development, the sa
 - [POST /portable/bundle](#post-portablebundle)
 - [POST /portable/package](#post-portablepackage)
 - [GET /snippets](#get-snippets)
+- [S3 server proxy (/api/s3)](#s3-server-proxy-apis3)
 - [Usage Notes](#usage-notes)
 - [Environment Variables](#environment-variables)
 
@@ -1071,6 +1072,39 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
       "category": "Program Flow Control"
     }
   ]
+}
+```
+
+---
+
+## S3 server proxy (/api/s3)
+
+These routes sit under `/api/s3`, not `/api/calcpad`. They connect this server to a Calcpad S3 server (see [../s3-server/README.md](../s3-server/README.md)), and the session token stays in this process. While signed in, `{s3:bucket}` path roots resolve through a local cache in `s3cache/`, a sibling of the logs folder.
+
+| Route | Description |
+|-------|-------------|
+| `GET /api/s3/session` | `{ connected, url, user }` |
+| `POST /api/s3/session` | Body `{ url, username, password }`. Signs in and returns the session. The S3 server's error is relayed on failure |
+| `DELETE /api/s3/session` | Signs out |
+| `POST /api/s3/upload` | Body `{ bucket, key, content, sourceFilePath?, force }`. Uploads a new version and returns `{ info, content }`, where `content` is the text with the server-stamped `fileInfo` footer |
+| `GET\|POST\|PUT\|DELETE /api/s3/remote/{path}` | Forwards to the S3 server's `/api/{path}` with the session token |
+
+The upload returns **409** when the server's latest version is not the one the content's footer `id` names. Pass `force: true` to overwrite it.
+
+```typescript
+interface ObjectInfo {
+  key: string;               // logical key, e.g. "steel/beam.cpd"
+  storageKey: string;        // archived versions live under ".versions/"
+  latest: boolean;
+  baseId: string | null;     // stable across versions
+  id: string | null;         // this version
+  version: number;
+  size: number;
+  sha256: string | null;
+  title: string | null;
+  author: string | null;
+  updatedBy: string | null;
+  updatedAt: string | null;
 }
 ```
 

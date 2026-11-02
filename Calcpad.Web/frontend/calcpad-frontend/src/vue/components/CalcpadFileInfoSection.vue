@@ -29,6 +29,9 @@
         <dt>{{ t('Last updated') }}</dt><dd>{{ formatTimestamp(info.lastUpdatedAt) }}</dd>
         <dt>{{ t('Last updated by') }}</dt><dd>{{ info.lastUpdatedBy || '—' }}</dd>
         <dt>{{ t('Program version') }}</dt><dd>{{ info.programVersion || '—' }}</dd>
+        <dt>{{ t('Base ID') }}</dt><dd class="mono">{{ info.baseId || '—' }}</dd>
+        <dt>{{ t('ID') }}</dt><dd class="mono">{{ info.id || '—' }}</dd>
+        <dt>{{ t('Version') }}</dt><dd>{{ info.version || '—' }}</dd>
       </dl>
 
       <div v-show="rowVisible('review')">
@@ -222,6 +225,10 @@ function formatTimestamp(iso: string): string {
 .details dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.details dd.mono {
+  font-family: var(--vscode-editor-font-family, monospace);
 }
 
 .actions {

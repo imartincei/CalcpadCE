@@ -132,7 +132,7 @@ namespace Calcpad.Server.Services
             PathRoots roots, ref string raw, bool reportErrors, Reference reference, string owner, int line,
             out bool isToken)
         {
-            isToken = PathRoots.IsUserToken(raw.AsSpan()) || PathRoots.HasToken(raw.AsSpan());
+            isToken = PathRoots.IsRootToken(raw.AsSpan());
             if (!isToken)
                 return true;
 
@@ -151,7 +151,7 @@ namespace Calcpad.Server.Services
         /// </summary>
         private bool TryResolveTarget(string raw, out bool isAbsolute, out string effective, out string resolved)
         {
-            isAbsolute = PathRoots.HasToken(raw.AsSpan()) || PathRoots.IsUserToken(raw.AsSpan()) || IsAbsoluteTarget(raw);
+            isAbsolute = PathRoots.IsRootToken(raw.AsSpan()) || IsAbsoluteTarget(raw);
             effective = raw;
             resolved = raw;
             try

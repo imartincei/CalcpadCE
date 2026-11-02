@@ -448,6 +448,15 @@ export abstract class BaseMessageBridge {
             case 'updateUserName':
                 this.setExtraSetting('userName', String(message.value ?? '').trim());
                 break;
+            case 's3Request':
+                void this.handleS3Request(message);
+                break;
+            case 's3Upload':
+                void this.handleS3Upload(message);
+                break;
+            case 'updateS3Url':
+                this.setExtraSetting('s3Url', String(message.value ?? '').trim());
+                break;
             case 'goToLine':
                 this.handleGoToLine(message.line);
                 break;
@@ -614,6 +623,7 @@ export abstract class BaseMessageBridge {
             editorFontFamily: this.getExtraSetting('editorFontFamily') ?? 'JuliaMono',
             completionDelayMs: Number(this.getExtraSetting('completionDelayMs') ?? DEFAULT_COMPLETION_DELAY_MS),
             userName: this.getExtraSetting('userName') ?? '',
+            s3Url: this.getExtraSetting('s3Url') ?? '',
             writeMode: this.writeMode(),
             ...extras,
         });
@@ -1231,6 +1241,38 @@ export abstract class BaseMessageBridge {
         this.refreshDocumentMetadata();
     }
 
+    private async handleS3Request(message: any): Promise<void> {
+        const method = String(message.method ?? '').toUpperCase();
+        const reply = ['GET', 'POST', 'PUT', 'DELETE'].includes(method)
+            ? await this.apiClient.s3Request(method, String(message.path ?? ''), message.body)
+            : { status: 0, data: { error: 'Unsupported request.' } };
+        this.postToVue({ type: 's3Response', id: message.id, ...reply });
+    }
+
+    /** Uploads the active document, then replaces its text with the server-stamped copy. */
+    private async handleS3Upload(message: any): Promise<void> {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model) {
+            this.postToVue({ type: 's3Response', id: message.id, status: 0, data: { error: 'No document is open.' } });
+            return;
+        }
+        const content = model.getValue();
+        const { sourceFilePath } = await this.buildFileContext(content);
+        const reply = await this.apiClient.s3Request('POST', 'upload', {
+            bucket: message.bucket, key: message.key, content, sourceFilePath, force: !!message.force,
+        });
+        const data = reply.data as { info?: unknown; content?: unknown } | null;
+        if (reply.status === 200 && typeof data?.content === 'string') {
+            model.pushStackElement();
+            model.pushEditOperations([], [{ range: model.getFullModelRange(), text: data.content }], () => null);
+            model.pushStackElement();
+            this.refreshDocumentMetadata();
+            this.postToVue({ type: 's3Response', id: message.id, status: 200, data: { info: data.info } });
+            return;
+        }
+        this.postToVue({ type: 's3Response', id: message.id, ...reply });
+    }
+
     /** Writes the Properties tab's saved #UI values, and hands them to the in-memory store. */
     private handleUpdateUiOverrides(raw: unknown): void {
         const model = this.getActiveMonacoEditor()?.getModel();
@@ -1280,6 +1322,7 @@ interface MonacoModelLike {
     getLineCount(): number;
     getLineMaxColumn(line: number): number;
     getEOL(): string;
+    getFullModelRange(): MonacoRangeLike;
     pushStackElement(): void;
     pushEditOperations(before: [], edits: { range: MonacoRangeLike; text: string }[], cursorComputer: () => null): unknown;
 }

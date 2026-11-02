@@ -17,6 +17,11 @@ export interface FileInfo {
     reviewedAt: string;
     /** Version of the app that last saved the file. */
     programVersion: string;
+    /** Identity shared by every version of the file; set once, then only changed by an upload. */
+    baseId: string;
+    /** Identity of this version. */
+    id: string;
+    version: string;
 }
 
 /** What a save stamps into the comment. */
@@ -32,8 +37,11 @@ export interface FileInfoStamp {
 
 export const FILE_INFO_FIELDS: readonly (keyof FileInfo)[] = [
     'title', 'project', 'author', 'createdAt', 'lastUpdatedBy', 'lastUpdatedAt',
-    'reviewedBy', 'reviewedAt', 'programVersion',
+    'reviewedBy', 'reviewedAt', 'programVersion', 'baseId', 'id', 'version',
 ];
+
+/** Identity fields only an upload changes, so the Properties tab can't write them. */
+const READ_ONLY_FIELDS: readonly (keyof FileInfo)[] = ['baseId', 'id', 'version'];
 
 function emptyFileInfo(): FileInfo {
     return Object.fromEntries(FILE_INFO_FIELDS.map(f => [f, ''])) as unknown as FileInfo;
@@ -64,6 +72,7 @@ export function sanitizeFileInfoPatch(patch: unknown): Partial<FileInfo> {
     if (!isPlainObject(patch)) return {};
     const out: Partial<FileInfo> = {};
     for (const field of FILE_INFO_FIELDS) {
+        if (READ_ONLY_FIELDS.includes(field)) continue;
         if (typeof patch[field] === 'string') out[field] = patch[field] as string;
     }
     return out;
@@ -122,6 +131,9 @@ export function stampFileInfo(current: FileInfo | null, stamp: FileInfoStamp): F
         ...update,
         title: base.title || fileStem(stamp.fileName),
         programVersion: stamp.programVersion,
+        baseId: base.baseId || crypto.randomUUID(),
+        id: base.id || crypto.randomUUID(),
+        version: base.version || '1',
     };
 }
 

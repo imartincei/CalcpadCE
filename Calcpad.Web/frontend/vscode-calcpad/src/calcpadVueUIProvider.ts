@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits } from 'calcpad-frontend';
-import type { ParseMode, CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
+import type { CalcpadApiClient, ParseMode, CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -42,6 +42,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public updateCompiledFileInfo?: (uri: vscode.Uri, patch: unknown) => void;
     /** Saves a compiled worksheet with unsaved changes; false when it couldn't be saved. */
     public saveCompiled?: (uri: vscode.Uri) => Promise<boolean>;
+    /** The local server's client, which the S3 tab's requests go through. */
+    public getApiClient?: () => CalcpadApiClient | undefined;
 
     /** Parse mode at a document line. Set by the extension, so the server cache is used first. */
     public getParseMode?: (document: vscode.TextDocument, line: number) => ParseMode;
@@ -441,6 +443,18 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     this._settingsManager.setExtra('userName', String(data.value ?? '').trim());
                     break;
 
+                case 'updateS3Url':
+                    this._settingsManager.setExtra('s3Url', String(data.value ?? '').trim());
+                    break;
+
+                case 's3Request':
+                    await this._handleS3Request(data);
+                    break;
+
+                case 's3Upload':
+                    await this._handleS3Upload(data);
+                    break;
+
                 case 'getUiControls':
                     {
                         // A failed render leaves the panel unresolved rather than empty:
@@ -544,6 +558,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             maxPreviewConsoleMessages: sm.getExtraNumber(
                 'maxPreviewConsoleMessages', DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT),
             userName: sm.getExtra('userName', ''),
+            s3Url: sm.getExtra('s3Url', ''),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
         };
@@ -698,6 +713,49 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         await this._applyFooterEdits(editor, planMetadataFooter(editor.document.getText().split(/\r?\n/), { uiOverrides: overrides }));
         this.onUiOverridesEdited?.(editor.document.uri.toString(), overrides);
         this.refreshDocumentMetadata();
+    }
+
+    private _postS3Response(id: unknown, status: number, data: unknown) {
+        this._view?.webview.postMessage({ type: 's3Response', id, status, data });
+    }
+
+    private async _handleS3Request(data: { id: unknown; method?: string; path?: string; body?: unknown }): Promise<void> {
+        const method = String(data.method ?? '').toUpperCase();
+        const client = this.getApiClient?.();
+        if (!client || !['GET', 'POST', 'PUT', 'DELETE'].includes(method)) {
+            this._postS3Response(data.id, 0, { error: 'No CalcpadCE server is available.' });
+            return;
+        }
+        const reply = await client.s3Request(method, String(data.path ?? ''), data.body);
+        this._postS3Response(data.id, reply.status, reply.data);
+    }
+
+    /** Uploads the active document, then replaces its text with the server-stamped copy. */
+    private async _handleS3Upload(data: { id: unknown; bucket?: string; key?: string; force?: boolean }): Promise<void> {
+        const client = this.getApiClient?.();
+        const editor = this.getCompiledSource?.() ? undefined : this._calcpadSourceEditor();
+        if (!client || !editor) {
+            this._postS3Response(data.id, 0, { error: 'No document is open.' });
+            return;
+        }
+        const document = editor.document;
+        const reply = await client.s3Request('POST', 'upload', {
+            bucket: data.bucket,
+            key: data.key,
+            content: document.getText(),
+            sourceFilePath: document.isUntitled ? undefined : document.uri.fsPath,
+            force: !!data.force,
+        });
+        const body = reply.data as { info?: unknown; content?: unknown } | null;
+        if (reply.status === 200 && typeof body?.content === 'string') {
+            const content = body.content;
+            const whole = new vscode.Range(0, 0, document.lineCount, 0);
+            await editor.edit(editBuilder => editBuilder.replace(document.validateRange(whole), content));
+            this.refreshDocumentMetadata();
+            this._postS3Response(data.id, 200, { info: body.info });
+            return;
+        }
+        this._postS3Response(data.id, reply.status, reply.data);
     }
 
     /** Applies the Properties tab's file-info edit; a document without one has nothing to edit yet. */

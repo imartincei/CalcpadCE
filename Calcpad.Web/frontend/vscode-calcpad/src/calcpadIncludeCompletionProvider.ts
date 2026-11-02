@@ -5,6 +5,7 @@ import * as os from 'os';
 import {
     getPathRootTokenKind,
     isUserToken,
+    isS3Token,
     parseDirectiveLine,
     extensionsForDirective,
     resolveCompletionPathRoots,
@@ -88,6 +89,8 @@ export class CalcpadIncludeCompletionProvider implements vscode.CompletionItemPr
         , 'verbose');
 
         try {
+            if (isS3Token(partialPath)) return new vscode.CompletionList([]);
+
             const tokenKind = getPathRootTokenKind(partialPath);
             const isUser = isUserToken(partialPath);
             if (isUser) {

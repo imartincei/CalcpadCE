@@ -60,6 +60,7 @@
         "editorFontFamily": "JuliaMono",
         "completionDelayMs": 500,
         "userName": "",
+        "s3Url": "",
         "pdfSettings": {
             "format": "Letter",
             "orientation": "portrait",

@@ -136,7 +136,7 @@ namespace Calcpad.Server.Services
                 var references = WorksheetReferences.Scan(line);
                 var needsRewrite = references.Exists(r => r.IsOutput
                     || r.Kind == WorksheetReferences.ReferenceKind.Image
-                        && (PathRoots.HasToken(r.Raw) || PathRoots.IsUserToken(r.Raw)));
+                        && PathRoots.IsRootToken(r.Raw));
                 sb.Append(needsRewrite ? WorksheetReferences.Rewrite(line, references, Target) : line)
                   .Append('\n');
             }
@@ -147,7 +147,7 @@ namespace Calcpad.Server.Services
                 if (r.IsOutput)
                     return outputs.Rewrite(r, "the worksheet", lineNumber);
                 if (r.Kind != WorksheetReferences.ReferenceKind.Image
-                    || !(PathRoots.HasToken(r.Raw) || PathRoots.IsUserToken(r.Raw)))
+                    || !PathRoots.IsRootToken(r.Raw))
                     return null;
 
                 if (!pathRoots.TryExpand(r.Raw, out var expandedSrc, out var tokenError))
@@ -185,7 +185,7 @@ namespace Calcpad.Server.Services
             WorksheetReferences.ImageSource.Replace(content, match =>
             {
                 var src = match.Groups[2].Value;
-                if (WorksheetReferences.IsExternalSource(src) || PathRoots.HasToken(src) || PathRoots.IsUserToken(src))
+                if (WorksheetReferences.IsExternalSource(src) || PathRoots.IsRootToken(src))
                     return match.Value;
 
                 try

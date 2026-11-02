@@ -98,6 +98,7 @@
         :initial-completion-delay-ms="completionDelayMs"
         :initial-available-fonts="availableFonts"
         :initial-user-name="userName"
+        :initial-s3-url="s3Url"
         :focus-request="settingFocus?.paneId === pane.id ? settingFocus : null"
         @focus-handled="settingFocus = null"
         :app-version="appVersion"
@@ -132,6 +133,7 @@
         @update-editor-font-family="handleUpdateEditorFontFamily"
         @update-completion-delay-ms="handleUpdateCompletionDelayMs"
         @update-user-name="handleUpdateUserName"
+        @update-s3-url="handleUpdateS3Url"
       >
         <template #formatting>
           <CalcpadFormattingTab
@@ -198,6 +200,14 @@
         @update-ui-overrides="handleUpdateUiOverrides"
         @ui-overrides-draft-dirty="handleDraftDirty($event, 'uiOverrides')"
       />
+      <CalcpadS3Tab
+        v-else-if="pane.activeTab === 's3'"
+        :s3-url="s3Url"
+        :doc-key="fileInfoDocKey"
+        :has-document="fileInfoHasDocument"
+        @insert-text="handleInsertText"
+        @request="postMessage"
+      />
     </div>
     </div>
     </div>
@@ -206,7 +216,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import SidebarIcon from './SidebarIcon.vue'
 import CalcpadTocTab from './CalcpadTocTab.vue'
@@ -217,6 +227,7 @@ import CalcpadExportTab from './CalcpadExportTab.vue'
 import CalcpadFilesTab from './CalcpadFilesTab.vue'
 import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
+import CalcpadS3Tab from './CalcpadS3Tab.vue'
 import { postMessage } from '../services/messaging'
 import type { FileInfo } from '../../services/file-info'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
@@ -303,6 +314,7 @@ const prettifyIndentSize = ref(4)
 const prettifyTrimTrailing = ref(true)
 
 const userName = ref('')
+const s3Url = ref('')
 const fileInfo = ref<FileInfo | null>(null)
 const savedUiOverrides = ref<Record<string, string>>({})
 const fileInfoHasDocument = ref(false)
@@ -327,6 +339,7 @@ const tabs = computed<Tab[]>(() => {
   // File info is stamped on save, which only those two hosts have.
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
     base.push({ id: 'metadata', label: t('Properties') })
+    if (s3Url.value) base.push({ id: 's3', label: t('S3') })
   }
   return base
 })
@@ -702,6 +715,16 @@ const handleUpdateUserName = (value: string) => {
   postMessage({ type: 'updateUserName', value })
 }
 
+const handleUpdateS3Url = (value: string) => {
+  s3Url.value = value
+  postMessage({ type: 'updateS3Url', value })
+}
+
+// Clearing the URL removes the S3 tab, so move any pane still showing it.
+watch(s3Url, url => {
+  if (!url) panes.value.filter(p => p.activeTab === 's3').forEach(p => activateTab(p, 'settings'))
+})
+
 const handleUpdateFileInfo = (patch: Partial<FileInfo>) => {
   postMessage({ type: 'updateFileInfo', patch })
 }
@@ -845,6 +868,7 @@ const handleMessage = (event: MessageEvent) => {
       completionDelayMs.value = message.completionDelayMs
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
       if (typeof message.userName === 'string') userName.value = message.userName
+      if (typeof message.s3Url === 'string') s3Url.value = message.s3Url
       break
     case 'documentMetadata':
       fileInfo.value = message.info ?? null

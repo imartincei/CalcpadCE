@@ -78,28 +78,30 @@ namespace Calcpad.Server
             _ => "TRACE",
         };
 
+        /// <summary>
+        /// Hosts set CALCPAD_LOG_DIR when the executable dir is read-only (e.g. Program Files).
+        /// Executable-adjacent logs/ otherwise.
+        /// </summary>
+        public static string LogsDirectory { get; } = ResolveLogsDirectory();
+
+        private static string ResolveLogsDirectory()
+        {
+            var overrideDir = Environment.GetEnvironmentVariable("CALCPAD_LOG_DIR");
+            if (!string.IsNullOrEmpty(overrideDir))
+                return overrideDir;
+
+            var executablePath = Assembly.GetExecutingAssembly().Location;
+            if (string.IsNullOrEmpty(executablePath))
+                executablePath = Environment.ProcessPath ?? AppContext.BaseDirectory;
+            var directory = Path.GetDirectoryName(executablePath) ?? AppContext.BaseDirectory;
+            return Path.Combine(directory, "logs");
+        }
+
         static FileLogger()
         {
             try
             {
-                // Hosts set CALCPAD_LOG_DIR when the executable dir is read-only (e.g.
-                // Program Files). Executable-adjacent logs/ otherwise.
-                var overrideDir = Environment.GetEnvironmentVariable("CALCPAD_LOG_DIR");
-                string logsDir;
-                if (!string.IsNullOrEmpty(overrideDir))
-                {
-                    logsDir = overrideDir;
-                }
-                else
-                {
-                    var executablePath = Assembly.GetExecutingAssembly().Location;
-                    if (string.IsNullOrEmpty(executablePath))
-                    {
-                        executablePath = Environment.ProcessPath ?? AppContext.BaseDirectory;
-                    }
-                    var directory = Path.GetDirectoryName(executablePath) ?? AppContext.BaseDirectory;
-                    logsDir = Path.Combine(directory, "logs");
-                }
+                var logsDir = LogsDirectory;
                 Directory.CreateDirectory(logsDir);
                 var timestamp = DateTime.Now.ToString("yyyyMMdd");
                 _logFilePath = Path.Combine(logsDir, $"CalcpadServer-{timestamp}.log");

@@ -3,4 +3,4 @@
 - The web editor lives in `calcpad-web/`
 - The desktop wrapper lives in `calcpad-desktop/`
 - Don't use console.log, use VS Code Output
-- This branch is localhost-only; hosted-mode work (auth, S3 storage, multi-user) lives on `calcpad-experimental`
+- The Calcpad server is localhost-only; shared S3 storage with users lives in `Calcpad.Web/s3-server` and is reached through the server's `/api/s3` routes

@@ -289,6 +289,19 @@
               @change="updateUserName"
             />
           </div>
+          <div v-if="versionConfig.isVSCode || versionConfig.isDesktop" v-show="rowVisible('user', 's3Url')" class="setting-group">
+            <label for="s3Url">
+              S3 Server URL:
+              <span class="setting-info" title="Address of the S3 server. When set, the S3 tab lets you sign in, browse buckets and upload files.">ⓘ</span>
+            </label>
+            <input
+              id="s3Url"
+              v-model="s3Url"
+              type="text"
+              placeholder="e.g. https://s3.example.com"
+              @change="updateS3Url"
+            />
+          </div>
         </div>
       </section>
 
@@ -783,6 +796,7 @@ interface Props {
   initialCompletionDelayMs?: number
   initialAvailableFonts?: string[]
   initialUserName?: string
+  initialS3Url?: string
   /** A setting to bring into view and focus, by its section and input id. */
   focusRequest?: { section: string; id: string } | null
   appVersion?: string
@@ -816,6 +830,7 @@ const props = withDefaults(defineProps<Props>(), {
   initialCompletionDelayMs: DEFAULT_COMPLETION_DELAY_MS,
   initialAvailableFonts: () => [],
   initialUserName: '',
+  initialS3Url: '',
   focusRequest: null,
   appVersion: '',
   pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS })
@@ -851,6 +866,7 @@ const emit = defineEmits<{
   updateEditorFontFamily: [family: string]
   updateCompletionDelayMs: [delayMs: number]
   updateUserName: [value: string]
+  updateS3Url: [value: string]
   focusHandled: []
   updatePdfSettings: [settings: PdfSettings]
   resetPdfSettings: []
@@ -941,6 +957,7 @@ const editorFontFamily = ref(props.initialEditorFontFamily)
 const completionDelayMs = ref(props.initialCompletionDelayMs)
 const availableFonts = ref<string[]>(props.initialAvailableFonts)
 const userName = ref(props.initialUserName)
+const s3Url = ref(props.initialS3Url)
 const newConfigName = ref('')
 const saveError = ref('')
 
@@ -1009,7 +1026,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   user: {
     title: 'User',
     rows: {
-      userName: 'user name username author reviewer file info'
+      userName: 'user name username author reviewer file info',
+      s3Url: 's3 server url bucket upload'
     }
   },
   editor: {
@@ -1273,6 +1291,11 @@ const updateCompletionDelayMs = (event: Event) => {
   if (input.reportValidity()) emit('updateCompletionDelayMs', input.valueAsNumber)
 }
 
+const updateS3Url = () => {
+  s3Url.value = s3Url.value.trim()
+  emit('updateS3Url', s3Url.value)
+}
+
 const updateUserName = () => {
   userName.value = userName.value.trim()
   emit('updateUserName', userName.value)
@@ -1440,6 +1463,13 @@ watch(
   () => props.initialCompletionDelayMs,
   (delayMs) => {
     completionDelayMs.value = delayMs
+  }
+)
+
+watch(
+  () => props.initialS3Url,
+  (newValue) => {
+    s3Url.value = newValue
   }
 )
 

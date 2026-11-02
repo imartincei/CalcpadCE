@@ -21,6 +21,7 @@ import type {
     PortablePackageResult,
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
+import type { S3Result } from '../types/s3';
 import { pdfResponseError } from './pdf-browser';
 
 /** Request header carrying the server's per-launch token. Must match the backend's constant. */
@@ -494,6 +495,27 @@ export class CalcpadApiClient {
             return response.ok;
         } catch {
             return false;
+        }
+    }
+
+    /** Calls the local server's `/api/s3` relay; a non-2xx answer is returned rather than hidden, so callers can show its `error`. */
+    public async s3Request(method: string, path: string, body?: unknown): Promise<S3Result> {
+        const url = await this.resolveUrl('/api/s3/' + path.replace(/^\/+/, ''), 'S3');
+        if (url === null) return { status: 0, data: { error: NO_SERVER_ERROR } };
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: body === undefined ? this.authHeaders() : this.jsonHeaders(),
+                body: body === undefined ? undefined : JSON.stringify(body),
+                signal: AbortSignal.timeout(60000),
+            });
+            const text = await response.text();
+            let data: unknown = null;
+            try { data = text ? JSON.parse(text) : null; } catch { data = { error: text }; }
+            return { status: response.status, data };
+        } catch (error) {
+            this.logError('S3', error);
+            return { status: 0, data: { error: error instanceof Error ? error.message : String(error) } };
         }
     }
 

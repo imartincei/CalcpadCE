@@ -37,6 +37,7 @@ export type {
 export { CalcpadTokenType, CalcpadTypeId } from './types/api';
 
 export type { ILogger, IFileSystem } from './types/interfaces';
+export type { S3Result, S3UploadRequest, S3UploadResponse } from './types/s3';
 
 export type { SettingOption, MetadataSettingKey } from './types/catalog';
 export { specForKey, validateCatalogValue } from './types/catalog';
@@ -326,6 +327,7 @@ export {
     hasPathRootToken,
     getPathRootTokenKind,
     isUserToken,
+    isS3Token,
     expandUserToken,
     parsePathRootDeclaration,
     scanDeclaredPathRoots,
