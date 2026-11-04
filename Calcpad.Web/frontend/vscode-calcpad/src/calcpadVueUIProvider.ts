@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits } from 'calcpad-frontend';
-import type { ParseMode, CalcpadError, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
+import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -642,10 +642,6 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 data: data
             });
         }
-    }
-
-    public updateConvertErrors(errors: CalcpadError[]) {
-        this._view?.webview.postMessage({ type: 'updateConvertErrors', errors });
     }
 
     /** Report the outcome of a "Write to Disk" run to the Export tab. */

@@ -7,7 +7,7 @@ import type { MetadataCommentData, MetadataCommentBlock, MetadataLayout, Setting
 import { buildSourceDefinitionResolver } from '../../text/source-definitions';
 import { findUiDirectiveBlock, serializeUiDirective } from '../../text/ui-directive';
 import type { UiDirectiveData } from '../../text/ui-directive';
-import type { ExportVariant } from '../../types/api';
+import type { CalcpadError, ExportVariant } from '../../types/api';
 import { getDefaultSettings, buildApiSettings, coerceWriteMode, coerceLogLevel, writesAllowed, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings';
 import { setLogLevel } from '../log-level';
 import type { CalcpadSettings, WriteMode } from '../../types/settings';
@@ -118,6 +118,8 @@ const BUILTIN_THEMES = [
  * `handlePlatformMessage`.
  */
 export abstract class BaseMessageBridge {
+    /** Receives the errors of a run of the active document, for the Problems panel. */
+    public onRunErrors?: (errors: CalcpadError[]) => void;
     protected apiClient: CalcpadApiClient;
     protected snippetService: CalcpadSnippetService;
     protected definitionsService: CalcpadDefinitionsService;
@@ -961,7 +963,7 @@ export abstract class BaseMessageBridge {
             return;
         }
         const errors = result.errors ?? [];
-        this.postToVue({ type: 'updateConvertErrors', errors });
+        this.onRunErrors?.(errors);
         this.postToVue({
             type: 'writeFilesResult',
             ok: errors.length === 0,

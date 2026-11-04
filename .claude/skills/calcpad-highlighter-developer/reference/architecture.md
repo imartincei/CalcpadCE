@@ -141,7 +141,12 @@ CPD-32xx: Stage 3 - Naming (variable/function names)
 CPD-33xx: Stage 3 - Usage (undefined identifiers)
 CPD-34xx: Stage 3 - Semantic (operators, commands)
 CPD-35xx: Stage 3 - Function type checking
+CPD-5xxx: Core errors (51 syntax, 52 blocks, 53 names, 54 values, 55 matrices, 56 solvers, 57 files, 59 run limits)
 ```
+
+Lint checks that Core's MacroParser reports on every run (CPD-1102 and CPD-2201/2202/2204/2206-2208/2210-2213) were removed from the linter; only CPD-1101/1103 and CPD-2203/2205/2209 remain lint checks.
+
+Every Core error carries a code (`MathParserException.Code`, `CalcpadError.Code`). Core errors that match a lint check reuse its code, so one LintIgnore covers both. `CoreErrorCodeTests` fails if Core uses a code missing from `ErrorCodes.cs`.
 
 ## TokenType Enum
 

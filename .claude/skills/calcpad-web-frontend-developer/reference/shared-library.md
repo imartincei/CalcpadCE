@@ -74,8 +74,10 @@ interface SymbolAtPositionResponse {
     locations: SymbolLocation[];   // definition, reassignments, usages
 }
 
-// Calculation errors ride the X-Calcpad-Errors response header, not the body
-interface ConvertResult { html: string; errors: CalcpadError[]; }
+// Calculation errors ride the X-Calcpad-Errors response header, not the body.
+// Hosts show them in their Problems panels (Monaco owner / VS Code collection 'calcpad-run');
+// Both hosts prefix messages with [Runtime] or [Linter].
+interface ConvertResult { html: string; errors: CalcpadError[]; }  // CalcpadError.code is a CPD-xxxx code
 
 enum CalcpadTokenType {
     None = 0, Const = 1, Operator = 2, Bracket = 3, LineContinuation = 4,

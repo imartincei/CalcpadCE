@@ -73,10 +73,11 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
-        public void MacroDefinition_RequiredAfterOptional_IsReported()
+        public void MacroDefinition_RequiredAfterOptional_IsReportedByCore()
         {
-            var (result, _) = Lint("#def m$(a$ = 1; b$) = a$ + b$\nr = m$(1; 2)\n");
-            Assert.Contains("CPD-2213", Codes(result));
+            var parser = new MacroParser();
+            parser.Parse("#def m$(a$ = 1; b$) = a$ + b$\nr = m$(1; 2)\n", out _, null, 0, true);
+            Assert.Contains("CPD-2213", parser.Errors.Select(e => e.Code));
         }
 
         [Fact]

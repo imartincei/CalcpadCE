@@ -105,6 +105,10 @@ Each carries a `CPD-XXXX` code, and the linter minimum-severity setting controls
 - **VS Code** — diagnostics appear in the **Problems** panel (**Ctrl+Shift+M**).
 - **Desktop app** — diagnostics appear in the **Problems** panel below the editor.
 
+When the preview runs, its calculation errors join them in the **Problems** panel.
+Each entry starts with `[Linter]` or `[Runtime]` to show where it came from.
+This includes errors inside `#hide` blocks, which the preview omits.
+
 See **[Linter and Diagnostics](new-linter.md)** for what each code means.
 
 ## See also

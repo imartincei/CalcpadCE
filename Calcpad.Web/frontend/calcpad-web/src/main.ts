@@ -39,7 +39,7 @@ import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhen
 import { uiText } from './editor/ui-text';
 import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
-import { setupDiagnostics } from './editor/diagnostics';
+import { setupDiagnostics, setRunErrorMarkers } from './editor/diagnostics';
 import { registerCompletionProvider } from './editor/completions';
 import { registerIncludeCompletionProvider } from './editor/include-completions';
 import { registerHoverProvider } from './editor/hover';
@@ -299,7 +299,7 @@ async function bootstrap(): Promise<void> {
 
     // The base message bridge's handleGoToLine looks up the editor via
     // window.monaco (matches the vscode-webview convention). Expose it here so
-    // sidebar tabs (TOC, Errors) can post `goToLine` and reach Monaco.
+    // sidebar tabs (TOC) can post `goToLine` and reach Monaco.
     (window as any).monaco = monaco;
 
     // Mount the main app layout
@@ -359,6 +359,10 @@ async function bootstrap(): Promise<void> {
     let activeGroup!: EditorGroup;
     let editor!: monaco.editor.IStandaloneCodeEditor;
     let tabs!: TabManager;
+    activeBridge.onRunErrors = errors => {
+        const model = activeGroup.editor.getModel();
+        if (model) setRunErrorMarkers(model, errors);
+    };
     const historyCallbacks = { confirm: confirmLeaveUiDoc, restore: restoreNavigation };
     let navigationHistory: NavigationHistoryClient | undefined = isTauri
         ? undefined : createBrowserNavigationHistory(historyCallbacks);
@@ -790,6 +794,7 @@ async function bootstrap(): Promise<void> {
         if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
         const content = group.editor.getValue();
+        const model = group.editor.getModel();
         const settings = activeBridge.getSettings();
         const apiSettings = buildApiSettings(settings);
         const mode = appInstance.getResultMode() as ResultMode;
@@ -873,9 +878,8 @@ async function bootstrap(): Promise<void> {
                 uiPause.update(uiDocKeyFor(group), result.pause);
                 appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
             }
-            window.dispatchEvent(new MessageEvent('message', {
-                data: { type: 'updateConvertErrors', errors: result.errors },
-            }));
+            // A PDF view renders without line anchors, so Core records no errors.
+            if (model && !pdfView) setRunErrorMarkers(model, result.errors);
             await committed;
         }
         await hideLoading();

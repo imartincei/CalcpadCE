@@ -1,7 +1,4 @@
 using System.Linq;
-using Calcpad.Highlighter.ContentResolution;
-using Calcpad.Highlighter.Linter;
-using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
@@ -11,15 +8,15 @@ namespace Calcpad.Tests.Highlighter
     /// </summary>
     public class MacroParamCaseSensitivityTests
     {
-        private static LinterResult Lint(string content)
+        private static MacroParser Lint(string content)
         {
-            var staged = new ContentResolver().GetStagedContent(content);
-            var ignoreRegions = new LintIgnoreRegionParser().ExtractRegions(content);
-            return new CalcpadLinter().Lint(staged, ignoreRegions);
+            var parser = new MacroParser();
+            parser.Parse(content, out _, null, 0, true);
+            return parser;
         }
 
-        private static int DuplicateParamErrors(LinterResult result) =>
-            result.Diagnostics.Count(d => d.Code == "CPD-2212");
+        private static int DuplicateParamErrors(MacroParser parser) =>
+            parser.Errors.Count(e => e.Code == "CPD-2212");
 
         [Fact]
         public void ParamsDifferingOnlyByCase_AreNotDuplicates()
