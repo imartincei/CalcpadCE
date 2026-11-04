@@ -305,7 +305,7 @@ namespace Calcpad.Core
             new(string.Format(Messages.Inconsistent_units_0_1_2, ua, op, ub));
 
         internal static MathParserException UnitsToComplexPower() =>
-            new(Messages.Units_cannon_be_raised_to_complex_power);
+            new(Messages.Units_cannot_be_raised_to_complex_power);
 
         internal static MathParserException CannotEvaluateRemainder(string ua, string ub) =>
             new(string.Format(Messages.Cannot_evaluate_remainder_0_1_The_denominator_must_be_unitless, ua, ub));

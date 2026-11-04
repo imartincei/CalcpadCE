@@ -1654,11 +1654,11 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to Units cannon be raised to complex power..
+        // /   Looks up a localized string similar to Units cannot be raised to complex power..
         // / </summary>
-        public static string Units_cannon_be_raised_to_complex_power {
+        public static string Units_cannot_be_raised_to_complex_power {
             get {
-                return ResourceManager.GetString("Units_cannon_be_raised_to_complex_power", resourceCulture);
+                return ResourceManager.GetString("Units_cannot_be_raised_to_complex_power", resourceCulture);
             }
         }
 

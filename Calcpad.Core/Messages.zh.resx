@@ -298,7 +298,7 @@
   <data name="Inconsistent_units_0_1_2" xml:space="preserve">
     <value>单位不一致： "{0} {1} {2}".</value>
   </data>
-  <data name="Units_cannon_be_raised_to_complex_power" xml:space="preserve">
+  <data name="Units_cannot_be_raised_to_complex_power" xml:space="preserve">
     <value>单位无法计算复数次幂.</value>
   </data>
   <data name="if_block_not_closed_Missing_end_if" xml:space="preserve">

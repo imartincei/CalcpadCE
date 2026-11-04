@@ -313,8 +313,8 @@
   <data name="Inconsistent_units_0_1_2" xml:space="preserve">
         <value>Inconsistent units: "{0} {1} {2}".</value>
     </data>
-  <data name="Units_cannon_be_raised_to_complex_power" xml:space="preserve">
-        <value>Units cannon be raised to complex power.</value>
+  <data name="Units_cannot_be_raised_to_complex_power" xml:space="preserve">
+        <value>Units cannot be raised to complex power.</value>
     </data>
   <data name="Cannot_evaluate_remainder_0_1_The_denominator_must_be_unitless" xml:space="preserve">
         <value>Cannot evaluate remainder: "{0}  ⦼  {1}". The denominator must be unitless.</value>

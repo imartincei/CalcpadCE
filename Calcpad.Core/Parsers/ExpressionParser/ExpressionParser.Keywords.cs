@@ -415,7 +415,7 @@ namespace Calcpad.Core
                     else
                         count = -1d;
 
-                    _loops.Push(new RepeatLoop(_currentLine, count, _condition.Id));
+                    _loops.Push(new RepeatLoop(_currentLine, count, _condition.Id) { SourceLine = _parser.Line });
                 }
             }
             else if (_isVisible)
@@ -488,7 +488,7 @@ namespace Calcpad.Core
                                     return;
                                 }
                                 var counter = _parser.GetVariableRef(varName);
-                                _loops.Push(new ForLoop(_currentLine, start, end, counter, _condition.Id));
+                                _loops.Push(new ForLoop(_currentLine, start, end, counter, _condition.Id) { SourceLine = _parser.Line });
                                 _parser.SetVariable(varName, start);
                             }
                             catch (MathParserException ex)
@@ -537,11 +537,11 @@ namespace Calcpad.Core
                         var condition = commentStart < 0 ? expression : expression[..commentStart];
                         _parser.Parse(condition);
                         _parser.Calculate();
-                        _condition.SetCondition(Keyword.While - Keyword.If);
+                        _condition.SetCondition(Keyword.While - Keyword.If, _currentLine, _parser.Line);
                         _condition.Check(_parser.Result);
                         if (_condition.IsSatisfied)
                         {
-                            _loops.Push(new WhileLoop(_currentLine, expression.ToString(), _condition.Id));
+                            _loops.Push(new WhileLoop(_currentLine, expression.ToString(), _condition.Id) { SourceLine = _parser.Line });
                             if (commentStart >= 0)
                                 ParseTokens(GetTokens(expression[commentStart..]), false, false);
                         }
@@ -703,7 +703,7 @@ namespace Calcpad.Core
                     if (Validator.IsValidFormatString(format))
                         Settings.Math.FormatString = format;
                     else
-                        AppendError("#format " + format, Messages.Invalid_format_string_0, _currentLine);
+                        AppendError("#format " + format, string.Format(Messages.Invalid_format_string_0, format), _currentLine);
                 }
             }
             else
