@@ -1414,6 +1414,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#where-diagnostics-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where diagnostics come from
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1496,6 +1507,17 @@
     <span class="md-ellipsis">
       
         Formatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calculation-errors-cpd-5xxx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calculation errors (CPD-5xxx)
       
     </span>
   </a>
@@ -3076,6 +3098,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#where-diagnostics-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where diagnostics come from
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3164,6 +3197,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#calculation-errors-cpd-5xxx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calculation errors (CPD-5xxx)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3223,6 +3267,11 @@
 <p>CalcpadCE checks your document as you write and flags problems before you ever run it.
 Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can look up exactly what it means.</p>
 <p>Diagnostics appear as squiggles in the editor and entries in the Problems panel.</p>
+<h2 id="where-diagnostics-come-from">Where diagnostics come from<a class="headerlink" href="#where-diagnostics-come-from" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>As you type</strong>, the linter checks the document without running it.</li>
+<li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel. <code>#include</code> and <code>#def</code> errors come from the run only.</li>
+</ul>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
 The tables below group them by the kind of problem.</p>
@@ -3251,6 +3300,21 @@ The tables below group them by the kind of problem.</p>
 <td>Warning</td>
 <td>Deprecated <code>#include</code> input values</td>
 </tr>
+<tr>
+<td>CPD-1104</td>
+<td>Error</td>
+<td>Include file not found</td>
+</tr>
+<tr>
+<td>CPD-1105</td>
+<td>Error</td>
+<td>Circular <code>#include</code></td>
+</tr>
+<tr>
+<td>CPD-1106</td>
+<td>Error</td>
+<td>Invalid <code>#ProjectPath</code> or <code>#LibraryPath</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="macro-definitions">Macro definitions<a class="headerlink" href="#macro-definitions" title="Permanent link">&para;</a></h3>
@@ -3263,6 +3327,11 @@ The tables below group them by the kind of problem.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>CPD-2200</td>
+<td>Error</td>
+<td>Macro or include error</td>
+</tr>
 <tr>
 <td>CPD-2201</td>
 <td>Error</td>
@@ -3499,6 +3568,16 @@ The tables below group them by the kind of problem.</p>
 <td>Error</td>
 <td>Unknown keyword argument in a function call</td>
 </tr>
+<tr>
+<td>CPD-3316</td>
+<td>Error</td>
+<td>Duplicate keyword argument in a macro call</td>
+</tr>
+<tr>
+<td>CPD-3317</td>
+<td>Error</td>
+<td>Circular macro reference</td>
+</tr>
 </tbody>
 </table>
 <h3 id="semantics">Semantics<a class="headerlink" href="#semantics" title="Permanent link">&para;</a></h3>
@@ -3632,6 +3711,559 @@ The tables below group them by the kind of problem.</p>
 <td>CPD-3601</td>
 <td>Warning</td>
 <td>Invalid format specifier</td>
+</tr>
+</tbody>
+</table>
+<h3 id="calculation-errors-cpd-5xxx">Calculation errors (CPD-5xxx)<a class="headerlink" href="#calculation-errors-cpd-5xxx" title="Permanent link">&para;</a></h3>
+<p>Reported when the document runs. Errors that match a check above reuse its code.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Group</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPD-5101</td>
+<td>Syntax</td>
+<td>Cannot evaluate literal</td>
+</tr>
+<tr>
+<td>CPD-5102</td>
+<td>Syntax</td>
+<td>Expression is empty</td>
+</tr>
+<tr>
+<td>CPD-5103</td>
+<td>Syntax</td>
+<td>Missing operand</td>
+</tr>
+<tr>
+<td>CPD-5104</td>
+<td>Syntax</td>
+<td>Cannot evaluate as type</td>
+</tr>
+<tr>
+<td>CPD-5105</td>
+<td>Syntax</td>
+<td>Invalid expression (stack leak)</td>
+</tr>
+<tr>
+<td>CPD-5106</td>
+<td>Syntax</td>
+<td>Invalid expression (empty stack)</td>
+</tr>
+<tr>
+<td>CPD-5107</td>
+<td>Syntax</td>
+<td>Undefined input field</td>
+</tr>
+<tr>
+<td>CPD-5108</td>
+<td>Syntax</td>
+<td>Cannot parse number</td>
+</tr>
+<tr>
+<td>CPD-5109</td>
+<td>Syntax</td>
+<td>More than one assignment</td>
+</tr>
+<tr>
+<td>CPD-5110</td>
+<td>Syntax</td>
+<td>Unexpected delimiter</td>
+</tr>
+<tr>
+<td>CPD-5111</td>
+<td>Syntax</td>
+<td>Missing delimiter in function definition</td>
+</tr>
+<tr>
+<td>CPD-5112</td>
+<td>Syntax</td>
+<td>Duplicate keyword argument in a function call</td>
+</tr>
+<tr>
+<td>CPD-5113</td>
+<td>Syntax</td>
+<td>Missing item in a $Plot or $Map command</td>
+</tr>
+<tr>
+<td>CPD-5114</td>
+<td>Syntax</td>
+<td>Bracket mismatch</td>
+</tr>
+<tr>
+<td>CPD-5115</td>
+<td>Syntax</td>
+<td>Function definition inside a solver block</td>
+</tr>
+<tr>
+<td>CPD-5116</td>
+<td>Syntax</td>
+<td>Missing file name</td>
+</tr>
+<tr>
+<td>CPD-5117</td>
+<td>Syntax</td>
+<td>Invalid data type</td>
+</tr>
+<tr>
+<td>CPD-5118</td>
+<td>Syntax</td>
+<td>Missing matrix index</td>
+</tr>
+<tr>
+<td>CPD-5119</td>
+<td>Syntax</td>
+<td>Invalid number of indexes</td>
+</tr>
+<tr>
+<td>CPD-5120</td>
+<td>Syntax</td>
+<td>More than one delimiter in a plot command</td>
+</tr>
+<tr>
+<td>CPD-5201</td>
+<td>Blocks</td>
+<td>Condition cannot be empty</td>
+</tr>
+<tr>
+<td>CPD-5202</td>
+<td>Blocks</td>
+<td>Duplicate #else</td>
+</tr>
+<tr>
+<td>CPD-5203</td>
+<td>Blocks</td>
+<td>#else if after #else</td>
+</tr>
+<tr>
+<td>CPD-5301</td>
+<td>Names</td>
+<td>Cannot evaluate as a function</td>
+</tr>
+<tr>
+<td>CPD-5302</td>
+<td>Names</td>
+<td>Cannot evaluate as a function or operator</td>
+</tr>
+<tr>
+<td>CPD-5303</td>
+<td>Names</td>
+<td>Cannot redefine existing units</td>
+</tr>
+<tr>
+<td>CPD-5304</td>
+<td>Names</td>
+<td>Right side must be constant</td>
+</tr>
+<tr>
+<td>CPD-5305</td>
+<td>Names</td>
+<td>Recursion not allowed in function definition</td>
+</tr>
+<tr>
+<td>CPD-5306</td>
+<td>Names</td>
+<td>Circular function reference</td>
+</tr>
+<tr>
+<td>CPD-5401</td>
+<td>Values</td>
+<td>Power must be unitless</td>
+</tr>
+<tr>
+<td>CPD-5402</td>
+<td>Values</td>
+<td>Right side does not evaluate to units</td>
+</tr>
+<tr>
+<td>CPD-5403</td>
+<td>Values</td>
+<td>Inconsistent units</td>
+</tr>
+<tr>
+<td>CPD-5404</td>
+<td>Values</td>
+<td>Invalid units for function</td>
+</tr>
+<tr>
+<td>CPD-5405</td>
+<td>Values</td>
+<td>Root index must be unitless</td>
+</tr>
+<tr>
+<td>CPD-5406</td>
+<td>Values</td>
+<td>Root index cannot be complex</td>
+</tr>
+<tr>
+<td>CPD-5407</td>
+<td>Values</td>
+<td>Root index must be an integer greater than 1</td>
+</tr>
+<tr>
+<td>CPD-5408</td>
+<td>Values</td>
+<td>Factorial argument out of range</td>
+</tr>
+<tr>
+<td>CPD-5409</td>
+<td>Values</td>
+<td>Factorial argument must be unitless</td>
+</tr>
+<tr>
+<td>CPD-5410</td>
+<td>Values</td>
+<td>Factorial argument must be a positive integer</td>
+</tr>
+<tr>
+<td>CPD-5411</td>
+<td>Values</td>
+<td>Factorial argument cannot be complex</td>
+</tr>
+<tr>
+<td>CPD-5412</td>
+<td>Values</td>
+<td>Remainder denominator must be unitless</td>
+</tr>
+<tr>
+<td>CPD-5413</td>
+<td>Values</td>
+<td>Both values must be integers</td>
+</tr>
+<tr>
+<td>CPD-5414</td>
+<td>Values</td>
+<td>Calculated units inconsistent with target units</td>
+</tr>
+<tr>
+<td>CPD-5415</td>
+<td>Values</td>
+<td>Inconsistent units for assigned value</td>
+</tr>
+<tr>
+<td>CPD-5416</td>
+<td>Values</td>
+<td>Inconsistent units for assigned value</td>
+</tr>
+<tr>
+<td>CPD-5417</td>
+<td>Values</td>
+<td>Result is not a real number</td>
+</tr>
+<tr>
+<td>CPD-5418</td>
+<td>Values</td>
+<td>Argument out of range</td>
+</tr>
+<tr>
+<td>CPD-5419</td>
+<td>Values</td>
+<td>Condition cannot be complex</td>
+</tr>
+<tr>
+<td>CPD-5420</td>
+<td>Values</td>
+<td>Condition result is invalid</td>
+</tr>
+<tr>
+<td>CPD-5421</td>
+<td>Values</td>
+<td>Plot limits are identical</td>
+</tr>
+<tr>
+<td>CPD-5422</td>
+<td>Values</td>
+<td>Inconsistent units in operation</td>
+</tr>
+<tr>
+<td>CPD-5423</td>
+<td>Values</td>
+<td>Units raised to a complex power</td>
+</tr>
+<tr>
+<td>CPD-5424</td>
+<td>Values</td>
+<td>Cannot evaluate remainder</td>
+</tr>
+<tr>
+<td>CPD-5501</td>
+<td>Vectors and matrices</td>
+<td>Index out of range</td>
+</tr>
+<tr>
+<td>CPD-5502</td>
+<td>Vectors and matrices</td>
+<td>Cannot assign vector to scalar</td>
+</tr>
+<tr>
+<td>CPD-5503</td>
+<td>Vectors and matrices</td>
+<td>Value must be scalar</td>
+</tr>
+<tr>
+<td>CPD-5504</td>
+<td>Vectors and matrices</td>
+<td>Value must be real</td>
+</tr>
+<tr>
+<td>CPD-5505</td>
+<td>Vectors and matrices</td>
+<td>Value must be a positive integer</td>
+</tr>
+<tr>
+<td>CPD-5506</td>
+<td>Vectors and matrices</td>
+<td>Value must be a matrix</td>
+</tr>
+<tr>
+<td>CPD-5507</td>
+<td>Vectors and matrices</td>
+<td>Value must be a vector</td>
+</tr>
+<tr>
+<td>CPD-5508</td>
+<td>Vectors and matrices</td>
+<td>Step cannot be zero</td>
+</tr>
+<tr>
+<td>CPD-5509</td>
+<td>Vectors and matrices</td>
+<td>Vector size limit exceeded</td>
+</tr>
+<tr>
+<td>CPD-5510</td>
+<td>Vectors and matrices</td>
+<td>Cross product needs 2 or 3 element vectors</td>
+</tr>
+<tr>
+<td>CPD-5511</td>
+<td>Vectors and matrices</td>
+<td>Function not defined in complex mode</td>
+</tr>
+<tr>
+<td>CPD-5512</td>
+<td>Vectors and matrices</td>
+<td>Matrix dimensions do not match</td>
+</tr>
+<tr>
+<td>CPD-5513</td>
+<td>Vectors and matrices</td>
+<td>Matrix must be square</td>
+</tr>
+<tr>
+<td>CPD-5514</td>
+<td>Vectors and matrices</td>
+<td>Lp norm needs p &gt;= 1</td>
+</tr>
+<tr>
+<td>CPD-5515</td>
+<td>Vectors and matrices</td>
+<td>Matrix must be symmetric</td>
+</tr>
+<tr>
+<td>CPD-5516</td>
+<td>Vectors and matrices</td>
+<td>Matrix is not positive definite</td>
+</tr>
+<tr>
+<td>CPD-5517</td>
+<td>Vectors and matrices</td>
+<td>Matrix is singular</td>
+</tr>
+<tr>
+<td>CPD-5518</td>
+<td>Vectors and matrices</td>
+<td>Matrix is singular or close to singular</td>
+</tr>
+<tr>
+<td>CPD-5519</td>
+<td>Vectors and matrices</td>
+<td>Vectors and matrices not supported in complex mode</td>
+</tr>
+<tr>
+<td>CPD-5520</td>
+<td>Vectors and matrices</td>
+<td>Cannot interpolate with a non-scalar value</td>
+</tr>
+<tr>
+<td>CPD-5521</td>
+<td>Vectors and matrices</td>
+<td>Jacobi iteration failed</td>
+</tr>
+<tr>
+<td>CPD-5522</td>
+<td>Vectors and matrices</td>
+<td>Invalid operand</td>
+</tr>
+<tr>
+<td>CPD-5523</td>
+<td>Vectors and matrices</td>
+<td>Invalid argument</td>
+</tr>
+<tr>
+<td>CPD-5524</td>
+<td>Vectors and matrices</td>
+<td>Argument is not an eigenvalue</td>
+</tr>
+<tr>
+<td>CPD-5525</td>
+<td>Vectors and matrices</td>
+<td>QL algorithm failed to converge</td>
+</tr>
+<tr>
+<td>CPD-5526</td>
+<td>Vectors and matrices</td>
+<td>Matrix size limit exceeded</td>
+</tr>
+<tr>
+<td>CPD-5527</td>
+<td>Vectors and matrices</td>
+<td>Embedded data size limit exceeded</td>
+</tr>
+<tr>
+<td>CPD-5528</td>
+<td>Vectors and matrices</td>
+<td>Datagrid size limit exceeded</td>
+</tr>
+<tr>
+<td>CPD-5529</td>
+<td>Vectors and matrices</td>
+<td>Matrix needs at least as many rows as columns</td>
+</tr>
+<tr>
+<td>CPD-5530</td>
+<td>Vectors and matrices</td>
+<td>Variable is not a matrix</td>
+</tr>
+<tr>
+<td>CPD-5531</td>
+<td>Vectors and matrices</td>
+<td>Value must be a high-performance matrix</td>
+</tr>
+<tr>
+<td>CPD-5532</td>
+<td>Vectors and matrices</td>
+<td>Value must be a high-performance vector</td>
+</tr>
+<tr>
+<td>CPD-5533</td>
+<td>Vectors and matrices</td>
+<td>FFT input needs one or two rows</td>
+</tr>
+<tr>
+<td>CPD-5534</td>
+<td>Vectors and matrices</td>
+<td>Matrix is ill-conditioned</td>
+</tr>
+<tr>
+<td>CPD-5535</td>
+<td>Vectors and matrices</td>
+<td>PCG solver failed to converge</td>
+</tr>
+<tr>
+<td>CPD-5536</td>
+<td>Vectors and matrices</td>
+<td>SVD failed to converge</td>
+</tr>
+<tr>
+<td>CPD-5537</td>
+<td>Vectors and matrices</td>
+<td>Complex value outside of complex mode</td>
+</tr>
+<tr>
+<td>CPD-5601</td>
+<td>Solvers</td>
+<td>Cannot evaluate the function for the solver variable</td>
+</tr>
+<tr>
+<td>CPD-5602</td>
+<td>Solvers</td>
+<td>Function not defined for the solver variable</td>
+</tr>
+<tr>
+<td>CPD-5603</td>
+<td>Solvers</td>
+<td>Solver limits out of range</td>
+</tr>
+<tr>
+<td>CPD-5604</td>
+<td>Solvers</td>
+<td>No solution</td>
+</tr>
+<tr>
+<td>CPD-5701</td>
+<td>Files</td>
+<td>Cannot write PNG file</td>
+</tr>
+<tr>
+<td>CPD-5702</td>
+<td>Files</td>
+<td>Cannot write SVG file</td>
+</tr>
+<tr>
+<td>CPD-5703</td>
+<td>Files</td>
+<td>Cannot convert PNG to Base64</td>
+</tr>
+<tr>
+<td>CPD-5704</td>
+<td>Files</td>
+<td>File not found</td>
+</tr>
+<tr>
+<td>CPD-5705</td>
+<td>Files</td>
+<td>Path not found</td>
+</tr>
+<tr>
+<td>CPD-5706</td>
+<td>Files</td>
+<td>File format not supported</td>
+</tr>
+<tr>
+<td>CPD-5707</td>
+<td>Files</td>
+<td>Cannot read or write data file</td>
+</tr>
+<tr>
+<td>CPD-5900</td>
+<td>Run limits</td>
+<td>Unexpected error</td>
+</tr>
+<tr>
+<td>CPD-5901</td>
+<td>Run limits</td>
+<td>Interrupted by user</td>
+</tr>
+<tr>
+<td>CPD-5902</td>
+<td>Run limits</td>
+<td>Calculations not active</td>
+</tr>
+<tr>
+<td>CPD-5903</td>
+<td>Run limits</td>
+<td>Possibly infinite loop</td>
+</tr>
+<tr>
+<td>CPD-5904</td>
+<td>Run limits</td>
+<td>Too many errors</td>
+</tr>
+<tr>
+<td>CPD-5905</td>
+<td>Run limits</td>
+<td>Iteration limit exceeded</td>
+</tr>
+<tr>
+<td>CPD-5906</td>
+<td>Run limits</td>
+<td>Output too long</td>
 </tr>
 </tbody>
 </table>

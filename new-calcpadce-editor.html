@@ -3340,6 +3340,9 @@ Each carries a <code>CPD-XXXX</code> code, and the linter minimum-severity setti
 <li><strong>VS Code</strong> — diagnostics appear in the <strong>Problems</strong> panel (<strong>Ctrl+Shift+M</strong>).</li>
 <li><strong>Desktop app</strong> — diagnostics appear in the <strong>Problems</strong> panel below the editor.</li>
 </ul>
+<p>When the preview runs, its calculation errors join them in the <strong>Problems</strong> panel.
+Each entry starts with <code>[Linter]</code> or <code>[Runtime]</code> to show where it came from.
+This includes errors inside <code>#hide</code> blocks, which the preview omits.</p>
 <p>See <strong><a href="new-linter.html">Linter and Diagnostics</a></strong> for what each code means.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
