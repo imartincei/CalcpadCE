@@ -17,6 +17,7 @@ import {
     buildSourceDefinitionResolver,
     UiOverrideStore,
     UiPauseStore,
+    UiEditHistory,
     writeUiOverrides,
     extractUiControls,
     isCompiledPath,
@@ -421,8 +422,11 @@ async function bootstrap(): Promise<void> {
         ? (content: string) => (activeBridge as any).buildFileContext(content)
         : undefined;
 
+    function tabDocKey(tabId: string): string {
+        return `tab:${tabId}`;
+    }
     function docKeyFor(group: EditorGroup): string {
-        return `tab:${group.tabs.activeId ?? 'none'}`;
+        return tabDocKey(group.tabs.activeId ?? 'none');
     }
     function activeDocumentKey(): string {
         return docKeyFor(activeGroup);
@@ -508,6 +512,8 @@ async function bootstrap(): Promise<void> {
     const uiOverrides = new UiOverrideStore();
     // Documents whose in-memory values have not been written back yet.
     const uiOverridesDirty = new Set<string>();
+    // Undo/redo of those values, per tab.
+    const uiHistory = new UiEditHistory();
     // The #pause step each input form is on.
     const uiPause = new UiPauseStore();
     // Documents with an unapplied Properties or Info form, and which, as reported by the panel.
@@ -997,7 +1003,10 @@ async function bootstrap(): Promise<void> {
                 || (event.source === 'modelChange' && event.reason === monaco.editor.CursorChangeReason.NotSet)) return;
             recordNavigation(group, event.source === 'code.navigation' || event.source === 'code.jump');
         }));
-        group.tabs.onTabRemoved(tabId => navigationHistory?.remove(group.id, tabId));
+        group.tabs.onTabRemoved(tabId => {
+            navigationHistory?.remove(group.id, tabId);
+            uiHistory.clear(tabDocKey(tabId));
+        });
 
         // Focus tracking — the focused group becomes active.
         group.disposables.push(
@@ -1610,7 +1619,21 @@ async function bootstrap(): Promise<void> {
             if (!fromPreview) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
             const docKey = uiDocKeyFor(group);
-            if (!uiOverrides.set(docKey, String(data.varName), String(data.newValue))) return;
+            if (!uiHistory.set(docKeyFor(group), uiOverrides, docKey, String(data.varName), String(data.newValue))) return;
+            uiOverridesDirty.add(docKey);
+            refreshUiDirtyIndicator();
+            void refreshPreviewFor(group);
+            return;
+        }
+
+        if (data.type === 'uiUndo' || data.type === 'uiRedo') {
+            if (!fromPreview) return;
+            const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
+            const docKey = uiDocKeyFor(group);
+            const applied = data.type === 'uiUndo'
+                ? uiHistory.undo(docKeyFor(group), uiOverrides, docKey)
+                : uiHistory.redo(docKeyFor(group), uiOverrides, docKey);
+            if (!applied) return;
             uiOverridesDirty.add(docKey);
             refreshUiDirtyIndicator();
             void refreshPreviewFor(group);
@@ -1937,6 +1960,11 @@ async function bootstrap(): Promise<void> {
 
     appInstance.onSaveUiOverridesRequest = () => { void saveUiOverrides(); };
 
+    appInstance.uiHistoryStateProvider = (groupId: string) => {
+        const group = groups.get(groupId);
+        return group ? uiHistory.state(docKeyFor(group)) : null;
+    };
+
     appInstance.onUiPauseStepRequest = (direction: 'next' | 'previous') => {
         if (uiPause.step(activeUiDocKey(), direction)) void refreshPreviewFor(activeGroup);
     };
@@ -1960,6 +1988,7 @@ async function bootstrap(): Promise<void> {
         }
         uiOverrides.clear(docKey);
         uiOverridesDirty.delete(docKey);
+        uiHistory.clear(activeDocumentKey());
         refreshUiDirtyIndicator();
         uiPause.clear(docKey);
         appInstance.setUiPauseState(null);

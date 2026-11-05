@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadRunDiagnostics } from './calcpadRunDiagnostics';
@@ -47,6 +47,8 @@ let uiPanel: vscode.WebviewPanel | undefined = undefined;
 let uiReportPanel: vscode.WebviewPanel | undefined = undefined;
 const uiOverrides = new UiOverrideStore();
 const uiOverridesDirty = new Set<string>();
+// Undo/redo of entered values, per document tab.
+const uiHistory = new UiEditHistory();
 // The #pause step each input form is on, shared with the compiled-worksheet editor.
 const uiPause = new UiPauseStore();
 // Controls each document's last input-form render produced, keyed like the store above.
@@ -99,7 +101,7 @@ function syncInputMode(): void {
         && input.viewType.endsWith(CalcpadCompiledEditorProvider.reportViewType);
     const sourceless = !!compiled || compiledReport;
     vueUiProvider?.setInputMode(!!uiPanel || sourceless, sourceless);
-    syncUiPauseContext();
+    syncUiFormContext();
 }
 
 /** The document whose #pause steps the Previous/Next buttons act on. */
@@ -107,12 +109,22 @@ function activeUiPauseDocKey(): string | undefined {
     return activeCompiledUri()?.toString() ?? (uiPanel ? uiPanelDocKey : undefined);
 }
 
-function syncUiPauseContext(): void {
+function syncUiFormContext(): void {
     const docKey = activeUiPauseDocKey();
     const state = docKey ? uiPause.state(docKey) : undefined;
     void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseActive', hasPauseSteps(state));
     void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseHasPrevious', !!state && state.previous !== null);
     void vscode.commands.executeCommand('setContext', 'calcpad.uiPauseHasNext', !!state && state.next !== null);
+    const history = docKey ? uiHistory.state(docKey) : undefined;
+    void vscode.commands.executeCommand('setContext', 'calcpad.uiCanUndo', !!history?.undo);
+    void vscode.commands.executeCommand('setContext', 'calcpad.uiCanRedo', !!history?.redo);
+}
+
+/** Asked of the form's frame, which flushes pending grid edits before posting it back. */
+function requestUiHistory(op: 'uiUndo' | 'uiRedo'): void {
+    const compiled = activeCompiledUri();
+    const panel = compiled ? compiledEditor?.formPanel(compiled) : uiPanel;
+    void panel?.webview.postMessage({ type: 'cpdUiHistory', op });
 }
 
 async function stepUiPause(direction: 'next' | 'previous'): Promise<void> {
@@ -257,8 +269,9 @@ async function discardUiValues(docKey: string | undefined, allowCancel = false):
     }
     uiOverrides.clear(docKey);
     uiOverridesDirty.delete(docKey);
+    uiHistory.clear(docKey);
     uiPause.clear(docKey);
-    syncUiPauseContext();
+    syncUiFormContext();
     return true;
 }
 
@@ -1055,7 +1068,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         if (!pdfView) runDiagnostics?.update(sourceFileUri, parseConvertErrorHeader(response));
         if (enableUi) {
             uiPause.update(docKey, parseConvertPauseHeader(response));
-            syncUiPauseContext();
+            syncUiFormContext();
         }
 
         // Use the entire API response as the webview HTML
@@ -1145,6 +1158,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         const agentScript = getFrameAgentScript({
             scroll: scrollToLine === undefined ? frameState.scroll : undefined,
             uiPosition: frameState.uiPosition,
+            uiHistory: enableUi ? uiHistory.state(docKey) : undefined,
             maxConsoleMessages,
         });
         // Consumed once, matching the #UI script's own semantics: a stale position must
@@ -1730,10 +1744,23 @@ function handlePreviewMessage(message: any, kind: PreviewKind) {
             const sourceEditor = previewSourceEditor;
             if (!sourceEditor || kind !== 'ui') break;
             const docKey = sourceEditor.document.uri.toString();
-            if (!uiOverrides.set(docKey, String(message.varName), String(message.newValue))) break;
+            if (!uiHistory.set(docKey, uiOverrides, docKey, String(message.varName), String(message.newValue))) break;
             uiOverridesDirty.add(docKey);
             // Refreshes the form (so the control keeps the entered value) and the
             // report panel beside it (so the result updates).
+            void refreshPreviewPanels(sourceEditor.document);
+            break;
+        }
+        case 'uiUndo':
+        case 'uiRedo': {
+            const sourceEditor = previewSourceEditor;
+            if (!sourceEditor || kind !== 'ui') break;
+            const docKey = sourceEditor.document.uri.toString();
+            const applied = message.type === 'uiUndo'
+                ? uiHistory.undo(docKey, uiOverrides, docKey)
+                : uiHistory.redo(docKey, uiOverrides, docKey);
+            if (!applied) break;
+            uiOverridesDirty.add(docKey);
             void refreshPreviewPanels(sourceEditor.document);
             break;
         }
@@ -2164,6 +2191,7 @@ export async function activate(context: vscode.ExtensionContext) {
         compiledEditor = CalcpadCompiledEditorProvider.register(
             apiClient,
             uiOverrides,
+            uiHistory,
             uiPause,
             (panel, text, uri, kind) => updatePreviewContent(
                 panel, text, uri, false, undefined, kind === 'form', kind === 'report', true),
@@ -2427,6 +2455,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const uiPausePreviousCommand = vscode.commands.registerCommand('vscode-calcpad.uiPausePrevious', () => stepUiPause('previous'));
     const uiPauseNextCommand = vscode.commands.registerCommand('vscode-calcpad.uiPauseNext', () => stepUiPause('next'));
+    const uiUndoCommand = vscode.commands.registerCommand('vscode-calcpad.uiUndo', () => requestUiHistory('uiUndo'));
+    const uiRedoCommand = vscode.commands.registerCommand('vscode-calcpad.uiRedo', () => requestUiHistory('uiRedo'));
 
     // `targetLine` lets a caller name the line (the sidebar's TOC does); from the palette or
     // a keybinding it arrives undefined and the cursor's line is used. Only that second form
@@ -2727,6 +2757,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // a close, so the draft is dropped rather than offered back.
     const onDidCloseTextDocument = vscode.workspace.onDidCloseTextDocument(document => {
         vueUiProvider?.discardMetadataDraft(document.uri.toString());
+        uiHistory.clear(document.uri.toString());
         runDiagnostics?.delete(document.uri);
     });
 
@@ -2856,6 +2887,8 @@ export async function activate(context: vscode.ExtensionContext) {
             saveUiValuesCommand,
             uiPausePreviousCommand,
             uiPauseNextCommand,
+            uiUndoCommand,
+            uiRedoCommand,
             focusPreviewToLineCommand,
             onDidChangeTextEditorSelection,
             showInsertCommand,

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import * as path from 'path';
 import { writeUiOverrides, stampFileInfoText, patchFileInfoText, onlyReviewChanged } from 'calcpad-frontend';
-import type { CalcpadApiClient, UiOverrideStore, UiPauseStore } from 'calcpad-frontend';
+import type { CalcpadApiClient, UiEditHistory, UiOverrideStore, UiPauseStore } from 'calcpad-frontend';
 import { handleFrameStateMessage } from './previewFrame';
 
 /**
@@ -70,6 +70,7 @@ export class CalcpadCompiledEditorProvider
     constructor(
         private readonly _apiClient: CalcpadApiClient,
         private readonly _uiOverrides: UiOverrideStore,
+        private readonly _uiHistory: UiEditHistory,
         private readonly _uiPause: UiPauseStore,
         private readonly _renderPanel: RenderPanel,
         private readonly _log: ILogger,
@@ -78,11 +79,12 @@ export class CalcpadCompiledEditorProvider
     public static register(
         apiClient: CalcpadApiClient,
         uiOverrides: UiOverrideStore,
+        uiHistory: UiEditHistory,
         uiPause: UiPauseStore,
         renderPanel: RenderPanel,
         log: ILogger,
     ): CalcpadCompiledEditorProvider {
-        const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, uiPause, renderPanel, log);
+        const provider = new CalcpadCompiledEditorProvider(apiClient, uiOverrides, uiHistory, uiPause, renderPanel, log);
         provider._registration = vscode.window.registerCustomEditorProvider(
             CalcpadCompiledEditorProvider.viewType,
             provider,
@@ -141,8 +143,7 @@ export class CalcpadCompiledEditorProvider
         const document = this._docs.get(key);
         if (!document) return;
 
-        const forms = [...(this._panels.get(key) ?? [])];
-        const form = forms.find(p => p.active) ?? forms[0];
+        const form = this.formPanel(uri);
         const panel = vscode.window.createWebviewPanel(
             CalcpadCompiledEditorProvider.reportViewType,
             `CalcpadCE Report - ${path.basename(uri.fsPath)}`,
@@ -166,6 +167,12 @@ export class CalcpadCompiledEditorProvider
         form?.reveal(form.viewColumn, false);
     }
 
+    /** The form a command acts on: the focused one when the worksheet is open in several. */
+    public formPanel(uri: vscode.Uri): vscode.WebviewPanel | undefined {
+        const forms = [...(this._panels.get(uri.toString()) ?? [])];
+        return forms.find(p => p.active) ?? forms[0];
+    }
+
     async openCustomDocument(uri: vscode.Uri): Promise<CompiledWorksheetDocument> {
         const bytes = await vscode.workspace.fs.readFile(uri);
         const decoded = await this._apiClient.decodeCpdz(bytes);
@@ -185,11 +192,18 @@ export class CalcpadCompiledEditorProvider
             // Scroll offset, #UI position and outbound links belong to the frame the
             // worksheet renders in, and are the same for every panel that hosts one.
             if (handleFrameStateMessage(panel, message)) return;
-            // The form posts every edited control; anything else the preview scripts
-            // send (line links, console relay) has no meaning without a text editor.
-            if (message?.type !== 'uiValueChange') return;
+            // The form posts every edited control and its undo/redo; anything else the preview
+            // scripts send (line links, console relay) has no meaning without a text editor.
             const docKey = document.uri.toString();
-            if (!this._uiOverrides.set(docKey, String(message.varName), String(message.newValue))) return;
+            let applied: boolean;
+            if (message?.type === 'uiValueChange')
+                applied = this._uiHistory.set(docKey, this._uiOverrides, docKey, String(message.varName), String(message.newValue));
+            else if (message?.type === 'uiUndo')
+                applied = this._uiHistory.undo(docKey, this._uiOverrides, docKey);
+            else if (message?.type === 'uiRedo')
+                applied = this._uiHistory.redo(docKey, this._uiOverrides, docKey);
+            else return;
+            if (!applied) return;
             document.dirty = true;
             this._onDidChange.fire({ document });
             // Re-render so results depending on the edited value recalculate.
@@ -220,6 +234,7 @@ export class CalcpadCompiledEditorProvider
         document.dirty = false;
         // Drop the entered values so the form comes back as the file has it.
         this._uiOverrides.clear(document.uri.toString());
+        this._uiHistory.clear(document.uri.toString());
         this._uiPause.clear(document.uri.toString());
         await this._refresh(document);
     }
@@ -289,6 +304,7 @@ export class CalcpadCompiledEditorProvider
             // Entered values only live in memory; with no view left on the document
             // there is nothing to keep them for.
             this._uiOverrides.clear(key);
+            this._uiHistory.clear(key);
             this._uiPause.clear(key);
         });
     }
