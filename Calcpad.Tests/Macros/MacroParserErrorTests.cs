@@ -100,4 +100,25 @@ public class MacroParserErrorTests
         Assert.Equal(2, error.SourceLine);
         Assert.Equal(Core.Messages.Macro_definition_block_not_closed_Missing_end_def, error.Message);
     }
+
+    [Fact]
+    public void NestedDefInBlock_StaysInTheBlock()
+    {
+        var (parser, lines) = Parse("#def a$\n#def b$\nleak = 1\n#end def\n#end def\nx = 1");
+        Assert.Equal([Core.Messages.Invalid_inside_macro_definition], Messages(parser));
+        Assert.DoesNotContain("leak = 1", lines);
+        Assert.Contains("x = 1", lines);
+    }
+
+    [Theory]
+    [InlineData("#def a$\n1\n#end def\n#def a$\n2\n#end def\nx = a$", 4)]
+    [InlineData("#def a$ = 1\n#def a$ = 2\nx = a$", 2)]
+    public void DuplicateMacro_IsReportedOnItsDefLine(string source, int line)
+    {
+        var (parser, lines) = Parse(source);
+        var error = Assert.Single(parser.Errors);
+        Assert.Equal(line, error.SourceLine);
+        Assert.Equal(string.Format(Core.Messages.Duplicate_macro_name_0, "a$"), error.Message);
+        Assert.Contains("x = 1", lines);
+    }
 }

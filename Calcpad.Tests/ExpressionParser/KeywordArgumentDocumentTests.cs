@@ -65,5 +65,16 @@ namespace Calcpad.Tests
             Assert.Contains("1; <var>z</var> = 10", html);
             Assert.DoesNotContain("1; 2; 10", html);
         }
+
+        [Theory]
+        [InlineData("f(a; b) = a + b\na = 1\ny = f(a == 1; 2)")]
+        [InlineData("f(x; b) = x + b\na = 1\ny = f(a == 1; 2)")]
+        public void DoubleEquals_IsNotAKeywordArgument(string source)
+        {
+            var parser = new ExpressionParser { Debug = true };
+            parser.Parse(source, true, false);
+            var error = Assert.Single(parser.Errors);
+            Assert.DoesNotContain("argument", error.Message, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

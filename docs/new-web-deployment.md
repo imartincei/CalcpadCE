@@ -98,8 +98,11 @@ The analysis endpoints (`/highlight`, `/lint`, `/definitions`, `/symbol-at-posit
 Calculation errors come back alongside it in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
 
 ```typescript
-Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression" }>
+Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression", code }>
 ```
+
+`code` is the error's `CPD-xxxx` code (see [Linter and Diagnostics](new-linter.md)).
+The editors show these errors in their Problems panels.
 
 A stepped input form also returns an `X-Calcpad-Pause` header, URL-encoded JSON of `{ next, previous }`. Send `next` or `previous` back as `pauseAfter` to move a step; either is null when there is no step that way.
 

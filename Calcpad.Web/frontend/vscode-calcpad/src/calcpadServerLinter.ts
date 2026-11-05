@@ -73,7 +73,7 @@ export class CalcpadServerLinter {
 
                 const diagnostic = new vscode.Diagnostic(
                     range,
-                    '[' + d.code + '] ' + d.message,
+                    '[Linter] [' + d.code + '] ' + d.message,
                     severity
                 );
                 diagnostic.code = d.code;

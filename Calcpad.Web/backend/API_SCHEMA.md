@@ -139,8 +139,11 @@ Array<{
   outputLine: number;
   message: string;
   source: "Macro" | "Expression";
+  code: string;         // CPD-xxxx, shared with /lint where both report the same problem
 }>
 ```
+
+The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 
 When `stepPauses` is in effect, an `X-Calcpad-Pause` header reports where the form stopped, URL-encoded JSON of:
 
@@ -504,7 +507,11 @@ interface LintDiagnostic {
 | CPD-1101 | Include | Malformed #include statement |
 | CPD-1102 | Include | Missing #include filename |
 | CPD-1103 | Include | Deprecated #include input values |
+| CPD-1104 | Include | Include file not found |
+| CPD-1105 | Include | Circular #include |
+| CPD-1106 | Include | Invalid #ProjectPath or #LibraryPath |
 | **Stage 2: Macro definitions (CPD-22xx)** |||
+| CPD-2200 | Macro | Macro or include error |
 | CPD-2201 | Macro | Duplicate macro definition |
 | CPD-2202 | Macro | Macro name must end with '$' |
 | CPD-2203 | Macro | Macro parameter must end with '$' |
@@ -517,6 +524,7 @@ interface LintDiagnostic {
 | CPD-2210 | Macro | Invalid character in macro name |
 | CPD-2211 | Macro | Invalid character in macro parameter |
 | CPD-2212 | Macro | Duplicate macro parameter |
+| CPD-2213 | Macro | Required parameter after optional parameter |
 | **Stage 3: Balance (CPD-31xx)** |||
 | CPD-3101 | Balance | Unmatched opening parenthesis |
 | CPD-3102 | Balance | Unmatched closing parenthesis |
@@ -531,6 +539,7 @@ interface LintDiagnostic {
 | CPD-3204 | Naming | Variable name conflicts with a keyword |
 | CPD-3205 | Naming | Variable name conflicts with a built-in constant |
 | CPD-3206 | Naming | Function must have at least one parameter |
+| CPD-3207 | Naming | Required parameter after optional parameter in function definition |
 | **Stage 3: Usage (CPD-33xx)** |||
 | CPD-3301 | Usage | Undefined variable |
 | CPD-3302 | Usage | Function called with the wrong number of parameters |
@@ -545,6 +554,10 @@ interface LintDiagnostic {
 | CPD-3311 | Usage | Empty parameter in a function call |
 | CPD-3312 | Usage | Unused variable |
 | CPD-3313 | Usage | Redefinition of existing function |
+| CPD-3314 | Usage | Unknown keyword argument |
+| CPD-3315 | Usage | Unknown keyword argument in function call |
+| CPD-3316 | Usage | Duplicate keyword argument in a macro call |
+| CPD-3317 | Usage | Circular macro reference |
 | **Stage 3: Semantic (CPD-34xx)** |||
 | CPD-3401 | Semantic | Invalid operator usage |
 | CPD-3402 | Semantic | Unknown command name |
@@ -569,6 +582,115 @@ interface LintDiagnostic {
 | CPD-3421 | Semantic | 'fileInfo' metadata comment not on the last line |
 | **Stage 3: Format (CPD-36xx)** |||
 | CPD-3601 | Format | Invalid format specifier |
+| **Core calculation errors (CPD-5xxx)** |||
+| CPD-5101 | Syntax | Cannot evaluate literal |
+| CPD-5102 | Syntax | Expression is empty |
+| CPD-5103 | Syntax | Missing operand |
+| CPD-5104 | Syntax | Cannot evaluate as type |
+| CPD-5105 | Syntax | Invalid expression (stack leak) |
+| CPD-5106 | Syntax | Invalid expression (empty stack) |
+| CPD-5107 | Syntax | Undefined input field |
+| CPD-5108 | Syntax | Cannot parse number |
+| CPD-5109 | Syntax | More than one assignment |
+| CPD-5110 | Syntax | Unexpected delimiter |
+| CPD-5111 | Syntax | Missing delimiter in function definition |
+| CPD-5112 | Syntax | Duplicate keyword argument in a function call |
+| CPD-5113 | Syntax | Missing item in a $Plot or $Map command |
+| CPD-5114 | Syntax | Bracket mismatch |
+| CPD-5115 | Syntax | Function definition inside a solver block |
+| CPD-5116 | Syntax | Missing file name |
+| CPD-5117 | Syntax | Invalid data type |
+| CPD-5118 | Syntax | Missing matrix index |
+| CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5120 | Syntax | More than one delimiter in a plot command |
+| CPD-5201 | Blocks | Condition cannot be empty |
+| CPD-5202 | Blocks | Duplicate #else |
+| CPD-5203 | Blocks | #else if after #else |
+| CPD-5301 | Names | Cannot evaluate as a function |
+| CPD-5302 | Names | Cannot evaluate as a function or operator |
+| CPD-5303 | Names | Cannot redefine existing units |
+| CPD-5304 | Names | Right side must be constant |
+| CPD-5305 | Names | Recursion not allowed in function definition |
+| CPD-5306 | Names | Circular function reference |
+| CPD-5401 | Values | Power must be unitless |
+| CPD-5402 | Values | Right side does not evaluate to units |
+| CPD-5403 | Values | Inconsistent units |
+| CPD-5404 | Values | Invalid units for function |
+| CPD-5405 | Values | Root index must be unitless |
+| CPD-5406 | Values | Root index cannot be complex |
+| CPD-5407 | Values | Root index must be an integer greater than 1 |
+| CPD-5408 | Values | Factorial argument out of range |
+| CPD-5409 | Values | Factorial argument must be unitless |
+| CPD-5410 | Values | Factorial argument must be a positive integer |
+| CPD-5411 | Values | Factorial argument cannot be complex |
+| CPD-5412 | Values | Remainder denominator must be unitless |
+| CPD-5413 | Values | Both values must be integers |
+| CPD-5414 | Values | Calculated units inconsistent with target units |
+| CPD-5415 | Values | Inconsistent units for assigned value |
+| CPD-5416 | Values | Inconsistent units for assigned value |
+| CPD-5417 | Values | Result is not a real number |
+| CPD-5418 | Values | Argument out of range |
+| CPD-5419 | Values | Condition cannot be complex |
+| CPD-5420 | Values | Condition result is invalid |
+| CPD-5421 | Values | Plot limits are identical |
+| CPD-5422 | Values | Inconsistent units in operation |
+| CPD-5423 | Values | Units raised to a complex power |
+| CPD-5424 | Values | Cannot evaluate remainder |
+| CPD-5501 | Vectors and matrices | Index out of range |
+| CPD-5502 | Vectors and matrices | Cannot assign vector to scalar |
+| CPD-5503 | Vectors and matrices | Value must be scalar |
+| CPD-5504 | Vectors and matrices | Value must be real |
+| CPD-5505 | Vectors and matrices | Value must be a positive integer |
+| CPD-5506 | Vectors and matrices | Value must be a matrix |
+| CPD-5507 | Vectors and matrices | Value must be a vector |
+| CPD-5508 | Vectors and matrices | Step cannot be zero |
+| CPD-5509 | Vectors and matrices | Vector size limit exceeded |
+| CPD-5510 | Vectors and matrices | Cross product needs 2 or 3 element vectors |
+| CPD-5511 | Vectors and matrices | Function not defined in complex mode |
+| CPD-5512 | Vectors and matrices | Matrix dimensions do not match |
+| CPD-5513 | Vectors and matrices | Matrix must be square |
+| CPD-5514 | Vectors and matrices | Lp norm needs p >= 1 |
+| CPD-5515 | Vectors and matrices | Matrix must be symmetric |
+| CPD-5516 | Vectors and matrices | Matrix is not positive definite |
+| CPD-5517 | Vectors and matrices | Matrix is singular |
+| CPD-5518 | Vectors and matrices | Matrix is singular or close to singular |
+| CPD-5519 | Vectors and matrices | Vectors and matrices not supported in complex mode |
+| CPD-5520 | Vectors and matrices | Cannot interpolate with a non-scalar value |
+| CPD-5521 | Vectors and matrices | Jacobi iteration failed |
+| CPD-5522 | Vectors and matrices | Invalid operand |
+| CPD-5523 | Vectors and matrices | Invalid argument |
+| CPD-5524 | Vectors and matrices | Argument is not an eigenvalue |
+| CPD-5525 | Vectors and matrices | QL algorithm failed to converge |
+| CPD-5526 | Vectors and matrices | Matrix size limit exceeded |
+| CPD-5527 | Vectors and matrices | Embedded data size limit exceeded |
+| CPD-5528 | Vectors and matrices | Datagrid size limit exceeded |
+| CPD-5529 | Vectors and matrices | Matrix needs at least as many rows as columns |
+| CPD-5530 | Vectors and matrices | Variable is not a matrix |
+| CPD-5531 | Vectors and matrices | Value must be a high-performance matrix |
+| CPD-5532 | Vectors and matrices | Value must be a high-performance vector |
+| CPD-5533 | Vectors and matrices | FFT input needs one or two rows |
+| CPD-5534 | Vectors and matrices | Matrix is ill-conditioned |
+| CPD-5535 | Vectors and matrices | PCG solver failed to converge |
+| CPD-5536 | Vectors and matrices | SVD failed to converge |
+| CPD-5537 | Vectors and matrices | Complex value outside of complex mode |
+| CPD-5601 | Solvers | Cannot evaluate the function for the solver variable |
+| CPD-5602 | Solvers | Function not defined for the solver variable |
+| CPD-5603 | Solvers | Solver limits out of range |
+| CPD-5604 | Solvers | No solution |
+| CPD-5701 | Files | Cannot write PNG file |
+| CPD-5702 | Files | Cannot write SVG file |
+| CPD-5703 | Files | Cannot convert PNG to Base64 |
+| CPD-5704 | Files | File not found |
+| CPD-5705 | Files | Path not found |
+| CPD-5706 | Files | File format not supported |
+| CPD-5707 | Files | Cannot read or write data file |
+| CPD-5900 | Run limits | Unexpected error |
+| CPD-5901 | Run limits | Interrupted by user |
+| CPD-5902 | Run limits | Calculations not active |
+| CPD-5903 | Run limits | Possibly infinite loop |
+| CPD-5904 | Run limits | Too many errors |
+| CPD-5905 | Run limits | Iteration limit exceeded |
+| CPD-5906 | Run limits | Output too long |
 
 **Example Request:**
 ```json

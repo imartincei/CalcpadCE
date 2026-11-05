@@ -307,6 +307,8 @@ export interface CalcpadError {
     outputLine: number;
     message: string;
     source: CalcpadErrorSource;
+    /** CPD-xxxx code, shared with the linter where both report the same problem. */
+    code?: string;
 }
 
 export interface ConvertResult {

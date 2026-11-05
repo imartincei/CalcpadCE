@@ -223,7 +223,7 @@ namespace Calcpad.Core
                         break;
                     }
                     if (iter == MaxIterations)
-                        throw new MathParserException($"no convergence in {MaxIterations} SVD iterations.");
+                        throw new MathParserException($"no convergence in {MaxIterations} SVD iterations.", "CPD-5536");
 
                     var x = sig[l];
                     nm = k - 1;

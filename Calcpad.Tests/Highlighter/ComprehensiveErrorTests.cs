@@ -49,18 +49,10 @@ namespace Calcpad.Tests.Highlighter
                 { "balance_errors.cpd", "CPD-3106" },
 
                 // Include errors (CPD-11xx)
-                { "include_errors.cpd", "CPD-1102" },
                 { "include_errors.cpd", "CPD-1103" }, // Warning: deprecated #include input values
 
                 // Macro errors (CPD-22xx)
-                { "macro_errors.cpd", "CPD-2201" },
-                { "macro_errors.cpd", "CPD-2202" },
-                { "macro_errors.cpd", "CPD-2206" },
-                { "macro_errors.cpd", "CPD-2207" },
                 { "macro_errors.cpd", "CPD-2209" },
-                { "macro_errors.cpd", "CPD-2210" },
-                { "macro_errors.cpd", "CPD-2212" },
-                { "macro_errors.cpd", "CPD-2213" },
                 { "macro_errors.cpd", "CPD-3314" },
 
                 // Naming errors (CPD-32xx)
@@ -96,6 +88,23 @@ namespace Calcpad.Tests.Highlighter
                 { "ui_errors.cpd", "CPD-3415" },
             };
             return data;
+        }
+
+        // Reported by Core's MacroParser, so the linter doesn't repeat them
+        [Theory]
+        [InlineData("include_errors.cpd", "CPD-1102")]
+        [InlineData("macro_errors.cpd", "CPD-2201")]
+        [InlineData("macro_errors.cpd", "CPD-2202")]
+        [InlineData("macro_errors.cpd", "CPD-2204")]
+        [InlineData("macro_errors.cpd", "CPD-2206")]
+        [InlineData("macro_errors.cpd", "CPD-2207")]
+        [InlineData("macro_errors.cpd", "CPD-2212")]
+        [InlineData("macro_errors.cpd", "CPD-2213")]
+        public void ErrorExample_ProducesExpectedMacroParserCode(string filename, string expectedCode)
+        {
+            var parser = new MacroParser();
+            parser.Parse(File.ReadAllText(Path.Combine(_fixture.ErrorsDir, filename)), out _, null, 0, true);
+            Assert.Contains(expectedCode, parser.Errors.Select(e => e.Code));
         }
 
         [Theory]

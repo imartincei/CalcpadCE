@@ -779,16 +779,17 @@ export class TauriMessageBridge extends BaseMessageBridge {
         const names = new Set<string>();
         for (const m of input.matchAll(/%([^%]+)%/g)) names.add(m[1]);
         for (const m of input.matchAll(/\$([A-Za-z_][A-Za-z0-9_]*)/g)) names.add(m[1]);
-        const values: Record<string, string> = {};
+        const values: Record<string, string | null> = {};
         for (const name of names) {
             try {
-                values[name] = (await invoke<string | null>('get_env', { name })) ?? '';
+                values[name] = await invoke<string | null>('get_env', { name });
             } catch {
-                values[name] = '';
+                values[name] = null;
             }
         }
+        // Unresolved %VAR% stays literal, matching .NET's ExpandEnvironmentVariables.
         return input
-            .replace(/%([^%]+)%/g, (_, n) => values[n] ?? '')
+            .replace(/%([^%]+)%/g, (match, n) => values[n] ?? match)
             .replace(/\$([A-Za-z_][A-Za-z0-9_]*)/g, (_, n) => values[n] ?? '');
     }
 

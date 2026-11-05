@@ -171,11 +171,6 @@
         @update-write-mode="handleUpdateWriteMode"
         @write-files-now="handleWriteFilesNow"
       />
-      <CalcpadErrorsTab
-        v-else-if="pane.activeTab === 'errors'"
-        :errors="convertErrors"
-        @go-to-line="handleGoToLine"
-      />
       <CalcpadMetadataTab
         v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
@@ -215,7 +210,6 @@ import CalcpadVariablesTab from './CalcpadVariablesTab.vue'
 import CalcpadFormattingTab from './CalcpadFormattingTab.vue'
 import CalcpadExportTab from './CalcpadExportTab.vue'
 import CalcpadFilesTab from './CalcpadFilesTab.vue'
-import CalcpadErrorsTab from './CalcpadErrorsTab.vue'
 import CalcpadMetadataTab from './CalcpadMetadataTab.vue'
 import { postMessage } from '../services/messaging'
 import type { FileInfo } from '../../services/file-info'
@@ -225,7 +219,7 @@ import type { UiDirectiveData } from '../../text/ui-directive'
 import type { UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
-import type { CalcpadError, ExportVariant } from '../../types/api'
+import type { ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
 import { coerceWriteMode, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
@@ -318,8 +312,7 @@ const tabs = computed<Tab[]>(() => {
     { id: 'toc', label: t('TOC') },
     { id: 'settings', label: t('Settings') },
     { id: 'variables', label: t('Variables') },
-    { id: 'export', label: t('Export') },
-    { id: 'errors', label: t('Errors') }
+    { id: 'export', label: t('Export') }
   ]
   if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: t('Files') })
   // The metadata comment editor is driven by editor cursor tracking, available
@@ -352,15 +345,13 @@ panes.value[0].activeTab = storedStartTab()
  * Settings and Properties' File Info still work, since a filled-in worksheet is still
  * navigated, exported and reviewed.
  */
-const SOURCE_TABS = ['insert', 'variables', 'errors']
+const SOURCE_TABS = ['insert', 'variables']
 const INPUT_MODE_NOTE = 'Unavailable in input mode — this acts on the document source, which the input form does not edit.'
 const inputMode = ref(false)
 const tabUnavailable = (tabId: string) => inputMode.value && SOURCE_TABS.includes(tabId)
 // A compiled worksheet has no source at all, so the Export tab drops the exports
 // and re-packaging options that would need it.
 const activeIsCompiled = ref(false)
-
-const convertErrors = ref<CalcpadError[]>([])
 
 interface PlotSummary { index: number; ext: 'png' | 'svg'; dataUri: string; sizeBytes: number }
 const plots = ref<PlotSummary[]>([])
@@ -879,9 +870,6 @@ const handleMessage = (event: MessageEvent) => {
     case 'updateHeadings':
       tocHeadings.value = message.headings || []
       tocLoading.value = false
-      break
-    case 'updateConvertErrors':
-      convertErrors.value = message.errors || []
       break
     case 'pdfSettingsResponse':
       pdfSettings.value = message.settings

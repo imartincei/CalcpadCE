@@ -104,7 +104,8 @@ CalcpadCE errors surface in VS Code's **Problems** panel (**Ctrl+Shift+M**) as s
 Click one to jump to the offending line.
 Control how much is shown with the linter minimum-severity setting.
 
-For errors that occur inside hidden (`#hide`) regions — which don't appear in the preview — use the **Errors** tab in the sidebar to see the full list with source-line links.
+When the preview runs, its calculation errors are added to the Problems panel.
+Each entry starts with `[Linter]` or `[Runtime]` to show where it came from.
 
 See **[The CalcpadCE Editor → Linting](new-calcpadce-editor.md#linting)** and **[Linter and Diagnostics](new-linter.md)**.
 

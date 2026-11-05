@@ -150,17 +150,6 @@ namespace Calcpad.Highlighter.Linter
                 });
             }
 
-            // Convert duplicate macros
-            foreach (var dup in stage2Result.DuplicateMacros)
-            {
-                context.DuplicateMacros.Add(new DuplicateMacroInfo
-                {
-                    Name = dup.Name,
-                    OriginalLineNumber = dup.OriginalLineNumber,
-                    DuplicateLineNumber = dup.DuplicateLineNumber
-                });
-            }
-
             return context;
         }
 

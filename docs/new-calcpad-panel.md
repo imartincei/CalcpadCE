@@ -21,9 +21,8 @@ The **CalcpadCE** view is organized into tabs:
 | **Variables** | Everything defined in the document — macros, variables, functions, and custom units — with types and signatures. Click an entry to insert it; each is searchable. |
 | **Properties** | Form-based editor for the [metadata comment](new-metadata-comments.md) at the cursor — descriptions, parameter/return types, per-file settings, lint-ignore, and per-document PDF export settings. Also allows editing #UI JSON, #settings JSON, and the UI Overrides line. |
 | **Export** | PDF / HTML / Word save actions, grouped by which rendering they capture, plus per-plot and ZIP image exports and the portable formats. See  [Exports Documentation](new-exports.md). |
-| **Errors** | Full list of calculation errors from the engine, each linking to its source line. |
 
-While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, **Errors**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
+While a [`#UI` input form](new-ui-mode.md) (or a compiled `.cpdz` worksheet) is the active document, **Insert**, **Variables**, and **Properties** go inactive — they act on the document source, which the form doesn't edit.
 **TOC**, **Settings**, and **Export** stay available.
 **Prettify Document** is disabled in input mode.
 
@@ -82,11 +81,6 @@ Allows saving results from the CalcpadCE file into various formats. The tab is f
 | **Portable Exports** | **Save Compiled…** (a `.cpdz` compiled worksheet) and **Export Portable…** (a `.zip` bundled with everything it reads) |
 
 See [Exports](new-exports.md) for what each rendering captures, which formats it offers, how PDF page setup is resolved, and what the two portable formats produce.
-
-### Errors
-
-Lists every error the calculation engine reports, each with its source line and a link that jumps there.  
-This is the reliable place to see errors that occur inside `#hide` blocks, which are omitted from the rendered preview.
 
 ## Settings
 

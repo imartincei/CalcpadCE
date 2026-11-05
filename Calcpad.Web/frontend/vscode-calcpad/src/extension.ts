@@ -4,6 +4,7 @@ import * as os from 'os';
 import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
 import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
+import { CalcpadRunDiagnostics } from './calcpadRunDiagnostics';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
 import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
 import { CalcpadSettingsManager } from './calcpadSettings';
@@ -314,6 +315,7 @@ async function refreshPreviewPanels(document: vscode.TextDocument): Promise<void
     if (uiReportPanel) await updatePreviewContent(uiReportPanel, text, document.uri, false, undefined, false, true);
 }
 let linter: CalcpadServerLinter;
+let runDiagnostics: CalcpadRunDiagnostics | undefined;
 let definitionsService: CalcpadDefinitionsService;
 let serverManager: CalcpadServerManager | undefined;
 let outputChannel: VSCodeLogger;
@@ -1062,7 +1064,8 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         }
         outputChannel.appendLine('API call successful', 'verbose');
 
-        vueUiProvider?.updateConvertErrors(parseConvertErrorHeader(response));
+        // A PDF view renders without line anchors, so Core records no errors.
+        if (!pdfView) runDiagnostics?.update(sourceFileUri, parseConvertErrorHeader(response));
         if (enableUi) {
             uiPause.update(docKey, parseConvertPauseHeader(response));
             syncUiFormContext();
@@ -1458,7 +1461,7 @@ async function writeDataFiles() {
             ? 'Ran the document; #write and #append are up to date.'
             : `Ran with ${errors.length} error${errors.length === 1 ? '' : 's'} — some output may be missing.`;
         vueUiProvider?.writeFilesResult(ok, message);
-        vueUiProvider?.updateConvertErrors(errors);
+        runDiagnostics?.update(source.uri, errors);
         if (ok)
             vscode.window.showInformationMessage(message);
         else
@@ -2109,6 +2112,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
         outputChannel.appendLine('Initializing linter...', 'verbose');
         linter = new CalcpadServerLinter(apiClient, serverDebugChannel);
+        runDiagnostics = new CalcpadRunDiagnostics();
 
         outputChannel.appendLine('Initializing definitions service...', 'verbose');
         definitionsService = new CalcpadDefinitionsService(apiClient, serverDebugChannel);
@@ -2754,6 +2758,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const onDidCloseTextDocument = vscode.workspace.onDidCloseTextDocument(document => {
         vueUiProvider?.discardMetadataDraft(document.uri.toString());
         uiHistory.clear(document.uri.toString());
+        runDiagnostics?.delete(document.uri);
     });
 
     const onWillSaveTextDocument = vscode.workspace.onWillSaveTextDocument(event => {
@@ -2905,6 +2910,7 @@ export async function activate(context: vscode.ExtensionContext) {
             vueUiProviderDisposable,
             vueUiProvider,
             linter,
+            runDiagnostics,
             semanticTokensDisposable,
             outputChannel,
             serverDebugChannel,
