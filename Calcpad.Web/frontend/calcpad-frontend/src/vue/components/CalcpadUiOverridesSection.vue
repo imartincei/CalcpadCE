@@ -189,7 +189,7 @@ let flashTimer: ReturnType<typeof setTimeout> | null = null
 
 function scrollToFlashed() {
   if (!pendingScroll) return
-  const el = [...root.value?.querySelectorAll<HTMLElement>('.list-row') ?? []]
+  const el = Array.from(root.value?.querySelectorAll<HTMLElement>('.list-row') ?? [])
     .find(r => flashKeys.value.has(r.dataset.key ?? '') && r.offsetParent !== null)
   if (!el) return
   pendingScroll = false
