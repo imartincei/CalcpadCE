@@ -352,6 +352,14 @@ If a document's values do end up scrambled, the metadata comment is plain text: 
 Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.
 
 The [Properties tab](new-calcpad-panel.md#properties) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
+Click **Selected lines only** to list just the values for the lines under the cursor or selection.
+An `#include` line, macro call, or loop lists the overrides for every UI element it produces.
+
+### Seeing saved values in the editor
+
+Turn on **Show UI Override Hints** in [Settings](new-settings.md#editor-features) to show saved values above the lines they apply to.
+This is the value itself on a `#UI` line with one control, or the count for a loop, macro call or `#include` line.
+Click a hint to open those values in the Properties tab.
 
 ## Exporting
 
