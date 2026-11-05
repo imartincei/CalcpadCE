@@ -92,6 +92,11 @@ export class UiOverrideStore {
         return true;
     }
 
+    /** Drops an entered value, so the control falls back to the document's own. */
+    public unset(docKey: string, key: string): boolean {
+        return !!this.byDocument.get(docKey)?.delete(key);
+    }
+
     public get(docKey: string, key: string): string | undefined {
         return this.byDocument.get(docKey)?.get(key);
     }

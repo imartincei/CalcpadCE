@@ -268,6 +268,8 @@ const zh: Record<string, string> = {
     "Close Others": "关闭其他",
     "Copy Full Path": "复制完整路径",
     "Copy Relative Path": "复制相对路径",
+    "Undo (Ctrl+Z)": "撤销（Ctrl+Z）",
+    "Redo (Ctrl+Y)": "重做（Ctrl+Y）",
     "Cut (Ctrl+X)": "剪切（Ctrl+X）",
     "Copy (Ctrl+C)": "复制（Ctrl+C）",
     "Paste (Ctrl+V)": "粘贴（Ctrl+V）",

@@ -12,6 +12,7 @@ import {
     scrollAnchorScript,
     BACK_BUFFER_CLEAR_CHARS,
     type PreviewScrollState,
+    type UiHistoryState,
 } from 'calcpad-frontend';
 
 /**
@@ -211,6 +212,8 @@ const RELAYED = [
     'navigateToLine',
     'consoleMessage',
     'uiValueChange',
+    'uiUndo',
+    'uiRedo',
     'openExternal',
     'previewCopy',
     'cpdScrollState',
@@ -423,7 +426,7 @@ function buildPreviewShell(options: ShellOptions): string {
             function fromHost(d) {
                 if (d.type === 'cpdRender') render(String(d.html || ''), d.background);
                 else if (d.type === 'cpdLoading') loading.hidden = !d.on;
-                else if (d.type === 'scrollToSourceLine') toFrame(d);
+                else if (d.type === 'scrollToSourceLine' || d.type === 'cpdUiHistory') toFrame(d);
             }
 
             // VS Code only watches this document for its context contributions.
@@ -487,6 +490,8 @@ export interface AgentOptions {
     scroll?: PreviewScrollState;
     /** The `#UI` script's focus/caret state, which only survives via the host. */
     uiPosition?: unknown;
+    /** What the form's undo/redo can do, for its datagrid menu. */
+    uiHistory?: UiHistoryState;
     /** Console relay cap. Must match what the console patch in the same document passes. */
     maxConsoleMessages?: number;
 }
@@ -497,11 +502,11 @@ export interface AgentOptions {
  * and comes back as a DOM anchor; links are intercepted here for the same reason.
  */
 export function getFrameAgentScript(options: AgentOptions = {}): string {
-    const { scroll, uiPosition, maxConsoleMessages } = options;
+    const { scroll, uiPosition, uiHistory, maxConsoleMessages } = options;
     // Carries a control key taken from the document, so close any tag it could open.
-    const seedUi = uiPosition !== undefined
+    const seedUi = (uiPosition !== undefined
         ? `window.__calcpadUiPosition = ${JSON.stringify(uiPosition).replace(/</g, '\\u003c')};`
-        : '';
+        : '') + (uiHistory ? `window.__calcpadUiHistory = ${JSON.stringify(uiHistory)};` : '');
 
     return `
         <style>

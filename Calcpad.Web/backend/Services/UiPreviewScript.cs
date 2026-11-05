@@ -54,6 +54,8 @@ namespace Calcpad.Server.Services
     // Consumed once: a stale position must not steal focus when a document is merely opened.
     var pending = window.__calcpadUiPosition || null;
     window.__calcpadUiPosition = null;
+    // Seeded by the host so the datagrid menu can grey out; enabled when it is not.
+    var historyState = window.__calcpadUiHistory || { undo: true, redo: true };
 
     function saveState() {
         var state = {};
@@ -120,6 +122,53 @@ namespace Calcpad.Server.Services
     document.addEventListener('focusin', trackPosition);
     document.addEventListener('mouseup', trackPosition);
 
+    // The host holds the form's undo history. Uncommitted typing keeps the browser's own undo,
+    // and stopping propagation keeps jspreadsheet's history out of it.
+    window.addEventListener('keydown', function (e) {
+        var op = historyOp(e);
+        if (!op) return;
+        e.stopImmediatePropagation();
+        if (typingUncommitted()) return;
+        e.preventDefault();
+        requestHistory(op);
+    }, true);
+
+    // The host's own context menu asks through here, so pending grid edits are flushed first.
+    window.addEventListener('message', function (e) {
+        var d = e.data;
+        if (e.source !== window.parent || !d || d.type !== 'cpdUiHistory') return;
+        if (d.op === 'uiUndo' || d.op === 'uiRedo') requestHistory(d.op);
+    });
+
+    function requestHistory(op) {
+        for (var key in sheetsByKey) sheetsByKey[key].calcpadFlush();
+        saveState();
+        send({ type: op, groupId: window.__calcpadGroupId });
+    }
+
+    function gridMenu(worksheet, x, y, e, items) {
+        var own = [
+            { title: 'Undo', shortcut: 'Ctrl + Z', disabled: !historyState.undo, onclick: function () { requestHistory('uiUndo'); } },
+            { title: 'Redo', shortcut: 'Ctrl + Y', disabled: !historyState.redo, onclick: function () { requestHistory('uiRedo'); } }
+        ];
+        return items && items.length ? own.concat([{ type: 'line' }], items) : own;
+    }
+
+    function historyOp(e) {
+        if (!(e.ctrlKey || e.metaKey) || e.altKey) return null;
+        var k = (e.key || '').toLowerCase();
+        if (k === 'z') return e.shiftKey ? 'uiRedo' : 'uiUndo';
+        return k === 'y' && !e.shiftKey ? 'uiRedo' : null;
+    }
+
+    function typingUncommitted() {
+        var el = document.activeElement;
+        if (el && el.classList && el.classList.contains('calcpad-ui-input'))
+            return el.value !== el.calcpadCommitted;
+        var sheet = typeof jspreadsheet !== 'undefined' ? jspreadsheet.current : null;
+        return !!(sheet && sheet.edition);
+    }
+
     // The entered text replaces the right hand side, so anything the parser would reject turns
     // the line into an error - no exponent form, since MathParser reads the 'e' of 2.5e6 as a
     // unit. PARTIAL also passes the mid-typing states, which are never posted.
@@ -150,6 +199,7 @@ namespace Calcpad.Server.Services
         if (mode === 'number') input.setAttribute('inputmode', 'decimal');
         var typed = input.value;
         var committed = input.value;
+        input.calcpadCommitted = committed;
         // Only the number-only mode can tell a mid-typing state from a wrong one.
         if (mode === 'number')
             input.addEventListener('input', function () {
@@ -172,6 +222,7 @@ namespace Calcpad.Server.Services
             }
             input.value = value;
             committed = value;
+            input.calcpadCommitted = value;
             typed = value;
             change(input, value);
         });
@@ -275,11 +326,13 @@ namespace Calcpad.Server.Services
                 onchange: emit,
                 onpaste: emit,
                 onselection: trackPosition,
-                onblur: flushNow
+                onblur: flushNow,
+                contextMenu: gridMenu
             });
             var sheet = Array.isArray(created) ? created[0] : created;
             var key = container.getAttribute('data-ui-var');
             sheet.calcpadUiKey = key;
+            sheet.calcpadFlush = flushNow;
             sheetsByKey[key] = sheet;
             // Must stay synchronous: restoreState() paints the selection from live geometry.
             applyRowHeaderWidth(container, layout.rowHeader);
