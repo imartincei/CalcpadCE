@@ -26,6 +26,7 @@ namespace Calcpad.Core
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
         private readonly Stack<MathParser.VariableSubstitutionOptions> _substitutionStack = new();
+        private readonly Stack<SettingsDto> _settingsStack = new();
         private bool _isMarkdownOn;
         private MathParser _parser;
         private readonly StringBuilder _sb = new(10000);
@@ -531,6 +532,7 @@ namespace Calcpad.Core
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
+            _settingsStack.Clear();
             _isMarkdownOn = false;
             _parseMode = ParseMode.Cpd;
             _modeSuppressed = false;
