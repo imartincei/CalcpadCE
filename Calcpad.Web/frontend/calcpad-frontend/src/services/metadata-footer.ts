@@ -15,7 +15,7 @@ export const UI_OVERRIDES_KEY = 'uiOverrides';
 export const METADATA_ANCHOR = "'<!--CalcpadCE Metadata-->";
 
 /** Placeholder over the hidden footer where an editor can't remove the lines. */
-export const METADATA_HIDDEN_TEXT = '⋯ file metadata hidden (see Properties tab)';
+export const METADATA_HIDDEN_TEXT = '⋯ file metadata hidden (to show: Settings tab → Editor → Show File Metadata)';
 
 /** Replace lines `line..endLine` with {@link lines}, or insert them above `line` when `isNew`. */
 export interface LineEdit {
