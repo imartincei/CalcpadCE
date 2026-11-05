@@ -46,6 +46,8 @@
             :has-document="hasDocument"
             :doc-key="docKey"
             :ui-controls="uiControls"
+            :selection="selection"
+            :reveal="uiOverridesReveal"
             :visible="bodyVisible('uiOverrides')"
             :query="query"
             :filter="uiOverridesFilter"
@@ -403,7 +405,7 @@ import { FILE_INFO_KEY, UI_OVERRIDES_KEY } from '../../services/metadata-footer'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import { getMetadataDraft, setMetadataDraft, clearMetadataDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { MetadataDraft } from '../metadata-drafts'
-import type { UiControl, UiOverrides } from '../../services/ui-overrides'
+import type { LineRange, UiControl, UiOverrides } from '../../services/ui-overrides'
 import type { FileInfo } from '../../services/file-info'
 import CollapseAllButton from './CollapseAllButton.vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
@@ -417,6 +419,10 @@ interface Props {
   block?: MetadataCommentBlock | null
   /** Controls of the last input-form render, or null until the host resolves them. */
   uiControls?: UiControl[] | null
+  /** Editor lines the cursor or selection covers. */
+  selection?: LineRange | null
+  /** Saved values an editor hint asked to show. */
+  uiOverridesReveal?: { keys: string[]; seq: number } | null
   fileInfo?: FileInfo | null
   savedUiOverrides?: UiOverrides
   hasDocument?: boolean
@@ -430,6 +436,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   block: null,
   uiControls: null,
+  selection: null,
+  uiOverridesReveal: null,
   fileInfo: null,
   savedUiOverrides: () => ({}),
   hasDocument: false,
@@ -580,6 +588,12 @@ function reveal(target: RevealTarget) {
     ?.querySelector(`[data-anchor="${target.anchor}"]`)
     ?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
 }
+
+watch(() => props.uiOverridesReveal?.seq, seq => {
+  if (seq === undefined) return
+  searchQuery.value = ''
+  reveal({ section: 'uiOverrides', anchor: 'uiOverrides' })
+}, { immediate: true })
 
 /** The block the form is editing - not the one under the cursor while edits are held. */
 const boundBlock = ref<MetadataCommentBlock | null>(null)

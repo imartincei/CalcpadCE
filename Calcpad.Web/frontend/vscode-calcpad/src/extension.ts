@@ -29,6 +29,7 @@ import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
 import { MetadataFooterView } from './metadataFooterView';
+import { UiOverrideHintsProvider, REVEAL_UI_OVERRIDES_COMMAND } from './uiOverrideHints';
 import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml, copyPreviewSelection } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
@@ -53,6 +54,7 @@ const uiHistory = new UiEditHistory();
 const uiPause = new UiPauseStore();
 // Controls each document's last input-form render produced, keyed like the store above.
 const uiControls = new Map<string, UiControl[]>();
+let uiOverrideHints: UiOverrideHintsProvider | undefined;
 // Document the input form is currently showing, so its values can be prompted
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
@@ -385,15 +387,16 @@ const PREVIEW_BUSY_DELAY_MS = 400;
  */
 function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     let block = null;
-    if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
-        const lines = editor.document.getText().split(/\r?\n/);
-        const line = editor.selection.active.line;
-        const docKey = editor.document.uri.toString();
+    const calcpadEditor = editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext') ? editor : undefined;
+    if (calcpadEditor) {
+        const lines = calcpadEditor.document.getText().split(/\r?\n/);
+        const line = calcpadEditor.selection.active.line;
+        const docKey = calcpadEditor.document.uri.toString();
         block = computeMetadataBlock(lines, line, buildSourceDefinitionResolver(lines));
         if (block) block.docKey = docKey;
     }
     vscode.commands.executeCommand('setContext', 'calcpad.inMetadataComment', block !== null && !block.isNew);
-    vueUiProvider?.updateMetadataContext(block);
+    vueUiProvider?.updateMetadataContext(block, calcpadEditor);
     // Sent with the block so the panel's saved-values list follows the document the
     // cursor is actually in, rather than keeping the last one it asked about.
     vueUiProvider?.updateUiControls(editor ? uiControls.get(editor.document.uri.toString()) ?? null : null);
@@ -1101,6 +1104,7 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // whether a saved #UI value still applies to anything.
         if (enableUi) {
             uiControls.set(docKey, extractUiControls(apiResponse));
+            uiOverrideHints?.tracker.setControls(docKey, uiControls.get(docKey)!);
             vueUiProvider?.updateUiControls(uiControls.get(docKey) ?? null);
         }
 
@@ -2350,6 +2354,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
             const controls = extractUiControls(html);
             uiControls.set(editor.document.uri.toString(), controls);
+            uiOverrideHints?.tracker.setControls(editor.document.uri.toString(), controls);
             return controls;
         } catch (e) {
             outputChannel.appendLine('[UI controls] Render failed: ' + e, 'warning');
@@ -2376,6 +2381,29 @@ export async function activate(context: vscode.ExtensionContext) {
     const metadataFooterView = new MetadataFooterView(() => CalcpadSettingsManager.getInstance().getExtraBool('showFileMetadata', false));
     vueUiProvider.onShowFileMetadataChanged = () => metadataFooterView.refresh();
     context.subscriptions.push(metadataFooterView);
+
+    uiOverrideHints = new UiOverrideHintsProvider(
+        () => CalcpadSettingsManager.getInstance().getExtraBool('uiOverrideHints', false),
+        async (document) => {
+            try {
+                const { html } = await renderForExport(document.getText(), document.uri, 'input');
+                return extractUiControls(html);
+            } catch (e) {
+                outputChannel.appendLine('[UI override hints] Render failed: ' + e, 'warning');
+                return null;
+            }
+        });
+    vueUiProvider.onUiOverrideHintsChanged = () => uiOverrideHints?.refresh();
+    context.subscriptions.push(uiOverrideHints, vscode.commands.registerCommand(REVEAL_UI_OVERRIDES_COMMAND,
+        async (uri: vscode.Uri, line: number, keys: string[]) => {
+            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri.toString());
+            if (editor) {
+                const pos = new vscode.Position(line - 1, 0);
+                editor.selection = new vscode.Selection(pos, pos);
+            }
+            await vscode.commands.executeCommand('calcpadVueUI.focus');
+            vueUiProvider?.revealUiOverrides(keys);
+        }));
     const vueUiProviderDisposable = vscode.window.registerWebviewViewProvider(
         CalcpadVueUIProvider.viewType,
         vueUiProvider

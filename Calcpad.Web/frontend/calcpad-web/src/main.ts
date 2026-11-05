@@ -20,6 +20,8 @@ import {
     UiEditHistory,
     writeUiOverrides,
     extractUiControls,
+    readUiOverrides,
+    UiOverrideHintTracker,
     isCompiledPath,
     documentHasUiDirectives,
     DEFAULT_PREVIEW_SIZE_MB,
@@ -69,6 +71,7 @@ import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
 import { MetadataFooterView } from './editor/metadata-footer-view';
+import { registerUiOverrideHints } from './editor/ui-override-hints';
 
 // Monaco worker setup — must run before editor creation
 import './editor/workers';
@@ -522,6 +525,23 @@ async function bootstrap(): Promise<void> {
     // Properties tab whether a saved value still applies to anything.
     const uiControls = new Map<string, UiControl[]>();
 
+    const uiOverrideHintsEnabled = () => editorBridge.getExtraSetting('uiOverrideHints') === 'true';
+    let uiOverrideHints: ReturnType<typeof registerUiOverrideHints> | null = null;
+    // Controls for the editor's override hints, which outlive edits where the cache above does not.
+    const uiHintControls = new UiOverrideHintTracker({
+        resolve: async (docKey) => {
+            if (!uiOverrideHintsEnabled() || docKey !== activeUiDocKey()) return null;
+            if (!readUiOverrides(activeGroup.editor.getValue())) return null;
+            return activeBridge.resolveUiControls();
+        },
+        changed: () => uiOverrideHints?.refresh(),
+    });
+
+    function recordUiControls(docKey: string, controls: UiControl[]): void {
+        uiControls.set(docKey, controls);
+        uiHintControls.setControls(docKey, controls);
+    }
+
     /** Caps what a preview render will inline, and says so rather than dropping images silently. */
     function previewImageBudget(group: EditorGroup): InlineImageBudget {
         return {
@@ -674,7 +694,7 @@ async function bootstrap(): Promise<void> {
         return uiOverrides.toRecord(activeUiDocKey());
     });
     activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
-    activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    activeBridge.setUiControlsSink((controls) => recordUiControls(activeUiDocKey(), controls));
     activeBridge.setMetadataDirtySink((docKey, dirty, form) => {
         const forms = metadataDirty.get(docKey) ?? new Set<DraftForm>();
         if (dirty) forms.add(form);
@@ -880,7 +900,7 @@ async function bootstrap(): Promise<void> {
             }
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group), frameHtml);
             if (mode === 'ui') {
-                uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
+                recordUiControls(uiDocKeyFor(group), extractUiControls(result.html));
                 uiPause.update(uiDocKeyFor(group), result.pause);
                 appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
             }
@@ -1121,7 +1141,14 @@ async function bootstrap(): Promise<void> {
         let tocTimer: ReturnType<typeof setTimeout> | null = null;
         group.disposables.push(
             new MetadataFooterView(ed, () => editorBridge.getExtraSetting('showFileMetadata') === 'true'),
-            ed.onDidChangeModelContent(() => {
+            ed.onDidChangeModelContent((e) => {
+                uiHintControls.applyEdits(uiDocKeyFor(group), e.changes.map(c => ({
+                    startLine: c.range.startLineNumber,
+                    startColumn: c.range.startColumn,
+                    endLine: c.range.endLineNumber,
+                    endColumn: c.range.endColumn,
+                    text: c.text,
+                })));
                 if (definitionsTimer) clearTimeout(definitionsTimer);
                 definitionsTimer = setTimeout(() => {
                     invalidateUiControls(group);
@@ -1453,7 +1480,30 @@ async function bootstrap(): Promise<void> {
     registerRenameProvider(editorBridge, getFileContext);
     registerFormatDocumentProvider(editorBridge);
 
+    const groupForModel = (model: monaco.editor.ITextModel | string): EditorGroup | undefined => {
+        const uri = typeof model === 'string' ? model : model.uri.toString();
+        return [...groups.values()].find(g => g.editor.getModel()?.uri.toString() === uri);
+    };
+    uiOverrideHints = registerUiOverrideHints({
+        enabled: uiOverrideHintsEnabled,
+        controlsFor: (model) => {
+            const group = groupForModel(model);
+            return group ? uiHintControls.controlsFor(uiDocKeyFor(group)) : undefined;
+        },
+        requestControls: (model) => {
+            const group = groupForModel(model);
+            if (group === activeGroup) void uiHintControls.ensure(uiDocKeyFor(group));
+        },
+        reveal: (uri, line, keys) => {
+            const group = groupForModel(uri);
+            group?.editor.setPosition({ lineNumber: line, column: 1 });
+            appInstance.showSidebar();
+            window.dispatchEvent(new MessageEvent('message', { data: { type: 'revealUiOverrides', keys } }));
+        },
+    });
+
     window.addEventListener('message', (e: MessageEvent) => {
+        if (e.data?.type === 'showUiOverrideHintsChanged') uiOverrideHints?.refresh();
         if (e.data?.type === 'autoRunChanged') appInstance.setAutoRunEnabled(e.data.enabled);
         if (e.data?.type === 'settingsResponse') appInstance.setAutoRunEnabled(e.data.enableAutoRun);
         if (e.data?.type === 'linterMinSeverityChanged') {

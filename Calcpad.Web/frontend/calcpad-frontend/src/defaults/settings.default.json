@@ -47,6 +47,7 @@
         "previewUiOverrides": false,
         "previewPdf": false,
         "showFileMetadata": false,
+        "uiOverrideHints": false,
         "linterMinSeverity": "information",
         "logLevel": "warning",
         "maxOutputLines": 1000,
