@@ -85,6 +85,7 @@
         :initial-enable-preview-ui-overrides="enablePreviewUiOverrides"
         :initial-enable-preview-pdf="enablePreviewPdf"
         :initial-show-file-metadata="showFileMetadata"
+        :initial-show-ui-override-hints="showUiOverrideHints"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-log-level="logLevel"
@@ -116,6 +117,7 @@
         @update-preview-ui-overrides="handleUpdatePreviewUiOverrides"
         @update-preview-pdf="handleUpdatePreviewPdf"
         @update-show-file-metadata="handleUpdateShowFileMetadata"
+        @update-show-ui-override-hints="handleUpdateShowUiOverrideHints"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-log-level="handleUpdateLogLevel"
@@ -175,6 +177,8 @@
         v-else-if="pane.activeTab === 'metadata'"
         :block="metadataBlock"
         :ui-controls="uiControls"
+        :selection="editorSelection"
+        :ui-overrides-reveal="uiOverridesReveal"
         :file-info="fileInfo"
         :saved-ui-overrides="savedUiOverrides"
         :has-document="fileInfoHasDocument"
@@ -216,7 +220,7 @@ import type { FileInfo } from '../../services/file-info'
 import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '../../text/metadata-comment'
 import { discardMetadataDraft } from '../metadata-drafts'
 import type { UiDirectiveData } from '../../text/ui-directive'
-import type { UiControl } from '../../services/ui-overrides'
+import type { LineRange, UiControl } from '../../services/ui-overrides'
 import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { ExportVariant } from '../../types/api'
@@ -271,6 +275,7 @@ const enableAutoInputMode = ref(true)
 const enablePreviewUiOverrides = ref(false)
 const enablePreviewPdf = ref(false)
 const showFileMetadata = ref(false)
+const showUiOverrideHints = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const logLevel = ref('warning')
@@ -305,6 +310,7 @@ const fileInfoDocKey = ref('')
 const metadataBlock = ref<MetadataCommentBlock | null>(null)
 // #UI controls of the last input-form render, null until the host resolves them.
 const uiControls = ref<UiControl[] | null>(null)
+const editorSelection = ref<LineRange | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
@@ -611,6 +617,21 @@ const handleUpdateShowFileMetadata = (enabled: boolean) => {
   postMessage({ type: 'updateShowFileMetadata', enabled })
 }
 
+const handleUpdateShowUiOverrideHints = (enabled: boolean) => {
+  showUiOverrideHints.value = enabled
+  postMessage({ type: 'updateShowUiOverrideHints', enabled })
+}
+
+// A hint the editor's user clicked: the saved values it stands for, to show in Properties.
+const uiOverridesReveal = ref<{ keys: string[]; seq: number } | null>(null)
+let revealSeq = 0
+const revealUiOverrides = (keys: string[]) => {
+  uiOverridesReveal.value = { keys, seq: ++revealSeq }
+  switchTab('metadata')
+  // Consumed once the tab mounts, so a later visit to it doesn't replay the reveal.
+  void nextTick(() => { uiOverridesReveal.value = null })
+}
+
 const handleUpdateAutoRun = (enabled: boolean) => {
   enableAutoRun.value = enabled
   postMessage({ type: 'updateAutoRun', enabled })
@@ -816,6 +837,7 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enablePreviewUiOverrides === 'boolean') enablePreviewUiOverrides.value = message.enablePreviewUiOverrides
       if (typeof message.enablePreviewPdf === 'boolean') enablePreviewPdf.value = message.enablePreviewPdf
       if (typeof message.showFileMetadata === 'boolean') showFileMetadata.value = message.showFileMetadata
+      if (typeof message.showUiOverrideHints === 'boolean') showUiOverrideHints.value = message.showUiOverrideHints
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       logLevel.value = message.logLevel || 'warning'
@@ -901,6 +923,7 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'metadataContext':
       metadataBlock.value = message.block ?? null
+      editorSelection.value = message.selection ?? null
       break
     case 'metadataDraftDiscard':
       discardMetadataDraft(String(message.docKey ?? ''))
@@ -914,6 +937,9 @@ const handleMessage = (event: MessageEvent) => {
       break
     case 'focusTab':
       if (typeof message.tab === 'string') switchTab(message.tab)
+      break
+    case 'revealUiOverrides':
+      revealUiOverrides(Array.isArray(message.keys) ? message.keys.map(String) : [])
       break
     case 'focusInsertSearch':
       void focusInsertSearch()

@@ -32,7 +32,31 @@ export interface UiOverrideRow {
     value: string;
     /** Source line of the control this override applies to, null when it applies to none. */
     line: number | null;
+    /** Every source line this override applies to. */
+    lines: number[];
     used: boolean;
+}
+
+/** 1-based, inclusive range of editor lines. */
+export interface LineRange {
+    start: number;
+    end: number;
+}
+
+/**
+ * The lines a 1-based editor selection covers. A selection ending at column 1 of a later
+ * line (a whole-line selection) leaves that line out.
+ */
+export function selectionLineRange(startLine: number, endLine: number, endColumn: number): LineRange {
+    const start = Math.min(startLine, endLine);
+    let end = Math.max(startLine, endLine);
+    if (end > start && endColumn <= 1) end--;
+    return { start, end };
+}
+
+/** Whether an override applies to a control declared within {@link range}. */
+export function rowInRange(row: UiOverrideRow, range: LineRange): boolean {
+    return row.lines.some(l => l >= range.start && l <= range.end);
 }
 
 /**
@@ -167,20 +191,28 @@ export function extractUiControls(html: string): UiControl[] {
  * `ExpressionParser.ApplyUiOverride` makes: this exact control, then every pass of its
  * declaration, then every declaration of the name. An override matching none of them is what
  * "unused" means, and key order is the saved one.
+ *
+ * Lines are the engine's: a control from an `#include` or a macro carries the line of the
+ * `#include` or macro call that produced it.
  */
 export function classifyUiOverrides(overrides: UiOverrides, controls: UiControl[]): UiOverrideRow[] {
-    const byKey = new Map<string, number>();
-    const byDeclaration = new Map<string, number>();
-    const byName = new Map<string, number>();
+    const byKey = new Map<string, number[]>();
+    const byDeclaration = new Map<string, number[]>();
+    const byName = new Map<string, number[]>();
+    const add = (map: Map<string, number[]>, key: string, line: number) => {
+        const lines = map.get(key);
+        if (!lines) map.set(key, [line]);
+        else if (!lines.includes(line)) lines.push(line);
+    };
     for (const { key, line } of controls) {
         const [name, ordinal] = key.split(':');
-        if (!byKey.has(key)) byKey.set(key, line);
-        if (!byDeclaration.has(`${name}:${ordinal}`)) byDeclaration.set(`${name}:${ordinal}`, line);
-        if (!byName.has(name)) byName.set(name, line);
+        add(byKey, key, line);
+        add(byDeclaration, `${name}:${ordinal}`, line);
+        add(byName, name, line);
     }
 
     return Object.entries(overrides).map(([key, value]) => {
-        const line = byKey.get(key) ?? byDeclaration.get(key) ?? byName.get(key) ?? null;
-        return { key, value, line, used: line !== null };
+        const lines = byKey.get(key) ?? byDeclaration.get(key) ?? byName.get(key) ?? [];
+        return { key, value, line: lines[0] ?? null, lines, used: lines.length > 0 };
     });
 }

@@ -172,7 +172,8 @@ export { extractPlotsFromHtml } from './services/plot-extract';
 export type { ExtractedPlot } from './services/plot-extract';
 export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
-export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
+export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides, selectionLineRange, rowInRange } from './services/ui-overrides';
+export { computeUiOverrideHints, shiftUiControls, uiOverrideHintTitle, UiOverrideHintTracker } from './services/ui-override-hints';
 export { UiPauseStore, hasPauseSteps } from './services/ui-pause';
 export {
     FILE_INFO_KEY, FILE_INFO_FIELDS, findFileInfoBlock, readFileInfo, sanitizeFileInfoPatch,
@@ -202,7 +203,8 @@ export {
     pathResolve,
     pathExtension,
 } from './services/paths';
-export type { UiOverrides, UiValueChange, UiControl, UiOverrideRow } from './services/ui-overrides';
+export type { UiOverrides, UiValueChange, UiControl, UiOverrideRow, LineRange } from './services/ui-overrides';
+export type { UiOverrideHint, UiOverrideHintLabels, SourceEdit, UiOverrideHintTrackerOptions } from './services/ui-override-hints';
 
 // --- Message Bridge (base class) --------------------------------------------
 export { BaseMessageBridge, variantRender } from './services/message-bridge/base';
