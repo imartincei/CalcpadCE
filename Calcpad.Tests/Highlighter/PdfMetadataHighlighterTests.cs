@@ -265,9 +265,7 @@ namespace Calcpad.Tests.Highlighter
         [Fact]
         public void UiOverrides_FromInclude_ReportsNothing()
         {
-            // CalcpadService strips 'uiOverrides' out of included content unconditionally
-            // (UiOverridesIncludeTests), so a comment only reached through #include is dead
-            // weight regardless of where it sits - not a misplaced comment worth flagging.
+            // A comment only reached through #include never applies, so it isn't flagged as misplaced.
             var mainPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "main.cpd");
             var subPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "sub.cpd");
             var content = "#UI L = 4\n#include sub.cpd\n";
