@@ -15,6 +15,7 @@ namespace Calcpad.Core
         ShowHiddenOutput,
         MaxOutputCount,
         IsUs,
+        AbsoluteTemperature,
         VectorGraphics,
         ColorScale,
         SmoothScale,
@@ -42,6 +43,7 @@ namespace Calcpad.Core
         public bool? ShowHiddenOutput { get; set; }
         public int? MaxOutputCount { get; set; }
         public bool? IsUs { get; set; }
+        public bool? AbsoluteTemperature { get; set; }
         public bool? VectorGraphics { get; set; }
         public string ColorScale { get; set; }
         public bool? SmoothScale { get; set; }
@@ -107,6 +109,8 @@ namespace Calcpad.Core
         public bool FormatEquations { get; set; }
         public bool ZeroSmallMatrixElements { get; set; }
         public bool ShowHiddenOutput { get; set; }
+        // °C/°F absolute; Δ°C/Δ°F are differences
+        public bool AbsoluteTemperature { get; set; }
         public int MaxOutputCount
         {
             get => _maxOutputCount;
@@ -134,6 +138,7 @@ namespace Calcpad.Core
             FormatEquations = true;
             ZeroSmallMatrixElements = true;
             ShowHiddenOutput = false;
+            AbsoluteTemperature = false;
             MaxOutputCount = 20;
             Precision = 1e-14;
             Tol = 1e-6;

@@ -484,7 +484,7 @@ namespace Calcpad.Core
                             _parser._targetUnits = null;
                         }
                         else
-                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units, _parser.IsUs);
+                            _parser._targetUnits = UnitsParser.Parse(unit.Trim(), _units, _parser.IsUs, _parser.AbsoluteTemperature);
                     }
                 }
                 else
@@ -726,7 +726,7 @@ namespace Calcpad.Core
             {
                 try
                 {
-                    var unit = Unit.Get(units, _parser.IsUs);
+                    var unit = Unit.Get(units, _parser.IsUs, _parser.AbsoluteTemperature);
                     var v = new RealValue(unit);
                     return new ValueToken(v)
                     {
@@ -782,7 +782,7 @@ namespace Calcpad.Core
                         i >= assignmentIndex &&
                         t.Type == TokenTypes.Variable &&
                         !DefinedVariables.Contains(t.Content) &&
-                        Unit.TryGet(t.Content, _parser.IsUs, out var u)
+                        Unit.TryGet(t.Content, _parser.IsUs, _parser.AbsoluteTemperature, out var u)
                     )
                     {
                         t.Type = TokenTypes.Unit;

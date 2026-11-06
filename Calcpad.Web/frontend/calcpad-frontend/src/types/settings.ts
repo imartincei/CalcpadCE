@@ -14,6 +14,7 @@ export interface CalcpadSettings {
         formatEquations: boolean;
         zeroSmallMatrixElements: boolean;
         showHiddenOutput: boolean;
+        absoluteTemperature: boolean;
         maxOutputCount: number;
         formatString: string;
         precision: number;
@@ -149,6 +150,7 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'showHiddenOutput', label: 'Show hidden output', detail: 'Ignore #hide so suppressed content is rendered anyway. For debugging.', type: 'boolean', def: false },
     { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum number of rows/columns shown for large matrices and vectors (5–100).', type: 'number', def: 20, min: 5, max: 100 },
     { key: 'isUs', label: 'Non-metric units', detail: 'Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).', type: 'boolean', def: true },
+    { key: 'absoluteTemperature', label: 'Absolute temperature', detail: '°C and °F are absolute temperatures: multiplying, dividing or raising them to a power converts them to K or °R first, and subtracting two of them gives Δ°C or Δ°F. Δ°C and Δ°F are always temperature differences. Off by default because it adds overhead to calculations.', type: 'boolean', def: false },
     { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Renders plots as SVG (scalable, sharp at any zoom) instead of raster PNG images.', type: 'boolean', def: false },
     { key: 'colorScale', label: 'Plot color scale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
     { key: 'smoothScale', label: 'Smooth color scale', detail: 'Smooth color scale transitions', type: 'boolean', def: false },
@@ -183,7 +185,7 @@ export const SETTINGS_PATH: Partial<Record<string, string>> = {
     substitute: 'math.substitute', formatEquations: 'math.formatEquations',
     zeroSmallMatrixElements: 'math.zeroSmallMatrixElements', showHiddenOutput: 'math.showHiddenOutput',
     maxOutputCount: 'math.maxOutputCount', precision: 'math.precision', tol: 'math.tol',
-    isUs: 'isUs', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
+    isUs: 'isUs', absoluteTemperature: 'math.absoluteTemperature', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
     smoothScale: 'plot.smoothScale', shadows: 'plot.shadows', adaptivePlot: 'plot.isAdaptive',
     plotWidth: 'plot.width', plotHeight: 'plot.height', plotStep: 'plot.step',
 };

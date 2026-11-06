@@ -12,7 +12,8 @@
             "showHiddenOutput": false,
             "maxOutputCount": 20,
             "precision": 1e-14,
-            "tol": 0.000001
+            "tol": 0.000001,
+            "absoluteTemperature": false
         },
         "plot": {
             "imagePath": "",

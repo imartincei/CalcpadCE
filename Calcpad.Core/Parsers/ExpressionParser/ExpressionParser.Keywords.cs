@@ -816,6 +816,10 @@ namespace Calcpad.Core
                         _parser.IsUs = dto.IsUs.Value;
                     }
                     break;
+                case SettingKey.AbsoluteTemperature:
+                    if (dto.AbsoluteTemperature.HasValue)
+                        _parser.AbsoluteTemperature = dto.AbsoluteTemperature.Value;
+                    break;
                 case SettingKey.VectorGraphics:
                     if (dto.VectorGraphics.HasValue)
                     {

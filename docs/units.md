@@ -52,6 +52,45 @@ In the next example, speed is calculated in m/s, but is converted and stored as 
 | `'What distance you will travel for't_2 = 5s'?` | What distance you will travel for $t_2 = 5s$?  
 | `s_2 = V*t_2\|m` | $s_2 = V*t_2 = 90 km/h*5s = 125m$
 
+## Temperature
+
+By default, `°C` and `°F` behave like `Δ°C` and `Δ°F`: every operation treats them as temperature differences.
+So with `T = 20°C`, `R*T` uses 20 rather than 293.15, and thermodynamic formulas need temperatures in `K` or `°R`.
+
+Turn on **Absolute Temperature** in the [Settings](new-settings.md#units) tab, or add this line at the top of the document, to treat `°C` and `°F` as absolute temperatures:
+
+```calcpad
+#settings {"absoluteTemperature": true}
+```
+
+The setting is off by default because it slows calculations down, including ones that do not use temperatures.
+For the fastest documents, leave it off and write temperatures used in products, quotients and powers in `K` or `°R`.
+
+With the setting on, `°C` and `°F` are absolute temperatures, while `Δ°C` and `Δ°F` are temperature differences.
+`K` and `°R` start at absolute zero, so they work as either.
+
+When an absolute temperature is multiplied, divided or raised to a power, it is first converted to `K` (from `°C`) or `°R` (from `°F`), as thermodynamic formulas require:
+
+| Code | Result
+| ---- | -
+| `8.314J/(mol*K)*20°C` | $2437.25 J/mol$
+| `30°C/20°C` | $1.0341$
+| `20°C*2` | $586.3K$
+| `(20°C + 30°C)/2 \| °C` | $25°C$
+
+Adding and subtracting follow the rules for points on a scale:
+
+| Code | Result
+| ---- | -
+| `30°C - 20°C` | $10Δ°C$
+| `20°C + 5Δ°C` | $25°C$
+| `20°C + 5K` | $25°C$
+| `20°C + 30°C` | $596.3K$
+
+Temperature differences are never offset, so `m*c*(T_2 - T_1)` works with `T_1` and `T_2` in `°C`.
+Units written directly in a unit expression, such as `kJ/(kg*°C)` or `1/°C`, are per-degree units and are not converted.
+Multiplying by a temperature value does convert it, so attach units with `x*°C` rather than `x*1°C`, which would multiply by 274.15 K.
+
 ## Predefined Units
 
 CalcpadCE includes a large collection of predefined units as follows:

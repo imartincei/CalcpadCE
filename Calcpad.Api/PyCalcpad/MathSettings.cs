@@ -25,6 +25,7 @@ namespace PyCalcpad
         public bool Substitute { get; set; }
         public bool FormatEquations { get; set; }
         public bool ZeroSmallMatrixElements { get; set; }
+        public bool AbsoluteTemperature { get; set; }
         public int MaxOutputCount
         {
             get => _maxOutputCount;
@@ -48,6 +49,7 @@ namespace PyCalcpad
             Substitute = true;
             FormatEquations = true;
             ZeroSmallMatrixElements = true;
+            AbsoluteTemperature = false;
             MaxOutputCount = 20;
         }
 

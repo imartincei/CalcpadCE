@@ -4,9 +4,13 @@ namespace Calcpad.Core
 {
     internal class ComplexCalculator : Calculator
     {
-        private readonly Operator<ComplexValue>[] _operators;
-        private readonly Function<ComplexValue>[] _functions;
-        private readonly Operator<ComplexValue>[] Functions2;
+        private readonly Operator<ComplexValue>[] _baseOperators;
+        private readonly Function<ComplexValue>[] _baseFunctions;
+        private readonly Operator<ComplexValue>[] _baseFunctions2;
+        private Operator<ComplexValue>[] _operators;
+        private Function<ComplexValue>[] _functions;
+        private Operator<ComplexValue>[] Functions2;
+        private bool _absoluteTemperature;
         private static readonly Func<IScalarValue[], IScalarValue>[] MultiFunctions =
             [
                 Min,
@@ -31,9 +35,21 @@ namespace Calcpad.Core
             get => _degrees;
         }
 
+        internal override bool AbsoluteTemperature
+        {
+            get => _absoluteTemperature;
+            set
+            {
+                _absoluteTemperature = value;
+                _operators = value ? AbsoluteTemperatureRules.WrapOperators(_baseOperators) : _baseOperators;
+                _functions = value ? AbsoluteTemperatureRules.WrapRoots(_baseFunctions) : _baseFunctions;
+                Functions2 = value ? AbsoluteTemperatureRules.WrapRoots2(_baseFunctions2) : _baseFunctions2;
+            }
+        }
+
         public ComplexCalculator()
         {
-            _operators =
+            _baseOperators =
             [
                 Pow,
                 (in ComplexValue a, in ComplexValue b) =>  a / b,
@@ -55,7 +71,7 @@ namespace Calcpad.Core
                 //Assignments do not need implementation here
             ];
 
-            _functions =
+            _baseFunctions =
             [
                 Sin,      // 0
                 Cos,      // 1
@@ -105,13 +121,16 @@ namespace Calcpad.Core
                 Timer     // 45
             ];
 
-            Functions2 =
+            _baseFunctions2 =
             [
                 Atan2,
                 Root,
                 (in ComplexValue a, in ComplexValue b) => a % b,
                 (in ComplexValue a, in ComplexValue b) => MandelbrotSet(a, b)
             ];
+            _operators = _baseOperators;
+            _functions = _baseFunctions;
+            Functions2 = _baseFunctions2;
         }
 
         internal override IScalarValue EvaluateOperator(long index, in IScalarValue a, in IScalarValue b) => _operators[index](a.AsComplex(), b.AsComplex());
@@ -530,7 +549,7 @@ namespace Calcpad.Core
             new(value * FromRad[_degrees], AngleUnits[_degrees]) :
             new(value * FromRad[_degrees]);
 
-        protected static ComplexValue Timer(in ComplexValue _) => new(Timer(), Unit.Get("s", false));
+        protected static ComplexValue Timer(in ComplexValue _) => new(Timer(), Unit.Get("s", false, false));
 
     }
 }

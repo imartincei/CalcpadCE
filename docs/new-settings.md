@@ -37,6 +37,7 @@ In VS Code, do not use VS Code's own settings editor.
 ## Units
 
 - **Non-Metric Units** — **UK (Imperial)** or **US Customary**, defaulting to **US Customary**. Selects the definition of bare unit names that differ between the two systems (`gal`, `ton`, `cwt`, `pt`, `qt`, `bbl`, `tonf`, `therm`, etc).
+- **Absolute Temperature** — off by default. On treats `°C` and `°F` as absolute temperatures: multiplying, dividing or raising them to a power first converts them to `K` or `°R`, and subtracting two of them gives `Δ°C` or `Δ°F`. Off treats `°C` and `°F` as differences in all arithmetic. Turning it on slows calculations down, including ones that do not use temperatures. A document can turn it on with `#settings {"absoluteTemperature": true}`. See [Temperature](units.md#temperature).
 
 ## PDF Export
 

@@ -18,6 +18,7 @@ namespace Calcpad.Core
         private string _text;
         private int _hashCode;
         private char _tempChar = 'C';
+        private bool _isAbsoluteTemp;
         private readonly float[] _powers;
         private readonly double[] _factors;
         private int Length => _powers.Length;
@@ -27,6 +28,7 @@ namespace Calcpad.Core
         private static readonly Unit[] ForceUnits = new Unit[9], ForceUnits_US = new Unit[9];
         private static readonly FrozenDictionary<Unit, Unit> ElectricalUnits;
         private static readonly FrozenDictionary<string, Unit> Units;
+        private static readonly Unit Celsius, Fahrenheit, AbsCelsius, AbsFahrenheit, Kelvin, Rankine, DeltaCelsius, DeltaFahrenheit;
         private static readonly string[] UnitNames =
         [
             "therm",
@@ -103,6 +105,15 @@ namespace Calcpad.Core
                                  _powers[4] == 0f &&
                                  _powers[5] == 0f &&
                                  _powers[6] == 0f;
+
+        // Absolute °C/°F, not a difference
+        internal bool IsAbsoluteTemp => _isAbsoluteTemp;
+
+        internal double AbsoluteTempOffset => _tempChar == 'F' ? 459.67 : 273.15;
+
+        internal Unit AbsoluteTempBase => _tempChar == 'F' ? Rankine : Kelvin;
+
+        internal Unit TempDelta => _tempChar == 'F' ? DeltaFahrenheit : DeltaCelsius;
 
         internal bool IsDimensionless => _powers.Length == 0;
 
@@ -285,6 +296,7 @@ namespace Calcpad.Core
         {
             _text = u._text;
             _tempChar = u._tempChar;
+            _isAbsoluteTemp = u._isAbsoluteTemp;
             _hashCode = u._hashCode;
             var n = u.Length;
             _powers = u._powers;
@@ -296,15 +308,37 @@ namespace Calcpad.Core
         {
             _text = alias;
             _tempChar = u._tempChar;
+            _isAbsoluteTemp = u._isAbsoluteTemp;
             _hashCode = u._hashCode;
             _powers = u._powers;
             _factors = u._factors;
         }
 
-        internal static Unit Get(string text, bool isUs) => Units[ResolveKey(text, isUs)];
+        internal static Unit Get(string text, bool isUs, bool absTemp) =>
+            ToAbsoluteTemp(Units[ResolveKey(text, isUs)], absTemp);
 
-        internal static bool TryGet(string text, bool isUs, out Unit u) =>
-            Units.TryGetValue(ResolveKey(text, isUs), out u);
+        internal static bool TryGet(string text, bool isUs, bool absTemp, out Unit u)
+        {
+            if (!Units.TryGetValue(ResolveKey(text, isUs), out u))
+                return false;
+
+            u = ToAbsoluteTemp(u, absTemp);
+            return true;
+        }
+
+        private static Unit ToAbsoluteTemp(Unit u, bool absTemp)
+        {
+            if (!absTemp)
+                return u;
+
+            if (ReferenceEquals(u, Celsius))
+                return AbsCelsius;
+
+            if (ReferenceEquals(u, Fahrenheit))
+                return AbsFahrenheit;
+
+            return u;
+        }
 
         private static string TemperatureToDelta(string s)
         {
@@ -863,6 +897,14 @@ namespace Calcpad.Core
                 units.Add(name, new(units[name + "_UK"], name));
             }
             Units = units.ToFrozenDictionary();
+            Celsius = Units["°C"];
+            Fahrenheit = Units["°F"];
+            Kelvin = Units["K"];
+            Rankine = Units["°R"];
+            DeltaCelsius = Units["Δ°C"];
+            DeltaFahrenheit = Units["Δ°F"];
+            AbsCelsius = new(Celsius, "°C") { _isAbsoluteTemp = true };
+            AbsFahrenheit = new(Fahrenheit, "°F") { _isAbsoluteTemp = true };
         }
 
         internal void Scale(double factor)

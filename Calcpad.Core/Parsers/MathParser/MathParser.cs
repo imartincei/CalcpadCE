@@ -42,6 +42,16 @@ namespace Calcpad.Core
         private int _isSolver;
         private Unit _targetUnits;
         internal bool IsUs { get; set; } = true;
+        internal bool AbsoluteTemperature
+        {
+            get => _settings.AbsoluteTemperature;
+            set
+            {
+                _settings.AbsoluteTemperature = value;
+                _realCalc.AbsoluteTemperature = value;
+                _complexCalc.AbsoluteTemperature = value;
+            }
+        }
         private int _functionDefinitionIndex;
         private KeyValuePair<string, IValue> _backupVariable;
         private double Precision
@@ -122,6 +132,7 @@ namespace Calcpad.Core
             InitVariables();
             _realCalc = new RealCalculator();
             _complexCalc = new ComplexCalculator();
+            AbsoluteTemperature = settings.AbsoluteTemperature;
             if (_settings.IsComplex)
                 _calc = _complexCalc;
             else
@@ -434,8 +445,8 @@ namespace Calcpad.Core
             if (n < s.Length)
             {
                 var unitSpan = s[n..];
-                if (!Unit.TryGet(unitSpan.ToString(), IsUs, out u))
-                    u = UnitsParser.Parse(unitSpan, null, IsUs);
+                if (!Unit.TryGet(unitSpan.ToString(), IsUs, AbsoluteTemperature, out u))
+                    u = UnitsParser.Parse(unitSpan, null, IsUs, AbsoluteTemperature);
             }
             return n == 0 ? new(u) : new(d, u);
         }
@@ -447,7 +458,7 @@ namespace Calcpad.Core
             if (Math.Abs(d) == 0d)
                 d = 1d;
 
-            var u = d * (value.Units ?? Unit.Get(string.Empty, IsUs));
+            var u = d * (value.Units ?? Unit.Get(string.Empty, IsUs, false));
             u.Text = name;
             if (_units.TryAdd(name, u))
                 _input.DefinedVariables.Add(name);
@@ -622,7 +633,7 @@ namespace Calcpad.Core
             {
                 var s = _rpn[0].Content;
                 ref var u = ref CollectionsMarshal.GetValueRefOrAddDefault(_units, s, out bool _);
-                u = Unit.Get(string.Empty, IsUs);
+                u = Unit.Get(string.Empty, IsUs, false);
                 u.Text = s;
             }
         }

@@ -40,6 +40,7 @@ The available classes and methods you can use in PyCalcpad.dll and PyCalcpadWrap
 &emsp;&emsp;```Substitute : bool``` = True - switches variable substitution in the output on (True) and off (False).  
 &emsp;&emsp;```FormatEquations : bool``` = True - specifies if the equations are formatted in professional or linear styles in the output.  
 &emsp;&emsp;```ZeroSmallMatrixElements : bool``` = True - sets if small vector/matrix elements (&lt; 10^-14 times of the max. element magnitude) to be displayed as zeros.  
+&emsp;&emsp;```AbsoluteTemperature : bool``` = False - treats °C and °F as absolute temperatures, converting them to K or °R in products, quotients and powers, and returning Δ°C or Δ°F when two of them are subtracted. Off by default because it adds overhead to calculations.  
 &emsp;&emsp;```MaxOutputCount : bool``` = 20 - sets the maximum number of elements in a vector or matrix rows/columns to be displayed in the output (5-100).  
 
 ```class PlotSettings:```  

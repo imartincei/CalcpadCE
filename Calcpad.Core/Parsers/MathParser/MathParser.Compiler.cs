@@ -326,6 +326,12 @@ namespace Calcpad.Core
                     }
                     return Expression.Assign(a, b);
                 }
+                // IValue operators bypass the calculator tables that apply absolute temperature rules
+                if (_parser.AbsoluteTemperature && AbsoluteTemperatureRules.IsAffected(tc0))
+                    return Expression.Call(EvaluateOperatorMethod,
+                        Expression.Constant(_matrixCalc),
+                        Expression.Constant(t.Index), a, b);
+
                 return tc0 switch
                 {
                     '+' => Expression.Add(a, b),
@@ -367,7 +373,7 @@ namespace Calcpad.Core
                     return Expression.Call(_evaluatorInstance, GetVariableValueMethod, Expression.Constant(v), Expression.Constant(t.Content));
                 try
                 {
-                    var u = Unit.Get(t.Content, _parser.IsUs);
+                    var u = Unit.Get(t.Content, _parser.IsUs, _parser.AbsoluteTemperature);
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);
                     return Expression.Constant(v.Value, typeof(IValue));

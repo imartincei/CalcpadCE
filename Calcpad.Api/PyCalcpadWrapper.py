@@ -108,6 +108,14 @@ class MathSettings:
         self._instance.ZeroSmallMatrixElements = value
 
     @property
+    def AbsoluteTemperature(self):
+        return self._instance.AbsoluteTemperature
+
+    @AbsoluteTemperature.setter
+    def AbsoluteTemperature(self, value):
+        self._instance.AbsoluteTemperature = value
+
+    @property
     def MaxOutputCount(self):
         return self._instance.MaxOutputCount
 

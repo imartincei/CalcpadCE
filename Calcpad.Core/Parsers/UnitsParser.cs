@@ -110,15 +110,15 @@ namespace Calcpad.Core
             _ => -1,
         };
 
-        internal static Unit Parse(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs)
+        internal static Unit Parse(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs, bool absTemp)
         {
-            var input = GetInput(expression, units, isUs);
+            var input = GetInput(expression, units, isUs, absTemp);
             UnitValidator.Check(input);
             var rpn = GetRpn(input);
             return Evaluate(rpn);
         }
 
-        private static Queue<Token> GetInput(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs)
+        private static Queue<Token> GetInput(ReadOnlySpan<char> expression, Dictionary<string, Unit> units, bool isUs, bool absTemp)
         {
             // Tokenize input string
             // It is converted to a queue of recognizable tokens
@@ -197,7 +197,7 @@ namespace Calcpad.Core
                 if (pt == TokenTypes.Units)
                 {
                     if (units is null || !units.TryGetValue(literal, out var u))
-                        Unit.TryGet(literal, isUs, out u);
+                        Unit.TryGet(literal, isUs, absTemp, out u);
 
                     if (u is null)
                         throw Exceptions.InvalidUnits(literal);

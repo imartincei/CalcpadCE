@@ -214,6 +214,17 @@
               <option :value="true">US Customary</option>
             </select>
           </div>
+          <div v-show="rowVisible('units', 'absoluteTemperature')" class="setting-group">
+            <label>
+              <input
+                type="checkbox"
+                v-model="settingModel('absoluteTemperature').value"
+                @change="updateSettings"
+              />
+              <CalcpadSearchHighlight :text="tt(ABS_TEMP_SPEC.label)" :query="query" />
+              <span class="setting-info" :title="tt(ABS_TEMP_SPEC.detail)">ⓘ</span>
+            </label>
+          </div>
         </div>
       </section>
 
@@ -872,6 +883,7 @@ const MATH_KEYS = [
 const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_C = ['plotWidth', 'plotHeight', 'plotStep'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
+const ABS_TEMP_SPEC = specForKey(METADATA_SETTINGS_KEYS, 'absoluteTemperature')!
 
 /** Writable computed bound through SETTINGS_PATH's dot-path, one per key, cached. */
 const settingModelCache = new Map<string, WritableComputedRef<string | number | boolean>>()
@@ -985,7 +997,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   units: {
     title: 'Units',
     rows: {
-      isUs: 'non-metric units us uk imperial customary'
+      isUs: 'non-metric units us uk imperial customary',
+      absoluteTemperature: 'absolute temperature celsius fahrenheit kelvin rankine delta °c °f'
     }
   },
   pdf: {

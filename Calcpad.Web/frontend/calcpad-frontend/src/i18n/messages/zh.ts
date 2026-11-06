@@ -180,6 +180,8 @@ const zh: Record<string, string> = {
     "Maximum number of rows/columns shown for large matrices and vectors (5–100).": "大矩阵/向量显示的最大行/列数（5–100）。",
     "Mesh size for map (surface) plotting in pixels; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.": "曲面图网格尺寸（像素）；0 表示由 Calcpad 自动选择。可在文档中用 PlotStep = … 覆盖。",
     "Non-metric units": "非公制单位",
+    "Absolute temperature": "绝对温度",
+    "°C and °F are absolute temperatures: multiplying, dividing or raising them to a power converts them to K or °R first, and subtracting two of them gives Δ°C or Δ°F. Δ°C and Δ°F are always temperature differences. Off by default because it adds overhead to calculations.": "°C 和 °F 为绝对温度：对其进行乘、除或乘方运算时先换算为 K 或 °R，两者相减得到 Δ°C 或 Δ°F。Δ°C 和 Δ°F 始终表示温差。由于会增加计算开销，默认关闭。",
     "None": "无",
     "Nothing writes until you press Write to Disk.": "在按「写入磁盘」之前不写任何文件。",
     "Numerical precision": "数值精度",

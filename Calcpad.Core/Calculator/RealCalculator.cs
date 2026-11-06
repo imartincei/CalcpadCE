@@ -4,7 +4,7 @@ namespace Calcpad.Core
 {
     internal class RealCalculator : Calculator
     {
-        private static readonly Operator<RealValue>[] _operators =
+        private static readonly Operator<RealValue>[] Operators =
             [
                 UnitPow,
                 RealValue.Divide,
@@ -24,8 +24,14 @@ namespace Calcpad.Core
                 (in RealValue a, in RealValue b) => a ^ b,
                 //Assignments do not need implementation here
             ];
-        private readonly Function<RealValue>[] _functions;
-        private readonly Operator<RealValue>[] _functions2;
+        private readonly Function<RealValue>[] _baseFunctions;
+        private readonly Operator<RealValue>[] _baseFunctions2;
+        private Operator<RealValue>[] _operators = Operators;
+        private Function<RealValue>[] _functions;
+        private Operator<RealValue>[] _functions2;
+        private Operator<RealValue> _pow = Pow, _root = Root;
+        private Function<RealValue> _sqrt = Sqrt, _cbrt = Cbrt;
+        private bool _absoluteTemperature;
         private static readonly Func<IScalarValue[], IScalarValue>[] MultiFunctions =
             [
                 values => Min(values),
@@ -49,9 +55,25 @@ namespace Calcpad.Core
             get => _degrees;
         }
 
+        internal override bool AbsoluteTemperature
+        {
+            get => _absoluteTemperature;
+            set
+            {
+                _absoluteTemperature = value;
+                _operators = value ? AbsoluteTemperatureRules.WrapOperators(Operators) : Operators;
+                _functions = value ? AbsoluteTemperatureRules.WrapRoots(_baseFunctions) : _baseFunctions;
+                _functions2 = value ? AbsoluteTemperatureRules.WrapRoots2(_baseFunctions2) : _baseFunctions2;
+                _pow = value ? AbsoluteTemperatureRules.WrapBase(Pow) : Pow;
+                _root = value ? AbsoluteTemperatureRules.WrapBase(Root) : Root;
+                _sqrt = value ? AbsoluteTemperatureRules.WrapRoot(Sqrt) : Sqrt;
+                _cbrt = value ? AbsoluteTemperatureRules.WrapRoot(Cbrt) : Cbrt;
+            }
+        }
+
         public RealCalculator()
         {
-            _functions =
+            _baseFunctions =
             [
                 Sin,      // 0
                 Cos,      // 1
@@ -101,13 +123,15 @@ namespace Calcpad.Core
                 Timer,     // 45
             ];
 
-            _functions2 =
+            _baseFunctions2 =
             [
                 Atan2,      // 0
                 UnitRoot,   // 1
                 (in RealValue a, in RealValue b) => a % b, // 2
                 (in RealValue a, in RealValue b) => MandelbrotSet(a, b), // 3
             ];
+            _functions = _baseFunctions;
+            _functions2 = _baseFunctions2;
         }
 
         internal override IScalarValue EvaluateOperator(long index, in IScalarValue a, in IScalarValue b) => _operators[index](a.AsReal(), b.AsReal());
@@ -116,18 +140,18 @@ namespace Calcpad.Core
         internal override IValue EvaluateFunction3(long index, in IValue a, in IValue b, in IValue c) => Functions3[index](a, b, c);
         internal override IScalarValue EvaluateMultiFunction(long index, IScalarValue[] a) => MultiFunctions[index](a);
         internal override IScalarValue EvaluateInterpolation(long index, IScalarValue[] a) => Interpolations[index](a);
-        internal override Operator<RealValue> GetOperator(long index) => index == PowerOperatorIndex ? Pow : _operators[index];
+        internal override Operator<RealValue> GetOperator(long index) => index == PowerOperatorIndex ? _pow : _operators[index];
         internal override Function<RealValue> GetFunction(long index)
         {
             if (index == SqrFunctionIndex || index == SqrtFunctionIndex)
-                return Sqrt;
+                return _sqrt;
 
             if (index == CbrtFunctionIndex)
-                return Cbrt;
+                return _cbrt;
 
             return _functions[index];
         }
-        internal override Operator<RealValue> GetFunction2(long index) => index == RootFunctionIndex ? Root : _functions2[index];
+        internal override Operator<RealValue> GetFunction2(long index) => index == RootFunctionIndex ? _root : _functions2[index];
         internal override Function3 GetFunction3(long index) => Functions3[index];
         internal override Func<IScalarValue[], IScalarValue> GetMultiFunction(long index) => MultiFunctions[index];
 
@@ -518,6 +542,6 @@ namespace Calcpad.Core
             new(value * FromRad[_degrees], AngleUnits[_degrees]) :
             new(value * FromRad[_degrees]);
 
-        protected static RealValue Timer(in RealValue _) => new(Timer(), Unit.Get("s", false));
+        protected static RealValue Timer(in RealValue _) => new(Timer(), Unit.Get("s", false, false));
     }
 }

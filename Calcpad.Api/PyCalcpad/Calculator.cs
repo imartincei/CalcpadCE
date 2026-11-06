@@ -35,6 +35,7 @@ namespace PyCalcpad
                 Substitute = settings.Substitute,
                 FormatEquations = settings.FormatEquations,
                 ZeroSmallMatrixElements = settings.ZeroSmallMatrixElements,
+                AbsoluteTemperature = settings.AbsoluteTemperature,
                 MaxOutputCount = settings.MaxOutputCount,
             };
     }

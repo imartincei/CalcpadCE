@@ -604,6 +604,17 @@ namespace Calcpad.Core
 
         internal static IValue EvaluateOperator(MatrixCalculator calc, long index, in IValue a, in IValue b)
         {
+            if (a is IScalarValue sa && b is IScalarValue sb)
+                return calc.Calculator.EvaluateOperator(index, sa, sb);
+
+            if (calc.Calculator.AbsoluteTemperature)
+                return AbsoluteTemperatureRules.EvaluateOperator(calc, index, a, b);
+
+            return EvaluateOperatorCore(calc, index, a, b);
+        }
+
+        internal static IValue EvaluateOperatorCore(MatrixCalculator calc, long index, in IValue a, in IValue b)
+        {
             if (a is IScalarValue sa)
             {
                 if (b is IScalarValue sb)
@@ -652,6 +663,17 @@ namespace Calcpad.Core
         }
 
         internal static IValue EvaluateFunction2(MatrixCalculator calc, long index, in IValue a, in IValue b)
+        {
+            if (a is IScalarValue sa && b is IScalarValue sb)
+                return calc.Calculator.EvaluateFunction2(index, sa, sb);
+
+            if (calc.Calculator.AbsoluteTemperature && index == Calculator.RootFunctionIndex)
+                return EvaluateFunction2Core(calc, index, AbsoluteTemperatureRules.ToBase(a), b);
+
+            return EvaluateFunction2Core(calc, index, a, b);
+        }
+
+        private static IValue EvaluateFunction2Core(MatrixCalculator calc, long index, in IValue a, in IValue b)
         {
             if (a is IScalarValue sa)
             {

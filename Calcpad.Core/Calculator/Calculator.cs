@@ -36,9 +36,9 @@ namespace Calcpad.Core
         // before any request's setting exists, so the isUs argument is irrelevant here.
         protected static readonly Unit[] AngleUnits =
         [
-            Unit.Get("deg", false),
-            Unit.Get("rad", false),
-            Unit.Get("grad", false)
+            Unit.Get("deg", false, false),
+            Unit.Get("rad", false, false),
+            Unit.Get("grad", false, false)
         ];
 
         protected Function3[] Functions3 =
@@ -54,6 +54,7 @@ namespace Calcpad.Core
         ];
 
         internal abstract int Degrees { get; set; }
+        internal abstract bool AbsoluteTemperature { get; set; }
         internal bool ReturnAngleUnits { set => _returnAngleUnits = value; }
 
         // Negation = 1                                   ^  ÷  \  ⦼  *  -  +  <  >  ≤  ≥  ≡  ≠  ∧ ∨  ⊕ ∠   =   ←

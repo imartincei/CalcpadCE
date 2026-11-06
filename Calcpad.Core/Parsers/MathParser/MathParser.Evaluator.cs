@@ -244,7 +244,7 @@ namespace Calcpad.Core
                 try
                 {
                     if (!_units.TryGetValue(s, out var u))
-                        u = Unit.Get(s, _parser.IsUs);
+                        u = Unit.Get(s, _parser.IsUs, _parser.AbsoluteTemperature);
 
                     t.Type = TokenTypes.Unit;
                     v.SetValue(u);
