@@ -319,7 +319,17 @@ const zh: Record<string, string> = {
     "New tab": "新建标签页",
     "File": "文件",
     "or markdown": "或 Markdown",
-    "syntax.": "语法。"
+    "syntax.": "语法。",
+    "File changed on disk": "文件已在磁盘上被更改",
+    "Another program changed this file while you had unsaved edits. Choose which version to keep.": "在您有未保存的编辑时，另一个程序更改了此文件。请选择要保留的版本。",
+    "On disk (theirs)": "磁盘上的版本（他人的）",
+    "Your edits (mine)": "您的编辑（我的）",
+    "Keep Mine": "保留我的",
+    "Keep Theirs": "保留他人的",
+    "Keep Both": "保留两者",
+    "Keep your edits; saving will overwrite the file on disk": "保留您的编辑；保存时将覆盖磁盘上的文件",
+    "Discard your edits and load the file from disk": "放弃您的编辑并从磁盘加载文件",
+    "Save each version as a copy next to the file": "将每个版本另存为该文件旁的副本"
 }
 
 export default zh

@@ -61,7 +61,8 @@ import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge }
 import { EditorGroup } from './editor/editor-group';
 import { navigationDirection, type NavigationLocation } from './editor/navigation-history';
 import { createBrowserNavigationHistory, createDesktopNavigationHistory, type NavigationHistoryClient } from './services/navigation-history';
-import { UNTITLED_TITLE, type TabManager } from './tabs/tab-manager';
+import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from './tabs/tab-manager';
+import type { FileConflictChoice } from './services/file-change-tracker';
 import { setupTabDragging } from './tabs/tab-drag';
 import { toDisplayLogLevel } from 'calcpad-frontend';
 import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm } from 'calcpad-frontend';
@@ -2142,7 +2143,9 @@ async function bootstrap(): Promise<void> {
             tauriListen<T>(event, handler, { target: windowLabel });
         navigationHistory = await createDesktopNavigationHistory(historyCallbacks);
         await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-            if (focused) recordNavigation(activeGroup);
+            if (!focused) return;
+            recordNavigation(activeGroup);
+            tauriBridge!.fileTracker.pollSoon();
         });
         recordNavigation(activeGroup);
         // The seeded group was wired before this branch ran, so kick the first native title.
@@ -2377,6 +2380,68 @@ async function bootstrap(): Promise<void> {
             }
         }
 
+        // ---- External file changes (e.g. an agent editing an open file) ----
+        function tabsHolding(path: string): { group: EditorGroup; id: string }[] {
+            return [...groups.values()].flatMap(group =>
+                group.tabs.all.filter(t => t.filePath === path).map(t => ({ group, id: t.id })));
+        }
+
+        async function onExternalChange(path: string, disk: string): Promise<boolean> {
+            const holders = tabsHolding(path);
+            if (holders.length === 0) return true;
+            const { group, id } = holders[0];
+            const model = group.tabs.modelForTab(id)!;
+            const title = group.tabs.getTitle(id) ?? path;
+            const settle = () => {
+                for (const h of holders) {
+                    if (!h.group.tabs.isDirty(h.id)) void deleteDraft(h.id);
+                }
+            };
+
+            if (!group.tabs.isDirty(id) || documentMatches(model, disk)) {
+                reloadDocument(model, disk);
+                settle();
+                appInstance.appendOutput('info', `Reloaded ${title}: it was changed on disk.`);
+                return true;
+            }
+
+            const choice: FileConflictChoice | null = await appInstance.showFileConflict({
+                title,
+                filePath: path,
+                mine: model.getValue(),
+                theirs: disk,
+            });
+            if (choice === 'mine') return true;
+            if (choice === 'theirs') {
+                reloadDocument(model, disk);
+                settle();
+                return true;
+            }
+            if (choice === 'both') {
+                const mine = model.getValue();
+                try {
+                    const minePath = await tauriBridge!.saveSiblingCopy(path, 'mine', mine);
+                    const theirsPath = await tauriBridge!.saveSiblingCopy(path, 'theirs', disk);
+                    reloadDocument(model, disk);
+                    settle();
+                    activeGroup.tabs.openFile(minePath, mine);
+                    appInstance.appendOutput('info', `Kept both versions of ${title}: ${minePath} and ${theirsPath}.`);
+                    return true;
+                } catch (err) {
+                    appInstance.appendOutput('error',
+                        `Could not save copies of ${title}: ${err instanceof Error ? err.message : String(err)}`);
+                    appInstance.showOutput();
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        tauriBridge.fileTracker.start(
+            () => [...groups.values()].flatMap(g => g.tabs.all.flatMap(t => t.filePath ? [t.filePath] : [])),
+            onExternalChange,
+        );
+
         /**
          * Writes the file-info comment into the active model just before it is saved to
          * `filePath`, returning the content to write. `saved` is the file as it is on disk,
@@ -2408,6 +2473,9 @@ async function bootstrap(): Promise<void> {
             const active = tabs.activeTab;
             if (!active) return false;
             if (active.filePath) {
+                if (!await tauriBridge!.fileTracker.verifyBeforeSave(active.filePath)) return false;
+                // Keep Both already saved each version to its own file and opened one.
+                if (tabs.activeId !== active.id) return true;
                 // Saving an unchanged file is not an update.
                 const content = tabs.isDirty(active.id)
                     ? stampedContentFor(active.filePath, await tauriBridge!.readFile(active.filePath).catch(() => undefined))
