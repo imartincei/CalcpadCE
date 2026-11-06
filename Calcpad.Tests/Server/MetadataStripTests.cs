@@ -27,4 +27,40 @@ public class MetadataStripTests
         Assert.DoesNotContain("fileInfo", html);
         Assert.Contains("kept", html);
     }
+
+    private const string Footer =
+        "'<!--CalcpadCE Metadata-->\r\n" +
+        "'<!--{\"uiOverrides\":{\"a:1\":\"2\"}}-->\r\n" +
+        "'<!--{\"fileInfo\": _\r\n" +
+        "'{\"title\":\"T\"}}-->\r\n\r\n";
+
+    [Theory]
+    [InlineData("#html\n<b>ZZBODY</b>\n")]
+    [InlineData("#markdown\n**ZZBODY**\n")]
+    [InlineData("#html\n<b>ZZBODY</b>\n#markdown\n")]
+    public void Convert_IgnoresFooterInsideOpenMode(string head)
+    {
+        var html = new CalcpadService().Convert(head + Footer).Html;
+        var body = html[html.IndexOf("ZZBODY", StringComparison.Ordinal)..];
+
+        Assert.DoesNotContain("<!--", body);
+        Assert.DoesNotContain("'", body);
+    }
+
+    [Theory]
+    [InlineData("a = 1\n" + Footer, "a = 1\n")]
+    [InlineData("a = 1\n'<!--{\"desc\":\"x\"}-->\n", "a = 1\n'<!--{\"desc\":\"x\"}-->\n")]
+    [InlineData("'<!--{\"fileInfo\":{}}-->\na = 1\n", "'<!--{\"fileInfo\":{}}-->\na = 1\n")]
+    [InlineData(Footer, "")]
+    public void Remove_CutsOnlyTheTrailingFooter(string source, string expected) =>
+        Assert.Equal(expected, MetadataFooter.Remove(source));
+
+    [Fact]
+    public void Convert_FooterOnlyFile_RendersNothing()
+    {
+        var html = new CalcpadService().Convert(Footer).Html;
+
+        Assert.DoesNotContain("CalcpadCE Metadata", html);
+        Assert.DoesNotContain("fileInfo", html);
+    }
 }

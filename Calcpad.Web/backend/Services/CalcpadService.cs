@@ -2,14 +2,13 @@ using Calcpad.Core;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 using Calcpad.Server.Controllers;
-using System.Text.RegularExpressions;
 
 namespace Calcpad.Server.Services
 {
     /// <summary>Where a stepped <c>#UI</c> form stopped, returned in <c>X-Calcpad-Pause</c>.</summary>
     public sealed record PauseInfo(string? Next, string? Previous);
 
-    public partial class CalcpadService
+    public class CalcpadService
     {
         private readonly string _tempDirectory;
 
@@ -95,7 +94,7 @@ namespace Calcpad.Server.Services
                 };
 
                 string outputText;
-                var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
+                var hasMacroErrors = macroParser.Parse(MetadataFooter.Remove(calcpadContent), out outputText, null, 0, true);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -164,8 +163,6 @@ namespace Calcpad.Server.Services
                         htmlResult = ConvertCodeToHtml(outputText, errors);
                     }
                 }
-
-                htmlResult = StripHostMetadata(htmlResult);
 
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
@@ -501,14 +498,8 @@ tan_angle = tan(angle°)";
         }
 
         /// <summary>
-        /// Processes included file content to respect #local and #global directives.
+        /// Drops #local...#global blocks and the file's metadata footer, which only applies to the file that carries it.
         /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
-        /// <para>
-        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
-        /// the host restores it by scanning the document you have open, before #include is
-        /// expanded. A 'fileInfo' comment goes too, so an included file's details
-        /// don't show up in the host file.
-        /// </para>
         /// </summary>
         private static string ProcessIncludedContent(string content)
         {
@@ -516,71 +507,20 @@ tan_angle = tan(angle°)";
                 return content;
 
             var isLocal = false;
-            var isHostComment = false;
-            var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var lines = MetadataFooter.Remove(content).Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             var outputLines = new List<string>();
 
             foreach (var line in lines)
             {
-                if (isHostComment)
-                {
-                    if (line.Contains("-->", StringComparison.Ordinal))
-                        isHostComment = false;
-
-                    continue;
-                }
                 if (Validator.IsKeyword(line, "#local"))
-                {
                     isLocal = true;
-                }
                 else if (Validator.IsKeyword(line, "#global"))
-                {
                     isLocal = false;
-                }
-                else if (IsHostCommentStart(line))
-                {
-                    isHostComment = !line.Contains("-->", StringComparison.Ordinal);
-                }
-                else
-                {
-                    // Only include lines that are not marked as local
-                    if (!isLocal)
-                    {
-                        outputLines.Add(line);
-                    }
-                }
+                else if (!isLocal)
+                    outputLines.Add(line);
             }
 
             return string.Join(Environment.NewLine, outputLines);
-        }
-
-        /// <summary>
-        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
-        /// a 'uiOverrides' or 'fileInfo' key, or the footer's '<!--CalcpadCE Metadata--> anchor. A cheap substring check rather than a JSON parse,
-        /// matching the rest of this method's line-based approach - good enough since the host
-        /// always writes the keys verbatim.
-        /// </summary>
-        /// <summary>Removes the metadata footer's comments from rendered output and from the unwrapped listing.</summary>
-        internal static string StripHostMetadata(string html)
-        {
-            html = RenderedMetadataRegex().Replace(html, "");
-            return ListedMetadataRegex().Replace(html, "");
-        }
-
-        [GeneratedRegex(@"<!--(?:CalcpadCE Metadata|\{(?:(?!-->).)*?""(?:uiOverrides|fileInfo)""(?:(?!-->).)*)-->[ \t]*(?:\r?\n)?", RegexOptions.Singleline)]
-        private static partial Regex RenderedMetadataRegex();
-
-        [GeneratedRegex(@"<p class=""line-text""[^>]*>(?:(?!</p>).)*?<span class=""htmlComment"">&lt;!--(?:CalcpadCE Metadata|\{(?:(?!--&gt;).)*?&quot;(?:uiOverrides|fileInfo)&quot;(?:(?!--&gt;).)*)--&gt;</span></p>(?:\r?\n)?", RegexOptions.Singleline)]
-        private static partial Regex ListedMetadataRegex();
-
-        private static bool IsHostCommentStart(string line)
-        {
-            var trimmed = line.TrimStart();
-            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
-                && trimmed.Contains("<!--", StringComparison.Ordinal)
-                && (trimmed.Contains("\"uiOverrides\"", StringComparison.Ordinal)
-                    || trimmed.Contains("\"fileInfo\"", StringComparison.Ordinal)
-                    || trimmed.Contains("<!--CalcpadCE Metadata-->", StringComparison.Ordinal));
         }
     }
 }

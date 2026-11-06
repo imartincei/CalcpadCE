@@ -4,19 +4,14 @@ using Calcpad.Server.Services;
 
 namespace Calcpad.Tests;
 
-/// <summary>
-/// A saved 'uiOverrides' metadata comment only has any effect on the file that carries it, so
-/// <c>CalcpadService</c> strips one out of an included file's content the same way it strips
-/// <c>#local</c>...<c>#global</c> blocks - it should never sit inertly in the flattened text
-/// just because the file happened to be reached through <c>#include</c>.
-/// </summary>
+/// <summary>An included file's metadata footer only applies to that file, so it never reaches the host's output.</summary>
 public class UiOverridesIncludeTests
 {
     [Fact]
     public void CalcpadService_StripsAUiOverridesCommentFromAnInclude()
     {
         using var temp = new TempDir();
-        temp.Write("sub/mod.cpd", "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI L = 4\n");
+        temp.Write("sub/mod.cpd", "#UI L = 4\n'<!--CalcpadCE Metadata-->\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n");
 
         var (html, _, errors, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
@@ -29,7 +24,7 @@ public class UiOverridesIncludeTests
     public void CalcpadService_StripsAFileInfoCommentFromAnInclude()
     {
         using var temp = new TempDir();
-        temp.Write("sub/mod.cpd", "'<!--{\"fileInfo\":{\"title\":\"Module\"}}-->\nx = 1\n");
+        temp.Write("sub/mod.cpd", "x = 1\n'<!--{\"fileInfo\":{\"title\":\"Module\"}}-->\n");
 
         var (html, _, errors, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
