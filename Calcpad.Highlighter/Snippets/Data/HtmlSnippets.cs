@@ -125,6 +125,12 @@ namespace Calcpad.Highlighter.Snippets.Data
                 Description = "Horizontal rule / divider",
                 Category = "HTML"
             },
+            new SnippetItem
+            {
+                Insert = "'<p style=\"break-before:page;\"></p>",
+                Description = "Page break (for printing / PDF)",
+                Category = "HTML"
+            },
 
             // ============================================
             // HTML CONTAINERS

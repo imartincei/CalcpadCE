@@ -175,6 +175,7 @@ export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides } from './services/ui-overrides';
 export { UiPauseStore, hasPauseSteps } from './services/ui-pause';
+export { UiEditHistory } from './services/ui-history';
 export {
     FILE_INFO_KEY, FILE_INFO_FIELDS, findFileInfoBlock, readFileInfo, sanitizeFileInfoPatch,
     planFileInfoEdit, writeFileInfo, stampFileInfo, planFileInfoStamp, fileStem,
@@ -204,6 +205,7 @@ export {
     pathExtension,
 } from './services/paths';
 export type { UiOverrides, UiValueChange, UiControl, UiOverrideRow } from './services/ui-overrides';
+export type { UiHistoryState } from './services/ui-history';
 
 // --- Message Bridge (base class) --------------------------------------------
 export { BaseMessageBridge, variantRender } from './services/message-bridge/base';

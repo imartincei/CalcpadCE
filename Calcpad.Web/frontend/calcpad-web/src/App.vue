@@ -456,6 +456,18 @@
       @mousedown.stop
       @click.stop
     >
+      <template v-if="previewContextMenu.uiHistory">
+        <button
+          class="context-menu"
+          :disabled="!previewContextMenu.uiHistory.undo"
+          @click="onPreviewUiHistory('uiUndo')"
+        >{{ t('Undo (Ctrl+Z)') }}</button>
+        <button
+          class="context-menu"
+          :disabled="!previewContextMenu.uiHistory.redo"
+          @click="onPreviewUiHistory('uiRedo')"
+        >{{ t('Redo (Ctrl+Y)') }}</button>
+      </template>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
@@ -576,6 +588,7 @@ import {
   MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
   hasPauseSteps,
   type UiPauseState,
+  type UiHistoryState,
   type PreviewScrollState,
   type ServerStatus,
   type DisplayLogLevel,
@@ -620,6 +633,8 @@ const onExitUiModeRequest = ref<(() => Promise<boolean>) | null>(null)
 // #pause steps of the input form; null when it has none.
 const uiPause = ref<UiPauseState | null>(null)
 const onUiPauseStepRequest = ref<((direction: 'next' | 'previous') => void) | null>(null)
+// Undo/redo of the input form's values, for its context menu and datagrid menu.
+const uiHistoryStateProvider = ref<((groupId: string) => UiHistoryState | null) | null>(null)
 
 /** UI mode hands the whole window to the input form; only the tab strip stays. */
 const uiModeFullscreen = computed(() => previewVisible.value && resultMode.value === 'ui')
@@ -1108,11 +1123,20 @@ interface PreviewContextMenuState {
   frameId: string
   selection: string
   editable: boolean
+  /** Set only on the input form itself. */
+  uiHistory: UiHistoryState | null
 }
 const previewContextMenu = ref<PreviewContextMenuState | null>(null)
 
 function closePreviewContextMenu(): void {
   previewContextMenu.value = null
+}
+
+/** Asked of the frame, which flushes pending grid edits before posting it back. */
+function onPreviewUiHistory(op: 'uiUndo' | 'uiRedo'): void {
+  const frameId = previewContextMenu.value?.frameId
+  closePreviewContextMenu()
+  if (frameId) postToPreviewFrame(frameId, { type: 'cpdUiHistory', op })
 }
 
 function onPreviewClipboard(action: PreviewClipboardAction): void {
@@ -1340,6 +1364,9 @@ function onPreviewWindowMessage(e: MessageEvent): void {
       selection: typeof data.selection === 'string' ? data.selection : '',
       // Only the frame can see what it has focused.
       editable: data.editable === true,
+      uiHistory: resultMode.value === 'ui' && frameId === groupId
+        ? uiHistoryStateProvider.value?.(groupId) ?? null
+        : null,
     }
     return
   }
@@ -1735,6 +1762,7 @@ function setPreviewHtml(groupId: string, html: string, scrollToLine?: number, do
   )
   out = injectPreviewConsole(out, groupId)
   out = injectUiPosition(out, groupId)
+  if (isUi) out = injectUiHistory(out, groupId)
   previewHtmlByGroup.set(groupId, html)
   setPreviewHtmlOutput(groupId, html)
   return commitToBuffer(groupId, out)
@@ -1956,6 +1984,13 @@ function injectUiPosition(html: string, frameId: string): string {
   // The state carries a key from the document, so close any tag it could open.
   const json = JSON.stringify(state).replace(/</g, '\\u003c')
   return insertHeadScript(html, 'window.__calcpadUiPosition = ' + json + ';')
+}
+
+/** Seeds the #UI script's datagrid menu with what undo/redo can do. */
+function injectUiHistory(html: string, groupId: string): string {
+  const state = uiHistoryStateProvider.value?.(groupId)
+  if (!state) return html
+  return insertHeadScript(html, 'window.__calcpadUiHistory = ' + JSON.stringify(state) + ';')
 }
 
 function insertHeadScript(html: string, body: string): string {
@@ -2426,6 +2461,7 @@ defineExpose({
   onExitUiModeRequest,
   setUiPauseState,
   onUiPauseStepRequest,
+  uiHistoryStateProvider,
   setUiPrintHtml,
   isUiPrintVisible,
   onUiPrintToggled,
