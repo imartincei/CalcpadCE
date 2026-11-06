@@ -346,6 +346,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 Append(TokenType.Const);
                 _builder.Append(c);
                 _state.CurrentType = TokenType.Units;
+                _state.IsUnitsAfterNumber = true;
             }
             else
             {
@@ -360,7 +361,10 @@ namespace Calcpad.Highlighter.Tokenizer
             _state.TokenStartColumn += _builder.Length;
             _builder.Append(c);
             if (char.IsLetter(c) || CalcpadCharacterHelpers.IsUnitStart(c))
+            {
                 _state.CurrentType = TokenType.Units;
+                _state.IsUnitsAfterNumber = true;
+            }
         }
 
         private void ParseLineBreak(int underscorePosition)

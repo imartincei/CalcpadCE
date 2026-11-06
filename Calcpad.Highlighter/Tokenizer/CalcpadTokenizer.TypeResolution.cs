@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Tokenizer.Models;
@@ -17,6 +18,9 @@ namespace Calcpad.Highlighter.Tokenizer
         private readonly HashSet<string> _localVariables = new(StringComparer.Ordinal);
         // Only these accept keyword arguments
         private readonly HashSet<string> _functionsWithDefaults = new(StringComparer.Ordinal);
+
+        // Variables the expanded content defines (includes, macros), by first source line.
+        private IReadOnlyDictionary<string, int> _resolvedVariableLines;
 
         // Tracks #read keyword in all modes (not just Lint) so the next variable can be
         // recorded as a definition.
@@ -158,6 +162,8 @@ namespace Calcpad.Highlighter.Tokenizer
                     break;
 
                 case TokenType.Units:
+                    if (_state.IsUnitsAfterNumber)
+                        break;
                     // If this is classified as Units but is actually a known local variable,
                     // reclassify it. This handles cases like "f(g) = 4*g" where g after the
                     // operator might be initially classified as Units due to PreviousType tracking.
@@ -195,7 +201,8 @@ namespace Calcpad.Highlighter.Tokenizer
                 // would misclassify standalone Greek letters like "μ = 5" as units.
                 if (CalcpadCharacterHelpers.IsIdentifierStartChar(c))
                 {
-                    if (_state.IsUnits || _state.PreviousType == TokenType.Const)
+                    _state.IsUnitsAfterNumber = _state.PreviousType == TokenType.Const;
+                    if (_state.IsUnits || _state.IsUnitsAfterNumber)
                         return TokenType.Units;
                     return TokenType.Variable;
                 }
@@ -457,11 +464,26 @@ namespace Calcpad.Highlighter.Tokenizer
             return CalcpadBuiltIns.Functions.Contains(name) || _definedFunctions.Contains(name);
         }
 
+        /// <summary>
+        /// Uses the macros and variables that only exist once includes and macros expand. A
+        /// resolved variable counts as known on lines after its first definition.
+        /// </summary>
+        public void SetResolvedContent(StagedResolvedContent staged)
+        {
+            SetMacroCommentParameters(
+                staged.Stage2.MacroCommentParameters,
+                staged.Stage2.MacroParameterOrder,
+                staged.Stage2.MacroBodies);
+            _resolvedVariableLines = staged.Stage3.VariableFirstLines;
+        }
+
         private bool IsKnownVariable(string name)
         {
             return _localVariables.Contains(name) ||
                    _definedVariables.Contains(name) ||
-                   CalcpadBuiltIns.CommonConstants.Contains(name);
+                   CalcpadBuiltIns.CommonConstants.Contains(name) ||
+                   _resolvedVariableLines != null &&
+                   _resolvedVariableLines.TryGetValue(name, out var line) && line < _state.Line;
         }
 
         private bool IsKnownUnit(string name)
