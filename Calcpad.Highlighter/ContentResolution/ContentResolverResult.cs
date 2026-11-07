@@ -17,12 +17,6 @@ namespace Calcpad.Highlighter.ContentResolution
         public string Source { get; set; } // "local" | "include"
         public string SourceFile { get; set; }
 
-        /// <summary>
-        /// Parameters that are used in comments (directly or transitively through nested macro calls).
-        /// These parameters should have their call-site arguments tokenized as Comment.
-        /// </summary>
-        public HashSet<string> CommentParameters { get; set; } = new(StringComparer.Ordinal);
-
         /// <summary>User-provided description from a metadata comment on the preceding line.</summary>
         public string Description { get; set; }
 
@@ -179,7 +173,15 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>Total number of lines in the expanded result for this call site</summary>
         public int TotalContentLines { get; set; }
+
+        /// <summary>Column in the call site line of each character, or -1 for macro body text.</summary>
+        public IReadOnlyList<int> SourceColumns { get; set; }
     }
+
+    /// <summary>A line a macro call expanded to.</summary>
+    /// <param name="Columns">Column on the original line of each character, or -1 when it is not from that line.</param>
+    /// <param name="CallLine">Original line of the call the text ran at.</param>
+    public sealed record CallSiteExpansion(string Text, int[] Columns, int CallLine);
 
     public class SourceInfo
     {
@@ -282,24 +284,10 @@ namespace Calcpad.Highlighter.ContentResolution
         public PathRoots PathRoots { get; set; }
 
         /// <summary>
-        /// Maps macro name to its comment parameters — those used in comments,
-        /// directly or transitively. Computed after all macros are collected, with transitive
-        /// closure for nested macro calls.
-        /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.Ordinal);
-
-        /// <summary>
         /// Maps macro name to ordered list of parameter names.
         /// Used for matching call-site argument positions to parameter names.
         /// </summary>
         public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.Ordinal);
-
-        /// <summary>
-        /// Maps macro name to inline body text (everything after = in #def for inline macros,
-        /// or joined content lines for multiline macros).
-        /// Used for argument type resolution via substitution + tokenization.
-        /// </summary>
-        public Dictionary<string, string> MacroBodies { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// User-defined macro info for linting, from the first definition of each macro.
@@ -391,17 +379,8 @@ namespace Calcpad.Highlighter.ContentResolution
         /// </summary>
         public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.Ordinal);
 
-        /// <summary>
-        /// Maps macro name to its comment parameters (parameters used in comments, directly or transitively).
-        /// Key: macro name, Value: set of parameter names that are comment parameters.
-        /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.Ordinal);
-
-        /// <summary>
-        /// Maps macro name to ordered list of parameter names.
-        /// Used for matching call-site argument positions to parameter names.
-        /// </summary>
-        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.Ordinal);
+        /// <summary>Expanded lines carrying text from each root-document line, keyed by original line.</summary>
+        public Dictionary<int, List<CallSiteExpansion>> CallSiteExpansions { get; set; } = new();
 
         internal Stage3Result ShallowCopy() => (Stage3Result)MemberwiseClone();
     }

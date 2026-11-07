@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Models;
@@ -70,10 +71,10 @@ namespace Calcpad.Highlighter.Linter.Helpers
             var stage2Line = stage3.Stage3ToStage2Map.TryGetValue(stage3Line, out var s2) ? s2 : stage3Line;
             var stage1Line = stage2.Stage2ToStage1Map.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
 
-            // Macro-expanded lines: the Stage 3 columns index into the substituted macro body,
-            // which shares no layout with the call site, so highlight the whole call site line
-            // instead of a range that would land on unrelated text (or past the end of the line).
-            if (stage3.MacroExpansions != null && stage3.MacroExpansions.ContainsKey(stage3Line))
+            // Macro-expanded lines map through the expansion's source columns; text from the macro
+            // body has no place at the call site, so the whole call site line is highlighted.
+            if (stage3.MacroExpansions != null && stage3.MacroExpansions.TryGetValue(stage3Line, out var expansion) &&
+                !TryProjectToCallSite(expansion, stage3.IncludeMap.GetValueOrDefault(stage3Line), ref column, ref endColumn))
             {
                 return MapWholeLineToOriginal(stage1Line, stage1);
             }
@@ -93,6 +94,29 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 EndColumn = endColumn,
                 AdditionalRanges = null
             };
+        }
+
+        private static bool TryProjectToCallSite(MacroExpansionInfo expansion, SourceInfo source, ref int column, ref int endColumn)
+        {
+            var columns = expansion.SourceColumns;
+            if (columns is null || source is { Source: not "local" })
+                return false;
+
+            int start = int.MaxValue, end = -1;
+            for (int i = Math.Max(column, 0), to = Math.Min(Math.Max(endColumn, column + 1), columns.Count); i < to; i++)
+            {
+                if (columns[i] < 0)
+                    continue;
+
+                start = Math.Min(start, columns[i]);
+                end = Math.Max(end, columns[i] + 1);
+            }
+            if (end < 0)
+                return false;
+
+            column = start;
+            endColumn = end;
+            return true;
         }
 
         /// <summary>

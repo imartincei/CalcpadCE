@@ -18,9 +18,8 @@ namespace Calcpad.Highlighter.Linter.Models
         public HashSet<string> CustomUnits { get; set; } = new();
 
         /// <summary>
-        /// Stage3 lines produced by macro expansion, keyed by Stage3 line index.
-        /// Columns on these lines refer to the expanded text, which has no correspondence
-        /// to the original call site, so diagnostics on them are widened to the whole line.
+        /// Stage3 lines produced by macro expansion, keyed by Stage3 line index. Diagnostics on
+        /// them map through the call site columns, or cover the whole line where there are none.
         /// </summary>
         public Dictionary<int, MacroExpansionInfo> MacroExpansions { get; set; } = new();
 

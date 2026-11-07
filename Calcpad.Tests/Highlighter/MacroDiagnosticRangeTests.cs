@@ -5,10 +5,8 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
-    /// Columns reported on a macro-expanded line index into the substituted macro body, which
-    /// shares no layout with the call site - they used to be applied verbatim to the original
-    /// line, underlining unrelated text or running past its end. Such diagnostics now cover the
-    /// whole call site line.
+    /// Columns reported on a macro-expanded line map back through the expansion: text from a call
+    /// argument keeps its range, and text from the macro body covers the whole call site line.
     /// </summary>
     public class MacroDiagnosticRangeTests : IClassFixture<HighlighterLinterFixture>
     {
@@ -101,6 +99,41 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal(3, additional.Line);
             Assert.Equal(0, additional.Column);
             Assert.Equal(lines[3].Length, additional.EndColumn);
+        }
+
+        [Fact]
+        public void UndefinedNameInArgument_HighlightsArgument()
+        {
+            var lines = new[]
+            {
+                "#def area$(w$; h$) = w$*h$",
+                "result = area$(2; zzzMissing)"
+            };
+
+            var diagnostic = LintUndefined(string.Join('\n', lines), "zzzMissing");
+
+            Assert.Equal(1, diagnostic.Line);
+            Assert.Equal(18, diagnostic.Column);
+            Assert.Equal(28, diagnostic.EndColumn);
+        }
+
+        [Fact]
+        public void UndefinedNameInContinuedArgument_HighlightsArgument()
+        {
+            var lines = new[]
+            {
+                "#def sum3$(a$; b$; c$) = a$ + b$ + c$",
+                "p = 1",
+                "r = sum3$(p; _",
+                "    zzzMissing; p)"
+            };
+
+            var diagnostic = LintUndefined(string.Join('\n', lines), "zzzMissing");
+
+            Assert.Equal(3, diagnostic.Line);
+            Assert.Equal(4, diagnostic.Column);
+            Assert.Equal(14, diagnostic.EndColumn);
+            Assert.Null(diagnostic.AdditionalRanges);
         }
 
         [Fact]
