@@ -521,6 +521,16 @@
       </div>
     </div>
 
+    <FileConflictDialog
+      v-if="fileConflictState"
+      :key="fileConflictState.filePath"
+      :title="fileConflictState.title"
+      :file-path="fileConflictState.filePath"
+      :mine="fileConflictState.mine"
+      :theirs="fileConflictState.theirs"
+      @resolve="resolveFileConflict"
+    />
+
     <!-- Single-select list modal (VS Code QuickPick analog). -->
     <div v-if="quickPickState" class="modal-backdrop" @click.self="resolveQuickPick(null)">
       <div class="modal-card quick-pick-card" role="dialog" aria-modal="true">
@@ -569,6 +579,8 @@ import { useI18n } from 'vue-i18n'
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import DesktopTitleBar from './components/DesktopTitleBar.vue'
 import DocumentTabStrip from './components/DocumentTabStrip.vue'
+import FileConflictDialog from './components/FileConflictDialog.vue'
+import type { FileConflictChoice } from './services/file-change-tracker'
 import RefreshIcon from 'calcpad-frontend/vue/components/RefreshIcon.vue'
 import SidebarIcon from 'calcpad-frontend/vue/components/SidebarIcon.vue'
 import {
@@ -2382,6 +2394,32 @@ function resolveOpenLink(ok: boolean): void {
   state.resolve(ok)
 }
 
+// ---- External-change conflict prompt ----
+interface FileConflictState {
+  title: string
+  filePath: string
+  mine: string
+  theirs: string
+  resolve: (choice: FileConflictChoice | null) => void
+}
+
+const fileConflictState = ref<FileConflictState | null>(null)
+
+/** Resolves null when dismissed without a choice. */
+function showFileConflict(opts: Omit<FileConflictState, 'resolve'>): Promise<FileConflictChoice | null> {
+  fileConflictState.value?.resolve(null)
+  return new Promise(resolve => {
+    fileConflictState.value = { ...opts, resolve }
+  })
+}
+
+function resolveFileConflict(choice: FileConflictChoice | null): void {
+  const state = fileConflictState.value
+  if (!state) return
+  fileConflictState.value = null
+  state.resolve(choice)
+}
+
 // ---- In-app quick-pick dialog ----
 interface QuickPickOptionUi {
   label: string
@@ -2473,6 +2511,7 @@ defineExpose({
   showConfirm,
   showOpenLink,
   showQuickPick,
+  showFileConflict,
   // tabs
   setTabs,
   onTabActivate,
