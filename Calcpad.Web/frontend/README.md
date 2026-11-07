@@ -8,12 +8,12 @@ This file covers building and packaging. What the editors *do* is documented for
 
 ## Projects
 
-| Directory | Description |
-|-----------|-------------|
+| Directory                              | Description                                                      |
+| -------------------------------------- | ---------------------------------------------------------------- |
 | [calcpad-frontend/](calcpad-frontend/) | Shared TypeScript library (API client, services, Vue components) |
-| [vscode-calcpad/](vscode-calcpad/) | VS Code extension with live preview and full language support |
-| [calcpad-web/](calcpad-web/) | Standalone web editor built with Monaco Editor + Vue |
-| [calcpad-desktop/](calcpad-desktop/) | Desktop application via Tauri wrapping the web editor |
+| [vscode-calcpad/](vscode-calcpad/)     | VS Code extension with live preview and full language support    |
+| [calcpad-web/](calcpad-web/)           | Standalone web editor built with Monaco Editor + Vue             |
+| [calcpad-desktop/](calcpad-desktop/)   | Desktop application via Tauri wrapping the web editor            |
 
 All projects depend on **Calcpad.Server** (the .NET backend at [../backend/](../backend/)) for computation, linting, and rendering via REST API. The extension and the desktop app spawn and manage their own copy; the standalone web editor needs one running already — see [../backend/README.md](../backend/README.md).
 
@@ -83,7 +83,73 @@ calcpad-desktop/           Tauri desktop wrapper
 
 The desktop app includes the bundled calculation server.
 
----
+### Desktop control channel
+
+On Unix, the desktop shell listens on `$XDG_RUNTIME_DIR/calcpad-desktop.sock`
+(mode 0600) so a terminal can drive the running window. If `XDG_RUNTIME_DIR`
+is unavailable it creates a private 0700 directory owned by the current user
+under the temp dir and refuses to reuse a socket owned by anyone else. The app binary is also
+the client, so no extra tool is required:
+
+```bash
+calcpad-desktop --ctl state
+calcpad-desktop --ctl open ./worksheet.cpd
+calcpad-desktop --ctl save
+calcpad-desktop --ctl export pdf ./report.pdf report
+calcpad-desktop --ctl result > preview.html
+```
+
+`calcpadctl.sh` is a convenience wrapper that also implements `screenshot`
+(needs `spectacle`, plus `kdotool` on KDE Wayland to raise the window). Install
+it somewhere on `PATH` or call `calcpad-desktop --ctl` directly. Run it with no
+arguments for the command list. Exports and `save-as` bypass the native save
+dialog; explicit output paths are written as given, with a default extension
+only when the path has none. Commands require the app to be running and answer
+with JSON (`{"ok": true, "result": ...}`).
+
+Command groups:
+
+| Group   | Commands                                                                                                                                                                                                                 |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Files   | `open`, `close [path] [--force]`, `save`, `save-as <path>`, `reload [path] [--force]`, `content [path]`, `set-content <file\|-> [path]`                                                                                  |
+| Compute | `refresh`, `result`, `state`, `menu <id>`                                                                                                                                                                                |
+| Editor  | `editor info\|focus\|undo\|redo`, `editor goto <line> [column]`, `editor select <l1> <c1> <l2> <c2>`, `editor insert <text\|->`, `editor find <text> [--regex --case --word]`, `editor replace-all <text> <new> [flags]` |
+| Exports | `export <pdf\|html\|docx\|cpdz\|zip> <out> [report\|preview\|input\|unwrapped]`, `plots`, `save-plot <index> <out>`, `save-plots <out.zip>`                                                                              |
+| Shell   | `windows`, `focus`, `window <minimize\|maximize\|unmaximize\|show\|hide\|close\|destroy>`, `clipboard read\|write <text\|->`, `ping`                                                                                     |
+| Bridge  | `message <json> [--wait=<responseType>]`                                                                                                                                                                                 |
+| Debug   | `eval <expression\|->` (requires the app started with `CALCPAD_CONTROL_EVAL=1`)                                                                                                                                          |
+
+Use `--window=<label>` with any command to target a specific window; without
+it the last focused window is used. `windows` lists the labels.
+
+`message` is the generic bridge entry point for the sidebar operations. It
+posts the same message the Vue UI posts and can wait for the matching response:
+
+```bash
+calcpad-desktop --ctl message '{"type":"getSettings"}' --wait=settingsResponse
+calcpad-desktop --ctl message '{"type":"getVariables"}' --wait=updateVariables
+calcpad-desktop --ctl message '{"type":"getUiControls"}' --wait=uiControls
+calcpad-desktop --ctl message '{"type":"updateUiOverrides","overrides":{"x:1":"6"}}'
+calcpad-desktop --ctl message '{"type":"writeFilesNow"}' --wait=writeFilesResult
+```
+
+Common response types: `settingsResponse`, `updateVariables`, `uiControls`,
+`plotsResponse`, `updateHeadings`, `documentMetadata`, `metadataContext`,
+`pdfSettingsResponse`, `insertDataResponse`, `folderOpened`, `folderContents`,
+`writeFilesResult`, `serverLogResponse`. Messages without a response type (for
+example `prettifyDocument`, `updateSettings`, `insertText`) return as soon as
+they are posted; read `content` afterwards to assert the effect.
+
+`eval` executes an expression in the webview, with access to `window`,
+`window.calcpadTabs`, `window.calcpadActiveEditor`, `window.calcpadBridge` and
+the DOM. It is a QA/debug escape hatch and is disabled unless explicitly
+enabled at startup. The socket is per-user and mode 0600; no network port is
+opened.
+
+The test suite for this channel lives in `tools/control-channel-qa/`; it
+asserts the channel contract against a running app and is separate from the
+calculation-engine tests and the WebDriver desktop-UI harness. The channel is
+Unix-only for now; Windows builds report it as unavailable.
 
 ## Development
 
@@ -156,11 +222,11 @@ with a trusted cert makes rebuilds trusted immediately.
 Signing is **off by default** (CI and contributors without a cert get a working,
 unsigned build). It turns on when `CALCPAD_SIGN_THUMBPRINT` is set at build time.
 
-| Env var | Purpose |
-|---------|---------|
-| `CALCPAD_SIGN_THUMBPRINT` | SHA1 thumbprint of a code-signing cert in `Cert:\CurrentUser\My`. **Required to enable signing.** |
-| `CALCPAD_SIGNTOOL` | Optional. Explicit path to `signtool.exe` if it isn't auto-discovered under the Windows SDK. |
-| `CALCPAD_SIGN_TIMESTAMP_URL` | Optional. RFC-3161 timestamp URL (default `http://timestamp.digicert.com`). |
+| Env var                      | Purpose                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------- |
+| `CALCPAD_SIGN_THUMBPRINT`    | SHA1 thumbprint of a code-signing cert in `Cert:\CurrentUser\My`. **Required to enable signing.** |
+| `CALCPAD_SIGNTOOL`           | Optional. Explicit path to `signtool.exe` if it isn't auto-discovered under the Windows SDK.      |
+| `CALCPAD_SIGN_TIMESTAMP_URL` | Optional. RFC-3161 timestamp URL (default `http://timestamp.digicert.com`).                       |
 
 What gets signed:
 
