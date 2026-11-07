@@ -16,6 +16,7 @@ export type {
     MacroDefinition,
     FunctionDefinition,
     VariableDefinition,
+    VariableTypeChange,
     CustomUnitDefinition,
     SymbolLocation,
     SymbolKind,
@@ -247,6 +248,7 @@ export {
     formatMacroCompletion,
     formatFunctionCompletion,
     formatVariableCompletion,
+    getVariableTypeAt,
     formatBuiltinSnippetCompletion,
     isCompletableBuiltin,
 } from './text/completion-format';

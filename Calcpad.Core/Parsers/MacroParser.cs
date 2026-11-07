@@ -149,6 +149,8 @@ namespace Calcpad.Core
         public string SourceFilePath { get; set; }
         private readonly List<CalcpadError> _errorList = new();
         public IReadOnlyList<CalcpadError> Errors => _errorList;
+        public MacroTrace Trace { get; set; }
+        private bool _traceAborted;
 
         private static Keywords GetKeyword(ReadOnlySpan<char> s)
         {
@@ -203,6 +205,7 @@ namespace Calcpad.Core
                 _parsedLineNumber = 0;
                 _errorList.Clear();
                 _pathRoots = new PathRoots();
+                _traceAborted = false;
             }
             var macroBuilder = new StringBuilder(1000);
             var macroName = string.Empty;
@@ -212,6 +215,11 @@ namespace Calcpad.Core
             var hasErrors = false;
             ReadOnlySpan<char> lineContent = "code";
             List<string> macroParameters = null;
+            var traceFile = includeLine == 0 ? null : SourceFilePath;
+            var fileLine = -1;
+            var traceSource = -1;
+            var defTraceSource = -1;
+            string traceText = null;
             List<string> macroDefaults = null;
             try
             {
@@ -224,6 +232,14 @@ namespace Calcpad.Core
                     }
 
                     lineContent = sourceLine.TrimStart();
+                    ++fileLine;
+                    if (Trace is not null)
+                    {
+                        traceText = sourceLine.ToString();
+                        traceSource = IsIncludeLine(lineContent)
+                            ? -1
+                            : Trace.AddSource(traceText, lineNumber, traceFile, fileLine);
+                    }
                     if (lineContent.IsEmpty)
                     {
                         AppendLine(sourceLine);
@@ -242,13 +258,20 @@ namespace Calcpad.Core
                     {
                         try
                         {
-                            var insertCode = ApplyMacros(sourceLine);
-                            var insertLines = insertCode.EnumerateLines();
-                            foreach (var line in insertLines)
-                                AppendLine(line);
+                            var expanded = Trace is null ? null : new List<string>();
+                            var insertCode = ApplyMacros(sourceLine, null, expanded);
+                            if (expanded is { Count: > 0 })
+                                AppendExpansion(insertCode, expanded);
+                            else
+                            {
+                                var insertLines = insertCode.EnumerateLines();
+                                foreach (var line in insertLines)
+                                    AppendLine(line);
+                            }
                         }
                         catch (Exception ex)
                         {
+                            Trace?.OutputLines.Add(new() { Text = traceText, SourceIndex = traceSource });
                             AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200");
                         }
                         continue;
@@ -263,6 +286,7 @@ namespace Calcpad.Core
                     var message = Messages.Macro_definition_block_not_closed_Missing_end_def;
                     sb.Append(message);
                     hasErrors = true;
+                    Trace?.Errors.Add(new(defTraceSource, message));
                     _errorList.Add(new CalcpadError
                     {
                         SourceLine = defLine,
@@ -276,10 +300,13 @@ namespace Calcpad.Core
             catch (Exception ex)
             {
                 AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200");
+                _traceAborted = true;
             }
             finally
             {
                 outCode = sb.ToString();
+                if (includeLine == 0 && Trace is not null)
+                    Trace.IsComplete = !_traceAborted;
             }
             return hasErrors;
 
@@ -353,6 +380,7 @@ namespace Calcpad.Core
                     ? Path.GetDirectoryName(SourceFilePath) : null;
                 if (!_pathRoots.TryExpand(rawFileName, out var tokenExpanded, out var tokenError))
                 {
+                    TraceFailedInclude(rawFileName);
                     AppendError(lineContent, tokenError, "CPD-1106");
                     return;
                 }
@@ -364,6 +392,7 @@ namespace Calcpad.Core
 
                 if (!_includeStack.Add(resolvedPath))
                 {
+                    TraceFailedInclude(tokenExpanded);
                     AppendError(lineContent, string.Format(Messages.Circular_include_detected_0, rawFileName), "CPD-1105");
                     return;
                 }
@@ -371,15 +400,26 @@ namespace Calcpad.Core
                 {
                     if (fileExists)
                     {
+                        Trace?.Includes.Add(new(resolvedPath, tokenExpanded, lineNumber));
                         ParseWithSourcePath(Include(resolvedPath, fields), resolvedPath);
                         return;
                     }
+                    TraceFailedInclude(tokenExpanded);
                     AppendError(lineContent, Messages.File_not_found, "CPD-1104");
                 }
                 finally
                 {
                     _includeStack.Remove(resolvedPath);
                 }
+            }
+
+            void TraceFailedInclude(string fileName)
+            {
+                if (Trace is null)
+                    return;
+
+                traceSource = Trace.AddSource(traceText, lineNumber, traceFile, fileLine);
+                Trace.OutputLines.Add(new() { Text = traceText, SourceIndex = traceSource, FailedInclude = fileName });
             }
 
             void ParseWithSourcePath(string content, string newSourcePath)
@@ -511,7 +551,7 @@ namespace Calcpad.Core
                 if (c == '=')
                 {
                     c = EatSpace(lineContent, ref i);
-                    _macros.TryAdd(macroName, new Macro(lineContent[i..].ToString(), macroParameters, macroDefaults));
+                    AddMacro(macroName, lineContent[i..].ToString(), macroParameters, macroDefaults, true);
                     macroName = string.Empty;
                     macroDefaults = null;
                 }
@@ -521,6 +561,7 @@ namespace Calcpad.Core
 
             void OpenDef()
             {
+                defTraceSource = traceSource;
                 defLine = lineNumber;
                 ++macroDefCount;
             }
@@ -546,14 +587,14 @@ namespace Calcpad.Core
 
                 macroBuilder.RemoveLastLineIfEmpty();
                 if (macroName.Length > 0)
-                    _macros.TryAdd(macroName, new Macro(macroBuilder.ToString(), macroParameters, macroDefaults));
+                    AddMacro(macroName, macroBuilder.ToString(), macroParameters, macroDefaults, false);
 
                 macroName = string.Empty;
                 macroDefaults = null;
                 macroBuilder.Clear();
             }
 
-            void AppendLine(ReadOnlySpan<char> line)
+            void AppendLine(ReadOnlySpan<char> line, bool trace = true)
             {
                 if (addLineNumbers)
                     sb.Append(line).Append('\v').Append(lineNumber).AppendLine();
@@ -561,6 +602,29 @@ namespace Calcpad.Core
                     sb.Append(line).AppendLine();
 
                 ++_parsedLineNumber;
+                if (trace && Trace is not null)
+                    Trace.OutputLines.Add(new() { Text = line.ToString(), SourceIndex = traceSource });
+            }
+
+            void AppendExpansion(string insertCode, List<string> expanded)
+            {
+                var count = 0;
+                foreach (var _ in insertCode.EnumerateLines())
+                    ++count;
+
+                var index = 0;
+                foreach (var line in insertCode.EnumerateLines())
+                {
+                    AppendLine(line, false);
+                    Trace.OutputLines.Add(new()
+                    {
+                        Text = line.ToString(),
+                        SourceIndex = traceSource,
+                        ExpandedMacros = expanded,
+                        ContentIndex = index++,
+                        ContentCount = count
+                    });
+                }
             }
 
             void SymbolError(ReadOnlySpan<char> lineContent, char c, string code)
@@ -574,6 +638,7 @@ namespace Calcpad.Core
                 sb.AppendLine(string.Format(Messages.Error_in_0_on_line_1_2, HttpUtility.HtmlEncode(lineContent.ToString()), LineHtml(lineNumber), errorMessage) + marker);
                 ++_parsedLineNumber;
                 hasErrors = true;
+                Trace?.Errors.Add(new(traceSource, errorMessage));
                 _errorList.Add(new CalcpadError
                 {
                     SourceLine = lineNumber,
@@ -584,7 +649,136 @@ namespace Calcpad.Core
                 });
             }
 
+            void AddMacro(string name, string contents, List<string> parameters, List<string> defaults, bool isInline)
+            {
+                var isAdded = _macros.TryAdd(name, new Macro(contents, parameters, defaults));
+                Trace?.Macros.Add(new()
+                {
+                    Name = name,
+                    Parameters = parameters is null ? [] : [.. parameters],
+                    Defaults = defaults is null ? [] : [.. defaults],
+                    Content = isInline ? [contents] : SplitLines(contents),
+                    SourceIndex = isInline ? traceSource : defTraceSource,
+                    EndSourceIndex = traceSource,
+                    IsInline = isInline,
+                    IsDuplicate = !isAdded
+                });
+            }
             static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
+        }
+
+        /// <summary>
+        /// Drops #local sections and the file metadata footer from included content. The footer's
+        /// 'uiOverrides' and 'fileInfo' belong to the file itself; other metadata comments are kept.
+        /// </summary>
+        /// <param name="keepLineCount">Blank filtered lines instead of removing them.</param>
+        public static string FilterIncludedContent(string content, bool keepLineCount = false)
+        {
+            if (string.IsNullOrEmpty(content))
+                return content;
+
+            var isLocal = false;
+            var lines = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+            var footerStart = FindMetadataFooterStart(lines);
+            var outputLines = new List<string>(lines.Length);
+            for (var i = 0; i < lines.Length; ++i)
+            {
+                var line = lines[i];
+                bool keep;
+                if (i >= footerStart)
+                    keep = false;
+                else if (Validator.IsKeyword(line, "#local"))
+                {
+                    isLocal = true;
+                    keep = false;
+                }
+                else if (Validator.IsKeyword(line, "#global"))
+                {
+                    isLocal = false;
+                    keep = false;
+                }
+                else
+                    keep = !isLocal;
+
+                if (keep)
+                    outputLines.Add(line);
+                else if (keepLineCount)
+                    outputLines.Add(string.Empty);
+            }
+            return string.Join(Environment.NewLine, outputLines);
+        }
+
+        // Mirrors the editors' findMetadataFooter: anchor, then 'uiOverrides', then 'fileInfo' last.
+        private static int FindMetadataFooterStart(string[] lines)
+        {
+            var start = lines.Length;
+            var end = LastContentLine(lines, lines.Length);
+            var block = MetadataCommentStart(lines, end);
+            if (block >= 0 && BlockContains(lines, block, end, "\"fileInfo\""))
+            {
+                start = block;
+                end = LastContentLine(lines, block);
+                block = MetadataCommentStart(lines, end);
+            }
+            if (block >= 0 && BlockContains(lines, block, end, "\"uiOverrides\""))
+            {
+                start = block;
+                end = LastContentLine(lines, block);
+            }
+            if (end >= 0 && lines[end].Trim() is "'<!--CalcpadCE Metadata-->" or "\"<!--CalcpadCE Metadata-->")
+                start = end;
+
+            return start;
+        }
+
+        private static int LastContentLine(string[] lines, int before)
+        {
+            for (var i = before - 1; i >= 0; --i)
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                    return i;
+
+            return -1;
+        }
+
+        // Opening line of the metadata comment that ends on 'end', following '_' continuations.
+        private static int MetadataCommentStart(string[] lines, int end)
+        {
+            if (end < 0 || !lines[end].Contains("-->", StringComparison.Ordinal))
+                return -1;
+
+            var i = end;
+            while (!IsMetadataOpener(lines[i]) && i > 0 && lines[i - 1].TrimEnd().EndsWith('_'))
+                --i;
+
+            return IsMetadataOpener(lines[i]) ? i : -1;
+        }
+
+        private static bool IsMetadataOpener(string line)
+        {
+            var trimmed = line.TrimStart();
+            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
+                && trimmed.Contains("<!--{", StringComparison.Ordinal);
+        }
+
+        private static bool BlockContains(string[] lines, int start, int end, string key)
+        {
+            for (var i = start; i <= end; ++i)
+                if (lines[i].Contains(key, StringComparison.Ordinal))
+                    return true;
+
+            return false;
+        }
+
+        private static bool IsIncludeLine(ReadOnlySpan<char> lineContent) =>
+            !lineContent.IsEmpty && lineContent[0] == '#' && GetKeyword(lineContent) == Keywords.Include;
+
+        private static List<string> SplitLines(string s)
+        {
+            var lines = new List<string>();
+            foreach (var line in s.EnumerateLines())
+                lines.Add(line.ToString());
+
+            return lines;
         }
 
         public static Queue<string> GetFields(ReadOnlySpan<char> s, char delimiter)
@@ -597,7 +791,7 @@ namespace Calcpad.Core
             return fields;
         }
 
-        private string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null)
+        private string ApplyMacros(ReadOnlySpan<char> lineContent, HashSet<string> currentlyExpanding = null, List<string> expanded = null)
         {
             var index = lineContent.IndexOf("$");
             if (index < 0)
@@ -651,7 +845,7 @@ namespace Calcpad.Core
                         if (TryParseKeywordArgument(rawArgument, macro, out var name, out var value))
                         {
                             seenKeyword = true;
-                            if (!keywordArguments.TryAdd(name.ToString(), ApplyMacros(value, currentlyExpanding)))
+                            if (!keywordArguments.TryAdd(name.ToString(), ApplyMacros(value, currentlyExpanding, expanded)))
                                 throw new MathParserException(string.Format(Messages.Duplicate_argument_0, name.ToString()), "CPD-3316");
                         }
                         else
@@ -659,7 +853,7 @@ namespace Calcpad.Core
                             if (seenKeyword)
                                 throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304");
 
-                            var s = ApplyMacros(textSpan.Cut(), currentlyExpanding);
+                            var s = ApplyMacros(textSpan.Cut(), currentlyExpanding, expanded);
                             macroArguments.Add(string.IsNullOrWhiteSpace(s) ? string.Empty : s);
                         }
                         textSpan.Reset(i + 1);
@@ -701,7 +895,7 @@ namespace Calcpad.Core
                 {
                     if (!macro.IsEmpty)
                     {
-                        var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding);
+                        var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding, expanded);
                         var sbLength = stringBuilder.Length;
                         SetLineInputFields(s, stringBuilder, fields, false);
                         if (stringBuilder.Length == sbLength)
@@ -735,20 +929,21 @@ namespace Calcpad.Core
             }
             else if (!insideArgList)
             {
-                var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding);
+                var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding, expanded);
                 stringBuilder.Append(s);
             }
             return stringBuilder.ToString();
         }
 
-        private string ExpandMacro(Macro macro, List<string> macroArguments, Dictionary<string, string> keywordArguments, string macroKey, ref HashSet<string> currentlyExpanding)
+        private string ExpandMacro(Macro macro, List<string> macroArguments, Dictionary<string, string> keywordArguments, string macroKey, ref HashSet<string> currentlyExpanding, List<string> expanded)
         {
             if (currentlyExpanding != null && currentlyExpanding.Contains(macroKey))
                 throw Exceptions.CircularMacroReference(macroKey);
             currentlyExpanding ??= new HashSet<string>(StringComparer.Ordinal);
             currentlyExpanding.Add(macroKey);
             var arguments = macro.ResolveArguments(macroArguments, keywordArguments);
-            try { return ApplyMacros(macro.Run(arguments), currentlyExpanding); }
+            expanded?.Add(macroKey);
+            try { return ApplyMacros(macro.Run(arguments), currentlyExpanding, expanded); }
             finally { currentlyExpanding.Remove(macroKey); }
         }
 

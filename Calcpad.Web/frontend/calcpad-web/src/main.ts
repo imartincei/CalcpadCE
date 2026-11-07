@@ -488,10 +488,14 @@ async function bootstrap(): Promise<void> {
         appInstance.setProblems(group.id, items);
     }
 
+    // Auto-run makes lint and definitions use the run's trace, so they wait for it.
+    const useTrace = () => editorBridge.getExtraSetting('autoRun') !== 'false';
+    const runFollows = () => useTrace() && appInstance.isPreviewVisible();
+
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
+        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`, useTrace());
     }
 
     // Also hands the result to App.vue, which themes the loading overlay with it.
@@ -797,6 +801,18 @@ async function bootstrap(): Promise<void> {
     }
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
+        const content = group.editor.getValue();
+        try {
+            await renderPreviewFor(group);
+        } finally {
+            if (useTrace() && group.editor.getValue() === content) {
+                void refreshDefinitionsFor(group);
+                void group.diagnostics?.refresh();
+            }
+        }
+    }
+
+    async function renderPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
         if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
@@ -1032,7 +1048,7 @@ async function bootstrap(): Promise<void> {
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
             const sev = editorBridge.getExtraSetting('linterMinSeverity');
             return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext, `lint:${group.id}`);
+        }, getFileContext, `lint:${group.id}`, useTrace, runFollows);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1126,7 +1142,7 @@ async function bootstrap(): Promise<void> {
                 if (definitionsTimer) clearTimeout(definitionsTimer);
                 definitionsTimer = setTimeout(() => {
                     invalidateUiControls(group);
-                    void refreshDefinitionsFor(group);
+                    if (!runFollows()) void refreshDefinitionsFor(group);
                 }, 800);
                 if (appInstance.isPreviewVisible() && editorBridge.getExtraSetting('autoRun') !== 'false') {
                     if (previewTimer) clearTimeout(previewTimer);
@@ -1177,7 +1193,8 @@ async function bootstrap(): Promise<void> {
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
-            void group.diagnostics?.refresh();
+            const deferToRun = runFollows();
+            if (!deferToRun) void group.diagnostics?.refresh();
             // The mode switch below renders the form itself, so rendering here first would
             // just be a preview nobody sees.
             if (!enteringUi && appInstance.isPreviewVisible()) void refreshPreviewFor(group);
@@ -1185,7 +1202,7 @@ async function bootstrap(): Promise<void> {
                 activeBridge.refreshHeadings();
                 activeBridge.refreshDocumentMetadata();
             }
-            void refreshDefinitionsFor(group);
+            if (!deferToRun) void refreshDefinitionsFor(group);
             if (enteringUi) autoEnterUiMode();
         });
 
@@ -1455,7 +1472,13 @@ async function bootstrap(): Promise<void> {
     registerFormatDocumentProvider(editorBridge);
 
     window.addEventListener('message', (e: MessageEvent) => {
-        if (e.data?.type === 'autoRunChanged') appInstance.setAutoRunEnabled(e.data.enabled);
+        if (e.data?.type === 'autoRunChanged') {
+            appInstance.setAutoRunEnabled(e.data.enabled);
+            for (const g of groups.values()) {
+                void g.diagnostics?.refresh();
+                void refreshDefinitionsFor(g);
+            }
+        }
         if (e.data?.type === 'settingsResponse') appInstance.setAutoRunEnabled(e.data.enableAutoRun);
         if (e.data?.type === 'linterMinSeverityChanged') {
             for (const g of groups.values()) void g.diagnostics?.refresh();
@@ -1898,8 +1921,10 @@ async function bootstrap(): Promise<void> {
         appInstance.appendOutput('info', reason);
         try {
             for (const g of groups.values()) {
-                await g.diagnostics?.refresh();
-                await refreshDefinitionsFor(g);
+                if (!runFollows()) {
+                    await g.diagnostics?.refresh();
+                    await refreshDefinitionsFor(g);
+                }
                 if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
             }
             activeBridge.refreshHeadings();

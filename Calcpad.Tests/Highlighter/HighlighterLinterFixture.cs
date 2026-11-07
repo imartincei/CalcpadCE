@@ -13,7 +13,6 @@ namespace Calcpad.Tests.Highlighter
         public string BaseDir { get; }
         public string ValidDir { get; }
         public string ErrorsDir { get; }
-        public Dictionary<string, string> IncludeFiles { get; }
 
         public HighlighterLinterFixture()
         {
@@ -25,17 +24,13 @@ namespace Calcpad.Tests.Highlighter
             if (!Directory.Exists(ValidDir))
                 throw new DirectoryNotFoundException(
                     $"Test data folder not found at '{ValidDir}'.");
-
-            IncludeFiles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var file in Directory.GetFiles(BaseDir, "*.cpd", SearchOption.AllDirectories))
-                IncludeFiles[Path.GetFileName(file)] = File.ReadAllText(file);
         }
 
         public LinterResult LintFile(string fullPath)
         {
             var content = File.ReadAllText(fullPath);
             var resolver = new ContentResolver();
-            var staged = resolver.GetStagedContent(content, IncludeFiles);
+            var staged = resolver.GetStagedContent(content, sourceFilePath: fullPath);
             var ignoreRegions = new LintIgnoreRegionParser().ExtractRegions(content);
             return new CalcpadLinter().Lint(staged, ignoreRegions);
         }

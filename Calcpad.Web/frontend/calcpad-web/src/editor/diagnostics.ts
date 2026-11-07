@@ -17,6 +17,7 @@ export interface DiagnosticsHandle extends monaco.IDisposable {
  * Set up diagnostics: lint on content change (debounced), filter by severity, show markers in
  * Monaco. `getMinSeverity` and `getFileContext` are read on every lint pass, so Settings-tab
  * changes take effect on the next refresh and #include directives resolve correctly.
+ * When `deferToRun` is true an edit doesn't lint; the run that follows calls `refresh`.
  */
 export function setupDiagnostics(
     editor: monaco.editor.IStandaloneCodeEditor,
@@ -24,14 +25,16 @@ export function setupDiagnostics(
     getMinSeverity: () => LintSeverity = () => 'information',
     getFileContext?: FileContextProvider,
     key?: string,
+    useTrace: () => boolean = () => false,
+    deferToRun: () => boolean = () => false,
 ): DiagnosticsHandle {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext, key);
+    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext, key, useTrace());
 
     const listener = editor.onDidChangeModelContent(() => {
         if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(run, 500);
+        if (!deferToRun()) debounceTimer = setTimeout(run, 500);
     });
 
     setTimeout(run, 300);
@@ -51,13 +54,14 @@ async function lintAndMark(
     minSeverity: LintSeverity,
     getFileContext?: FileContextProvider,
     key?: string,
+    useTrace?: boolean,
 ): Promise<void> {
     const model = editor.getModel();
     if (!model) return;
 
     const content = model.getValue();
     const ctx = getFileContext ? await getFileContext(content) : {};
-    const response = await apiClient.lint(content, ctx.sourceFilePath, { key });
+    const response = await apiClient.lint(content, ctx.sourceFilePath, { key, useTrace });
 
     if (!response?.diagnostics) {
         monaco.editor.setModelMarkers(model, 'calcpad', []);

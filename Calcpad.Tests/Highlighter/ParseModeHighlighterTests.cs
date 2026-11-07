@@ -19,7 +19,7 @@ namespace Calcpad.Tests.Highlighter
 
         private LinterResult Lint(string source)
         {
-            var staged = new ContentResolver().GetStagedContent(source, _fixture.IncludeFiles);
+            var staged = new ContentResolver().GetStagedContent(source);
             return new CalcpadLinter().Lint(staged, new LintIgnoreRegionParser().ExtractRegions(source));
         }
 
@@ -123,14 +123,14 @@ namespace Calcpad.Tests.Highlighter
         public void HtmlContent_DoesNotJoinContinuationLines()
         {
             const string source = "#html\n<style>\np { color: red;\n}\n</style>\n#end html";
-            var staged = new ContentResolver().GetStagedContent(source, _fixture.IncludeFiles);
+            var staged = new ContentResolver().GetStagedContent(source);
             Assert.Equal(6, staged.Stage1.Lines.Count);
             Assert.Empty(Lint(source).Diagnostics);
         }
 
         private ParseModeRange[] SourceModes(string source)
         {
-            var staged = new ContentResolver().GetStagedContent(source, _fixture.IncludeFiles);
+            var staged = new ContentResolver().GetStagedContent(source);
             return SourceParseModes.Build(staged, source.Split('\n').Length).ToArray();
         }
 

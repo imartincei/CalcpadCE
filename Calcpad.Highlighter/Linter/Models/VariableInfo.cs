@@ -17,6 +17,8 @@ namespace Calcpad.Highlighter.Linter.Models
         /// </summary>
         public CalcpadType Type { get; set; } = CalcpadType.Unknown;
 
+        public VariableInfo Clone() => (VariableInfo)MemberwiseClone();
+
         /// <summary>
         /// Line number where defined (0-based)
         /// </summary>
