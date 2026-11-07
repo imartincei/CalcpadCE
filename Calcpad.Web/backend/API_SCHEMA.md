@@ -161,7 +161,7 @@ A render with line anchors (`includeLineAnchors`, on by default for anything but
 
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
-Metadata footer comments (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) are stripped from the returned HTML.
+The metadata footer (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) at the end of the source is removed before rendering, in every parse mode.
 
 ---
 

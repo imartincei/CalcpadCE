@@ -4,10 +4,7 @@ using Calcpad.Server.Services;
 
 namespace Calcpad.Tests;
 
-/// <summary>
-/// An included file's metadata footer ('uiOverrides', 'fileInfo') only applies to that file, so
-/// <c>CalcpadService</c> drops it from the include, like a <c>#local</c>...<c>#global</c> block.
-/// </summary>
+/// <summary>An included file's metadata footer only applies to that file, so it never reaches the host's output.</summary>
 public class UiOverridesIncludeTests
 {
     [Fact]

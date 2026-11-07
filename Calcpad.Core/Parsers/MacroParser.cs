@@ -667,10 +667,7 @@ namespace Calcpad.Core
             static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
         }
 
-        /// <summary>
-        /// Drops #local sections and the file metadata footer from included content. The footer's
-        /// 'uiOverrides' and 'fileInfo' belong to the file itself; other metadata comments are kept.
-        /// </summary>
+        /// <summary>Drops #local sections and the <see cref="MetadataFooter"/> from included content.</summary>
         /// <param name="keepLineCount">Blank filtered lines instead of removing them.</param>
         public static string FilterIncludedContent(string content, bool keepLineCount = false)
         {
@@ -678,16 +675,12 @@ namespace Calcpad.Core
                 return content;
 
             var isLocal = false;
-            var lines = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-            var footerStart = FindMetadataFooterStart(lines);
+            var lines = MetadataFooter.Remove(content, keepLineCount).Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             var outputLines = new List<string>(lines.Length);
-            for (var i = 0; i < lines.Length; ++i)
+            foreach (var line in lines)
             {
-                var line = lines[i];
                 bool keep;
-                if (i >= footerStart)
-                    keep = false;
-                else if (Validator.IsKeyword(line, "#local"))
+                if (Validator.IsKeyword(line, "#local"))
                 {
                     isLocal = true;
                     keep = false;
@@ -706,67 +699,6 @@ namespace Calcpad.Core
                     outputLines.Add(string.Empty);
             }
             return string.Join(Environment.NewLine, outputLines);
-        }
-
-        // Mirrors the editors' findMetadataFooter: anchor, then 'uiOverrides', then 'fileInfo' last.
-        private static int FindMetadataFooterStart(string[] lines)
-        {
-            var start = lines.Length;
-            var end = LastContentLine(lines, lines.Length);
-            var block = MetadataCommentStart(lines, end);
-            if (block >= 0 && BlockContains(lines, block, end, "\"fileInfo\""))
-            {
-                start = block;
-                end = LastContentLine(lines, block);
-                block = MetadataCommentStart(lines, end);
-            }
-            if (block >= 0 && BlockContains(lines, block, end, "\"uiOverrides\""))
-            {
-                start = block;
-                end = LastContentLine(lines, block);
-            }
-            if (end >= 0 && lines[end].Trim() is "'<!--CalcpadCE Metadata-->" or "\"<!--CalcpadCE Metadata-->")
-                start = end;
-
-            return start;
-        }
-
-        private static int LastContentLine(string[] lines, int before)
-        {
-            for (var i = before - 1; i >= 0; --i)
-                if (!string.IsNullOrWhiteSpace(lines[i]))
-                    return i;
-
-            return -1;
-        }
-
-        // Opening line of the metadata comment that ends on 'end', following '_' continuations.
-        private static int MetadataCommentStart(string[] lines, int end)
-        {
-            if (end < 0 || !lines[end].Contains("-->", StringComparison.Ordinal))
-                return -1;
-
-            var i = end;
-            while (!IsMetadataOpener(lines[i]) && i > 0 && lines[i - 1].TrimEnd().EndsWith('_'))
-                --i;
-
-            return IsMetadataOpener(lines[i]) ? i : -1;
-        }
-
-        private static bool IsMetadataOpener(string line)
-        {
-            var trimmed = line.TrimStart();
-            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
-                && trimmed.Contains("<!--{", StringComparison.Ordinal);
-        }
-
-        private static bool BlockContains(string[] lines, int start, int end, string key)
-        {
-            for (var i = start; i <= end; ++i)
-                if (lines[i].Contains(key, StringComparison.Ordinal))
-                    return true;
-
-            return false;
         }
 
         private static bool IsIncludeLine(ReadOnlySpan<char> lineContent) =>
