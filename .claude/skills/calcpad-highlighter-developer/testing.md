@@ -21,13 +21,15 @@ dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "DisplayName~vectors.cpd
 
 ## HighlighterLinterFixture
 
-`Calcpad.Tests/Highlighter/HighlighterLinterFixture.cs` is the shared harness, injected via `IClassFixture<HighlighterLinterFixture>`. It exposes `ValidDir`, `ErrorsDir`, an `IncludeFiles` dictionary of every `.cpd` under the test folder (so `#include` resolves in-memory), and:
+`Calcpad.Tests/Highlighter/HighlighterLinterFixture.cs` is the shared harness, injected via `IClassFixture<HighlighterLinterFixture>`. It exposes `ValidDir`, `ErrorsDir`, and:
 
 ```csharp
 public LinterResult LintFile(string fullPath);
-// reads the file → ContentResolver.GetStagedContent(content, IncludeFiles)
+// reads the file → ContentResolver.GetStagedContent(content, sourceFilePath: fullPath)
 // → LintIgnoreRegionParser.ExtractRegions → CalcpadLinter.Lint(staged, ignoreRegions)
 ```
+
+Includes resolve from disk relative to the linted file, as Core's `MacroParser` does, so a sample's `#include` must point at a real file. Tests that build sources inline write them, and their includes, to a temp directory.
 
 The `.cpd` files are copied to the output directory by the csproj, so the fixture locates them relative to the assembly.
 
@@ -181,8 +183,6 @@ curl -X POST http://localhost:9420/api/calcpad/lint \
     "sourceFilePath": "/tmp/cpd/main.cpd"
   }'
 ```
-
-The in-memory `includeFiles` dictionary exists only in the unit-test fixture, via the `ContentResolver.GetStagedContent(content, files)` overload.
 
 ### Convert Endpoint (Runtime Validation)
 

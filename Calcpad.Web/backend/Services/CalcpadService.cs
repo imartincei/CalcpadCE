@@ -32,7 +32,7 @@ namespace Calcpad.Server.Services
             {
                 try
                 {
-                    return ProcessIncludedContent(File.ReadAllText(fileName));
+                    return MacroParser.FilterIncludedContent(File.ReadAllText(fileName));
                 }
                 catch (Exception ex)
                 {
@@ -42,7 +42,8 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, PauseInfo? Pause) Convert(
+        /// <returns>Trace is what Core executed, recorded only when the run was in debug mode.</returns>
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, RuntimeTrace? Trace, PauseInfo? Pause) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -102,6 +103,7 @@ namespace Calcpad.Server.Services
                 PauseInfo? pause = null;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
                 var errors = new List<CalcpadError>(macroParser.Errors);
+                RuntimeTrace? trace = null;
 
                 if (hasMacroErrors || forceUnwrappedCode)
                 {
@@ -118,6 +120,7 @@ namespace Calcpad.Server.Services
                             var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
                             silent.Parse(outputText, true, false);
                             errors.AddRange(silent.Errors);
+                            trace = silent.Trace;
                         }
                         catch (Exception silentEx)
                         {
@@ -154,6 +157,7 @@ namespace Calcpad.Server.Services
                         if (stepPauses)
                             pause = new PauseInfo(parser.NextPauseKey, parser.PreviousPauseKey);
                         errors.AddRange(parser.Errors);
+                        trace = parser.Trace;
                         if (captureOpenXml)
                             openXmlExpressions = parser.OpenXmlExpressions.ToList();
                     }
@@ -168,7 +172,7 @@ namespace Calcpad.Server.Services
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                return (finalHtml, openXmlExpressions, errors, pause);
+                return (finalHtml, openXmlExpressions, errors, trace, pause);
             }
             catch (OperationCanceledException)
             {
@@ -495,32 +499,6 @@ tan_angle = tan(angle°)";
             {
                 // Ignore cleanup errors
             }
-        }
-
-        /// <summary>
-        /// Drops #local...#global blocks and the file's metadata footer, which only applies to the file that carries it.
-        /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
-        /// </summary>
-        private static string ProcessIncludedContent(string content)
-        {
-            if (string.IsNullOrEmpty(content))
-                return content;
-
-            var isLocal = false;
-            var lines = MetadataFooter.Remove(content).Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var outputLines = new List<string>();
-
-            foreach (var line in lines)
-            {
-                if (Validator.IsKeyword(line, "#local"))
-                    isLocal = true;
-                else if (Validator.IsKeyword(line, "#global"))
-                    isLocal = false;
-                else if (!isLocal)
-                    outputLines.Add(line);
-            }
-
-            return string.Join(Environment.NewLine, outputLines);
         }
     }
 }

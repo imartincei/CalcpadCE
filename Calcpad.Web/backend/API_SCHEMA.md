@@ -157,6 +157,8 @@ When `stepPauses` is in effect, an `X-Calcpad-Pause` header reports where the fo
 
 Both headers are listed in the CORS policy's exposed headers, so a browser client can read them.
 
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed. `/lint` and `/definitions` requests with `useTrace: true` for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. Without `useTrace`, after a render with no line anchors, or for any other content, they use static inference. The editors set `useTrace` when auto-run is on and lint once each run finishes.
+
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
 The metadata footer (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) at the end of the source is removed before rendering, in every parse mode.
@@ -476,6 +478,7 @@ Lint Calcpad source code and return diagnostics (errors, warnings, and informati
 interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
+  useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
 }
 ```
 
@@ -740,6 +743,7 @@ Get detailed definitions (macros, functions, variables, custom units) from Calcp
 interface DefinitionsRequest {
   content: string;          // The Calcpad source code to analyze
   sourceFilePath?: string;  // Full path of source file on client
+  useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
 }
 ```
 
@@ -793,13 +797,19 @@ interface FunctionDefinitionDto {
 
 interface VariableDefinitionDto {
   name: string;
-  expression?: string;
-  type: string;
+  expression?: string;           // Right-hand side of the first definition; the first executed one when a trace matches
+  type: string;                  // "Various" when a matching trace saw the type change
   typeId: number;
-  lineNumber: number;
+  typeChanges: VariableTypeChangeDto[] | null;  // Set only alongside "Various": where each new type starts
+  lineNumber: number;            // Zero-based; the first executed definition when a trace matches
   source: string;
   sourceFile?: string;
   description?: string;
+}
+
+interface VariableTypeChangeDto {
+  line: number;                  // Zero-based line of the assignment
+  type: string;                  // Value, Vector or Matrix
 }
 
 interface CustomUnitDefinitionDto {
@@ -1229,6 +1239,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |
 | `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` when a hang is detected |
 | `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `50000` | Flattened source lines budgeted across the resolved-content cache shared by lint/highlight/definitions |
+| `CALCPAD_TRACE_CACHE_SIZE_LIMIT` | `20000` | Executed lines budgeted across stored run traces, kept per path and content; least recently used go first |
 | `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export. Also `BrowserPath` in `appsettings.json` |
 | `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own. Also `AllowChromiumDownload` in `appsettings.json` |
 

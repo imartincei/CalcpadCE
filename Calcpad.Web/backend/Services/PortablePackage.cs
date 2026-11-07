@@ -148,7 +148,7 @@ namespace Calcpad.Server.Services
         /// </summary>
         /// <remarks>
         /// A declaration inside a <c>#local</c>...<c>#global</c> section of a file reached by
-        /// <c>#include</c> is skipped, mirroring <c>CalcpadService.ProcessIncludedContent</c>,
+        /// <c>#include</c> is skipped, mirroring <c>MacroParser.FilterIncludedContent</c>,
         /// which drops that section before the includer sees it. The root's own <c>#local</c>
         /// is not gated: opening it directly never goes through the include delegate.
         /// </remarks>

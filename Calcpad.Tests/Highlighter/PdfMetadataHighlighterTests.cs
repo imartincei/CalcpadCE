@@ -14,7 +14,7 @@ namespace Calcpad.Tests.Highlighter
     {
         private static LinterResult Lint(string content)
         {
-            var staged = new ContentResolver().GetStagedContent(content, new Dictionary<string, string>());
+            var staged = new ContentResolver().GetStagedContent(content);
             var ignore = new LintIgnoreRegionParser().ExtractRegions(content);
             return new CalcpadLinter().Lint(staged, ignore);
         }
@@ -266,20 +266,25 @@ namespace Calcpad.Tests.Highlighter
         public void UiOverrides_FromInclude_ReportsNothing()
         {
             // A comment only reached through #include never applies, so it isn't flagged as misplaced.
-            var mainPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "main.cpd");
-            var subPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "uioverrides-include", "sub.cpd");
-            var content = "#UI L = 4\n#include sub.cpd\n";
-            var includeFiles = new Dictionary<string, string>
+            var dir = System.IO.Directory.CreateTempSubdirectory("uioverrides-include-");
+            try
             {
-                [subPath] = "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI q = 1"
-            };
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir.FullName, "sub.cpd"),
+                    "'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n#UI q = 1");
+                var content = "#UI L = 4\n#include sub.cpd\n";
 
-            var staged = new ContentResolver().GetStagedContent(content, includeFiles, sourceFilePath: mainPath);
-            var ignore = new LintIgnoreRegionParser().ExtractRegions(content);
-            var result = new CalcpadLinter().Lint(staged, ignore);
+                var staged = new ContentResolver().GetStagedContent(content,
+                    sourceFilePath: System.IO.Path.Combine(dir.FullName, "main.cpd"));
+                var ignore = new LintIgnoreRegionParser().ExtractRegions(content);
+                var result = new CalcpadLinter().Lint(staged, ignore);
 
-            Assert.DoesNotContain(result.Diagnostics, d =>
-                d.Code == "CPD-3416" || d.Code == "CPD-3417" || d.Code == "CPD-3418" || d.Code == "CPD-3412");
+                Assert.DoesNotContain(result.Diagnostics, d =>
+                    d.Code == "CPD-3416" || d.Code == "CPD-3417" || d.Code == "CPD-3418" || d.Code == "CPD-3412");
+            }
+            finally
+            {
+                dir.Delete(true);
+            }
         }
 
         [Fact]

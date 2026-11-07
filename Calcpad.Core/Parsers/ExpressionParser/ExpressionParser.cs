@@ -26,6 +26,7 @@ namespace Calcpad.Core
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
         private readonly Stack<MathParser.VariableSubstitutionOptions> _substitutionStack = new();
+        private readonly Stack<SettingsDto> _settingsStack = new();
         private bool _isMarkdownOn;
         private MathParser _parser;
         private readonly StringBuilder _sb = new(10000);
@@ -118,6 +119,8 @@ namespace Calcpad.Core
                             _parser.Line = currentLineCache.SourceLine != 0
                                 ? currentLineCache.SourceLine
                                 : _currentLine + 1;
+                            if (Trace is not null)
+                                TraceLine();
                             _condition.SetCondition(-1);
                             _parser.IsCalculation = _isVal != -1;
                             ParseLine(currentLineCache.Tokens, Keyword.None);
@@ -179,9 +182,18 @@ namespace Calcpad.Core
                     }
                     var lineCache = _currentLine;
                     _parser.IsConst = false;
+                    if (Trace is not null)
+                        TraceExpression(null);
                     var result = ParseKeyword(textSpan, ref keyword);
                     if (keyword != currentLineCache.Keyword)
                         _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
+
+                    if (Trace is not null)
+                    {
+                        _parser.SyncTrace();
+                        if (IsEnabled())
+                            TraceLine();
+                    }
 
                     if (result == KeywordResult.Continue)
                         continue;
@@ -243,7 +255,7 @@ namespace Calcpad.Core
             finally
             {
                 FlushMarkdown();
-                FinalizeOutput();
+                FinalizeOutput(lineCount);
             }
 
             void ReportUnclosed(string message, (int Line, int SourceLine) opening)
@@ -523,6 +535,8 @@ namespace Calcpad.Core
             {
                 ShowWarnings = ShowWarnings
             };
+            Trace = Debug ? new() : null;
+            _parser.Trace = Trace;
             _decimals = Settings.Math.Decimals;
             _lineCache = new LineInfo[lineCount];
             _sb.Clear();
@@ -531,6 +545,7 @@ namespace Calcpad.Core
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
+            _settingsStack.Clear();
             _isMarkdownOn = false;
             _parseMode = ParseMode.Cpd;
             _modeSuppressed = false;
@@ -551,13 +566,16 @@ namespace Calcpad.Core
             ResetUiState();
         }
 
-        private void FinalizeOutput()
+        private void FinalizeOutput(int lineCount)
         {
             if (NextPauseKey is not null)
                 _sb.Append(Messages.Paused_Click_Next_to_continue);
 
             if (Debug && _errors.Count != 0)
                 AppendErrors();
+
+            if (Trace is not null)
+                Trace.IsComplete = _currentLine == lineCount && _calculate;
 
             HtmlResult = _sb.ToString();
 
@@ -609,6 +627,8 @@ namespace Calcpad.Core
                     // What was actually parsed: a control's entered value replaces the right
                     // hand side, and an error has to name that rather than the source.
                     var expression = token.Value;
+                    if (Trace is not null)
+                        TraceExpression(expression);
                     try
                     {
                         ui = TakeUiControl(token.Value);
@@ -625,7 +645,11 @@ namespace Calcpad.Core
                             _parser.ReadEquationFromCache(cacheID);
 
                         if (_calculate && _isVal > -1)
+                        {
                             _parser.Calculate(isOutput, cacheID);
+                            if (Trace is not null)
+                                _parser.SyncTrace();
+                        }
                         else
                             _parser.DefineCustomUnits();
 

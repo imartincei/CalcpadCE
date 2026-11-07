@@ -24,7 +24,7 @@ export class CalcpadServerLinter {
         this.lintService = new CalcpadLintService(apiClient, this.logger);
     }
 
-    public async lintDocument(document: vscode.TextDocument): Promise<void> {
+    public async lintDocument(document: vscode.TextDocument, useTrace = false): Promise<void> {
         if (!document.fileName.endsWith('.cpd')) {
             this.diagnosticCollection.delete(document.uri);
             return;
@@ -34,7 +34,7 @@ export class CalcpadServerLinter {
 
         try {
             const sourceFilePath = document.uri.fsPath;
-            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`);
+            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`, useTrace);
 
             if (lintResponse) {
                 const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics);

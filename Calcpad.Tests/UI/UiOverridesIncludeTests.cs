@@ -13,7 +13,7 @@ public class UiOverridesIncludeTests
         using var temp = new TempDir();
         temp.Write("sub/mod.cpd", "#UI L = 4\n'<!--CalcpadCE Metadata-->\n'<!--{\"uiOverrides\":{\"L:1\":\"8\"}}-->\n");
 
-        var (html, _, errors, _) = new CalcpadService().Convert(
+        var (html, _, errors, _, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
 
         Assert.Empty(errors);
@@ -24,9 +24,9 @@ public class UiOverridesIncludeTests
     public void CalcpadService_StripsAFileInfoCommentFromAnInclude()
     {
         using var temp = new TempDir();
-        temp.Write("sub/mod.cpd", "x = 1\n'<!--{\"fileInfo\":{\"title\":\"Module\"}}-->\n");
+        temp.Write("sub/mod.cpd", "x = 1\n'<!--CalcpadCE Metadata-->\n'<!--{\"fileInfo\":{\"title\":\"Module\"}}-->\n");
 
-        var (html, _, errors, _) = new CalcpadService().Convert(
+        var (html, _, errors, _, _) = new CalcpadService().Convert(
             "#include sub/mod.cpd\n", sourceFilePath: temp.At("main.cpd"), forceUnwrappedCode: true);
 
         Assert.Empty(errors);

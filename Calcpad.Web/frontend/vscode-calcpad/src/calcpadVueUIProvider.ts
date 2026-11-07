@@ -28,6 +28,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public onPreviewThemeChanged?: () => void | Promise<void>;
     public onSettingsChanged?: () => void | Promise<void>;
     public onLogLevelChanged?: (level: string) => void;
+    public onAutoRunChanged?: () => void;
     /**
      * Renders the active document as an input form and reports the controls it produced,
      * or null when it could not be rendered. The extension owns the api client and the
@@ -189,6 +190,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 
                 case 'updateAutoRun':
                     this._settingsManager.setExtra('autoRun', data.enabled);
+                    this.onAutoRunChanged?.();
                     break;
 
                 case 'updateAutoInputMode':
