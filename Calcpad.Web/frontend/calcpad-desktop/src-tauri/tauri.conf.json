@@ -40,7 +40,10 @@
       "binaries/*.html": "./",
       "binaries/Fonts/**/*": "./Fonts/",
       "binaries/bg/**/*": "./bg/",
-      "binaries/zh/**/*": "./zh/"
+      "binaries/zh/**/*": "./zh/",
+      "agent-plugin/.claude-plugin/plugin.json": "agent-plugin/.claude-plugin/plugin.json",
+      "../../../../.claude/skills/calcpad-generator/SKILL.md": "agent-plugin/skills/calcpad-generator/SKILL.md",
+      "../../../../.claude/skills/calcpad-generator/reference/*": "agent-plugin/skills/calcpad-generator/reference/"
     },
     "icon": [
       "icons/32x32.png",

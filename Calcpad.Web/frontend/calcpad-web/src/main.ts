@@ -69,6 +69,7 @@ import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
 import { MetadataFooterView } from './editor/metadata-footer-view';
+import { registerAgentEditor } from './services/agent-chat';
 
 // Monaco worker setup — must run before editor creation
 import './editor/workers';
@@ -2317,6 +2318,12 @@ async function bootstrap(): Promise<void> {
                 appInstance.appendOutput('error', 'Failed to open file: ' + (err instanceof Error ? err.message : String(err)));
             }
         }
+
+        registerAgentEditor({
+            groups: () => [...groups.values()],
+            activeGroup: () => activeGroup,
+            openFile: loadFile,
+        });
 
         // Files-tab clicks arrive via a custom event dispatched by the bridge.
         window.addEventListener('calcpad-open-file', (e: Event) => {

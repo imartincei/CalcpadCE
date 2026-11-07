@@ -1239,3 +1239,31 @@ button.modal-btn {
 .status-text {
     opacity: 0.8;
 }
+
+.status-agent {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    padding: 0 6px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.status-agent .status-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.status-agent:hover,
+.status-agent.active {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.agent-resize-handle {
+    margin-inline-start: -4px;
+    margin-inline-end: 0;
+}

@@ -16,6 +16,7 @@ use tauri_plugin_window_state::StateFlags;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::mpsc;
 
+mod agent;
 mod navigation_history;
 use navigation_history::{
     complete_navigation, navigate_history, record_navigation, remove_navigation,
@@ -1712,6 +1713,7 @@ pub fn run() {
         .manage(OpenFiles::default())
         .manage(MenuState::default())
         .manage(NavigationHistoryState::default())
+        .manage(agent::AgentState::default())
         .menu(build_menu)
         .invoke_handler(tauri::generate_handler![
             set_menu_labels,
@@ -1747,6 +1749,16 @@ pub fn run() {
             show_app_menu,
             get_app_menu,
             create_export_path,
+            agent::agent_start,
+            agent::agent_send,
+            agent::agent_interrupt,
+            agent::agent_set_model,
+            agent::agent_stop,
+            agent::agent_tool_response,
+            agent::history::agent_history_list,
+            agent::history::agent_history_read,
+            agent::history::agent_history_write,
+            agent::history::agent_history_delete,
             #[cfg(target_os = "linux")]
             linux_file_dialog::linux_file_dialog,
         ])
@@ -1780,6 +1792,7 @@ pub fn run() {
                 window
                     .state::<NavigationHistoryState>()
                     .remove_window(window.label());
+                agent::on_window_destroyed(window.app_handle(), window.label());
                 let app = window.app_handle();
                 let next = app
                     .webview_windows()
@@ -1911,9 +1924,11 @@ pub fn run() {
         .run(|app, event| {
             if let RunEvent::ExitRequested { .. } = event {
                 stop_sidecar(app);
+                agent::stop_all(app);
             }
             if let RunEvent::Exit = event {
                 stop_sidecar(app);
+                agent::stop_all(app);
             }
         });
 }

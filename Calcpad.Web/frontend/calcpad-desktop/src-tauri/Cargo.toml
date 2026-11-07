@@ -35,7 +35,14 @@ serde_json = "1"
 # Only for the per-launch API token — already in the tree transitively, so this
 # pins nothing new. Kept off `rand` deliberately: this needs OS entropy, not a PRNG.
 getrandom = "0.2"
-tokio = { version = "1", features = ["sync", "time", "process", "io-util", "rt", "macros"] }
+tokio = { version = "1", features = ["sync", "time", "process", "io-util", "rt", "macros", "net"] }
+rmcp = { version = "3.9", default-features = false, features = ["server", "transport-streamable-http-server"] }
+hyper = { version = "1", features = ["server", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+http = "1"
+http-body-util = "0.1"
+bytes = "1"
+tower-service = "0.3"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 gtk = "0.18"
