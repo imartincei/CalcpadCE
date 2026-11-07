@@ -61,6 +61,7 @@ namespace Calcpad.Core
             Phasor,
             Complex,
             Settings,
+            End_Settings,
             Ui,
             ProjectPath,
             LibraryPath,
@@ -267,6 +268,14 @@ namespace Calcpad.Core
                     break;
                 case Keyword.Settings:
                     ParseKeywordSettings(s);
+                    break;
+                case Keyword.End_Settings:
+                    if (_settingsStack.Count > 0)
+                    {
+                        var prior = _settingsStack.Pop();
+                        foreach (var key in Enum.GetValues<SettingKey>())
+                            ApplySetting(key, prior);
+                    }
                     break;
                 case Keyword.Ui:
                     return ParseKeywordUi(s);
@@ -734,6 +743,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordSettings(ReadOnlySpan<char> s)
         {
+            // Pushed even when invalid so each #end settings pairs with its opener.
+            SettingsDto prior = new();
+            _settingsStack.Push(prior);
             var json = s[SettingsKeyword.Length..].Trim();
             if (json.IsEmpty)
             {
@@ -746,6 +758,7 @@ namespace Calcpad.Core
                 if (dto is null)
                     return;
 
+                CaptureSettings(dto, prior);
                 HashSet<SettingKey> invalid = null;
                 foreach (var error in dto.Validate())
                 {
@@ -760,133 +773,6 @@ namespace Calcpad.Core
             catch (JsonException)
             {
                 AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413");
-            }
-        }
-
-        private void ApplySetting(SettingKey key, SettingsDto dto)
-        {
-            switch (key)
-            {
-                case SettingKey.Decimals:
-                    if (dto.Decimals.HasValue)
-                        Settings.Math.Decimals = dto.Decimals.Value;
-                    break;
-                case SettingKey.Degrees:
-                    if (dto.Degrees.HasValue)
-                    {
-                        Settings.Math.Degrees = dto.Degrees.Value;
-                        _parser.Degrees = dto.Degrees.Value;
-                    }
-                    break;
-                case SettingKey.ReturnAngleUnits:
-                    if (dto.ReturnAngleUnits.HasValue)
-                    {
-                        Settings.Math.ReturnAngleUnits = dto.ReturnAngleUnits.Value;
-                        _parser.SetVariable("ReturnAngleUnits", dto.ReturnAngleUnits.Value ? 1d : 0d);
-                    }
-                    break;
-                case SettingKey.Complex:
-                    if (dto.Complex.HasValue)
-                        _parser.SetComplex(dto.Complex.Value);
-                    break;
-                case SettingKey.Substitute:
-                    if (dto.Substitute.HasValue)
-                        Settings.Math.Substitute = dto.Substitute.Value;
-                    break;
-                case SettingKey.FormatEquations:
-                    if (dto.FormatEquations.HasValue)
-                        Settings.Math.FormatEquations = dto.FormatEquations.Value;
-                    break;
-                case SettingKey.ZeroSmallMatrixElements:
-                    if (dto.ZeroSmallMatrixElements.HasValue)
-                        Settings.Math.ZeroSmallMatrixElements = dto.ZeroSmallMatrixElements.Value;
-                    break;
-                case SettingKey.ShowHiddenOutput:
-                    if (dto.ShowHiddenOutput.HasValue)
-                        Settings.Math.ShowHiddenOutput = dto.ShowHiddenOutput.Value;
-                    break;
-                case SettingKey.MaxOutputCount:
-                    if (dto.MaxOutputCount.HasValue)
-                        Settings.Math.MaxOutputCount = dto.MaxOutputCount.Value;
-                    break;
-                case SettingKey.IsUs:
-                    if (dto.IsUs.HasValue)
-                    {
-                        Settings.IsUs = dto.IsUs.Value;
-                        _parser.IsUs = dto.IsUs.Value;
-                    }
-                    break;
-                case SettingKey.VectorGraphics:
-                    if (dto.VectorGraphics.HasValue)
-                    {
-                        Settings.Plot.VectorGraphics = dto.VectorGraphics.Value;
-                        _parser.SetVariable("PlotSVG", dto.VectorGraphics.Value ? 1d : 0d);
-                    }
-                    break;
-                case SettingKey.ColorScale:
-                    if (dto.ColorScale is not null &&
-                        Enum.TryParse<PlotSettings.ColorScales>(dto.ColorScale, true, out var cs))
-                    {
-                        Settings.Plot.ColorScale = cs;
-                        _parser.SetVariable("PlotPalette", (int)cs);
-                    }
-                    break;
-                case SettingKey.SmoothScale:
-                    if (dto.SmoothScale.HasValue)
-                    {
-                        Settings.Plot.SmoothScale = dto.SmoothScale.Value;
-                        _parser.SetVariable("PlotSmooth", dto.SmoothScale.Value ? 1d : 0d);
-                    }
-                    break;
-                case SettingKey.Shadows:
-                    if (dto.Shadows.HasValue)
-                    {
-                        Settings.Plot.Shadows = dto.Shadows.Value;
-                        _parser.SetVariable("PlotShadows", dto.Shadows.Value ? 1d : 0d);
-                    }
-                    break;
-                case SettingKey.AdaptivePlot:
-                    if (dto.AdaptivePlot.HasValue)
-                    {
-                        Settings.Plot.IsAdaptive = dto.AdaptivePlot.Value;
-                        _parser.SetVariable("PlotAdaptive", dto.AdaptivePlot.Value ? 1d : 0d);
-                    }
-                    break;
-                case SettingKey.PlotWidth:
-                    if (dto.PlotWidth.HasValue)
-                    {
-                        Settings.Plot.Width = dto.PlotWidth.Value;
-                        _parser.SetVariable("PlotWidth", dto.PlotWidth.Value);
-                    }
-                    break;
-                case SettingKey.PlotHeight:
-                    if (dto.PlotHeight.HasValue)
-                    {
-                        Settings.Plot.Height = dto.PlotHeight.Value;
-                        _parser.SetVariable("PlotHeight", dto.PlotHeight.Value);
-                    }
-                    break;
-                case SettingKey.PlotStep:
-                    if (dto.PlotStep.HasValue)
-                    {
-                        Settings.Plot.Step = dto.PlotStep.Value;
-                        _parser.SetVariable("PlotStep", dto.PlotStep.Value);
-                    }
-                    break;
-                case SettingKey.Precision:
-                    if (dto.Precision.HasValue)
-                    {
-                        Settings.Math.Precision = dto.Precision.Value;
-                        _parser.SetVariable("Precision", dto.Precision.Value);
-                    }
-                    break;
-                case SettingKey.Tol:
-                    if (dto.Tol.HasValue)
-                    {
-                        Settings.Math.Tol = dto.Tol.Value;
-                        _parser.SetVariable("Tol", dto.Tol.Value);
-                    }
-                    break;
             }
         }
 
