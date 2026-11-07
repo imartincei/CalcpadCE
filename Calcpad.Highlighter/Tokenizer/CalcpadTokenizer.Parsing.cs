@@ -155,10 +155,7 @@ namespace Calcpad.Highlighter.Tokenizer
                         {
                             _state.CurrentMacroCall = macroName;
                             _state.CurrentMacroArgIndex = 0;
-
-                            // Resolve argument tokens by substituting into the macro body
-                            // _state.TokenStartColumn is at the '(' position
-                            ResolveMacroCallArgTokens(macroName, _state.TokenStartColumn);
+                            ResolveMacroCallArgTokens(_state.TokenStartColumn);
                         }
                     }
                 }
@@ -167,7 +164,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 if (!_state.IsFunctionDefinition &&
                     (t == TokenType.Variable || t == TokenType.Function) &&
                     _builder.Length > 0 &&
-                    _functionsWithDefaults.Contains(_builder.ToString()))
+                    HasDefaults(_builder.ToString()))
                     _state.FunctionCallMask |= callBit;
             }
             else if (c == ')')

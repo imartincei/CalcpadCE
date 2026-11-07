@@ -187,6 +187,7 @@ namespace Calcpad.Highlighter.Tokenizer
             _inHtmlComment = false;
             _explicitLineBreak = false;
             _continueLine = false;
+            _argTokensLine = -1;
             TokenizeLineInternal(line.AsMemory(), lineNumber);
             return _result;
         }

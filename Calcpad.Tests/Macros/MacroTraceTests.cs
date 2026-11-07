@@ -12,6 +12,7 @@ namespace Calcpad.Tests
             {
                 SourceFilePath = sourceFilePath,
                 Trace = trace,
+                Debug = true,
                 Include = (path, _) => MacroParser.FilterIncludedContent(File.ReadAllText(path), keepLineCount: true)
             };
             parser.Parse(source, out _, null, 0, false);
@@ -106,6 +107,65 @@ namespace Calcpad.Tests
             Assert.True(parser.Parse("x = 1\n#def blk$\ny = 2", out _, null, 0, false));
             Assert.Equal("#def blk$", trace.SourceLines[trace.Errors.Single().SourceIndex].Text);
             Assert.Equal(2, parser.Errors.Single().SourceLine);
+        }
+
+        // Source line of each character, '·' where none; every located character must match its source.
+        private static string SourceLines(MacroTrace trace, MacroTraceOutputLine output) =>
+            string.Concat(output.SourceOffsets.Select((offset, i) =>
+            {
+                if (!trace.TryLocate(offset, out var line, out var column))
+                    return '·';
+
+                Assert.Equal(output.Text[i], trace.SourceLines[line].Text[column]);
+                return (char)('0' + line);
+            }));
+
+        [Theory]
+        [InlineData("#def m$(a$) = a$ + 1", "x = m$(ab)", "x = ab + 1", "1111110000")]
+        [InlineData("#def m$(a$; b$) = b$*a$", "y = m$(1; 2) - 3", "y = 2*1 - 3", "11111011111")]
+        [InlineData("#def m$(a$; b$ = 9) = a$ + b$", "m$(b$ = 4; a$ = q)", "q + 4", "10001")]
+        [InlineData("#def m$(a$; b$ = 9) = a$ + b$", "m$(5)", "5 + 9", "1000·")]
+        [InlineData("#def in$(p$) = (p$)\n#def out$(q$) = in$(q$)*2", "y = out$(z) + 1", "y = (z)*2 + 1", "2222020112222")]
+        [InlineData("#def m$(a$) = a$ + a$", "'note m$(t)", "'note t + t", "11111110001")]
+        public void SourceOffsets_LocateEveryCharacter(string defs, string line, string expected, string sources)
+        {
+            var trace = Trace(defs + "\n" + line);
+            var output = trace.OutputLines.Last();
+            Assert.Equal(expected, output.Text);
+            Assert.Equal(sources, SourceLines(trace, output));
+        }
+
+        [Fact]
+        public void SourceOffsets_SplitAcrossBodyLines()
+        {
+            var trace = Trace("#def blk$(n$; x$)\nn$ = x$\nr = n$*2\n#end def\n  blk$(v; 7)");
+            var outputs = trace.OutputLines;
+            Assert.Equal(["  v = 7", "r = v*2"], outputs.Select(o => o.Text));
+            Assert.Equal("4441114", SourceLines(trace, outputs[0]));
+            Assert.Equal("2222422", SourceLines(trace, outputs[1]));
+        }
+
+        [Fact]
+        public void SourceOffsets_NullWithoutDebug()
+        {
+            var trace = new MacroTrace();
+            new MacroParser { Trace = trace }.Parse("#def m$(a$) = a$ + 1\nx = m$(2)", out _, null, 0, false);
+            Assert.Equal("x = 2 + 1", trace.OutputLines.Single().Text);
+            Assert.Null(trace.OutputLines.Single().SourceOffsets);
+        }
+
+        [Fact]
+        public void SourceOffsets_NullWithoutExpansion()
+        {
+            var outputs = Trace("#def m$ = 1\nx = 2\n'cost $").OutputLines;
+            Assert.All(outputs, o => Assert.Null(o.SourceOffsets));
+        }
+
+        [Fact]
+        public void ArgumentText_IsNotSubstitutedAgain()
+        {
+            var trace = Trace("#def f$(a; b) = a + b\nx = f$(1; a)");
+            Assert.Equal("x = 1 + a", trace.OutputLines.Single().Text);
         }
 
         [Fact]

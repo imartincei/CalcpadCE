@@ -9,6 +9,7 @@ namespace Calcpad.Core
         private int _end = 0;
         private ReadOnlySpan<char> _contents = contents;
 
+        public readonly int Start => _start;
         public readonly bool IsEmpty => _end == _start;
         public readonly int Length => _end - _start;
 
