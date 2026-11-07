@@ -139,6 +139,13 @@ namespace Calcpad.Core
                     else
                         _parser.Line = _currentLine + 1;
 
+                    if (MacroParser.TryParseErrorLine(lineSpan, out _, out var macroLine, out var macroMessage))
+                    {
+                        textSpan = [];
+                        AppendMacroError(macroLine, macroMessage);
+                        continue;
+                    }
+
                     var rawLine = lineSpan.TrimEnd();
                     lineSpan = lineSpan.Trim();
                     if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
@@ -720,6 +727,17 @@ namespace Calcpad.Core
             if (_isVisible)
                 _sb.Append(ErrHtml(FormatError(s, text, line), line));
             RecordError(line, text, Debug, code);
+        }
+
+        // MacroParser.Errors already lists it, so it only goes to the HTML and the summary
+        private void AppendMacroError(string lineContent, string message)
+        {
+            if (!_isVisible)
+                return;
+
+            _sb.Append(ErrHtml(FormatError(HttpUtility.HtmlEncode(lineContent), message, _currentLine), _currentLine));
+            if (Debug && _errorKeys.Add((_currentLine, message)))
+                _errors.Enqueue(_currentLine);
         }
 
         private bool RecordError(int line, MathParserException ex, bool enabled) =>

@@ -431,15 +431,9 @@ namespace Calcpad.Cli
                     Include = CalcpadReader.Include,
                     SourceFilePath = fileName
                 };
-                var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
+                macroParser.Parse(code, out var unwrappedCode, null, 0, true);
                 string htmlResult;
                 Converter converter = new(isSilent, isBodyOnly);
-                if (hasMacroErrors)
-                {
-                    htmlResult = CalcpadReader.CodeToHtml(unwrappedCode);
-                    converter.ToHtml(htmlResult, outFile);
-                    return true;
-                }
                 ExpressionParser parser = new()
                 {
                     Settings = settings,

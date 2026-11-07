@@ -95,7 +95,7 @@ namespace Calcpad.Server.Services
                 };
 
                 string outputText;
-                var hasMacroErrors = macroParser.Parse(MetadataFooter.Remove(calcpadContent), out outputText, null, 0, true);
+                macroParser.Parse(MetadataFooter.Remove(calcpadContent), out outputText, null, 0, true);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -105,27 +105,22 @@ namespace Calcpad.Server.Services
                 var errors = new List<CalcpadError>(macroParser.Errors);
                 RuntimeTrace? trace = null;
 
-                if (hasMacroErrors || forceUnwrappedCode)
+                if (forceUnwrappedCode)
                 {
-                    // Forced-unwrapped with no macro errors: silently run
-                    // ExpressionParser so the code view can highlight lines that
-                    // would error in the wrapped preview. Skip when macro errors
-                    // already exist since the expression pass would just fail.
-                    if (forceUnwrappedCode && !hasMacroErrors)
+                    // Silently run ExpressionParser so the code view can highlight lines that
+                    // would error in the wrapped preview.
+                    try
                     {
-                        try
-                        {
-                            // Hard-coded rather than threaded from `write`: this pass exists only to
-                            // collect error lines, so it must never repeat the document's writes.
-                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
-                            silent.Parse(outputText, true, false);
-                            errors.AddRange(silent.Errors);
-                            trace = silent.Trace;
-                        }
-                        catch (Exception silentEx)
-                        {
-                            FileLogger.LogWarning("Silent expression parse for error collection failed", silentEx.Message);
-                        }
+                        // Hard-coded rather than threaded from `write`: this pass exists only to
+                        // collect error lines, so it must never repeat the document's writes.
+                        var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
+                        silent.Parse(outputText, true, false);
+                        errors.AddRange(silent.Errors);
+                        trace = silent.Trace;
+                    }
+                    catch (Exception silentEx)
+                    {
+                        FileLogger.LogWarning("Silent expression parse for error collection failed", silentEx.Message);
                     }
                     htmlResult = ConvertCodeToHtml(outputText, errors);
                 }
@@ -290,7 +285,11 @@ tan_angle = tan(angle°)";
                 // original source line (mirrors WPF's CodeToHtml).
                 stringBuilder.Append($"<p class=\"line-text{errClass}\" id=\"line-{lineNumber}\"{errTitle}><a class=\"line-num\" href=\"#0\" data-text=\"{sourceLine}\" title=\"Source line {sourceLine}\">{paddedSpaces}{lineNumber}</a>&emsp;│&emsp;");
 
-                if (lineText.StartsWith(ErrorString))
+                if (MacroParser.TryParseErrorLine(lineText, out _, out var failedLine, out var macroMessage))
+                {
+                    stringBuilder.Append($"<span class=\"err\">{System.Web.HttpUtility.HtmlEncode(failedLine)}: {System.Web.HttpUtility.HtmlEncode(macroMessage)}</span>");
+                }
+                else if (lineText.StartsWith(ErrorString))
                 {
                     var errorText = lineText.Length > ErrorString.Length ? lineText.Substring(ErrorString.Length) : "";
                     // MacroParser already HTML encoded the error text, but we need to preserve HTML links

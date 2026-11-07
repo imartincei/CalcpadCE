@@ -333,10 +333,9 @@ Macros and string variables are preprocessed and rewritten before the actual par
 As a result, intermediate (unwrapped) code is generated.
 You can review it by checking the "**Unwrapped code**" checkbox below the "**Output**" window.
 
-If any errors occur during macro preprocessing, the unwrapped code is displayed, together with the errors.
-Line numbers in error descriptions refer to your initial code.
-If preprocessing is completed successfully, the unwrapped code is parsed and calculated as normal.
-If errors are detected at this stage, they are displayed in the output.
+If a macro call or an `#include` fails during preprocessing, that line is shown as an error in the output, and the rest of the code is still calculated.
+Line numbers in these errors refer to your initial code.
+Errors in the unwrapped code are displayed in the output as well.
 Line numbers in error descriptions refer to the unwrapped code.
 You can go to the respective line by clicking the link on the line number.
 

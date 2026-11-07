@@ -33,7 +33,7 @@ public class Parser
 }
 ```
 
-`Convert` chooses its output by extension. `outputFileName` may be a full path, empty (defaults to `.html` beside the input), or just `"html"` / `"htm"` / `"docx"` / `"pdf"` to mean "same name, this extension". Anything else returns `false`. It sets the process's current directory to the input file's folder so relative `#include` and `#read` paths resolve. When macro expansion fails, it writes a syntax-highlighted listing of the unwrapped code instead of a report, and still returns `true`.
+`Convert` chooses its output by extension. `outputFileName` may be a full path, empty (defaults to `.html` beside the input), or just `"html"` / `"htm"` / `"docx"` / `"pdf"` to mean "same name, this extension". Anything else returns `false`. It sets the process's current directory to the input file's folder so relative `#include` and `#read` paths resolve. A line that macro expansion rejects (a failed call or `#include`) shows as an error in the report, and the rest still runs.
 
 ## Settings Classes
 

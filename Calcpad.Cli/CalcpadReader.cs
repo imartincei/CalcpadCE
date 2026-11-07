@@ -248,55 +248,5 @@ namespace Calcpad.Cli
 
             return s[8..n].Trim().ToString();
         }
-
-        private const string ErrorString = "#Error";
-        internal static string CodeToHtml(string code)
-        {
-            const string spaces = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            var errors = new Queue<int>();
-            _stringBuilder.Clear();
-            var lines = code.EnumerateLines();
-            _stringBuilder.AppendLine("<pre class=\"code\">");
-            var lineNumber = 0;
-            foreach (var line in lines)
-            {
-                ++lineNumber;
-                var i = line.IndexOf('\v');
-                var lineText = i < 0 ? line : line[..i];
-                var sourceLine = i < 0 ? lineNumber.ToString() : line[(i + 1)..];
-                var lineNumText = lineNumber.ToString(CultureInfo.InvariantCulture);
-                var n = lineNumText.Length;
-                _stringBuilder.Append($"<p class=\"line-text\" id=\"line-{lineNumber}><span title=\"Source line {sourceLine}\">{spaces[(6*n)..]}{lineNumber}</span>&emsp;│&emsp;");
-                if (line.StartsWith(ErrorString))
-                {
-                    errors.Enqueue(lineNumber);
-                    _stringBuilder.Append($"<span class=\"err\">{lineText[1..]}</span>");
-                }
-                else
-                {
-                    _stringBuilder.Append(lineText);
-                }
-                _stringBuilder.Append("</p>");
-            }
-            _stringBuilder.Append("</pre>");
-            if (errors.Count != 0 && lineNumber > 30)
-            {
-                _stringBuilder.AppendLine($"<div class=\"errorHeader\">Found <b>{errors.Count}</b> errors in modules and macros:");
-                var count = 0;
-                while (errors.Count != 0 && ++count < 20)
-                {
-                    var line = errors.Dequeue();
-                    _stringBuilder.Append($" <span class=\"roundBox\" data-line=\"{line}\">{line}</span>");
-                }
-                if (errors.Count > 0)
-                    _stringBuilder.Append(" ...");
-
-                _stringBuilder.Append("</div>");
-                _stringBuilder.AppendLine("<style>body {padding-top:0.5em;} p {margin:0; line-height:1.15em;}</style>");
-            }
-            else
-                _stringBuilder.AppendLine("<style>p {margin:0; line-height:1.15em;}</style>");
-            return _stringBuilder.ToString();
-        }
     }
 }

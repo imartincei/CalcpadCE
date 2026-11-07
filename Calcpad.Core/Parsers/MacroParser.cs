@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web;
 
 namespace Calcpad.Core
 {
@@ -149,6 +148,33 @@ namespace Calcpad.Core
         public string SourceFilePath { get; set; }
         private readonly List<CalcpadError> _errorList = new();
         public IReadOnlyList<CalcpadError> Errors => _errorList;
+
+        /// <summary>Starts an output line that stands for a line MacroParser rejected: code, line text and message.</summary>
+        public const char ErrorLineMarker = '\u001F';
+
+        private static string ErrorLine(string code, ReadOnlySpan<char> lineContent, string message) =>
+            string.Concat(
+                $"{ErrorLineMarker}{code}{ErrorLineMarker}",
+                lineContent.ToString().Replace(ErrorLineMarker, ' '),
+                $"{ErrorLineMarker}{message}");
+
+        public static bool TryParseErrorLine(ReadOnlySpan<char> line, out string code, out string lineContent, out string message)
+        {
+            code = lineContent = message = null;
+            if (line.IsEmpty || line[0] != ErrorLineMarker)
+                return false;
+
+            line = line[1..];
+            var i = line.IndexOf(ErrorLineMarker);
+            var j = line.LastIndexOf(ErrorLineMarker);
+            if (i < 0 || j <= i)
+                return false;
+
+            code = line[..i].ToString();
+            lineContent = line[(i + 1)..j].ToString();
+            message = line[(j + 1)..].ToString();
+            return true;
+        }
         public MacroTrace Trace { get; set; }
         private bool _traceAborted;
 
@@ -212,6 +238,7 @@ namespace Calcpad.Core
             var lineNumber = includeLine;
             var macroDefCount = 0;
             var defLine = -1;
+            var defLineContent = string.Empty;
             var hasErrors = false;
             ReadOnlySpan<char> lineContent = "code";
             List<string> macroParameters = null;
@@ -284,13 +311,17 @@ namespace Calcpad.Core
                 if (macroDefCount > 0)
                 {
                     var message = Messages.Macro_definition_block_not_closed_Missing_end_def;
-                    sb.Append(message);
+                    sb.Append(ErrorLine("CPD-2206", defLineContent, message));
+                    if (addLineNumbers)
+                        sb.Append('\v').Append(defLine);
+                    sb.AppendLine();
+                    ++_parsedLineNumber;
                     hasErrors = true;
                     Trace?.Errors.Add(new(defTraceSource, message));
                     _errorList.Add(new CalcpadError
                     {
                         SourceLine = defLine,
-                        OutputLine = _parsedLineNumber + 1,
+                        OutputLine = _parsedLineNumber,
                         Message = message,
                         Source = CalcpadErrorSource.Macro,
                         Code = "CPD-2206",
@@ -463,7 +494,7 @@ namespace Calcpad.Core
                 {
                     InvalidMacroName(lineContent, textSpan, i);
                     if (!IsInlineDef(lineContent))
-                        OpenDef();
+                        OpenDef(lineContent);
 
                     return;
                 }
@@ -556,13 +587,14 @@ namespace Calcpad.Core
                     macroDefaults = null;
                 }
                 else
-                    OpenDef();
+                    OpenDef(lineContent);
             }
 
-            void OpenDef()
+            void OpenDef(ReadOnlySpan<char> lineContent)
             {
                 defTraceSource = traceSource;
                 defLine = lineNumber;
+                defLineContent = lineContent.ToString();
                 ++macroDefCount;
             }
 
@@ -634,8 +666,10 @@ namespace Calcpad.Core
 
             void AppendError(ReadOnlySpan<char> lineContent, string errorMessage, string code)
             {
-                var marker = addLineNumbers ? $"\v{lineNumber}" : string.Empty;
-                sb.AppendLine(string.Format(Messages.Error_in_0_on_line_1_2, HttpUtility.HtmlEncode(lineContent.ToString()), LineHtml(lineNumber), errorMessage) + marker);
+                sb.Append(ErrorLine(code, lineContent, errorMessage));
+                if (addLineNumbers)
+                    sb.Append('\v').Append(lineNumber);
+                sb.AppendLine();
                 ++_parsedLineNumber;
                 hasErrors = true;
                 Trace?.Errors.Add(new(traceSource, errorMessage));
@@ -664,7 +698,6 @@ namespace Calcpad.Core
                     IsDuplicate = !isAdded
                 });
             }
-            static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line}\">{line}</a>]";
         }
 
         /// <summary>Drops #local sections and the <see cref="MetadataFooter"/> from included content.</summary>
