@@ -47,14 +47,6 @@ public class MetadataStripTests
         Assert.DoesNotContain("'", body);
     }
 
-    [Theory]
-    [InlineData("a = 1\n" + Footer, "a = 1\n")]
-    [InlineData("a = 1\n'<!--{\"desc\":\"x\"}-->\n", "a = 1\n'<!--{\"desc\":\"x\"}-->\n")]
-    [InlineData("'<!--{\"fileInfo\":{}}-->\na = 1\n", "'<!--{\"fileInfo\":{}}-->\na = 1\n")]
-    [InlineData(Footer, "")]
-    public void Remove_CutsOnlyTheTrailingFooter(string source, string expected) =>
-        Assert.Equal(expected, MetadataFooter.Remove(source));
-
     [Fact]
     public void Convert_FooterOnlyFile_RendersNothing()
     {

@@ -76,7 +76,7 @@ public string GetSampleContent();
 
 Errors are returned, not thrown — the controller serializes them into the `X-Calcpad-Errors` response header and still returns the HTML.
 
-`StripHostMetadata` removes the metadata footer comments from the HTML.
+The source goes through `MetadataFooter.Remove` and every `#include` through `MacroParser.FilterIncludedContent` (both Calcpad.Core) before parsing, so the metadata footer never renders.
 
 ### CalcpadApiService (Static)
 Shared configuration for the web application:

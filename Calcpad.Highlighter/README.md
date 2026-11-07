@@ -41,7 +41,7 @@ Merges multi-line expressions into single lines. Explicit continuation is a trai
 
 The Stage 1 lines run through `MacroParser` with a `MacroTrace` attached. The trace records every line read (includes inlined, with their file and line), every line emitted, and every `#def`. Stage 2 is built from what was read, Stage 3 from what was emitted.
 
-Included files are read from disk, filtered with `MacroParser.FilterIncludedContent` (the same rule the server's include delegate uses: drop `#local` sections and the file metadata footer, but blank the lines so include line numbers stay exact), and put through Stage 1. A file that can't be found becomes an error comment and processing continues.
+Included files are read from disk, filtered with `MacroParser.FilterIncludedContent` (the same rule the server's include delegate uses: drop the file metadata footer and `#local` sections, but blank the lines so include line numbers stay exact), and put through Stage 1. A file that can't be found becomes an error comment and processing continues.
 
 Macro metadata comments and *comment parameters* are computed here. Comment parameters are parameters used inside comments, with transitive closure through nested macro calls, so the tokenizer highlights the matching call-site arguments as comments rather than expressions.
 
