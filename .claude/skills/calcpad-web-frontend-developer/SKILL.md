@@ -79,6 +79,17 @@ public async newMethod(content: string): Promise<NewResponse | null> {
 
 For Monaco editor features and VS Code commands, see the recipes in `reference/web-editor.md` and `reference/vscode-extension.md`.
 
+### Localization (i18n)
+Never hard-code translated strings inline (e.g. `uiText('English', '中文')` or ad-hoc `locale === 'zh' ? … : …`). All UI text goes through the shared messages in `calcpad-frontend/src/i18n/`:
+- Keys are the English source text; `messages/en.ts` stays empty. Add the Chinese translation to `messages/zh.ts`.
+- Use `{name}` placeholders for interpolation and `'{n} item | {n} items'` for plurals; `fallbackFormat` formats the English key when no entry exists.
+- In Vue components, use `t()` from `useI18n()`.
+- In non-Vue code (Monaco providers, editor commands), have the host pass in the shared i18n `t` (see `registerUiOverrideHints` in `calcpad-web/src/main.ts`) instead of importing a locale helper.
+- Native Tauri menu labels live in `i18n/menu.ts`.
+
+### Animations and Motion
+Respect `prefers-reduced-motion`. When adding a CSS animation or transition, add a `@media (prefers-reduced-motion: reduce)` override that disables it, keeping any static visual cue (e.g. a highlight without the fade). For JS motion such as `scrollIntoView({ behavior: 'smooth' })`, check `matchMedia('(prefers-reduced-motion: reduce)')` and use `'auto'` instead. `base.css` already disables transitions globally under reduced motion, but not animations.
+
 ## Workflow
 
 1. **Understand the feature** - Which frontend(s) does it affect?

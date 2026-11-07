@@ -409,6 +409,18 @@
             </label>
           </div>
 
+          <div v-show="rowVisible('editor', 'showUiOverrideHints')" class="setting-group">
+            <label>
+              <input
+                v-model="showUiOverrideHints"
+                type="checkbox"
+                @change="updateShowUiOverrideHints"
+              />
+              <CalcpadSearchHighlight text="Show UI Override Hints" :query="query" />
+              <span class="setting-info" title="Show saved #UI values above the lines they apply to: the value for a lone #UI control, a count for loops, macro calls and #include lines. Click one to edit it in the Properties tab.">ⓘ</span>
+            </label>
+          </div>
+
           <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('editor', 'completionDelayMs')" class="setting-group">
             <label for="completionDelayMs">
               <CalcpadSearchHighlight text="Completion Delay (ms):" :query="query" />
@@ -770,6 +782,7 @@ interface Props {
   initialEnablePreviewUiOverrides?: boolean
   initialEnablePreviewPdf?: boolean
   initialShowFileMetadata?: boolean
+  initialShowUiOverrideHints?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialLogLevel?: string
@@ -803,6 +816,7 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnablePreviewUiOverrides: false,
   initialEnablePreviewPdf: false,
   initialShowFileMetadata: false,
+  initialShowUiOverrideHints: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialLogLevel: 'warning',
@@ -835,6 +849,7 @@ const emit = defineEmits<{
   updatePreviewUiOverrides: [enabled: boolean]
   updatePreviewPdf: [enabled: boolean]
   updateShowFileMetadata: [enabled: boolean]
+  updateShowUiOverrideHints: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateLogLevel: [level: string]
@@ -926,6 +941,7 @@ const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
 const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const enablePreviewPdf = ref(props.initialEnablePreviewPdf)
 const showFileMetadata = ref(props.initialShowFileMetadata)
+const showUiOverrideHints = ref(props.initialShowUiOverrideHints)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const logLevel = ref(props.initialLogLevel)
@@ -1024,6 +1040,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
       previewPdf: 'render preview as pdf print preview pages viewer',
       showFileMetadata: 'show hide file metadata info ui overrides comment footer',
+      showUiOverrideHints: 'show ui override hints codelens saved values above #ui line loop macro include',
       fontFamily: 'editor font family juliamono system',
       completionDelayMs: 'completion delay autocomplete code suggestions milliseconds ms',
       fontsFolder: 'open fonts folder custom',
@@ -1185,6 +1202,10 @@ const updatePreviewPdf = () => {
 
 const updateShowFileMetadata = () => {
   emit('updateShowFileMetadata', showFileMetadata.value)
+}
+
+const updateShowUiOverrideHints = () => {
+  emit('updateShowUiOverrideHints', showUiOverrideHints.value)
 }
 
 const updateDarkBackground = () => {
@@ -1363,6 +1384,13 @@ watch(
   () => props.initialShowFileMetadata,
   (newValue) => {
     showFileMetadata.value = newValue
+  }
+)
+
+watch(
+  () => props.initialShowUiOverrideHints,
+  (newValue) => {
+    showUiOverrideHints.value = newValue
   }
 )
 

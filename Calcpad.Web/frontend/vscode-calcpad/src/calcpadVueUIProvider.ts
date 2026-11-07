@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits, selectionLineRange } from 'calcpad-frontend';
 import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -38,6 +38,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     /** Entered #UI values the panel rewrote, so the extension's in-memory ones follow. */
     public onUiOverridesEdited?: (documentUri: string, overrides: Record<string, string>) => void;
     public onShowFileMetadataChanged?: () => void;
+    public onUiOverrideHintsChanged?: () => void;
     /** The compiled worksheet being worked in, which has no text editor for the Properties tab to read. */
     public getCompiledSource?: () => { uri: vscode.Uri; text: string } | undefined;
     public updateCompiledFileInfo?: (uri: vscode.Uri, patch: unknown) => void;
@@ -200,6 +201,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 case 'updateShowFileMetadata':
                     this._settingsManager.setExtra('showFileMetadata', !!data.enabled);
                     this.onShowFileMetadataChanged?.();
+                    break;
+
+                case 'updateShowUiOverrideHints':
+                    this._settingsManager.setExtra('uiOverrideHints', !!data.enabled);
+                    this.onUiOverrideHintsChanged?.();
                     break;
 
                 // Changes what an open preview renders, so it is re-run rather than
@@ -416,7 +422,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     break;
 
                 case 'getMetadataContext':
-                    this.updateMetadataContext(this._computeMetadataBlock());
+                    this.updateMetadataContext(this._computeMetadataBlock(), this._metadataEditor());
                     break;
 
                 case 'updateMetadata':
@@ -538,6 +544,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewUiOverrides: sm.getExtraBool('previewUiOverrides', false),
             enablePreviewPdf: sm.getExtraBool('previewPdf', false),
             showFileMetadata: sm.getExtraBool('showFileMetadata', false),
+            showUiOverrideHints: sm.getExtraBool('uiOverrideHints', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
             logLevel: coerceLogLevel(sm.getExtra('logLevel', 'warning')),
@@ -651,9 +658,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'writeFilesResult', ok, message });
     }
 
-    /** Push the metadata comment (or null) the cursor currently sits in to the panel. */
-    public updateMetadataContext(block: MetadataCommentBlock | null) {
-        this._view?.webview.postMessage({ type: 'metadataContext', block });
+    /** Push the metadata comment (or null) the cursor currently sits in, and the selected lines, to the panel. */
+    public updateMetadataContext(block: MetadataCommentBlock | null, editor?: vscode.TextEditor) {
+        const sel = editor?.selection;
+        const selection = sel ? selectionLineRange(sel.start.line + 1, sel.end.line + 1, sel.end.character + 1) : null;
+        this._view?.webview.postMessage({ type: 'metadataContext', block, selection });
     }
 
     /** Push the source editor's file info and saved #UI values to the Properties tab. */
@@ -757,12 +766,16 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._view?.webview.postMessage({ type: 'uiControls', controls });
     }
 
+    private _metadataEditor(): vscode.TextEditor | undefined {
+        const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+        const lang = editor?.document.languageId;
+        return lang === 'calcpad' || lang === 'plaintext' ? editor : undefined;
+    }
+
     /** Detect the single-line metadata comment at the source editor's cursor. */
     private _computeMetadataBlock(): MetadataCommentBlock | null {
-        const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-        if (!editor || (editor.document.languageId !== 'calcpad' && editor.document.languageId !== 'plaintext')) {
-            return null;
-        }
+        const editor = this._metadataEditor();
+        if (!editor) return null;
         const lines = editor.document.getText().split(/\r?\n/);
         const line = editor.selection.active.line;
         const docKey = editor.document.uri.toString();
@@ -772,6 +785,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     }
 
     /** Ask the panel to switch to a given tab id. */
+    /** Opens Properties on the UI Overrides section, picking out the saved values `keys` names. */
+    public revealUiOverrides(keys: string[]) {
+        this._view?.webview.postMessage({ type: 'revealUiOverrides', keys });
+    }
+
     public focusTab(tab: string) {
         this._view?.webview.postMessage({ type: 'focusTab', tab });
     }
@@ -906,7 +924,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         const docKey = editor.document.uri.toString();
         const block = computeMetadataBlock(lines, editor.selection.active.line, buildSourceDefinitionResolver(lines));
         if (block) block.docKey = docKey;
-        this.updateMetadataContext(block);
+        this.updateMetadataContext(block, editor);
     }
 
     /** 0-based index of the line equal to `text`, closest to `near`; null if none. */

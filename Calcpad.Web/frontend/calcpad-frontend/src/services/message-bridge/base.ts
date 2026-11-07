@@ -16,10 +16,10 @@ import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
-import { extractUiControls, readUiOverrides } from '../ui-overrides';
+import { extractUiControls, readUiOverrides, selectionLineRange } from '../ui-overrides';
 import { readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, stampFileInfoText, pdfDocumentTitle } from '../file-info';
 import { planMetadataFooter, toRangeEdits, type LineEdit } from '../metadata-footer';
-import type { UiControl } from '../ui-overrides';
+import type { LineRange, UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
 import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
 import { buildZip } from '../zip-writer';
@@ -239,15 +239,20 @@ export abstract class BaseMessageBridge {
      * the form itself was shown.
      */
     private async handleGetUiControls(): Promise<void> {
+        const controls = await this.resolveUiControls();
+        // A failed render leaves the panel unresolved rather than empty - "no controls"
+        // and "could not tell" must not read the same to a purge button.
+        if (!controls) return;
+        this._uiControlsSink?.(controls);
+        this.postToVue({ type: 'uiControls', controls });
+    }
+
+    /** The active document's controls, rendered afresh as a form; null when the render fails. */
+    async resolveUiControls(): Promise<UiControl[] | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const rendered = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
-        // A failed render leaves the panel unresolved rather than empty - "no controls"
-        // and "could not tell" must not read the same to a purge button.
-        if (rendered == null) return;
-        const controls = extractUiControls(rendered);
-        this._uiControlsSink?.(controls);
-        this.postToVue({ type: 'uiControls', controls });
+        return rendered == null ? null : extractUiControls(rendered);
     }
 
     /** The `#UI` options an export of `variant` should render with. */
@@ -356,6 +361,10 @@ export abstract class BaseMessageBridge {
             case 'updateShowFileMetadata':
                 this.setExtraSetting('showFileMetadata', String(!!message.enabled));
                 this.postToVue({ type: 'showFileMetadataChanged', enabled: !!message.enabled });
+                break;
+            case 'updateShowUiOverrideHints':
+                this.setExtraSetting('uiOverrideHints', String(!!message.enabled));
+                this.postToVue({ type: 'showUiOverrideHintsChanged', enabled: !!message.enabled });
                 break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
@@ -607,6 +616,7 @@ export abstract class BaseMessageBridge {
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             enablePreviewPdf: this.getExtraSetting('previewPdf') === 'true',
             showFileMetadata: this.getExtraSetting('showFileMetadata') === 'true',
+            showUiOverrideHints: this.getExtraSetting('uiOverrideHints') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
@@ -1091,7 +1101,7 @@ export abstract class BaseMessageBridge {
             block = computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines));
             if (block) block.docKey = this.getMetadataDocKey();
         }
-        this.postToVue({ type: 'metadataContext', block });
+        this.postToVue({ type: 'metadataContext', block, selection: this.selectionLines(editor) });
         // Sent with the block so the panel's saved-values list follows the document the
         // cursor is actually in, rather than keeping the last one it asked about.
         this.refreshUiControls();
@@ -1201,7 +1211,12 @@ export abstract class BaseMessageBridge {
         const lines = model.getValue().split(/\r?\n/);
         const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines)) : null;
         if (block) block.docKey = this.getMetadataDocKey();
-        this.postToVue({ type: 'metadataContext', block });
+        this.postToVue({ type: 'metadataContext', block, selection: this.selectionLines(editor) });
+    }
+
+    private selectionLines(editor: MonacoEditorLike | undefined): LineRange | null {
+        const sel = editor?.getSelection();
+        return sel ? selectionLineRange(sel.startLineNumber, sel.endLineNumber, sel.endColumn) : null;
     }
 
     /** Applies footer edits through the model, since a compiled worksheet's editor is read-only. */
@@ -1294,6 +1309,7 @@ interface MonacoRangeLike {
 interface MonacoEditorLike {
     getModel(): MonacoModelLike | null;
     getPosition(): { lineNumber: number; column: number } | null;
+    getSelection(): MonacoRangeLike | null;
     revealLineInCenter(line: number): void;
     setPosition(pos: { lineNumber: number; column: number }, source?: string): void;
     executeEdits(source: string, edits: { range: MonacoRangeLike; text: string }[]): void;
