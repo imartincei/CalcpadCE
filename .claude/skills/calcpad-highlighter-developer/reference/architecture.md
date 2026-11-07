@@ -6,14 +6,15 @@
 Calcpad.Highlighter/
 ├── ContentResolution/
 │   ├── ContentResolver.cs          - 3-stage content processing (partial class)
-│   ├── ContentResolver.Stage1.cs   - Includes
-│   ├── ContentResolver.Stage2.cs   - Macros
+│   ├── ContentResolver.Stage1.cs   - Line continuations
+│   ├── ContentResolver.Stage2.cs   - Includes + macros, via Core's MacroParser trace
 │   ├── ContentResolver.Stage3.cs   - Definitions + type tracking
 │   ├── ContentResolverResult.cs    - Result structures
+│   ├── RuntimeOverlay.cs           - Core RuntimeTrace facts (types, executed lines) per Stage 3 line
 │   └── SymbolResolver.cs           - Cursor position → symbol + every occurrence
 ├── Tokenizer/
 │   ├── CalcpadTokenizer.cs         - Tokenization engine (partial: .Comments, .Definitions,
-│   │                                 .Helpers, .MacroCollection, .Macros, .Parsing, .TypeResolution)
+│   │                                 .Helpers, .Macros, .Parsing, .TypeResolution)
 │   └── Models/
 │       ├── Token.cs                - Token structure
 │       ├── TokenType.cs            - 29 token types (0 None … 28 SettingsJson)

@@ -1,6 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
+import { emit, listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { appDataDir } from '@tauri-apps/api/path';
 import {
@@ -11,6 +11,7 @@ import {
     readDir,
     mkdir,
     exists,
+    stat,
 } from '@tauri-apps/plugin-fs';
 import { message as dialogMessage, ask as dialogAsk } from '@tauri-apps/plugin-dialog';
 import { open as dialogOpen, save as dialogSave } from './file-dialog';
@@ -51,6 +52,7 @@ import {
 } from 'calcpad-frontend';
 import { setAppTheme, coerceAppTheme } from '../editor/app-theme';
 import { UNTITLED_TITLE } from '../tabs/tab-manager';
+import { FileChangeTracker } from './file-change-tracker';
 
 const SETTINGS_DIR_NAME = 'settings';
 const FONTS_DIR_NAME = 'fonts';
@@ -66,7 +68,13 @@ const ACTIVE_SETTINGS_FILE = 'active-settings.json';
 const STORE_FILE = 'storage.json';
 const ACTIVE_PRESET_KEY = 'calcpad-active-preset';
 const RECENT_FILES_KEY = 'calcpad-recent-files';
-const OPENED_FOLDER_KEY = 'calcpad-opened-folder';
+/** Store key per Files-tab folder slot; slot 0 keeps the original key. */
+const FOLDER_KEYS = ['calcpad-opened-folder', 'calcpad-opened-folder-2'] as const;
+type FolderSlot = 0 | 1;
+const FOLDER_SLOTS: FolderSlot[] = [0, 1];
+const toFolderSlot = (raw: unknown): FolderSlot => (raw === 1 ? 1 : 0);
+const FOLDER_CHANGED_EVENT = 'calcpad-folder-changed';
+interface FolderChangedPayload { slot: FolderSlot; path: string | null; source: string }
 const LAST_DIALOG_DIR_KEY = 'calcpad-last-dialog-dir';
 const MAX_RECENT_FILES = 10;
 
@@ -106,6 +114,17 @@ export class TauriMessageBridge extends BaseMessageBridge {
     private _serverLogDir: string = '';
     private _platform: string = 'linux';
     private _store: Store | null = null;
+    readonly fileTracker = new FileChangeTracker({
+        stamp: async (path) => {
+            try {
+                const info = await stat(path);
+                return info.isFile ? { modifiedMs: info.mtime?.getTime() ?? 0, len: info.size } : null;
+            } catch {
+                return null;
+            }
+        },
+        read: (path) => this.readFromDisk(path),
+    });
 
     constructor(serverUrl: string) {
         super(serverUrl);
@@ -139,6 +158,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         await listen<string>('open-file-request', (evt) => {
             void this.handleOpenFileByPath(evt.payload);
         }, { target: getCurrentWindow().label });
+        await listen<FolderChangedPayload>(FOLDER_CHANGED_EVENT, (evt) => {
+            if (evt.payload.source === getCurrentWindow().label) return;
+            void this.postFolder(toFolderSlot(evt.payload.slot), evt.payload.path);
+        });
     }
 
     getExtraSetting(key: string): string | undefined {
@@ -466,13 +489,13 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 this.handleGetServerLog();
                 return true;
             case 'openFolder':
-                this.handleOpenFolder();
+                this.handleOpenFolder(toFolderSlot(message.slot));
                 return true;
             case 'readDirectory':
                 this.handleReadDirectory(message.path);
                 return true;
             case 'getOpenedFolder':
-                this.handleGetOpenedFolder();
+                this.handleGetOpenedFolder(message.slot === undefined ? FOLDER_SLOTS : [toFolderSlot(message.slot)]);
                 return true;
             case 'openFileByPath':
                 this.handleOpenFileByPath(message.path);
@@ -481,7 +504,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
                 this.handleOpenContainingFolder(message.path);
                 return true;
             case 'closeFolder':
-                this.handleCloseFolder();
+                this.handleCloseFolder(toFolderSlot(message.slot));
                 return true;
         }
         return false;
@@ -584,14 +607,44 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     async saveFile(filePath: string, content: string): Promise<void> {
         this.rememberDialogDir(filePath);
-        if (isCompiledPath(filePath)) {
-            await this.writeCompiled(filePath, content);
-            return;
+        await this.fileTracker.exclusive(() => this.writeTracked(filePath, filePath, content));
+    }
+
+    /** Writes `content` to `targetPath`; a .cpdz carries over the images bundled in `sourcePath`. */
+    private async writeTracked(sourcePath: string, targetPath: string, content: string): Promise<void> {
+        if (isCompiledPath(targetPath)) {
+            await this.writeCompiled(sourcePath, targetPath, content);
+        } else {
+            await writeTextFile(targetPath, content);
         }
-        await writeTextFile(filePath, content);
+        await this.fileTracker.noteWritten(targetPath, content);
+    }
+
+    /**
+     * Saves `content` beside `filePath` as e.g. `name (mine).cpd`, returning the new path.
+     * Safe to call from the tracker's change handler, unlike saveFile.
+     */
+    async saveSiblingCopy(filePath: string, label: string, content: string): Promise<string> {
+        const dir = pathDirname(filePath);
+        const sep = dir.includes('\\') ? '\\' : '/';
+        const name = pathBasename(filePath);
+        const dot = name.lastIndexOf('.');
+        const base = dot > 0 ? name.slice(0, dot) : name;
+        const ext = dot > 0 ? name.slice(dot) : '';
+        const target = `${dir}${sep}${await this.uniqueFilename(dir, `${base} (${label})${ext}`, sep)}`;
+        await this.writeTracked(filePath, target, content);
+        return target;
     }
 
     async readFile(filePath: string): Promise<string> {
+        // Stamped before reading, so a write landing mid-read still shows up as a change.
+        const stamp = await this.fileTracker.stampOf(filePath);
+        const content = await this.readFromDisk(filePath);
+        this.fileTracker.noteRead(filePath, content, stamp);
+        return content;
+    }
+
+    private async readFromDisk(filePath: string): Promise<string> {
         if (!isCompiledPath(filePath)) return readTextFile(filePath);
 
         const bytes = await fsReadFile(filePath);
@@ -606,8 +659,8 @@ export class TauriMessageBridge extends BaseMessageBridge {
      * Writes a .cpdz, re-encoding from the current text. A composite archive is
      * rebuilt from the bytes captured on read, so its images are carried over.
      */
-    private async writeCompiled(filePath: string, content: string): Promise<void> {
-        const encoded = await this.apiClient.encodeCpdz(content, this._compiledOriginals.get(filePath));
+    private async writeCompiled(sourcePath: string, filePath: string, content: string): Promise<void> {
+        const encoded = await this.apiClient.encodeCpdz(content, this._compiledOriginals.get(sourcePath));
         if (!encoded) throw new Error(`Could not write the compiled worksheet ${filePath}`);
         await fsWriteFile(filePath, encoded);
     }
@@ -674,9 +727,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     // ---- Folder browser ----
 
-    async getOpenedFolder(): Promise<string | null> {
+    async getOpenedFolder(slot: FolderSlot = 0): Promise<string | null> {
         try {
-            const raw = await this._store?.get<string>(OPENED_FOLDER_KEY);
+            const raw = await this._store?.get<string>(FOLDER_KEYS[slot]);
             return (raw ?? '').trim() || null;
         } catch {
             return null;
@@ -707,7 +760,7 @@ export class TauriMessageBridge extends BaseMessageBridge {
         }
     }
 
-    private async handleOpenFolder(): Promise<void> {
+    private async handleOpenFolder(slot: FolderSlot): Promise<void> {
         const folder = await dialogOpen({
             title: 'Open Folder',
             directory: true,
@@ -718,11 +771,21 @@ export class TauriMessageBridge extends BaseMessageBridge {
         if (!folder || Array.isArray(folder)) return;
         this.rememberDialogDir(folder, true);
         if (this._store) {
-            await this._store.set(OPENED_FOLDER_KEY, folder);
+            await this._store.set(FOLDER_KEYS[slot], folder);
             await this._store.save();
         }
-        const entries = await this.listDirectory(folder);
-        this.postToVue({ type: 'folderOpened', path: folder, entries });
+        await this.postFolder(slot, folder);
+        this.broadcastFolder(slot, folder);
+    }
+
+    private async postFolder(slot: FolderSlot, folder: string | null): Promise<void> {
+        const entries = folder ? await this.listDirectory(folder) : [];
+        this.postToVue({ type: 'folderOpened', slot, path: folder, entries });
+    }
+
+    private broadcastFolder(slot: FolderSlot, path: string | null): void {
+        const payload: FolderChangedPayload = { slot, path, source: getCurrentWindow().label };
+        void emit(FOLDER_CHANGED_EVENT, payload).catch(() => { /* other windows just won't sync */ });
     }
 
     private async handleReadDirectory(dirPath: string): Promise<void> {
@@ -731,14 +794,10 @@ export class TauriMessageBridge extends BaseMessageBridge {
         this.postToVue({ type: 'folderContents', path: dirPath, entries });
     }
 
-    private async handleGetOpenedFolder(): Promise<void> {
-        const folder = await this.getOpenedFolder();
-        if (!folder) {
-            this.postToVue({ type: 'folderOpened', path: null, entries: [] });
-            return;
+    private async handleGetOpenedFolder(slots: FolderSlot[]): Promise<void> {
+        for (const slot of slots) {
+            await this.postFolder(slot, await this.getOpenedFolder(slot));
         }
-        const entries = await this.listDirectory(folder);
-        this.postToVue({ type: 'folderOpened', path: folder, entries });
     }
 
     private async handleOpenFileByPath(filePath: string): Promise<void> {
@@ -746,15 +805,16 @@ export class TauriMessageBridge extends BaseMessageBridge {
         window.dispatchEvent(new CustomEvent('calcpad-open-file', { detail: { path: filePath } }));
     }
 
-    private async handleCloseFolder(): Promise<void> {
+    private async handleCloseFolder(slot: FolderSlot): Promise<void> {
         try {
             if (this._store) {
-                await this._store.set(OPENED_FOLDER_KEY, '');
+                await this._store.set(FOLDER_KEYS[slot], '');
                 await this._store.save();
             }
         } catch {
             /* nothing persisted yet */
         }
+        this.broadcastFolder(slot, null);
     }
 
     // Reveals rather than opening the parent, so the file manager lands with the

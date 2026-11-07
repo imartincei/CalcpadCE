@@ -220,6 +220,11 @@ The cells stay numeric, hovering the cell shows the unit that will be applied in
 So `U = matrix(2; 2)*5m` fills the grid with `5` and writes `[5m; 5m | 5m; 5m]`, and a literal default such as `M = [1m; 2m]` behaves the same way.
 
 It is also recommended to put units in column or row headers.
+Headers accept inline HTML, as in a regular HTML table:
+
+```text
+#UI {"type": "datagrid", "columnHeaders": ["F<sub>x</sub>, kN", "M<sub>y</sub>, kN·m"]} L = [0; 0]
+```
 
 `forceUnits: false` puts the units in the cells instead, so `5m` can be typed into one, and `allowExpression: true` accepts any expression in the cell.
 Note that this is still subject to the limitations of the calculation engine, putting a vector or matrix into a cell will throw an error.

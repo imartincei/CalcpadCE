@@ -137,6 +137,19 @@ The **Configuration** section lets you keep more than one named set of settings 
 
 Configurations persist between sessions.
 
+## In a document
+
+`#settings` overrides math and plot settings from that line on, using the JSON keys shown in the [Properties](new-calcpad-panel.md#properties) tab.
+`#end settings` restores the values the matching `#settings` changed:
+
+```calcpad
+#settings {"decimals": 4}
+x = 6.12345
+#end settings
+'Back to the previous decimals.
+y = 6.12345
+```
+
 ## See also
 
 - [The CalcpadCE Panel](new-calcpad-panel.md)

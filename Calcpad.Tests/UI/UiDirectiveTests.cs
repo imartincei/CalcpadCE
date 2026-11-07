@@ -498,6 +498,20 @@ namespace Calcpad.Tests
             Assert.Contains("data-ui-row-headers=\"[&quot;r1&quot;]\"", html);
         }
 
+        [Fact]
+        public void Datagrid_HeaderMarkup_ReachesTheGrid()
+        {
+            var html = Render(
+                "#UI {\"type\": \"datagrid\", \"columnHeaders\": [\"F<sub>x</sub>\", \"b\"]} T = [1; 2]",
+                enableUi: true);
+            var start = html.IndexOf("data-ui-col-headers=\"", StringComparison.Ordinal);
+            Assert.True(start >= 0);
+            start += "data-ui-col-headers=\"".Length;
+            var encoded = html[start..html.IndexOf('"', start)];
+            var headers = System.Text.Json.JsonSerializer.Deserialize<string[]>(System.Net.WebUtility.HtmlDecode(encoded));
+            Assert.Equal(["F<sub>x</sub>", "b"], headers);
+        }
+
         [Theory]
         // No literal to read, so the cells come from the value the line produced.
         [InlineData("#UI {\"type\": \"datagrid\"} G = matrix(2; 2) + 5", "5;5|5;5")]

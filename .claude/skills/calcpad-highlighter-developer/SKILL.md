@@ -64,7 +64,7 @@ Raw Source
     ↓
 [Stage 1: Line Continuations] - Merges lines with \ continuation
     ↓ Stage1Result
-[Stage 2: Includes + Macro Collection] - Resolves #include, collects macros
+[Stage 2: Includes + Macro Collection] - Core MacroParser resolves #include, collects macros
     ↓ Stage2Result
 [Stage 3: Macro Expansion + Definitions] - Expands macros, builds TypeTracker
     ↓ Stage3Result (with TypeTracker)

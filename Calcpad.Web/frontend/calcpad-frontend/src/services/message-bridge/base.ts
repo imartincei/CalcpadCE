@@ -653,6 +653,8 @@ export abstract class BaseMessageBridge {
             content,
             this.getVariablesOrigin(),
             sourceFilePath,
+            undefined,
+            this.getExtraSetting('autoRun') !== 'false',
         );
         this.postToVue({
             type: 'updateVariables',
@@ -666,7 +668,6 @@ export abstract class BaseMessageBridge {
                     description: m.description,
                     paramTypes: m.paramTypes,
                     paramDescriptions: m.paramDescriptions,
-                    defaults: m.defaults,
                 })),
                 variables: (response?.variables ?? []).map(v => ({
                     name: v.name,
@@ -688,7 +689,6 @@ export abstract class BaseMessageBridge {
                     description: f.description,
                     paramTypes: f.paramTypes,
                     paramDescriptions: f.paramDescriptions,
-                    defaults: f.defaults,
                 })),
                 customUnits: (response?.customUnits ?? []).map(u => ({
                     name: u.name,

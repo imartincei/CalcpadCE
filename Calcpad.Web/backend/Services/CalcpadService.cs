@@ -33,7 +33,7 @@ namespace Calcpad.Server.Services
             {
                 try
                 {
-                    return ProcessIncludedContent(File.ReadAllText(fileName));
+                    return MacroParser.FilterIncludedContent(File.ReadAllText(fileName));
                 }
                 catch (Exception ex)
                 {
@@ -43,7 +43,8 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, PauseInfo? Pause) Convert(
+        /// <returns>Trace is what Core executed, recorded only when the run was in debug mode.</returns>
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, RuntimeTrace? Trace, PauseInfo? Pause) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -103,6 +104,7 @@ namespace Calcpad.Server.Services
                 PauseInfo? pause = null;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
                 var errors = new List<CalcpadError>(macroParser.Errors);
+                RuntimeTrace? trace = null;
 
                 if (hasMacroErrors || forceUnwrappedCode)
                 {
@@ -119,6 +121,7 @@ namespace Calcpad.Server.Services
                             var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
                             silent.Parse(outputText, true, false);
                             errors.AddRange(silent.Errors);
+                            trace = silent.Trace;
                         }
                         catch (Exception silentEx)
                         {
@@ -155,6 +158,7 @@ namespace Calcpad.Server.Services
                         if (stepPauses)
                             pause = new PauseInfo(parser.NextPauseKey, parser.PreviousPauseKey);
                         errors.AddRange(parser.Errors);
+                        trace = parser.Trace;
                         if (captureOpenXml)
                             openXmlExpressions = parser.OpenXmlExpressions.ToList();
                     }
@@ -171,7 +175,7 @@ namespace Calcpad.Server.Services
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                return (finalHtml, openXmlExpressions, errors, pause);
+                return (finalHtml, openXmlExpressions, errors, trace, pause);
             }
             catch (OperationCanceledException)
             {
@@ -500,66 +504,6 @@ tan_angle = tan(angle°)";
             }
         }
 
-        /// <summary>
-        /// Processes included file content to respect #local and #global directives.
-        /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
-        /// <para>
-        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
-        /// the host restores it by scanning the document you have open, before #include is
-        /// expanded. A 'fileInfo' comment goes too, so an included file's details
-        /// don't show up in the host file.
-        /// </para>
-        /// </summary>
-        private static string ProcessIncludedContent(string content)
-        {
-            if (string.IsNullOrEmpty(content))
-                return content;
-
-            var isLocal = false;
-            var isHostComment = false;
-            var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var outputLines = new List<string>();
-
-            foreach (var line in lines)
-            {
-                if (isHostComment)
-                {
-                    if (line.Contains("-->", StringComparison.Ordinal))
-                        isHostComment = false;
-
-                    continue;
-                }
-                if (Validator.IsKeyword(line, "#local"))
-                {
-                    isLocal = true;
-                }
-                else if (Validator.IsKeyword(line, "#global"))
-                {
-                    isLocal = false;
-                }
-                else if (IsHostCommentStart(line))
-                {
-                    isHostComment = !line.Contains("-->", StringComparison.Ordinal);
-                }
-                else
-                {
-                    // Only include lines that are not marked as local
-                    if (!isLocal)
-                    {
-                        outputLines.Add(line);
-                    }
-                }
-            }
-
-            return string.Join(Environment.NewLine, outputLines);
-        }
-
-        /// <summary>
-        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
-        /// a 'uiOverrides' or 'fileInfo' key, or the footer's '<!--CalcpadCE Metadata--> anchor. A cheap substring check rather than a JSON parse,
-        /// matching the rest of this method's line-based approach - good enough since the host
-        /// always writes the keys verbatim.
-        /// </summary>
         /// <summary>Removes the metadata footer's comments from rendered output and from the unwrapped listing.</summary>
         internal static string StripHostMetadata(string html)
         {
@@ -572,15 +516,5 @@ tan_angle = tan(angle°)";
 
         [GeneratedRegex(@"<p class=""line-text""[^>]*>(?:(?!</p>).)*?<span class=""htmlComment"">&lt;!--(?:CalcpadCE Metadata|\{(?:(?!--&gt;).)*?&quot;(?:uiOverrides|fileInfo)&quot;(?:(?!--&gt;).)*)--&gt;</span></p>(?:\r?\n)?", RegexOptions.Singleline)]
         private static partial Regex ListedMetadataRegex();
-
-        private static bool IsHostCommentStart(string line)
-        {
-            var trimmed = line.TrimStart();
-            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
-                && trimmed.Contains("<!--", StringComparison.Ordinal)
-                && (trimmed.Contains("\"uiOverrides\"", StringComparison.Ordinal)
-                    || trimmed.Contains("\"fileInfo\"", StringComparison.Ordinal)
-                    || trimmed.Contains("<!--CalcpadCE Metadata-->", StringComparison.Ordinal));
-        }
     }
 }

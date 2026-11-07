@@ -64,7 +64,8 @@ import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge }
 import { EditorGroup } from './editor/editor-group';
 import { navigationDirection, type NavigationLocation } from './editor/navigation-history';
 import { createBrowserNavigationHistory, createDesktopNavigationHistory, type NavigationHistoryClient } from './services/navigation-history';
-import { UNTITLED_TITLE, type TabManager } from './tabs/tab-manager';
+import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from './tabs/tab-manager';
+import type { FileConflictChoice } from './services/file-change-tracker';
 import { setupTabDragging } from './tabs/tab-drag';
 import { toDisplayLogLevel } from 'calcpad-frontend';
 import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm } from 'calcpad-frontend';
@@ -491,10 +492,14 @@ async function bootstrap(): Promise<void> {
         appInstance.setProblems(group.id, items);
     }
 
+    // Auto-run makes lint and definitions use the run's trace, so they wait for it.
+    const useTrace = () => editorBridge.getExtraSetting('autoRun') !== 'false';
+    const runFollows = () => useTrace() && appInstance.isPreviewVisible();
+
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
+        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`, useTrace());
     }
 
     // Also hands the result to App.vue, which themes the loading overlay with it.
@@ -817,6 +822,18 @@ async function bootstrap(): Promise<void> {
     }
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
+        const content = group.editor.getValue();
+        try {
+            await renderPreviewFor(group);
+        } finally {
+            if (useTrace() && group.editor.getValue() === content) {
+                void refreshDefinitionsFor(group);
+                void group.diagnostics?.refresh();
+            }
+        }
+    }
+
+    async function renderPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
         if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
@@ -1052,7 +1069,7 @@ async function bootstrap(): Promise<void> {
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
             const sev = editorBridge.getExtraSetting('linterMinSeverity');
             return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext, `lint:${group.id}`);
+        }, getFileContext, `lint:${group.id}`, useTrace, runFollows);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1153,7 +1170,7 @@ async function bootstrap(): Promise<void> {
                 if (definitionsTimer) clearTimeout(definitionsTimer);
                 definitionsTimer = setTimeout(() => {
                     invalidateUiControls(group);
-                    void refreshDefinitionsFor(group);
+                    if (!runFollows()) void refreshDefinitionsFor(group);
                 }, 800);
                 if (appInstance.isPreviewVisible() && editorBridge.getExtraSetting('autoRun') !== 'false') {
                     if (previewTimer) clearTimeout(previewTimer);
@@ -1204,7 +1221,8 @@ async function bootstrap(): Promise<void> {
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
-            void group.diagnostics?.refresh();
+            const deferToRun = runFollows();
+            if (!deferToRun) void group.diagnostics?.refresh();
             // The mode switch below renders the form itself, so rendering here first would
             // just be a preview nobody sees.
             if (!enteringUi && appInstance.isPreviewVisible()) void refreshPreviewFor(group);
@@ -1212,7 +1230,7 @@ async function bootstrap(): Promise<void> {
                 activeBridge.refreshHeadings();
                 activeBridge.refreshDocumentMetadata();
             }
-            void refreshDefinitionsFor(group);
+            if (!deferToRun) void refreshDefinitionsFor(group);
             if (enteringUi) autoEnterUiMode();
         });
 
@@ -1509,7 +1527,13 @@ async function bootstrap(): Promise<void> {
 
     window.addEventListener('message', (e: MessageEvent) => {
         if (e.data?.type === 'showUiOverrideHintsChanged') uiOverrideHints?.refresh();
-        if (e.data?.type === 'autoRunChanged') appInstance.setAutoRunEnabled(e.data.enabled);
+        if (e.data?.type === 'autoRunChanged') {
+            appInstance.setAutoRunEnabled(e.data.enabled);
+            for (const g of groups.values()) {
+                void g.diagnostics?.refresh();
+                void refreshDefinitionsFor(g);
+            }
+        }
         if (e.data?.type === 'settingsResponse') appInstance.setAutoRunEnabled(e.data.enableAutoRun);
         if (e.data?.type === 'linterMinSeverityChanged') {
             for (const g of groups.values()) void g.diagnostics?.refresh();
@@ -1955,8 +1979,10 @@ async function bootstrap(): Promise<void> {
         appInstance.appendOutput('info', reason);
         try {
             for (const g of groups.values()) {
-                await g.diagnostics?.refresh();
-                await refreshDefinitionsFor(g);
+                if (!runFollows()) {
+                    await g.diagnostics?.refresh();
+                    await refreshDefinitionsFor(g);
+                }
                 if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
             }
             activeBridge.refreshHeadings();
@@ -2200,7 +2226,9 @@ async function bootstrap(): Promise<void> {
             tauriListen<T>(event, handler, { target: windowLabel });
         navigationHistory = await createDesktopNavigationHistory(historyCallbacks);
         await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-            if (focused) recordNavigation(activeGroup);
+            if (!focused) return;
+            recordNavigation(activeGroup);
+            tauriBridge!.fileTracker.pollSoon();
         });
         recordNavigation(activeGroup);
         // The seeded group was wired before this branch ran, so kick the first native title.
@@ -2435,6 +2463,68 @@ async function bootstrap(): Promise<void> {
             }
         }
 
+        // ---- External file changes (e.g. an agent editing an open file) ----
+        function tabsHolding(path: string): { group: EditorGroup; id: string }[] {
+            return [...groups.values()].flatMap(group =>
+                group.tabs.all.filter(t => t.filePath === path).map(t => ({ group, id: t.id })));
+        }
+
+        async function onExternalChange(path: string, disk: string): Promise<boolean> {
+            const holders = tabsHolding(path);
+            if (holders.length === 0) return true;
+            const { group, id } = holders[0];
+            const model = group.tabs.modelForTab(id)!;
+            const title = group.tabs.getTitle(id) ?? path;
+            const settle = () => {
+                for (const h of holders) {
+                    if (!h.group.tabs.isDirty(h.id)) void deleteDraft(h.id);
+                }
+            };
+
+            if (!group.tabs.isDirty(id) || documentMatches(model, disk)) {
+                reloadDocument(model, disk);
+                settle();
+                appInstance.appendOutput('info', `Reloaded ${title}: it was changed on disk.`);
+                return true;
+            }
+
+            const choice: FileConflictChoice | null = await appInstance.showFileConflict({
+                title,
+                filePath: path,
+                mine: model.getValue(),
+                theirs: disk,
+            });
+            if (choice === 'mine') return true;
+            if (choice === 'theirs') {
+                reloadDocument(model, disk);
+                settle();
+                return true;
+            }
+            if (choice === 'both') {
+                const mine = model.getValue();
+                try {
+                    const minePath = await tauriBridge!.saveSiblingCopy(path, 'mine', mine);
+                    const theirsPath = await tauriBridge!.saveSiblingCopy(path, 'theirs', disk);
+                    reloadDocument(model, disk);
+                    settle();
+                    activeGroup.tabs.openFile(minePath, mine);
+                    appInstance.appendOutput('info', `Kept both versions of ${title}: ${minePath} and ${theirsPath}.`);
+                    return true;
+                } catch (err) {
+                    appInstance.appendOutput('error',
+                        `Could not save copies of ${title}: ${err instanceof Error ? err.message : String(err)}`);
+                    appInstance.showOutput();
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        tauriBridge.fileTracker.start(
+            () => [...groups.values()].flatMap(g => g.tabs.all.flatMap(t => t.filePath ? [t.filePath] : [])),
+            onExternalChange,
+        );
+
         /**
          * Writes the file-info comment into the active model just before it is saved to
          * `filePath`, returning the content to write. `saved` is the file as it is on disk,
@@ -2466,6 +2556,9 @@ async function bootstrap(): Promise<void> {
             const active = tabs.activeTab;
             if (!active) return false;
             if (active.filePath) {
+                if (!await tauriBridge!.fileTracker.verifyBeforeSave(active.filePath)) return false;
+                // Keep Both already saved each version to its own file and opened one.
+                if (tabs.activeId !== active.id) return true;
                 // Saving an unchanged file is not an update.
                 const content = tabs.isDirty(active.id)
                     ? stampedContentFor(active.filePath, await tauriBridge!.readFile(active.filePath).catch(() => undefined))
