@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -3937,7 +3937,10 @@ Whatever the line evaluates to fills the cells:</p>
 When a default value carries a unit, the unit is kept aside rather than shown.
 The cells stay numeric, hovering the cell shows the unit that will be applied in the report.
 So <code>U = matrix(2; 2)*5m</code> fills the grid with <code>5</code> and writes <code>[5m; 5m | 5m; 5m]</code>, and a literal default such as <code>M = [1m; 2m]</code> behaves the same way.</p>
-<p>It is also recommended to put units in column or row headers.</p>
+<p>It is also recommended to put units in column or row headers.
+Headers accept inline HTML, as in a regular HTML table:</p>
+<div class="language-text highlight"><pre><span></span><code>#UI {"type": "datagrid", "columnHeaders": ["F&lt;sub&gt;x&lt;/sub&gt;, kN", "M&lt;sub&gt;y&lt;/sub&gt;, kN·m"]} L = [0; 0]
+</code></pre></div>
 <p><code>forceUnits: false</code> puts the units in the cells instead, so <code>5m</code> can be typed into one, and <code>allowExpression: true</code> accepts any expression in the cell.
 Note that this is still subject to the limitations of the calculation engine, putting a vector or matrix into a cell will throw an error.</p>
 <h4 id="sizing">Sizing<a class="headerlink" href="#sizing" title="Permanent link">&para;</a></h4>
@@ -4254,7 +4257,7 @@ In VS Code, they are arrows in the input form's title bar (beside the save butto
     
     
   
-      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="javascripts/mathjax.js"></script>
       

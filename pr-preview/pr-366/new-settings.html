@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -1466,6 +1466,17 @@
     <span class="md-ellipsis">
       
         Named configurations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-a-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In a document
       
     </span>
   </a>
@@ -3246,6 +3257,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#in-a-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In a document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3572,6 +3594,15 @@ Use external files with filepaths for larger images.</p>
 <li><strong>Reset to Default</strong> — restore the default settings.</li>
 </ul>
 <p>Configurations persist between sessions.</p>
+<h2 id="in-a-document">In a document<a class="headerlink" href="#in-a-document" title="Permanent link">&para;</a></h2>
+<p><code>#settings</code> overrides math and plot settings from that line on, using the JSON keys shown in the <a href="new-calcpad-panel.html#properties">Properties</a> tab.
+<code>#end settings</code> restores the values the matching <code>#settings</code> changed:</p>
+<div class="language-calcpad highlight"><pre><span></span><code><span class="k">#</span><span class="nv">settings</span><span class="w"> </span><span class="p">{</span><span class="cs">"decimals"</span><span class="p">:</span><span class="w"> </span><span class="m">4</span><span class="p">}</span>
+<span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6.12345</span>
+<span class="k">#</span><span class="nv">end</span><span class="w"> </span><span class="nv">settings</span>
+<span class="c1">'Back to the previous decimals.</span>
+<span class="nv">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">6.12345</span>
+</code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="new-calcpad-panel.html">The CalcpadCE Panel</a></li>
@@ -3636,7 +3667,7 @@ Use external files with filepaths for larger images.</p>
     
     
   
-      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="javascripts/mathjax.js"></script>
       
