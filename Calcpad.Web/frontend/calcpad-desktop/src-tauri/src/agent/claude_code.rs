@@ -33,6 +33,13 @@ const INHERITED_SESSION_VARS: &[&str] = &[
 const MAX_TOOL_RESULT_CHARS: usize = 4000;
 // Built-in editing tools write to disk underneath unsaved editor buffers; edits go through propose_edit.
 const DISALLOWED_TOOLS: &[&str] = &["Edit", "MultiEdit", "NotebookEdit"];
+// Automatic modes may only change open worksheets, through propose_edit.
+const RESTRICTED_TOOLS: &[&str] = &["Write", "Bash"];
+const RESTRICTED_PROMPT: &str = " You are in an automatic mode: you cannot run shell commands or write files; change only worksheets open in Calcpad, with propose_edit.";
+
+fn is_restricted(options: &StartOptions) -> bool {
+    matches!(options.permission_mode.as_deref(), Some("acceptEdits" | "auto"))
+}
 const SYSTEM_PROMPT: &str = "You are running inside the CalcpadCE desktop app, next to the user's open worksheets. \
 Use the calcpad MCP tools to work with them: read open worksheets with get_document (it includes unsaved changes) rather than from disk, \
 check get_diagnostics after changes, and change open worksheets only with propose_edit, which shows the user a diff to accept. \
@@ -63,6 +70,10 @@ impl AgentBackend for ClaudeCodeSession {
     fn set_model(&self, model: &str) -> Result<(), String> {
         let model = if model.is_empty() { "default" } else { model };
         self.control(json!({"subtype": "set_model", "model": model}))
+    }
+
+    fn set_permission_mode(&self, mode: &str) -> Result<(), String> {
+        self.control(json!({"subtype": "set_permission_mode", "mode": mode}))
     }
 
     fn stop(&self) {
@@ -114,10 +125,21 @@ pub fn build_args(options: &StartOptions, mcp_config: &Path, plugin_dir: Option<
     args.push(format!("mcp__{SERVER_NAME}__{APPROVAL_TOOL}"));
     args.push("--allowedTools".into());
     args.push(auto_approved_tools().join(","));
+    let restricted = is_restricted(options);
+    let mut disallowed = DISALLOWED_TOOLS.to_vec();
+    if restricted {
+        disallowed.extend_from_slice(RESTRICTED_TOOLS);
+        // The user's own MCP servers could change things outside Calcpad.
+        args.push("--strict-mcp-config".into());
+    }
     args.push("--disallowedTools".into());
-    args.push(DISALLOWED_TOOLS.join(","));
+    args.push(disallowed.join(","));
     args.push("--append-system-prompt".into());
-    args.push(SYSTEM_PROMPT.into());
+    args.push(if restricted {
+        format!("{SYSTEM_PROMPT}{RESTRICTED_PROMPT}")
+    } else {
+        SYSTEM_PROMPT.into()
+    });
     if let Some(dir) = plugin_dir {
         args.push("--plugin-dir".into());
         args.push(dir.to_string_lossy().into_owned());
@@ -125,6 +147,10 @@ pub fn build_args(options: &StartOptions, mcp_config: &Path, plugin_dir: Option<
     if let Some(model) = options.model.as_deref().filter(|m| !m.trim().is_empty()) {
         args.push("--model".into());
         args.push(model.trim().into());
+    }
+    if let Some(mode) = options.permission_mode.as_deref().filter(|m| *m != "default") {
+        args.push("--permission-mode".into());
+        args.push(mode.into());
     }
     if let Some(session) = options.resume.as_deref().filter(|s| !s.is_empty()) {
         args.push("--resume".into());
@@ -239,6 +265,7 @@ pub fn map_line(line: &Value) -> Vec<AgentEvent> {
                 session_id: str_at(line, "session_id").unwrap_or_default(),
                 model: str_at(line, "model"),
                 version: str_at(line, "claude_code_version"),
+                permission_mode: str_at(line, "permissionMode"),
             }],
             Some("api_retry") => vec![AgentEvent::Status {
                 text: "Retrying the API request…".into(),
@@ -286,6 +313,14 @@ pub fn map_line(line: &Value) -> Vec<AgentEvent> {
                     .collect()
             })
             .unwrap_or_default(),
+        Some("control_response") if line["response"]["subtype"] == "error" => {
+            let response = &line["response"];
+            vec![AgentEvent::Error {
+                message: str_at(response, "error")
+                    .or_else(|| str_at(response, "message"))
+                    .unwrap_or_else(|| "Claude Code rejected the request".into()),
+            }]
+        }
         Some("result") => {
             let is_error = line["is_error"].as_bool().unwrap_or(false);
             vec![AgentEvent::TurnComplete {
@@ -451,15 +486,20 @@ mod tests {
 
     #[test]
     fn maps_init_and_text_delta() {
-        let init = json!({"type":"system","subtype":"init","session_id":"s1","model":"m","claude_code_version":"2.1.318","parent_tool_use_id":null});
+        let init = json!({"type":"system","subtype":"init","session_id":"s1","model":"m","claude_code_version":"2.1.318","permissionMode":"auto","parent_tool_use_id":null});
         assert_eq!(
             map_line(&init),
             vec![AgentEvent::SessionStarted {
                 session_id: "s1".into(),
                 model: Some("m".into()),
-                version: Some("2.1.318".into())
+                version: Some("2.1.318".into()),
+                permission_mode: Some("auto".into())
             }]
         );
+        let rejected = json!({"type":"control_response","response":{"subtype":"error","request_id":"calcpad-1","error":"Auto mode is unavailable"}});
+        assert_eq!(map_line(&rejected), vec![AgentEvent::Error { message: "Auto mode is unavailable".into() }]);
+        let ok = json!({"type":"control_response","response":{"subtype":"success","request_id":"calcpad-1"}});
+        assert!(map_line(&ok).is_empty());
         let delta = json!({"type":"stream_event","event":{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ok"}},"parent_tool_use_id":null});
         assert_eq!(map_line(&delta), vec![AgentEvent::TextDelta { text: "ok".into() }]);
     }
@@ -521,6 +561,7 @@ mod tests {
     fn args_route_permissions_through_calcpad() {
         let options = StartOptions {
             model: Some(" sonnet ".into()),
+            permission_mode: Some("auto".into()),
             resume: Some("abc".into()),
             ..Default::default()
         };
@@ -532,6 +573,15 @@ mod tests {
         assert_eq!(value_after("--permission-prompt-tool"), "mcp__calcpad__approve_tool");
         assert_eq!(value_after("--model"), "sonnet");
         assert_eq!(value_after("--resume"), "abc");
+        assert_eq!(value_after("--permission-mode"), "auto");
+        assert!(value_after("--disallowedTools").contains("Bash"));
+        assert!(value_after("--disallowedTools").contains("Write"));
+        assert!(args.contains(&"--strict-mcp-config".to_string()));
+        let manual = build_args(&StartOptions::default(), Path::new("/tmp/mcp.json"), None);
+        let i = manual.iter().position(|a| a == "--disallowedTools").unwrap();
+        assert!(!manual[i + 1].contains("Bash"));
+        assert!(!manual.contains(&"--permission-mode".to_string()));
+        assert!(!manual.contains(&"--strict-mcp-config".to_string()));
         assert_eq!(value_after("--plugin-dir"), "/res/agent-plugin");
         assert!(value_after("--disallowedTools").contains("Edit"));
         assert!(!value_after("--allowedTools").contains("approve_tool"));

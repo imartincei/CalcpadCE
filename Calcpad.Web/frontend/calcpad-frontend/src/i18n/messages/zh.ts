@@ -352,7 +352,31 @@ const zh: Record<string, string> = {
     "Untitled conversation": "未命名对话",
     "Open": "打开",
     "Delete": "删除",
-    "No longer pending": "已失效"
+    "No longer pending": "已失效",
+    "Edit automatically": "自动编辑",
+    "Plan mode": "计划模式",
+    "Auto mode": "自动模式",
+    "Ask before running commands or editing": "运行命令或编辑前先询问",
+    "Apply edits to open worksheets without review; no commands or file writes": "直接修改已打开的计算书，无需审阅；不运行命令、不写入文件",
+    "Explore and propose a plan without making changes": "只做分析并提出计划，不做任何修改",
+    "Work without asking, changing only open worksheets; every change is backed up": "无需询问即可工作，只修改已打开的计算书；每次修改都会备份",
+    "Permission mode": "权限模式",
+    "Changes": "更改",
+    "Changes in this conversation": "本次对话中的更改",
+    "Revert all": "全部还原",
+    "Keep all": "全部保留",
+    "Claude has not changed any worksheets in this conversation. Each worksheet is backed up before its first change.": "Claude 尚未在本次对话中修改任何计算书。每个计算书在首次修改前都会备份。",
+    "Closed; reverting reopens it": "已关闭；还原时会重新打开",
+    "Show changes": "显示更改",
+    "Untitled": "未命名",
+    "Closed": "已关闭",
+    "Revert to backup": "还原到备份",
+    "Keep changes": "保留更改",
+    "Applied automatically": "已自动应用",
+    "View changes": "查看更改",
+    "Changes since backup": "自备份以来的更改",
+    "Backup": "备份",
+    "Current": "当前"
 }
 
 export default zh

@@ -1753,6 +1753,7 @@ pub fn run() {
             agent::agent_send,
             agent::agent_interrupt,
             agent::agent_set_model,
+            agent::agent_set_permission_mode,
             agent::agent_stop,
             agent::agent_tool_response,
             agent::history::agent_history_list,

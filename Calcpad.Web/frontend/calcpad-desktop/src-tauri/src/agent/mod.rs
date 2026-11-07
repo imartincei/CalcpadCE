@@ -26,6 +26,7 @@ pub enum AgentEvent {
         session_id: String,
         model: Option<String>,
         version: Option<String>,
+        permission_mode: Option<String>,
     },
     TextDelta {
         text: String,
@@ -56,6 +57,20 @@ pub enum AgentEvent {
         code: Option<i32>,
         output: String,
     },
+    Error {
+        message: String,
+    },
+}
+
+/// Modes the UI may select; bypassing permissions is deliberately not offered.
+pub const PERMISSION_MODES: &[&str] = &["default", "acceptEdits", "plan", "auto"];
+
+fn check_mode(mode: &str) -> Result<(), String> {
+    if PERMISSION_MODES.contains(&mode) {
+        Ok(())
+    } else {
+        Err(format!("Unsupported permission mode {mode}"))
+    }
 }
 
 /// One running agent conversation. Backends other than Claude Code (e.g. ACP) implement this.
@@ -64,6 +79,7 @@ pub trait AgentBackend: Send + Sync {
     fn interrupt(&self) -> Result<(), String>;
     /// Empty selects the backend's default model.
     fn set_model(&self, model: &str) -> Result<(), String>;
+    fn set_permission_mode(&self, mode: &str) -> Result<(), String>;
     fn stop(&self);
 }
 
@@ -73,6 +89,7 @@ pub struct StartOptions {
     pub executable: Option<String>,
     pub cwd: Option<String>,
     pub model: Option<String>,
+    pub permission_mode: Option<String>,
     pub resume: Option<String>,
 }
 
@@ -243,6 +260,9 @@ pub async fn agent_start(
     options: StartOptions,
 ) -> Result<(), String> {
     let key = SessionKey::new(&window, conversation)?;
+    if let Some(mode) = options.permission_mode.as_deref() {
+        check_mode(mode)?;
+    }
     let state = app.state::<AgentState>();
     state.stop_where(|k| *k == key);
 
@@ -310,6 +330,22 @@ pub fn agent_set_model(
     let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
     match sessions.get(&key) {
         Some(session) => session.backend.set_model(model.trim()),
+        None => Ok(()),
+    }
+}
+
+#[tauri::command]
+pub fn agent_set_permission_mode(
+    state: State<'_, AgentState>,
+    window: tauri::WebviewWindow,
+    conversation: String,
+    mode: String,
+) -> Result<(), String> {
+    check_mode(&mode)?;
+    let key = SessionKey::new(&window, conversation)?;
+    let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
+    match sessions.get(&key) {
+        Some(session) => session.backend.set_permission_mode(&mode),
         None => Ok(()),
     }
 }

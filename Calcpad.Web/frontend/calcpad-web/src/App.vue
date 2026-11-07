@@ -467,6 +467,18 @@
         :modified="agentChat.pendingEdit.modified"
         @resolve="resolveEdit"
       />
+      <AgentDiffModal
+        v-else-if="agentChat.reviewChange"
+        :key="agentChat.reviewChange.key"
+        review
+        :title="agentChat.reviewChange.title"
+        summary=""
+        :original="agentChat.reviewChange.baseline"
+        :modified="agentChat.reviewChange.current"
+        @revert="revertChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
+        @keep="keepChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
+        @close="closeChangeDiff"
+      />
     </template>
 
     <!-- Replaces the broken native WebView menu (see injectLineLinks). Viewport
@@ -606,7 +618,7 @@ import DesktopTitleBar from './components/DesktopTitleBar.vue'
 import DocumentTabStrip from './components/DocumentTabStrip.vue'
 import AgentChatPanel from './components/AgentChatPanel.vue'
 import AgentDiffModal from './components/AgentDiffModal.vue'
-import { agentChat, resolveEdit, setPanelOpen } from './services/agent-chat'
+import { agentChat, closeChangeDiff, keepChange, resolveEdit, revertChange, setPanelOpen } from './services/agent-chat'
 import RefreshIcon from 'calcpad-frontend/vue/components/RefreshIcon.vue'
 import SidebarIcon from 'calcpad-frontend/vue/components/SidebarIcon.vue'
 import {

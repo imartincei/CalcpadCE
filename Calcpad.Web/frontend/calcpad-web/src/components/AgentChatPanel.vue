@@ -12,6 +12,17 @@
       </div>
       <div class="agent-header-actions">
         <button
+          class="agent-icon-btn agent-changes-btn"
+          :class="{ active: agentChat.view === 'changes' }"
+          :title="t('Changes')"
+          :aria-label="t('Changes')"
+          :aria-pressed="agentChat.view === 'changes'"
+          @click="showChanges(agentChat.view !== 'changes')"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 1.5a2 2 0 0 1 .75 3.85v5.3a2 2 0 1 1-1.5 0v-5.3A2 2 0 0 1 4.5 1.5m0 1.25a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5m0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5M11.5 14.5a2 2 0 0 1-.75-3.85V7a1.25 1.25 0 0 0-1.25-1.25H8.06l.97.97a.75.75 0 0 1-1.06 1.06L5.72 5.53a.75.75 0 0 1 0-1.06l2.25-2.25a.75.75 0 0 1 1.06 1.06l-.97.97H9.5A2.75 2.75 0 0 1 12.25 7v3.65a2 2 0 0 1-.75 3.85m0-1.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5"/></svg>
+          <span v-if="conversation.changes.length" class="agent-badge">{{ conversation.changes.length }}</span>
+        </button>
+        <button
           class="agent-icon-btn"
           :class="{ active: agentChat.view === 'history' }"
           :title="t('Conversation history')"
@@ -40,7 +51,7 @@
       </div>
     </header>
 
-    <div v-if="agentChat.view === 'chat'" class="agent-tabs" role="tablist" @wheel.passive="onTabsWheel">
+    <div v-if="agentChat.view !== 'history'" class="agent-tabs" role="tablist" @wheel.passive="onTabsWheel">
       <div
         v-for="tab in agentChat.conversations"
         :key="tab.id"
@@ -81,7 +92,63 @@
       </div>
     </form>
 
-    <div v-if="agentChat.view === 'history'" class="agent-history">
+    <div v-if="agentChat.view === 'changes'" class="agent-history agent-changes">
+      <div class="agent-changes-head">
+        <span class="agent-history-title">{{ t('Changes in this conversation') }}</span>
+        <template v-if="conversation.changes.length">
+          <button class="agent-icon-btn" :title="t('Revert all')" :aria-label="t('Revert all')" @click="revertAllChanges(conversation.id)">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.53 2.47a.75.75 0 0 1 0 1.06L4.06 5H9.5a4.5 4.5 0 1 1 0 9H6a.75.75 0 0 1 0-1.5h3.5a3 3 0 1 0 0-6H4.06l1.47 1.47a.75.75 0 0 1-1.06 1.06L1.72 6.28a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0"/></svg>
+          </button>
+          <button class="agent-icon-btn" :title="t('Keep all')" :aria-label="t('Keep all')" @click="keepAllChanges(conversation.id)">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0"/></svg>
+          </button>
+        </template>
+      </div>
+      <div v-if="!conversation.changes.length" class="agent-empty">
+        <p>{{ t('Claude has not changed any worksheets in this conversation. Each worksheet is backed up before its first change.') }}</p>
+      </div>
+      <div
+        v-for="change in changeRows"
+        :key="change.key"
+        class="agent-history-item agent-change-item"
+        :class="{ closed: change.current === null }"
+        role="button"
+        tabindex="0"
+        :title="change.current === null ? t('Closed; reverting reopens it') : t('Show changes')"
+        @click="openChangeDiff(conversation.id, change.key)"
+        @keydown.enter="openChangeDiff(conversation.id, change.key)"
+      >
+        <svg class="agent-change-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.3L13 5.2v8.3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1m.25 1.25v10.5h7.5V6H8.5V2.75zM9.75 3.3v1.45h1.45z"/></svg>
+        <div class="agent-history-text">
+          <span class="agent-history-name">{{ baseName(change.path ?? change.title) }}</span>
+          <span class="agent-history-meta" :title="change.path ?? ''">{{ change.path ? dirName(change.path) : t('Untitled') }}</span>
+        </div>
+        <span v-if="change.current === null" class="agent-change-stat">{{ t('Closed') }}</span>
+        <span v-else class="agent-change-stat">
+          <span class="added">+{{ change.added }}</span>
+          <span class="removed">−{{ change.removed }}</span>
+        </span>
+        <button
+          class="agent-icon-btn agent-history-delete"
+          :title="t('Revert to backup')"
+          :aria-label="t('Revert to backup')"
+          :disabled="change.current === null && !change.path"
+          @click.stop="revertChange(conversation.id, change.key)"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.53 2.47a.75.75 0 0 1 0 1.06L4.06 5H9.5a4.5 4.5 0 1 1 0 9H6a.75.75 0 0 1 0-1.5h3.5a3 3 0 1 0 0-6H4.06l1.47 1.47a.75.75 0 0 1-1.06 1.06L1.72 6.28a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0"/></svg>
+        </button>
+        <button
+          class="agent-icon-btn agent-history-delete"
+          :title="t('Keep changes')"
+          :aria-label="t('Keep changes')"
+          @click.stop="keepChange(conversation.id, change.key)"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div v-else-if="agentChat.view === 'history'" class="agent-history">
       <div class="agent-history-title">{{ t('Conversation history') }}</div>
       <div v-if="!agentChat.history.length" class="agent-empty">
         <p>{{ t('No saved conversations yet.') }}</p>
@@ -169,6 +236,10 @@
           <div v-if="item.summary" class="agent-card-summary">{{ item.summary }}</div>
           <div class="agent-card-state">
             <template v-if="item.state === 'pending'">{{ t('Review the diff to accept or reject it.') }}</template>
+            <template v-else-if="item.auto">
+              {{ t('Applied automatically') }} ·
+              <a href="#" class="agent-link" @click.prevent="showChanges(true)">{{ t('View changes') }}</a>
+            </template>
             <template v-else>{{ stateLabel(item.state, true) }}</template>
           </div>
         </div>
@@ -189,8 +260,10 @@
           v-model="draft"
           rows="1"
           :placeholder="t('Message Claude…')"
+          :title="t('Enter to send · Shift+Enter for a new line')"
           @input="autoSize"
           @keydown.enter.exact.prevent="submit"
+          @keydown.shift.tab.prevent="cyclePermissionMode"
         ></textarea>
         <button
           v-if="isWorking"
@@ -215,12 +288,20 @@
       <div class="agent-composer-footer">
         <label class="agent-model-picker" :title="t('Model')">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
+          <span class="agent-picker-label">{{ currentModelLabel }}</span>
           <select :value="conversation.model" :aria-label="t('Model')" @change="onModelPicked">
             <option v-for="option in modelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
         </label>
-        <span class="agent-hint">{{ t('Enter to send · Shift+Enter for a new line') }}</span>
+        <label class="agent-model-picker agent-mode-picker" :class="'mode-' + conversation.permissionMode" :title="modeHint + ' (Shift+Tab)'">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
+          <span class="agent-picker-label">{{ t(currentMode.label) }}</span>
+          <select :value="conversation.permissionMode" :aria-label="t('Permission mode')" @change="onModePicked">
+            <option v-for="mode in PERMISSION_MODES" :key="mode.value" :value="mode.value">{{ t(mode.label) }}</option>
+          </select>
+          <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+        </label>
       </div>
     </div>
     </template>
@@ -228,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   activateConversation,
@@ -236,9 +317,21 @@ import {
   agentChat,
   answerApproval,
   closeConversation,
+  currentText,
+  cyclePermissionMode,
   deleteFromHistory,
   interrupt,
+  keepAllChanges,
+  keepChange,
+  lineStats,
   MODEL_OPTIONS,
+  openChangeDiff,
+  PERMISSION_MODES,
+  revertAllChanges,
+  revertChange,
+  setPermissionMode,
+  showChanges,
+  type PermissionMode,
   needsAttention,
   newConversation,
   openFromHistory,
@@ -280,6 +373,35 @@ const subtitle = computed(() => [conversation.value.resolvedModel, conversation.
 
 function modelLabel(option: { value: string; label: string }): string {
   return option.value === '' ? t('Default') : option.label
+}
+
+const currentMode = computed(() => PERMISSION_MODES.find(m => m.value === conversation.value.permissionMode) ?? PERMISSION_MODES[0])
+const modeHint = computed(() => t(currentMode.value.hint))
+const currentModelLabel = computed(() => {
+  const option = modelOptions.value.find(o => o.value === conversation.value.model)
+  return option ? modelLabel(option) : conversation.value.model
+})
+
+function onModePicked(event: Event): void {
+  void setPermissionMode((event.target as HTMLSelectElement).value as PermissionMode)
+}
+
+const liveTick = ref(0)
+let liveTimer: ReturnType<typeof setInterval> | undefined
+watch(() => agentChat.view === 'changes', open => {
+  clearInterval(liveTimer)
+  if (open) liveTimer = setInterval(() => { liveTick.value++ }, 1000)
+}, { immediate: true })
+onBeforeUnmount(() => clearInterval(liveTimer))
+
+const changeRows = computed(() => (void liveTick.value, conversation.value.changes).map(change => {
+  const current = currentText(change)
+  return { ...change, current, ...(current === null ? { added: 0, removed: 0 } : lineStats(change.baseline, current)) }
+}))
+
+function dirName(path: string): string {
+  const cut = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'))
+  return cut > 0 ? path.slice(0, cut) : path
 }
 
 function onModelPicked(event: Event): void {
@@ -890,18 +1012,10 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-composer-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
   margin-top: 6px;
   padding: 0 2px;
-}
-.agent-hint {
-  overflow: hidden;
-  color: var(--agent-muted);
-  font-size: 11px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  opacity: 0.8;
 }
 .agent-model-picker {
   position: relative;
@@ -933,7 +1047,16 @@ defineExpose({ focus: () => input.value?.focus() })
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.agent-picker-label {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
 .agent-model-picker select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
   appearance: none;
   padding: 0;
   border: none;
@@ -1141,6 +1264,76 @@ defineExpose({ focus: () => input.value?.focus() })
   background: var(--agent-surface);
   box-shadow: none;
   opacity: 0.75;
+}
+
+.agent-changes-btn {
+  position: relative;
+}
+.agent-badge {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: #d97757;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+.agent-changes-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 4px;
+}
+.agent-changes-head .agent-history-title {
+  flex: 1;
+  padding-bottom: 0;
+}
+.agent-changes-head + .agent-empty,
+.agent-changes-head + .agent-change-item {
+  margin-top: 6px;
+}
+.agent-change-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
+}
+.agent-change-item.closed .agent-change-icon,
+.agent-change-item.closed .agent-history-name {
+  opacity: 0.6;
+}
+.agent-change-stat {
+  display: flex;
+  gap: 6px;
+  color: var(--agent-muted);
+  font-family: var(--agent-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agent-change-stat .added {
+  color: var(--vscode-gitDecoration-addedResourceForeground, #73c991);
+}
+.agent-change-stat .removed {
+  color: var(--vscode-errorForeground, #f48771);
+}
+.agent-link {
+  color: var(--vscode-textLink-foreground, #3794ff);
+  text-decoration: none;
+}
+.agent-link:hover {
+  text-decoration: underline;
+}
+.agent-mode-picker.mode-auto,
+.agent-mode-picker.mode-acceptEdits {
+  color: #d97757;
+}
+.agent-mode-picker.mode-plan {
+  color: var(--vscode-textLink-foreground, #3794ff);
 }
 
 @keyframes agent-blink {

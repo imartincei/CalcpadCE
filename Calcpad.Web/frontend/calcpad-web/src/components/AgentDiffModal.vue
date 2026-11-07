@@ -1,10 +1,18 @@
 <template>
   <div class="modal-backdrop agent-diff-backdrop">
     <div class="modal-card agent-diff-card" role="dialog" aria-modal="true">
-      <div class="modal-title">{{ t('Proposed edit') }}: {{ title }}</div>
+      <div class="modal-title">{{ review ? t('Changes since backup') : t('Proposed edit') }}: {{ title }}</div>
       <div v-if="summary" class="modal-message">{{ summary }}</div>
+      <div v-if="review" class="agent-diff-legend">
+        <span>{{ t('Backup') }}</span><span>{{ t('Current') }}</span>
+      </div>
       <div ref="host" class="agent-diff-host"></div>
-      <div class="modal-actions">
+      <div v-if="review" class="modal-actions">
+        <button class="modal-btn" @click="emit('revert')">{{ t('Revert to backup') }}</button>
+        <button class="modal-btn secondary" @click="emit('keep')">{{ t('Keep changes') }}</button>
+        <button class="modal-btn secondary" @click="emit('close')">{{ t('Close') }}</button>
+      </div>
+      <div v-else class="modal-actions">
         <button class="modal-btn" @click="emit('resolve', true)">{{ t('Accept') }}</button>
         <button class="modal-btn secondary" @click="emit('resolve', false)">{{ t('Reject') }}</button>
       </div>
@@ -17,8 +25,8 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as monaco from 'monaco-editor'
 
-const props = defineProps<{ title: string; summary: string; original: string; modified: string }>()
-const emit = defineEmits<{ resolve: [accept: boolean] }>()
+const props = defineProps<{ title: string; summary: string; original: string; modified: string; review?: boolean }>()
+const emit = defineEmits<{ resolve: [accept: boolean]; revert: []; keep: []; close: [] }>()
 const { t } = useI18n()
 
 const host = ref<HTMLElement | null>(null)
@@ -26,7 +34,9 @@ let diffEditor: monaco.editor.IStandaloneDiffEditor | null = null
 const models: monaco.editor.ITextModel[] = []
 
 function onKey(e: KeyboardEvent): void {
-  if (e.key === 'Escape') emit('resolve', false)
+  if (e.key !== 'Escape') return
+  if (props.review) emit('close')
+  else emit('resolve', false)
 }
 
 onMounted(() => {
@@ -60,6 +70,13 @@ onBeforeUnmount(() => {
   width: min(1200px, 92vw);
   max-width: none;
   height: min(800px, 85vh);
+}
+.agent-diff-legend {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 8px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
 }
 .agent-diff-host {
   flex: 1;
