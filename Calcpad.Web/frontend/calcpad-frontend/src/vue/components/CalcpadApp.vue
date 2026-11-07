@@ -47,8 +47,7 @@
     <div class="tab-content" :class="{ unavailable: tabUnavailable(pane.activeTab), 'insert-content': pane.activeTab === 'insert' }" :inert="tabUnavailable(pane.activeTab)">
       <CalcpadFilesTab
         v-if="pane.activeTab === 'files'"
-        :opened-folder="openedFolder"
-        :tree-roots="fileTreeRoots"
+        :folders="folders"
         @open-folder-request="handleOpenFolderRequest"
         @open-file="handleOpenFile"
         @expand-folder="handleExpandFolder"
@@ -217,7 +216,7 @@ import type { MetadataCommentBlock, MetadataCommentData, SettingsValues } from '
 import { discardMetadataDraft } from '../metadata-drafts'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import type { UiControl } from '../../services/ui-overrides'
-import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, VersionConfig } from '../types'
+import type { Tab, InsertItem, Settings, VariablesData, PdfSettings, TocHeading, ThemeInfo, FileNode, OpenedFolder, VersionConfig } from '../types'
 import { DEFAULT_VERSION_CONFIG } from '../types'
 import type { ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
@@ -241,8 +240,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Files tab state
-const openedFolder = ref<string | null>(null)
-const fileTreeRoots = ref<FileNode[]>([])
+const folders = ref<OpenedFolder[]>([{ path: null, roots: [] }, { path: null, roots: [] }])
 
 // Split icon (two stacked rows) and close icon for the per-pane action button;
 // hide-sidebar collapses the panel itself.
@@ -361,8 +359,8 @@ const writeMode = ref<WriteMode>('reportOnly')
 const writeResult = ref<{ ok: boolean; message: string } | null>(null)
 
 // Methods
-const handleOpenFolderRequest = () => {
-  postMessage({ type: 'openFolder' })
+const handleOpenFolderRequest = (slot: number) => {
+  postMessage({ type: 'openFolder', slot })
 }
 
 const handleOpenFile = (path: string) => {
@@ -377,14 +375,13 @@ const handleOpenContainingFolder = (path: string) => {
   postMessage({ type: 'openContainingFolder', path })
 }
 
-const handleCloseFolder = () => {
-  openedFolder.value = null
-  fileTreeRoots.value = []
-  postMessage({ type: 'closeFolder' })
+const handleCloseFolder = (slot: number) => {
+  folders.value[slot] = { path: null, roots: [] }
+  postMessage({ type: 'closeFolder', slot })
 }
 
-const handleRefreshFolder = () => {
-  postMessage({ type: 'getOpenedFolder' })
+const handleRefreshFolder = (slot: number) => {
+  postMessage({ type: 'getOpenedFolder', slot })
 }
 
 // Insert children into the tree at the given directory path.
@@ -402,7 +399,8 @@ const setDirectoryChildren = (parentPath: string, children: FileNode[]) => {
     }
     return false
   }
-  walk(fileTreeRoots.value)
+  // Both folders may contain the same directory.
+  for (const folder of folders.value) walk(folder.roots)
 }
 
 // Add a second pane, defaulting it to a tab other than the first pane's so the
@@ -435,7 +433,7 @@ const activateTab = (pane: Pane, tabId: string) => {
   // Nothing below is worth asking the host for while the tab is inert.
   if (tabUnavailable(tabId)) return
 
-  if (tabId === 'files' && !openedFolder.value) {
+  if (tabId === 'files' && !folders.value.some(f => f.path)) {
     postMessage({ type: 'getOpenedFolder' })
   }
 
@@ -883,8 +881,7 @@ const handleMessage = (event: MessageEvent) => {
       prettifyTrimTrailing.value = message.trimTrailingWhitespace !== false
       break
     case 'folderOpened':
-      openedFolder.value = message.path || null
-      fileTreeRoots.value = message.entries || []
+      folders.value[message.slot === 1 ? 1 : 0] = { path: message.path || null, roots: message.entries || [] }
       break
     case 'folderContents':
       setDirectoryChildren(message.path, message.entries || [])

@@ -121,3 +121,8 @@ export interface FileNode {
   children?: FileNode[]
   loaded?: boolean
 }
+
+export interface OpenedFolder {
+  path: string | null
+  roots: FileNode[]
+}

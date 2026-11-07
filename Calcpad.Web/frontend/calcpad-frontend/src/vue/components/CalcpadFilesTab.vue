@@ -1,40 +1,43 @@
 <template>
   <div class="files-tab">
-    <div v-if="!openedFolder" class="files-empty">
+    <div v-if="!anyOpen" class="files-empty">
       <p class="files-empty-message">{{ t('No folder open.') }}</p>
-      <button class="files-open-btn" @click="$emit('open-folder-request')">{{ t('Open Folder') }}</button>
+      <button class="files-open-btn" @click="$emit('open-folder-request', 0)">{{ t('Open Folder') }}</button>
     </div>
     <template v-else>
-      <div class="files-header">
-        <button class="icon files-close-btn" @click="$emit('close-folder')" :title="t('Close Folder')">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 8.707l3.646 3.647.708-.707L8.707 8l3.647-3.646-.707-.708L8 7.293 4.354 3.646l-.707.708L7.293 8l-3.647 3.646.708.708L8 8.707z"/></svg>
-        </button>
-        <span class="files-folder-name" :title="openedFolder">{{ folderBasename }}</span>
-        <div class="files-header-actions">
-          <button class="icon" @click="onRefresh" :title="t('Refresh')">
-            <RefreshIcon />
-          </button>
-          <button class="icon" @click="collapseAll" :title="t('Collapse All')">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4 9h11v1H4z"/></svg>
-          </button>
-          <button class="secondary files-change-btn" @click="$emit('open-folder-request')" :title="t('Open a different folder')">{{ t('Change Folder') }}</button>
-        </div>
-      </div>
       <label class="files-show-all">
         <input type="checkbox" v-model="showAll" />
         <span>{{ t('Show all files') }}</span>
       </label>
-      <div class="file-tree" @contextmenu.prevent>
-        <FileTreeNode
-          v-for="node in filteredRoots"
-          :key="node.path"
-          :node="node"
-          :expanded-paths="expandedPaths"
-          @toggle="handleToggle"
-          @open-file="(p) => $emit('open-file', p)"
-          @context-menu="handleContextMenu"
-        />
+      <div ref="sectionsEl" class="files-sections">
+        <template v-for="(folder, slot) in folders" :key="slot">
+          <div
+            v-if="slot > 0 && resizable"
+            class="files-splitter"
+            role="separator"
+            aria-orientation="horizontal"
+            @pointerdown.prevent="startResize"
+            @dblclick="resetSplit"
+          />
+          <FilesFolderSection
+            v-if="folder.path"
+            :folder="folder.path"
+            :tree-roots="folder.roots"
+            :show-all="showAll"
+            :collapsed="collapsed[slot]"
+            :style="sectionStyle(slot)"
+            @open-file="(p) => $emit('open-file', p)"
+            @expand-folder="(p) => $emit('expand-folder', p)"
+            @context-menu="handleContextMenu"
+            @toggle-collapse="toggleCollapsed(slot)"
+            @close="$emit('close-folder', slot)"
+            @refresh="$emit('refresh-folder', slot)"
+          />
+        </template>
       </div>
+      <button v-if="emptySlot !== null" class="secondary files-add-btn" @click="$emit('open-folder-request', emptySlot)">
+        {{ t('Open Another Folder') }}
+      </button>
     </template>
     <!-- Custom right-click menu. Rendered outside .files-tab so it can be
          positioned absolutely without being clipped by the sidebar's overflow.
@@ -62,143 +65,97 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import type { FileNode } from '../types'
-import FileTreeNode from './FileTreeNode.vue'
-import RefreshIcon from './RefreshIcon.vue'
-import type { ContextMenuPayload } from './FileTreeNode.vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import type { OpenedFolder } from '../types'
+import FilesFolderSection from './FilesFolderSection.vue'
+import type { SectionContextMenuPayload } from './FilesFolderSection.vue'
 import { writeClipboard } from '../services/clipboard'
 
 const { t } = useI18n()
 
 interface Props {
-  openedFolder: string | null
-  treeRoots: FileNode[]
+  folders: OpenedFolder[]
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  'open-folder-request': []
+  'open-folder-request': [slot: number]
   'open-file': [path: string]
   'expand-folder': [path: string]
   'open-containing-folder': [path: string]
-  'close-folder': []
-  'refresh-folder': []
+  'close-folder': [slot: number]
+  'refresh-folder': [slot: number]
 }>()
 
-const expandedPaths = ref<string[]>([])
 const showAll = ref(false)
-const STORAGE_KEY = 'calcpad.files.expanded.'
 
-watch(() => props.openedFolder, (folder) => {
-  expandedPaths.value = folder
-    ? JSON.parse(localStorage.getItem(STORAGE_KEY + folder) ?? '[]')
-    : []
-}, { immediate: true })
-
-watch(expandedPaths, (paths) => {
-  if (props.openedFolder) {
-    localStorage.setItem(STORAGE_KEY + props.openedFolder, JSON.stringify(paths))
-  }
-}, { flush: 'sync' })
-
-// Extension filter: only worksheets — editable .cpd and compiled .cpdz — are
-// surfaced by default. Folders are always kept so the user can drill in.
-const WORKSHEET_EXTENSIONS = ['cpd', 'cpdz']
-
-const isCalcpadFile = (name: string): boolean => {
-  const dot = name.lastIndexOf('.')
-  if (dot < 0) return false
-  return WORKSHEET_EXTENSIONS.includes(name.substring(dot + 1).toLowerCase())
-}
-
-// Structural sharing: return the original array when no children were
-// filtered out and no directory needed to be re-cloned. Big win on large
-// trees — Vue can skip re-rendering entire branches when their reference
-// identity is unchanged.
-const filterNodes = (nodes: FileNode[]): FileNode[] => {
-  let out: FileNode[] | null = null
-  for (let i = 0; i < nodes.length; i++) {
-    const n = nodes[i]
-    if (n.isDirectory) {
-      const original = n.children
-      const filtered = original ? filterNodes(original) : original
-      if (filtered === original) {
-        if (out) out.push(n)
-      } else {
-        if (!out) out = nodes.slice(0, i)
-        out.push({ ...n, children: filtered })
-      }
-    } else if (isCalcpadFile(n.name)) {
-      if (out) out.push(n)
-    } else {
-      if (!out) out = nodes.slice(0, i)
-      // drop it
-    }
-  }
-  return out ?? nodes
-}
-
-const filteredRoots = computed(() =>
-  showAll.value ? props.treeRoots : filterNodes(props.treeRoots)
-)
-
-const folderBasename = computed(() => {
-  if (!props.openedFolder) return ''
-  const normalized = props.openedFolder.replace(/\\/g, '/').replace(/\/+$/, '')
-  const idx = normalized.lastIndexOf('/')
-  return idx >= 0 ? normalized.substring(idx + 1) : normalized
+const anyOpen = computed(() => props.folders.some(f => f.path))
+const emptySlot = computed(() => {
+  const i = props.folders.findIndex(f => !f.path)
+  return i >= 0 ? i : null
 })
 
-const handleToggle = (path: string, isExpanding: boolean) => {
-  if (isExpanding) {
-    if (!expandedPaths.value.includes(path)) {
-      expandedPaths.value = [...expandedPaths.value, path]
-    }
-  } else {
-    expandedPaths.value = expandedPaths.value.filter(p => p !== path)
+// ---- Section collapse and resize ----
+
+const COLLAPSED_KEY = 'calcpad.files.collapsed.'
+const SPLIT_KEY = 'calcpad.files.split'
+const MIN_SECTION_PX = 48
+
+const collapsed = ref([0, 1].map(i => localStorage.getItem(COLLAPSED_KEY + i) === '1'))
+
+const toggleCollapsed = (slot: number) => {
+  collapsed.value[slot] = !collapsed.value[slot]
+  localStorage.setItem(COLLAPSED_KEY + slot, collapsed.value[slot] ? '1' : '0')
+}
+
+const storedSplit = parseFloat(localStorage.getItem(SPLIT_KEY) ?? '')
+const split = ref(storedSplit > 0 && storedSplit < 1 ? storedSplit : 0.5)
+const sectionsEl = ref<HTMLElement | null>(null)
+
+const resizable = computed(() =>
+  props.folders.every(f => f.path) && !collapsed.value.some(Boolean)
+)
+
+const sectionStyle = (slot: number) =>
+  resizable.value ? { flexGrow: slot === 0 ? split.value : 1 - split.value } : undefined
+
+const resetSplit = () => {
+  split.value = 0.5
+  localStorage.setItem(SPLIT_KEY, '0.5')
+}
+
+const startResize = (e: PointerEvent) => {
+  const container = sectionsEl.value
+  const handle = e.currentTarget as HTMLElement
+  if (!container) return
+  handle.setPointerCapture(e.pointerId)
+
+  const onMove = (ev: PointerEvent) => {
+    const rect = container.getBoundingClientRect()
+    const available = rect.height - handle.offsetHeight
+    if (available <= 0) return
+    const min = Math.min(0.5, MIN_SECTION_PX / available)
+    const ratio = (ev.clientY - rect.top - handle.offsetHeight / 2) / available
+    split.value = Math.min(1 - min, Math.max(min, ratio))
   }
-}
-
-const requestedDirectories = new WeakSet<FileNode>()
-const loadExpandedDirectories = (nodes: FileNode[]) => {
-  for (const node of nodes) {
-    if (!node.isDirectory || !expandedPaths.value.includes(node.path)) continue
-    if (!node.loaded) {
-      if (!requestedDirectories.has(node)) {
-        requestedDirectories.add(node)
-        emit('expand-folder', node.path)
-      }
-    } else if (node.children) {
-      loadExpandedDirectories(node.children)
-    }
+  const onEnd = () => {
+    handle.removeEventListener('pointermove', onMove)
+    handle.removeEventListener('pointerup', onEnd)
+    handle.removeEventListener('pointercancel', onEnd)
+    localStorage.setItem(SPLIT_KEY, String(split.value))
   }
-}
-
-watch([() => props.treeRoots, expandedPaths], () => {
-  loadExpandedDirectories(props.treeRoots)
-}, { immediate: true, deep: true })
-
-const collapseAll = () => {
-  expandedPaths.value = []
-}
-
-const onRefresh = () => {
-  emit('refresh-folder')
+  handle.addEventListener('pointermove', onMove)
+  handle.addEventListener('pointerup', onEnd)
+  handle.addEventListener('pointercancel', onEnd)
 }
 
 // ---- Context menu ----
 
-interface ContextMenuState {
-  node: FileNode
-  x: number
-  y: number
-}
-const contextMenu = ref<ContextMenuState | null>(null)
+const contextMenu = ref<SectionContextMenuPayload | null>(null)
 
-const handleContextMenu = (payload: ContextMenuPayload) => {
-  contextMenu.value = { node: payload.node, x: payload.x, y: payload.y }
+const handleContextMenu = (payload: SectionContextMenuPayload) => {
+  contextMenu.value = payload
 }
 
 const closeContextMenu = () => {
@@ -221,9 +178,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', onDocumentInteraction)
 })
 
-const relativePathFor = (fullPath: string): string => {
-  if (!props.openedFolder) return fullPath
-  const rootNorm = props.openedFolder.replace(/[\\/]+$/, '')
+const relativePathFor = (fullPath: string, root: string): string => {
+  const rootNorm = root.replace(/[\\/]+$/, '')
   const rootWithSep = rootNorm + (rootNorm.includes('\\') ? '\\' : '/')
   if (fullPath.startsWith(rootWithSep)) {
     return fullPath.substring(rootWithSep.length)
@@ -249,7 +205,7 @@ const onCopyFullPath = async () => {
 const onCopyRelativePath = async () => {
   const menu = contextMenu.value
   if (!menu) return
-  await writeClipboard(relativePathFor(menu.node.path))
+  await writeClipboard(relativePathFor(menu.node.path, menu.root))
   closeContextMenu()
 }
 </script>
@@ -287,44 +243,6 @@ const onCopyRelativePath = async () => {
   background: var(--vscode-button-hoverBackground);
 }
 
-.files-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
-  gap: 6px;
-  border-bottom: 1px solid var(--vscode-widget-border);
-  text-transform: uppercase;
-  color: var(--vscode-sideBarSectionHeader-foreground, var(--vscode-foreground));
-  background: var(--vscode-sideBarSectionHeader-background, var(--vscode-editor-background));
-  flex: 0 0 auto;
-}
-
-.files-folder-name {
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-
-.files-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.files-close-btn {
-  margin-right: 2px;
-  flex-shrink: 0;
-}
-
-.files-change-btn {
-  text-transform: none;
-}
-
 .files-show-all {
   flex: 0 0 auto;
   display: flex;
@@ -334,12 +252,6 @@ const onCopyRelativePath = async () => {
   color: var(--vscode-descriptionForeground);
   cursor: pointer;
   user-select: none;
-  /* Stick right below the header — z-index just under so the header still
-     covers it if the sticky offsets ever overlap. */
-  position: sticky;
-  top: 24px;
-  z-index: 1;
-  background: var(--vscode-editor-background);
   border-bottom: 1px solid var(--vscode-widget-border);
 }
 
@@ -348,11 +260,37 @@ const onCopyRelativePath = async () => {
   cursor: pointer;
 }
 
-.file-tree {
+.files-sections {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.files-splitter {
+  flex: 0 0 4px;
+  position: relative;
+  z-index: 2;
+  cursor: row-resize;
+  touch-action: none;
+  background: transparent;
+  transition: background 0.1s ease 0.1s;
+}
+
+/* Wider hit area than the visible bar */
+.files-splitter::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.files-splitter:hover,
+.files-splitter:active {
+  background: var(--vscode-sash-hoverBorder, var(--vscode-focusBorder));
+}
+
+.files-add-btn {
+  flex: 0 0 auto;
+  margin: 6px 8px;
 }
 </style>
