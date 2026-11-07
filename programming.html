@@ -3549,10 +3549,9 @@ You can use <code>#include</code> inside macros, but only if the included file d
 Macros and string variables are preprocessed and rewritten before the actual parsing is performed.
 As a result, intermediate (unwrapped) code is generated.
 You can review it by checking the "<strong>Unwrapped code</strong>" checkbox below the "<strong>Output</strong>" window.</p>
-<p>If any errors occur during macro preprocessing, the unwrapped code is displayed, together with the errors.
-Line numbers in error descriptions refer to your initial code.
-If preprocessing is completed successfully, the unwrapped code is parsed and calculated as normal.
-If errors are detected at this stage, they are displayed in the output.
+<p>If a macro call or an <code>#include</code> fails during preprocessing, that line is shown as an error in the output, and the rest of the code is still calculated.
+Line numbers in these errors refer to your initial code.
+Errors in the unwrapped code are displayed in the output as well.
 Line numbers in error descriptions refer to the unwrapped code.
 You can go to the respective line by clicking the link on the line number.</p>
 <h2 id="importexport-of-external-data">Import/Export of External Data<a class="headerlink" href="#importexport-of-external-data" title="Permanent link">&para;</a></h2>
