@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { createApp, nextTick, watch, type Ref } from 'vue';
+import type { Composer } from 'vue-i18n';
 import App from './App.vue';
 import { createCalcpadI18n, readLocaleSetting, menuLabelsFor } from 'calcpad-frontend/i18n';
 import { invoke } from '@tauri-apps/api/core';
@@ -1486,6 +1487,10 @@ async function bootstrap(): Promise<void> {
     };
     uiOverrideHints = registerUiOverrideHints({
         enabled: uiOverrideHintsEnabled,
+        t: (key, named = {}, plural) => {
+            const { t } = i18n.global as unknown as Composer;
+            return plural === undefined ? t(key, named) : t(key, named, plural);
+        },
         controlsFor: (model) => {
             const group = groupForModel(model);
             return group ? uiHintControls.controlsFor(uiDocKeyFor(group)) : undefined;
@@ -1890,7 +1895,10 @@ async function bootstrap(): Promise<void> {
     };
     const sidebarApp = createApp(CalcpadAppVue, { versionConfig, appVersion });
     sidebarApp.use(i18n);
-    const sidebarInstance = sidebarApp.mount('#vue-sidebar') as InstanceType<typeof CalcpadAppVue>;
+    const sidebarInstance = sidebarApp.mount('#vue-sidebar') as unknown as {
+        switchTab(tabId: string): void;
+        focusInsertSearch(): Promise<void>;
+    };
 
     window.addEventListener('keydown', (event) => {
         if (event.key.toLowerCase() === 'i' && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {

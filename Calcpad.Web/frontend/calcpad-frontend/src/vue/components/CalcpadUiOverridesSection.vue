@@ -193,7 +193,8 @@ function scrollToFlashed() {
     .find(r => flashKeys.value.has(r.dataset.key ?? '') && r.offsetParent !== null)
   if (!el) return
   pendingScroll = false
-  el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  el.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' })
 }
 
 watch(() => props.reveal?.seq, seq => {
@@ -291,6 +292,13 @@ function reset() {
 @keyframes uo-flash {
   0%, 40% { background: var(--vscode-editor-findMatchHighlightBackground, rgba(234, 92, 0, 0.33)); }
   100% { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-row.flash {
+    animation: none;
+    background: var(--vscode-editor-findMatchHighlightBackground, rgba(234, 92, 0, 0.33));
+  }
 }
 
 .key-button {

@@ -1,7 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { computeUiOverrideHints, readUiOverrides, uiOverrideHintTitle } from 'calcpad-frontend';
 import type { UiControl, UiOverrideHintLabels } from 'calcpad-frontend';
-import { uiText } from './ui-text';
 
 const REVEAL_COMMAND = 'calcpad.revealUiOverrides';
 
@@ -12,15 +11,16 @@ export interface UiOverrideHintsHost {
     /** Asked when a model with saved values has no known controls yet. */
     requestControls(model: monaco.editor.ITextModel): void;
     reveal(uri: string, line: number, keys: string[]): void;
+    /** Translator from the shared i18n messages. */
+    t(key: string, named?: Record<string, unknown>, plural?: number): string;
 }
-
-const labels: UiOverrideHintLabels = {
-    value: (name, value) => uiText(`UI override: ${name} = ${value}`, `UI 覆盖：${name} = ${value}`),
-    count: n => uiText(`${n} UI override${n === 1 ? '' : 's'}`, `${n} 个 UI 覆盖`),
-};
 
 /** CodeLens above each line whose `#UI` controls take a saved value, linking to the Properties tab. */
 export function registerUiOverrideHints(host: UiOverrideHintsHost): monaco.IDisposable & { refresh(): void } {
+    const labels: UiOverrideHintLabels = {
+        value: (name, value) => host.t('UI override: {name} = {value}', { name, value }),
+        count: n => host.t('{n} UI override | {n} UI overrides', { n }, n),
+    };
     const changed = new monaco.Emitter<monaco.languages.CodeLensProvider>();
     const provider: monaco.languages.CodeLensProvider = {
         onDidChange: changed.event,
@@ -43,7 +43,7 @@ export function registerUiOverrideHints(host: UiOverrideHintsHost): monaco.IDisp
                     command: {
                         id: REVEAL_COMMAND,
                         title: uiOverrideHintTitle(h, labels),
-                        tooltip: uiText('Edit in the Properties tab', '在属性选项卡中编辑'),
+                        tooltip: host.t('Edit in the Properties tab'),
                         arguments: [model.uri.toString(), h.line, h.keys],
                     },
                 })),
