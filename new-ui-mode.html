@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -1708,6 +1708,17 @@
     <span class="md-ellipsis">
       
         Editing a document that has saved values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seeing-saved-values-in-the-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seeing saved values in the editor
       
     </span>
   </a>
@@ -3554,6 +3565,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#seeing-saved-values-in-the-editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seeing saved values in the editor
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4045,7 +4067,13 @@ The document still calculates correctly — the risk is that a filled-in form co
 Give each input its own name instead of re-assigning one, and every key is <code>name:1</code>: it cannot be renumbered by anything you do elsewhere in the document, and only renaming or removing that input affects it.</p>
 <p>If a document's values do end up scrambled, the metadata comment is plain text: fix the keys by hand, or clear the <code>uiOverrides</code> entry to start the form from the document's own values again.
 Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.</p>
-<p>The <a href="new-calcpad-panel.html#properties">Properties tab</a> does this without hand-editing: its <strong>Saved #UI values</strong> list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a <strong>Purge unused</strong> button to drop them.</p>
+<p>The <a href="new-calcpad-panel.html#properties">Properties tab</a> does this without hand-editing: its <strong>Saved #UI values</strong> list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a <strong>Purge unused</strong> button to drop them.
+Click <strong>Selected lines only</strong> to list just the values for the lines under the cursor or selection.
+An <code>#include</code> line, macro call, or loop lists the overrides for every UI element it produces.</p>
+<h3 id="seeing-saved-values-in-the-editor">Seeing saved values in the editor<a class="headerlink" href="#seeing-saved-values-in-the-editor" title="Permanent link">&para;</a></h3>
+<p>Turn on <strong>Show UI Override Hints</strong> in <a href="new-settings.html#editor-features">Settings</a> to show saved values above the lines they apply to.
+This is the value itself on a <code>#UI</code> line with one control, or the count for a loop, macro call or <code>#include</code> line.
+Click a hint to open those values in the Properties tab.</p>
 <h2 id="exporting">Exporting<a class="headerlink" href="#exporting" title="Permanent link">&para;</a></h2>
 <p>A document with <code>#UI</code> controls exports like any other — see <a href="new-exports.html">Exports</a> for the
 variants, the formats, and where each one lives.</p>
@@ -4229,7 +4257,7 @@ In VS Code, they are arrows in the input form's title bar (beside the save butto
     
     
   
-      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="javascripts/mathjax.js"></script>
       
