@@ -47,15 +47,9 @@ namespace PyCalcpad
                 Include = Reader.Include,
                 SourceFilePath = inputFileName
             };
-            var hasMacroErrors = macroParser.Parse(code, out var unwrappedCode, null, 0, true);
+            macroParser.Parse(code, out var unwrappedCode, null, 0, true);
             string htmlResult;
             Converter converter = new();
-            if (hasMacroErrors)
-            {
-                htmlResult = Reader.CodeToHtml(unwrappedCode);
-                converter.ToHtml(htmlResult, outputFileName);
-                return true;
-            }
             ExpressionParser parser = new()
             {
                 Settings = ConvertSettings(Settings),
