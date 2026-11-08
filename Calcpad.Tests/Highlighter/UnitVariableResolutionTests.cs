@@ -48,6 +48,16 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal(TokenType.Variable, TypeOf(new CalcpadTokenizer().Tokenize("a = 5\nb = 2*a"), 1, "a"));
         }
 
+        [Theory]
+        [InlineData("'Length -'l = 4'm, Height -'h = 2'm\nA = l*h")]
+        [InlineData("l = 4 'text' h = 2\nA = l*h")]
+        public void DefinitionAfterText_IsVariable(string source)
+        {
+            var result = new CalcpadTokenizer().Tokenize(source);
+            Assert.Equal(TokenType.Variable, TypeOf(result, 0, "h"));
+            Assert.Equal(TokenType.Variable, TypeOf(result, 1, "h"));
+        }
+
         [Fact]
         public void ParameterAfterOperator_IsLocalVariable()
         {
