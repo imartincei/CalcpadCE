@@ -662,6 +662,9 @@ namespace Calcpad.Highlighter.Tokenizer
             {
                 _beforeFirstCodeToken = false;
             }
+            // Text between expressions ends one, so the next identifier starts a new one
+            else if (type == TokenType.Comment && _state.TextComment == '\0')
+                _beforeFirstCodeToken = true;
 
             // Track potential definitions
             TrackDefinitions(type, text);
