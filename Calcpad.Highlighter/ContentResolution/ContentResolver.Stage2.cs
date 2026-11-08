@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Calcpad.Core;
@@ -122,7 +123,9 @@ namespace Calcpad.Highlighter.ContentResolution
                 MacroParameterOrder = macroParamOrder,
                 UserDefinedMacros = userDefinedMacros,
                 PathRoots = parser.PathRoots,
-                IncludedFileHashes = includedFileHashes
+                IncludedFileHashes = includedFileHashes,
+                MacroErrorLines = [.. trace.Errors.Where(e => e.SourceIndex >= 0).Select(e => e.SourceIndex)],
+                IsMacroParserComplete = trace.IsComplete
             };
         }
 

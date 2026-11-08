@@ -147,10 +147,12 @@ Reported when the document runs. Errors that match a check above reuse its code.
 | CPD-5117 | Syntax | Invalid data type |
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5121 | Syntax | Invalid `#for` header |
 | CPD-5120 | Syntax | More than one delimiter in a plot command |
 | CPD-5201 | Blocks | Condition cannot be empty |
 | CPD-5202 | Blocks | Duplicate #else |
 | CPD-5203 | Blocks | #else if after #else |
+| CPD-5204 | Blocks | Blocks nested too deeply |
 | CPD-5301 | Names | Cannot evaluate as a function |
 | CPD-5302 | Names | Cannot evaluate as a function or operator |
 | CPD-5303 | Names | Cannot redefine existing units |

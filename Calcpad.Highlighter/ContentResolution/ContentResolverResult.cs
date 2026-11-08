@@ -301,6 +301,12 @@ namespace Calcpad.Highlighter.ContentResolution
         /// by re-hashing just these files, without rerunning include resolution/macro expansion.
         /// </summary>
         public Dictionary<string, string> IncludedFileHashes { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Stage 2 lines MacroParser rejected; Core shows them as errors and skips them.</summary>
+        public HashSet<int> MacroErrorLines { get; set; } = [];
+
+        /// <summary>False when MacroParser stopped early and passed the rest through unexpanded.</summary>
+        public bool IsMacroParserComplete { get; set; } = true;
     }
 
     public class Stage3Result
@@ -393,5 +399,8 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>What Core executed for this content; null when no trace matched.</summary>
         public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>Core's check pass over the Stage 3 lines, run once on first use.</summary>
+        public Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> CoreCheck { get; set; }
     }
 }

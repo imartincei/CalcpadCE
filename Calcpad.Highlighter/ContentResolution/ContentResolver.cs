@@ -35,7 +35,8 @@ namespace Calcpad.Highlighter.ContentResolution
             {
                 Stage1 = stage1,
                 Stage2 = stage2,
-                Stage3 = stage3
+                Stage3 = stage3,
+                CoreCheck = new(() => RunCoreCheck(stage2, stage3))
             };
         }
 
@@ -53,8 +54,41 @@ namespace Calcpad.Highlighter.ContentResolution
                 Stage1 = staged.Stage1,
                 Stage2 = staged.Stage2,
                 Stage3 = stage3,
-                Runtime = overlay
+                Runtime = overlay,
+                CoreCheck = staged.CoreCheck
             };
+        }
+
+        private static IReadOnlyList<Calcpad.Core.CalcpadError> RunCoreCheck(Stage2Result stage2, Stage3Result stage3)
+        {
+            if (!stage2.IsMacroParserComplete)
+                return [];
+
+            // Lines MacroParser rejected are its errors, not Core's, so they are left blank
+            var lines = new List<string>(stage3.Lines.Count);
+            for (var i = 0; i < stage3.Lines.Count; i++)
+                lines.Add(!stage3.MacroExpansions.ContainsKey(i) &&
+                    stage3.SourceMap.TryGetValue(i, out var stage2Line) &&
+                    stage2.MacroErrorLines.Contains(stage2Line) ? string.Empty : stage3.Lines[i]);
+
+            // Complex mode can be set outside the document, so only lines that fail in both modes count
+            try
+            {
+                var code = JoinLines(lines);
+                var complex = Check(true).Select(e => e.SourceLine).ToHashSet();
+                return Check(false).Where(e => complex.Contains(e.SourceLine)).ToList();
+
+                IReadOnlyList<Calcpad.Core.CalcpadError> Check(bool isComplex) =>
+                    new Calcpad.Core.ExpressionParser
+                    {
+                        PathRoots = stage2.PathRoots,
+                        Settings = new Calcpad.Core.Settings { Math = { IsComplex = isComplex } }
+                    }.Check(code);
+            }
+            catch (Exception)
+            {
+                return [];
+            }
         }
 
         /// <summary>

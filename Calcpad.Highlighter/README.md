@@ -106,7 +106,7 @@ Twelve validators run in stage order:
 |-------|-----------|
 | 1 | `IncludeValidator` — `#include` syntax and file resolution |
 | 2 | `MacroValidator` — duplicates, parameter syntax, naming, nesting |
-| 3 | `BalanceValidator`, `NamingValidator`, `UsageValidator`, `SemanticValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `FormatValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator` |
+| 3 | `BalanceValidator`, `NamingValidator`, `UsageValidator`, `SemanticValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `FormatValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator`, `CoreCheckValidator` (Core's check pass) |
 
 Every diagnostic code, its severity, and the `LintIgnore`/`EndLintIgnore` markers that `LintIgnoreRegionParser` reads are documented in [docs/new-linter.md](../docs/new-linter.md). Codes are defined in [Linter/Constants/ErrorCodes.cs](Linter/Constants/ErrorCodes.cs) — keep the two in sync when adding one.
 
