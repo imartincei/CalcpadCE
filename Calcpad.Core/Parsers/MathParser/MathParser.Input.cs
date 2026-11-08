@@ -88,11 +88,13 @@ namespace Calcpad.Core
             };
 
             private int _depth;
+            private HashSet<string> _parameters;
 
             internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment)
             {
                 var isOuter = ++_depth == 1;
                 var at = -1;
+                var parameters = _parameters;
                 try
                 {
                     return ReadInput(expression, allowAssignment, ref at);
@@ -106,6 +108,7 @@ namespace Calcpad.Core
                 finally
                 {
                     --_depth;
+                    _parameters = parameters;
                 }
             }
 
@@ -370,6 +373,9 @@ namespace Calcpad.Core
                                                 vt.Variable.IsReadOnly = _parser.IsConst;
                                             }
                                         }
+                                        else if (c == '=' && tokens.Peek().Type == TokenTypes.CustomFunction)
+                                            _parameters = GetParameterNames(tokens);
+
                                         _parser._assignmentIndex = count;
                                     }
                                 }
@@ -697,9 +703,43 @@ namespace Calcpad.Core
                 vt.Variable = newVar;
             }
 
+            // Names in the signature: depth 1, after ( or ;
+            private static HashSet<string> GetParameterNames(Queue<Token> tokens)
+            {
+                var names = new HashSet<string>(StringComparer.Ordinal);
+                int depth = 0, squareDepth = 0;
+                var pt = TokenTypes.None;
+                foreach (var t in tokens)
+                {
+                    switch (t.Type)
+                    {
+                        case TokenTypes.BracketLeft: ++depth; break;
+                        case TokenTypes.BracketRight: --depth; break;
+                        case TokenTypes.SquareBracketLeft: ++squareDepth; break;
+                        case TokenTypes.SquareBracketRight: --squareDepth; break;
+                        case TokenTypes.Variable when depth == 1 && squareDepth == 0 &&
+                            (pt == TokenTypes.BracketLeft || pt == TokenTypes.Divisor):
+                            names.Add(t.Content);
+                            break;
+                    }
+                    pt = t.Type;
+                }
+                return names;
+            }
+
             private VariableToken MakeVectorOrMatrixToken(string s)
             {
                 foreach (var variables in _localVariables)
+                {
+                    // Parameters hide globals of the same name
+                    if (_parameters is not null &&
+                        ReferenceEquals(variables, _variables) &&
+                        _parameters.Contains(s))
+                        return new VariableToken(s, null)
+                        {
+                            Type = TokenTypes.Array
+                        };
+
                     if (variables.TryGetValue(s, out var v))
                     {
                         ref var value = ref v.ValueByRef();
@@ -720,6 +760,7 @@ namespace Calcpad.Core
                             };
                         return null;
                     }
+                }
                 return null;
             }
 
