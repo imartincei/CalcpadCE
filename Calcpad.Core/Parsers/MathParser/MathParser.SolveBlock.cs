@@ -417,6 +417,13 @@ namespace Calcpad.Core
                             parser.BindParameters(parameters, _items[i].Rpn);
             }
 
+            internal IEnumerable<Token[]> ItemRpns()
+            {
+                foreach (var item in _items ?? [])
+                    if (item.Rpn is not null)
+                        yield return item.Rpn;
+            }
+
             private void Clear() => OnChange?.Invoke();
 
             internal IValue Calculate()
