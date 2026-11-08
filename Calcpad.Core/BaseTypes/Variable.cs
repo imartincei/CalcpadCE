@@ -12,6 +12,7 @@ namespace Calcpad.Core
         internal bool IsInitialized => _isIntialised;
         internal bool IsReadOnly;
         private bool _isIntialised;
+        private object _subscribed;
 
         internal Variable(in IValue value)
         {
@@ -72,10 +73,25 @@ namespace Calcpad.Core
             _value = value;
             _isIntialised = true;
             OnChange?.Invoke();
+            if (ReferenceEquals(_subscribed, value))
+                return;
+
+            if (_subscribed is Vector oldVector)
+                oldVector.OnChange -= Change;
+            else if (_subscribed is Matrix oldMatrix)
+                oldMatrix.OnChange -= Change;
+
+            _subscribed = null;
             if (value is Vector vector)
+            {
                 vector.OnChange += Change;
+                _subscribed = vector;
+            }
             else if (value is Matrix matrix)
+            {
                 matrix.OnChange += Change;
+                _subscribed = matrix;
+            }
         }
     }
 }
