@@ -541,14 +541,18 @@ namespace Calcpad.Core
             _functionDefinitionIndex = -1;
             if (cacheId >= 0 && cacheId < _equationCache.Count)
             {
-                _targetUnits = _equationCache[cacheId].TargetUnits;
-                _rpn = _equationCache[cacheId].Rpn;
+                var equation = _equationCache[cacheId];
+                if (equation.IsStale)
+                    return false;
+
+                _targetUnits = equation.TargetUnits;
+                _rpn = equation.Rpn;
                 return true;
             }
             return false;
         }
 
-        public int WriteEquationToCache(bool isVisible = true)
+        public int WriteEquationToCache(bool isVisible = true, int cacheId = -1)
         {
             if (_rpn is null)
                 return -1;
@@ -557,7 +561,12 @@ namespace Calcpad.Core
             if (!isVisible)
                 f = _compiler.Compile(_rpn, true);
 
-            var equation = new Equation(_rpn, _targetUnits, f);
+            var equation = new Equation(_rpn, _targetUnits, f, this);
+            if (cacheId >= 0 && cacheId < _equationCache.Count)
+            {
+                _equationCache[cacheId] = equation;
+                return cacheId;
+            }
             _equationCache.Add(equation);
             return _equationCache.Count - 1;
         }
