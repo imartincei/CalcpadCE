@@ -199,6 +199,9 @@ namespace Calcpad.Core
 
         static double ConvertValue(RealValue v, ref Unit u)
         {
+            if (!double.IsFinite(v.D))
+                return v.D;
+
             if (u is null)
                 u = v.Units;
             else
@@ -276,18 +279,19 @@ namespace Calcpad.Core
                 if (c.Bounds.Width == 0 && c.Bounds.Height == 0)
                 {
                     pen.Style = SKPaintStyle.StrokeAndFill;
-                    canvas.DrawCircle(c.PngPoints[0], dotRadius, pen);
+                    canvas.DrawCircle(c.PngSegments[0][0], dotRadius, pen);
                     pen.Style = SKPaintStyle.Stroke;
                 }
                 else
                 {
-                    for (int i = 1, len = c.PngPoints.Length; i < len; ++i)
-                        canvas.DrawLine(c.PngPoints[i - 1], c.PngPoints[i], pen);
-
-                    if (c.Fill)
+                    var yf = (float)(y0 - Math.Clamp(0, bounds.Bottom * ys, bounds.Top * ys));
+                    foreach (var segment in c.PngSegments)
                     {
-                        var yf = y0 - Math.Clamp(0, bounds.Bottom * ys, bounds.Top * ys);
-                        FillChart(canvas, chartBrushes[penNo], (float)yf, c.PngPoints);
+                        for (int i = 1, len = segment.Length; i < len; ++i)
+                            canvas.DrawLine(segment[i - 1], segment[i], pen);
+
+                        if (c.Fill)
+                            FillChart(canvas, chartBrushes[penNo], yf, segment);
                     }
                 }
                 penNo++;
@@ -336,14 +340,15 @@ namespace Calcpad.Core
                     continue;
 
                 if (c.Bounds.Width == 0 && c.Bounds.Height == 0)
-                    svgDrawing.DrawCircle(c.SvgPoints[0].X, c.SvgPoints[0].Y, dotRadius, "Series" + penNo);
+                    svgDrawing.DrawCircle(c.SvgSegments[0][0].X, c.SvgSegments[0][0].Y, dotRadius, "Series" + penNo);
                 else
                 {
-                    svgDrawing.DrawPolyline(c.SvgPoints, "Series" + penNo);
-                    if (c.Fill)
+                    var yf = y0 - Math.Clamp(0, bounds.Bottom * ys, bounds.Top * ys);
+                    foreach (var segment in c.SvgSegments)
                     {
-                        var yf = y0 - Math.Clamp(0, bounds.Bottom * ys, bounds.Top * ys);
-                        FillChartSVG(svgDrawing, "Fill" + penNo, yf, c.SvgPoints);
+                        svgDrawing.DrawPolyline(segment, "Series" + penNo);
+                        if (c.Fill)
+                            FillChartSVG(svgDrawing, "Fill" + penNo, yf, segment);
                     }
                 }
                 penNo++;
@@ -371,56 +376,80 @@ namespace Calcpad.Core
 
         private struct Chart
         {
+            // Undefined points are kept as segment breaks
             private readonly Node[] _points;
-            internal SKPoint[] PngPoints;
-            internal SvgPoint[] SvgPoints;
+            private int _count;
+            internal SKPoint[][] PngSegments;
+            internal SvgPoint[][] SvgSegments;
             internal int PointCount;
             internal readonly Box Bounds;
             internal bool Fill;
             internal Chart(int size)
             {
                 _points = new Node[size];
-                PngPoints = [];
-                SvgPoints = [];
+                _count = 0;
+                PngSegments = [];
+                SvgSegments = [];
                 PointCount = 0;
                 Bounds = new Box();
             }
 
+            private static bool IsDefined(in Node p) => double.IsFinite(p.X) && double.IsFinite(p.Y);
+
             internal void AddPoint(double x, double y, double z)
             {
-                if (double.IsNaN(x) || double.IsInfinity(x) || (double.IsNaN(y) || double.IsInfinity(y)))
+                var p = new Node(x, y, z);
+                if (IsDefined(p))
+                {
+                    Bounds.Expand(p);
+                    ++PointCount;
+                }
+                else if (_count == 0 || !IsDefined(_points[_count - 1]))
                     return;
 
-                _points[PointCount] = new Node(x, y, z);
-                Bounds.Expand(_points[PointCount]);
-                ++PointCount;
+                _points[_count++] = p;
             }
 
-            internal readonly IEnumerable<Node> GetPoints() => _points.Take(PointCount);
+            internal readonly IEnumerable<Node> GetPoints() => _points.Take(_count);
+
+            private readonly T[][] GetSegments<T>(Func<Node, T> map)
+            {
+                var segments = new List<T[]>();
+                var segment = new List<T>();
+                for (int i = 0; i < _count; ++i)
+                {
+                    if (IsDefined(_points[i]))
+                        segment.Add(map(_points[i]));
+                    else if (segment.Count > 0)
+                    {
+                        segments.Add([.. segment]);
+                        segment.Clear();
+                    }
+                }
+                if (segment.Count > 0)
+                    segments.Add([.. segment]);
+
+                return [.. segments];
+            }
 
             internal void GetChartPngPoints(double x0, double y0, double xs, double ys)
             {
-                PngPoints = new SKPoint[PointCount];
-                for (int i = 0; i < PointCount; ++i)
+                PngSegments = GetSegments(p =>
                 {
-                    var x = (float)(x0 + _points[i].X * xs);
+                    var x = (float)(x0 + p.X * xs);
                     if (Math.Abs(x) > GDILimit)
                         x = (float)Math.CopySign(GDILimit, x);
 
-                    var y = (float)(y0 - _points[i].Y * ys);
+                    var y = (float)(y0 - p.Y * ys);
                     if (Math.Abs(y) > GDILimit)
                         y = (float)Math.CopySign(GDILimit, y);
 
-                    PngPoints[i] = new SKPoint(x, y);
-                }
+                    return new SKPoint(x, y);
+                });
             }
 
-            internal void GetChartSvgPoints(double x0, double y0, double xs, double ys)
-            {
-                SvgPoints = new SvgPoint[PointCount];
-                for (int i = 0; i < PointCount; ++i)
-                    SvgPoints[i] = new SvgPoint(x0 + _points[i].X * xs, y0 - _points[i].Y * ys);
-            }
+            internal void GetChartSvgPoints(double x0, double y0, double xs, double ys) =>
+                SvgSegments = GetSegments(p => new SvgPoint(x0 + p.X * xs, y0 - p.Y * ys));
         }
     }
 }
