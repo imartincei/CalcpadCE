@@ -55,7 +55,8 @@ Calcpad.Highlighter/
 │           ├── FormatValidator.cs       - Format specifiers
 │           ├── HtmlCommentValidator.cs  - Metadata comment directives
 │           ├── SettingsValidator.cs     - #Settings / settings directives
-│           └── UiValidator.cs           - #UI control directives
+│           ├── UiValidator.cs           - #UI control directives
+│           └── CoreCheckValidator.cs    - Core's check pass (ExpressionParser.Check)
 ├── HtmlComment/
 │   ├── HtmlCommentParser.cs        - Metadata comment parsing
 │   └── PdfSettingsDto.cs           - Shared with the backend's PDF request

@@ -1,3 +1,7 @@
+using System.Linq;
+using Calcpad.Highlighter.ContentResolution;
+using Calcpad.Highlighter.Linter;
+
 namespace Calcpad.Tests;
 
 public class MacroErrorRecoveryTests
@@ -47,5 +51,22 @@ public class MacroErrorRecoveryTests
         macros.Parse("#def m$ = 1\ny = undefined$(1)", out var expanded, null, 0, false);
         Assert.True(MacroParser.TryParseErrorLine(expanded.Trim(), out var code, out var line, out var message));
         Assert.Equal(("CPD-3303", "y = undefined$(1)", macros.Errors[0].Message), (code, line, message));
+    }
+
+    [Fact]
+    public void CheckPass_SkipsFailedLines()
+    {
+        new MacroParser().Parse("#def m$ = 1\ny = undefined$(1)\nz = 1 + * 2", out var expanded, null, 0, true);
+        var errors = new ExpressionParser().Check(expanded);
+        Assert.Equal([(3, "CPD-3401")], errors.Select(e => (e.SourceLine, e.Code)));
+    }
+
+    [Fact]
+    public void Lint_ChecksTheRestOfADocumentWithMacroErrors()
+    {
+        var staged = new ContentResolver().GetStagedContent("#def m$ = 1\ny = undefined$(1)\nz = 1 + * 2");
+        var diagnostics = new CalcpadLinter().Lint(staged).Diagnostics;
+        Assert.Contains(diagnostics, d => d.Line == 2 && d.Code == "CPD-3401");
+        Assert.DoesNotContain(diagnostics, d => d.Line == 1 && d.Code.StartsWith("CPD-5"));
     }
 }

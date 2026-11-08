@@ -87,7 +87,29 @@ namespace Calcpad.Core
                 TokenTypes.Error,
             };
 
+            private int _depth;
+
             internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment)
+            {
+                var isOuter = ++_depth == 1;
+                var at = -1;
+                try
+                {
+                    return ReadInput(expression, allowAssignment, ref at);
+                }
+                // Solver blocks parse their own text, so only the outermost call knows the offset
+                catch (MathParserException ex) when (isOuter && at >= 0 && ex.Position < 0)
+                {
+                    ex.Position = at;
+                    throw;
+                }
+                finally
+                {
+                    --_depth;
+                }
+            }
+
+            private Queue<Token> ReadInput(ReadOnlySpan<char> expression, bool allowAssignment, ref int at)
             {
                 var tokens = new Queue<Token>(expression.Length);
                 var pt = TokenTypes.None;
@@ -106,6 +128,7 @@ namespace Calcpad.Core
                 for (int i = 0; i <= n; ++i)
                 {
                     var c = (i == n) ? ' ' : expression[i];
+                    at = isSolver ? -1 : i;
                     var tt = GetCharType(c); // Get the type from a predefined array
                     if (pt == TokenTypes.Unit || pt == TokenTypes.Variable)
                     {
@@ -361,6 +384,7 @@ namespace Calcpad.Core
                     if (pt != TokenTypes.Input || tt != TokenTypes.None)
                         pt = tt;
                 }
+                at = -1;
                 GetVariables(tokens);
                 if (!isSolver)
                     return tokens;

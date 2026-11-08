@@ -27,6 +27,16 @@ namespace Calcpad.Highlighter.Linter
         private readonly UiValidator _uiValidator = new();
         private readonly LegacyInputValidator _legacyInputValidator = new();
         private readonly DeprecatedInputKeywordValidator _deprecatedInputKeywordValidator = new();
+        private readonly CoreCheckValidator _coreCheckValidator = new();
+
+        // Static checks that report, more precisely, what Core gives these codes on the same line
+        private static readonly Dictionary<string, string[]> CoveredCoreCodes = new()
+        {
+            ["CPD-3307"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3308"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3311"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
+            ["CPD-3405"] = ["CPD-3401"],
+        };
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -66,9 +76,12 @@ namespace Calcpad.Highlighter.Linter
             ValidateStage1(stage1Context, result);
             ValidateStage2(stage2Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
+            if (staged.CoreCheck is { } check)
+                _coreCheckValidator.Validate(stage3Context, check.Value, result);
 
             // Map all diagnostics from stage lines to original lines
             result.MapDiagnosticsToOriginal();
+            RemoveDuplicates(result);
 
             // Suppress diagnostics covered by LintIgnore regions
             if (ignoreRegions is { Count: > 0 })
@@ -81,6 +94,26 @@ namespace Calcpad.Highlighter.Linter
             IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
         {
             return Task.Run(() => Lint(staged, ignoreRegions));
+        }
+
+        // One diagnostic per line and code, keeping the static check's
+        private static void RemoveDuplicates(LinterResult result)
+        {
+            var seen = new HashSet<(int, string)>();
+            var duplicates = new HashSet<LinterDiagnostic>();
+            foreach (var d in result.Diagnostics.OrderBy(d => d.Origin))
+            {
+                if (d.Origin == DiagnosticOrigin.Static)
+                {
+                    seen.Add((d.Line, d.Code));
+                    foreach (var code in CoveredCoreCodes.GetValueOrDefault(d.Code, []))
+                        seen.Add((d.Line, code));
+                }
+                else if (!seen.Add((d.Line, d.Code)))
+                    duplicates.Add(d);
+            }
+            if (duplicates.Count > 0)
+                result.RemoveDiagnostics(duplicates.Contains);
         }
 
         private static void ApplyIgnoreRegions(

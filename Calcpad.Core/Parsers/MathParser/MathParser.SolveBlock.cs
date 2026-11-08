@@ -535,7 +535,7 @@ namespace Calcpad.Core
                     if (e.Message.Contains("%F"))
                     {
                         var s = e.Message.Replace("%F", _items[0].Input).Replace("%V", _items[1].Input);
-                        throw new MathParserException(s, e.Code);
+                        throw new MathParserException(s, e.Code, e.Kind);
                     }
                     throw;
                 }

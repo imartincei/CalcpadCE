@@ -126,7 +126,7 @@ namespace Calcpad.Core
             internal Mapped[] ResolveArguments(List<Mapped> positional, Dictionary<string, Mapped> keywords)
             {
                 if (positional.Count > ParameterCount)
-                    throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304");
+                    throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304", CalcpadErrorKind.Names);
 
                 var result = new Mapped[ParameterCount];
                 positional.CopyTo(result);
@@ -135,9 +135,9 @@ namespace Calcpad.Core
                 {
                     var j = GetParameterIndex(kv.Key);
                     if (j < 0)
-                        throw new MathParserException(string.Format(Messages.Unknown_keyword_argument_0, kv.Key), "CPD-3314");
+                        throw new MathParserException(string.Format(Messages.Unknown_keyword_argument_0, kv.Key), "CPD-3314", CalcpadErrorKind.Names);
                     if (result[j].Text is not null)
-                        throw new MathParserException(string.Format(Messages.Duplicate_argument_0, kv.Key), "CPD-3316");
+                        throw new MathParserException(string.Format(Messages.Duplicate_argument_0, kv.Key), "CPD-3316", CalcpadErrorKind.Syntax);
 
                     result[j] = kv.Value;
                 }
@@ -386,7 +386,7 @@ namespace Calcpad.Core
                         catch (Exception ex)
                         {
                             Trace?.OutputLines.Add(new() { Text = traceText, SourceIndex = traceSource });
-                            AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200");
+                            AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200", (ex as MathParserException)?.Kind ?? CalcpadErrorKind.Structure);
                         }
                         continue;
                     }
@@ -412,12 +412,13 @@ namespace Calcpad.Core
                         Message = message,
                         Source = CalcpadErrorSource.Macro,
                         Code = "CPD-2206",
+                        Kind = CalcpadErrorKind.Structure,
                     });
                 }
             }
             catch (Exception ex)
             {
-                AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200");
+                AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200", (ex as MathParserException)?.Kind ?? CalcpadErrorKind.Structure);
                 _traceAborted = true;
             }
             finally
@@ -457,7 +458,7 @@ namespace Calcpad.Core
                 if (length == 0)
                 {
                     AppendError(lineContent, string.Format(Messages.Missing_path_value_0,
-                        isProject ? "#ProjectPath" : "#LibraryPath"), "CPD-1106");
+                        isProject ? "#ProjectPath" : "#LibraryPath"), "CPD-1106", CalcpadErrorKind.Syntax);
                     return;
                 }
 
@@ -465,7 +466,7 @@ namespace Calcpad.Core
                 var declaringDir = !string.IsNullOrEmpty(SourceFilePath)
                     ? Path.GetDirectoryName(SourceFilePath) : null;
                 if (!_pathRoots.TryDeclare(isProject, rawValue, declaringDir, out var error))
-                    AppendError(lineContent, error, "CPD-1106");
+                    AppendError(lineContent, error, "CPD-1106", CalcpadErrorKind.Values);
                 else
                     AppendLine(sourceLine);
             }
@@ -474,7 +475,7 @@ namespace Calcpad.Core
             {
                 if (!TryGetIncludePath(lineContent, out var start, out var length))
                 {
-                    AppendError(lineContent, Messages.Missing_source_file_for_include, "CPD-1102");
+                    AppendError(lineContent, Messages.Missing_source_file_for_include, "CPD-1102", CalcpadErrorKind.Syntax);
                     return;
                 }
                 var rawFileName = lineContent.Slice(start, length).ToString();
@@ -485,7 +486,7 @@ namespace Calcpad.Core
                 {
                     var nf2 = lineContent.LastIndexOf('}');
                     if (nf2 < 0)
-                        AppendError(lineContent, Messages.Brackets_not_closed, "CPD-1101");
+                        AppendError(lineContent, Messages.Brackets_not_closed, "CPD-1101", CalcpadErrorKind.Syntax);
                     else
                     {
                         SplitEnumerator split = lineContent[(nf1 + FieldsMarker.Length)..nf2].EnumerateSplits(';');
@@ -499,7 +500,7 @@ namespace Calcpad.Core
                 if (!_pathRoots.TryExpand(rawFileName, out var tokenExpanded, out var tokenError))
                 {
                     TraceFailedInclude(rawFileName);
-                    AppendError(lineContent, tokenError, "CPD-1106");
+                    AppendError(lineContent, tokenError, "CPD-1106", CalcpadErrorKind.Names);
                     return;
                 }
                 var expanded = Environment.ExpandEnvironmentVariables(tokenExpanded);
@@ -511,7 +512,7 @@ namespace Calcpad.Core
                 if (!_includeStack.Add(resolvedPath))
                 {
                     TraceFailedInclude(tokenExpanded);
-                    AppendError(lineContent, string.Format(Messages.Circular_include_detected_0, rawFileName), "CPD-1105");
+                    AppendError(lineContent, string.Format(Messages.Circular_include_detected_0, rawFileName), "CPD-1105", CalcpadErrorKind.Structure);
                     return;
                 }
                 try
@@ -523,7 +524,7 @@ namespace Calcpad.Core
                         return;
                     }
                     TraceFailedInclude(tokenExpanded);
-                    AppendError(lineContent, Messages.File_not_found, "CPD-1104");
+                    AppendError(lineContent, Messages.File_not_found, "CPD-1104", CalcpadErrorKind.Values);
                 }
                 finally
                 {
@@ -552,7 +553,7 @@ namespace Calcpad.Core
             {
                 if (macroDefCount > 0)
                 {
-                    AppendError(lineContent, Messages.Invalid_inside_macro_definition, "CPD-2207");
+                    AppendError(lineContent, Messages.Invalid_inside_macro_definition, "CPD-2207", CalcpadErrorKind.Structure);
                     if (!IsInlineDef(lineContent))
                         ++macroDefCount;
 
@@ -586,7 +587,7 @@ namespace Calcpad.Core
                     return;
                 }
                 if (_macros.ContainsKey(macroName))
-                    AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, macroName), "CPD-2201");
+                    AppendError(lineContent, string.Format(Messages.Duplicate_macro_name_0, macroName), "CPD-2201", CalcpadErrorKind.Structure);
 
                 c = EatSpace(lineContent, ref i);
                 if (c == '(')
@@ -641,10 +642,10 @@ namespace Calcpad.Core
                         if (defaultValue is not null)
                             seenOptional = true;
                         else if (seenOptional)
-                            AppendError(lineContent, string.Format(Messages.Required_parameter_after_optional_0, parameterName), "CPD-2213");
+                            AppendError(lineContent, string.Format(Messages.Required_parameter_after_optional_0, parameterName), "CPD-2213", CalcpadErrorKind.Syntax);
 
                         if (macroParameters.Contains(parameterName))
-                            AppendError(lineContent, string.Format(Messages.Duplicate_macro_parameter_names_0_and_1, parameterName, parameterName), "CPD-2212");
+                            AppendError(lineContent, string.Format(Messages.Duplicate_macro_parameter_names_0_and_1, parameterName, parameterName), "CPD-2212", CalcpadErrorKind.Syntax);
                         else
                         {
                             macroParameters.Add(parameterName);
@@ -659,7 +660,7 @@ namespace Calcpad.Core
                         textSpan.Reset(i);
                     }
                     if (c != ')')
-                        AppendError(lineContent, Messages.Brackets_not_closed, "CPD-2205");
+                        AppendError(lineContent, Messages.Brackets_not_closed, "CPD-2205", CalcpadErrorKind.Syntax);
 
                     c = EatSpace(lineContent, ref i);
                 }
@@ -691,14 +692,14 @@ namespace Calcpad.Core
                 if (c is not ('\0' or ' ' or '(' or '='))
                     SymbolError(lineContent, c, name.IsEmpty && char.IsDigit(c) ? "CPD-2204" : "CPD-2210");
                 else
-                    AppendError(lineContent, string.Format(Messages.Invalid_macro_name_0, name.ToString()), name.IsEmpty ? "CPD-2205" : "CPD-2202");
+                    AppendError(lineContent, string.Format(Messages.Invalid_macro_name_0, name.ToString()), name.IsEmpty ? "CPD-2205" : "CPD-2202", CalcpadErrorKind.Syntax);
             }
 
             void ParseEndDef(ReadOnlySpan<char> lineContent)
             {
                 if (macroDefCount < 1)
                 {
-                    AppendError(lineContent, Messages.There_is_no_matching_def, "CPD-2206");
+                    AppendError(lineContent, Messages.There_is_no_matching_def, "CPD-2206", CalcpadErrorKind.Structure);
                     return;
                 }
                 if (--macroDefCount > 0)
@@ -756,10 +757,10 @@ namespace Calcpad.Core
 
             void SymbolError(ReadOnlySpan<char> lineContent, char c, string code)
             {
-                AppendError(lineContent, string.Format(Messages.Invalid_symbol_0_in_macro_name, c), code);
+                AppendError(lineContent, string.Format(Messages.Invalid_symbol_0_in_macro_name, c), code, CalcpadErrorKind.Syntax);
             }
 
-            void AppendError(ReadOnlySpan<char> lineContent, string errorMessage, string code)
+            void AppendError(ReadOnlySpan<char> lineContent, string errorMessage, string code, CalcpadErrorKind kind)
             {
                 sb.Append(ErrorLine(code, lineContent, errorMessage));
                 if (addLineNumbers)
@@ -775,6 +776,7 @@ namespace Calcpad.Core
                     Message = errorMessage,
                     Source = CalcpadErrorSource.Macro,
                     Code = code,
+                    Kind = kind,
                 });
             }
 
@@ -907,12 +909,12 @@ namespace Calcpad.Core
                             seenKeyword = true;
                             lineContent.Overlaps(value, out var valueStart);
                             if (!keywordArguments.TryAdd(name.ToString(), ApplyMacros(value, origins.Slice(valueStart), currentlyExpanding, expanded)))
-                                throw new MathParserException(string.Format(Messages.Duplicate_argument_0, name.ToString()), "CPD-3316");
+                                throw new MathParserException(string.Format(Messages.Duplicate_argument_0, name.ToString()), "CPD-3316", CalcpadErrorKind.Syntax);
                         }
                         else
                         {
                             if (seenKeyword)
-                                throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304");
+                                throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304", CalcpadErrorKind.Names);
 
                             var s = ApplyMacros(textSpan.Cut(), origins.Slice(textSpan.Start), currentlyExpanding, expanded);
                             macroArguments.Add(string.IsNullOrWhiteSpace(s.Text) ? new(string.Empty, Origins.None) : s);
