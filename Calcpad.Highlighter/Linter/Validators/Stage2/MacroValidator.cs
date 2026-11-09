@@ -6,7 +6,7 @@ using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Highlighter.Linter.Validators.Stage2
 {
-    /// <summary>Macro checks Core's MacroParser doesn't report; its own errors reach Problems from a run.</summary>
+    /// <summary>Macro checks Core's MacroParser doesn't report; <see cref="MacroErrorValidator"/> shows its own.</summary>
     public class MacroValidator
     {
         public void Validate(Stage2Context stage2, LinterResult result)
@@ -48,31 +48,14 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
             }
         }
 
+        // Core reports malformed definitions
         private void ValidateMacroSyntax(string line, string trimmed, int stage2Line, LinterResult result)
         {
-            // Try inline pattern first
-            var inlineMatch = CalcpadPatterns.InlineMacroDef.Match(trimmed);
-            if (inlineMatch.Success)
-            {
-                ValidateParams(inlineMatch.Groups[2].Value, stage2Line, line, result);
-                return;
-            }
-
-            // Try multiline pattern
-            var multilineMatch = CalcpadPatterns.MultilineMacroDef.Match(trimmed);
-            if (multilineMatch.Success)
-            {
-                ValidateParams(multilineMatch.Groups[2].Value, stage2Line, line, result);
-                return;
-            }
-
-            // Core reports invalid characters in the name
-            var looseMatch = CalcpadPatterns.LooseMacroNameExtract.Match(trimmed);
-            if (looseMatch.Success && !CalcpadPatterns.ValidMacroName.IsMatch(looseMatch.Groups[1].Value))
-                return;
-
-            // General malformed syntax
-            result.AddError(stage2Line, 0, line.Length, "CPD-2205", "'" + trimmed + "'", LineStage.Stage2);
+            var match = CalcpadPatterns.InlineMacroDef.Match(trimmed);
+            if (!match.Success)
+                match = CalcpadPatterns.MultilineMacroDef.Match(trimmed);
+            if (match.Success)
+                ValidateParams(match.Groups[2].Value, stage2Line, line, result);
         }
 
         // Core accepts a parameter without '$', so this is the one parameter check it doesn't repeat

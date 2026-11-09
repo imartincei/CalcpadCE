@@ -74,7 +74,7 @@ namespace Calcpad.Highlighter.ContentResolution
             // the undefined-variable check.
             CollectImplicitSolverVariables(tokenizerResult, variablesWithDefs);
             CollectLuIndexVariable(tokenizerResult, variablesWithDefs);
-            var variables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var variables = new HashSet<string>(StringComparer.Ordinal);
             foreach (var v in variablesWithDefs) variables.Add(v.Name);
             // Also include variables from basic tracking (e.g., inside command blocks)
             foreach (var name in tokenizerResult.DefinedVariables.Keys) variables.Add(name);

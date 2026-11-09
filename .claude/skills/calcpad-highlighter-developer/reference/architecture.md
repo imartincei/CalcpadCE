@@ -40,7 +40,7 @@ Calcpad.Highlighter/
 │   │   ├── LineParser.cs           - Line parsing utilities
 │   │   ├── ParameterParser.cs      - Parameter list parsing
 │   │   ├── SourceMapper.cs         - Maps lines across stages
-│   │   ├── DirectiveState.cs / DirectiveJsonReporter.cs - Metadata directive plumbing
+│   │   ├── DirectiveJsonReporter.cs   - Metadata directive plumbing
 │   │   └── CalcpadCharacterHelpers.cs / ParsingHelpers.cs / DiagnosticExtensions.cs
 │   └── Validators/
 │       ├── Stage1/IncludeValidator.cs

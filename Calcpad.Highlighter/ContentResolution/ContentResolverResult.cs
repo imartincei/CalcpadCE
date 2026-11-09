@@ -305,9 +305,16 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>Stage 2 lines MacroParser rejected; Core shows them as errors and skips them.</summary>
         public HashSet<int> MacroErrorLines { get; set; } = [];
 
+        /// <summary>MacroParser's errors, on Stage 2 lines.</summary>
+        public List<MacroError> MacroErrors { get; set; } = [];
+
         /// <summary>False when MacroParser stopped early and passed the rest through unexpanded.</summary>
         public bool IsMacroParserComplete { get; set; } = true;
     }
+
+    /// <param name="StartColumn">Column in the Stage 2 line, or -1 for the whole line.</param>
+    /// <param name="IsIncluded">The line was read from an included file.</param>
+    public readonly record struct MacroError(int Line, string Code, string Message, int StartColumn, int EndColumn, bool IsIncluded);
 
     public class Stage3Result
     {

@@ -169,16 +169,19 @@ namespace Calcpad.Tests
         }
 
         [Fact]
-        public void Abort_IsNotComplete()
+        public void IncludeException_RejectsOnlyItsLine()
         {
             var path = Path.GetTempFileName();
             try
             {
                 var trace = new MacroTrace();
                 var parser = new MacroParser { Trace = trace, Include = (_, _) => throw new IOException() };
-                parser.Parse($"#include {path}\nx = 1", out _, null, 0, false);
-                Assert.False(trace.IsComplete);
-                Assert.Single(trace.Errors);
+                parser.Parse($"#include {path}\nx = 1", out var code, null, 0, false);
+                Assert.True(trace.IsComplete);
+                var error = Assert.Single(trace.Errors);
+                Assert.Equal(0, error.SourceIndex);
+                Assert.Equal(path, trace.OutputLines[0].FailedInclude);
+                Assert.Contains("x = 1", code);
             }
             finally
             {

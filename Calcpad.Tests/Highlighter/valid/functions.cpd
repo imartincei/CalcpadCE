@@ -116,3 +116,9 @@ kwB = 7
 kwLaterUse = kwLater(1)
 kwNoDefaults(x; y) = x - y
 kwNoDefaultsUse = kwNoDefaults(y = 1; x = 5)
+
+' A redefinition only applies to calls after it
+redef(j) = 2*j
+redefOne = redef(1)
+redef(x; y) = x + y
+redefTwo = redef(1; 2)

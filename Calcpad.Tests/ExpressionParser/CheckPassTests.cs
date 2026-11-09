@@ -20,10 +20,52 @@ namespace Calcpad.Tests
             Assert.Equal([(3, "CPD-3407"), (5, "CPD-3101")], Check("x = 1\n#if x > 5\na = 1 +\n#else\nb = (2\n#end if"));
         }
 
-        [Fact]
-        public void UndefinedVariables_AreLeftToTheRun()
+        [Theory]
+        [InlineData("c = undefinedvar + 1", 1)]
+        [InlineData("Q = 1\nc = q", 2)]
+        [InlineData("#if 0\nc = typo + 1\n#end if", 2)]
+        [InlineData("f(x) = $Inline{q = 1; q + zz}", 1)]
+        [InlineData("#hide zz > 0\n#end hide", 1)]
+        [InlineData("a = b + 1\nb = 2", 1)]
+        [InlineData("#if zz > 0\n#end if\nzz = 1", 1)]
+        [InlineData("#for i = 1 : 2\ny = z\n#loop\nz = 1", 2)]
+        public void NameUndefinedWhenRead_IsReported(string code, int line)
         {
-            Assert.Empty(Check("c = undefinedvar + 1"));
+            Assert.Equal([(line, "CPD-3301")], Check(code));
+        }
+
+        [Theory]
+        [InlineData("#for i = 1 : 2\n#if i > 1\ny = z\n#end if\nz = i\n#loop")]
+        [InlineData("#while 1\n#if 0\ny = z\n#end if\n#for i = 1 : 2\nz = i\n#loop\n#loop")]
+        [InlineData("f(x) = x*k\nk = 2\ny = f(1)")]
+        [InlineData("#if 1\nx = 1\n#else\ny = x\n#end if")]
+        [InlineData("L = 2m\nA = L*kN/m")]
+        [InlineData("f(x; y) = x*y + z\nz = 1")]
+        [InlineData("r = $Root{x^2 - 4 @ x = 0 : 5}")]
+        [InlineData("s = $Sum{k @ k = 1 : 3}")]
+        [InlineData("#for i = 1 : 3\ny = i\n#loop")]
+        [InlineData("$Plot{sin(t) @ t = 0 : 1}")]
+        [InlineData("$Map{x*y @ x = 0 : 1 & y = 0 : 1}")]
+        [InlineData("f(x; z = 1) = x + z\nr = f(1; z = 2)")]
+        [InlineData("M = [1; 2|3; 4]\nL = lu(M)\np = ind")]
+        [InlineData("#noc\ny = undefinedvar\n#equ")]
+        [InlineData("x_min = $Inf{x^2 @ x = -1 : 1}\ny = x_inf")]
+        public void NameDefinedWhenRead_IsNotReported(string code)
+        {
+            Assert.Empty(Check(code));
+        }
+
+        [Fact]
+        public void ReadTarget_IsDefined()
+        {
+            Assert.Empty(Check("#read M from data.csv\ny = M"));
+        }
+
+        [Fact]
+        public void UndefinedName_CoversTheExpression()
+        {
+            var error = new ExpressionParser().Check("'Text' c = 2*zz 'more'").Single();
+            Assert.Equal((7, 15), (error.StartColumn, error.EndColumn));
         }
 
         [Fact]
@@ -72,6 +114,42 @@ namespace Calcpad.Tests
             var path = Path.Combine(Path.GetTempPath(), $"calcpad-check-{System.Guid.NewGuid():N}.csv");
             Check($"M = [1; 2]\n#write M to {path}");
             Assert.False(File.Exists(path));
+        }
+
+        [Theory]
+        [InlineData("#for i = 1 : 2\n#if i > 1\nzz ← 2\n#end if\nzz = 1\n#loop")]
+        [InlineData("#for i = 1 : 2\n#if i > 1\ny = g(1)\n#end if\ng(x) = x\n#loop")]
+        [InlineData("#for i = 1 : 2\ni ← 3\n#loop")]
+        public void NameDefinedLaterInLoop_IsNotReported(string code)
+        {
+            Assert.Empty(Check(code));
+        }
+
+        [Theory]
+        [InlineData("#for i = 1 : 2\nzz ← 2\n#loop", 2, "CPD-3410")]
+        [InlineData("#for i = 1 : 2\ny = nofn(1)\n#loop", 2, "CPD-3305")]
+        [InlineData("#if 0\ny = nofn(1)\n#end if", 2, "CPD-3305")]
+        [InlineData("#if 0\nπ = 3\n#end if", 2, "CPD-3409")]
+        [InlineData("#if 0\ny = 5 qqq\n#end if", 2, "CPD-3310")]
+        public void NameErrors_AreReportedOnLinesThatDidNotRun(string code, int line, string expected)
+        {
+            Assert.Equal([(line, expected)], Check(code));
+        }
+
+        [Theory]
+        [InlineData("x = (1 + 2", "CPD-3101", 4, 5)]
+        [InlineData("x = sin((1 + 2)", "CPD-3101", 7, 8)]
+        [InlineData("x = 1 + 2)", "CPD-3102", 9, 10)]
+        [InlineData("x = [1; 2", "CPD-3103", 4, 5)]
+        [InlineData("x = 1; 2]", "CPD-3104", 8, 9)]
+        [InlineData("x = $Root{x - 1 @ x = 0 : 5", "CPD-3105", 4, 10)]
+        [InlineData("x = $Root x - 1", "CPD-3106", 4, 9)]
+        [InlineData("x = 1*2}", "CPD-3106", 7, 8)]
+        [InlineData("x = (1 + [2)]", "CPD-5114", 12, 13)]
+        public void BracketErrors_PointAtTheBracket(string code, string expected, int start, int end)
+        {
+            var error = Assert.Single(new ExpressionParser().Check(code));
+            Assert.Equal((expected, start, end), (error.Code, error.StartColumn, error.EndColumn));
         }
 
         [Fact]

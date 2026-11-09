@@ -87,37 +87,34 @@ namespace Calcpad.Core
                 TokenTypes.Error,
             };
 
-            private int _depth;
             private HashSet<string> _parameters;
 
-            internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment)
+            internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment, bool trackPositions = false)
             {
-                var isOuter = ++_depth == 1;
                 var at = -1;
                 var parameters = _parameters;
                 try
                 {
-                    return ReadInput(expression, allowAssignment, ref at);
+                    return ReadInput(expression, allowAssignment, trackPositions, ref at);
                 }
-                // Solver blocks parse their own text, so only the outermost call knows the offset
-                catch (MathParserException ex) when (isOuter && at >= 0 && ex.Position < 0)
+                catch (MathParserException ex) when (trackPositions && at >= 0 && ex.Position < 0)
                 {
                     ex.Position = at;
                     throw;
                 }
                 finally
                 {
-                    --_depth;
                     _parameters = parameters;
                 }
             }
 
-            private Queue<Token> ReadInput(ReadOnlySpan<char> expression, bool allowAssignment, ref int at)
+            private Queue<Token> ReadInput(ReadOnlySpan<char> expression, bool allowAssignment, bool trackPositions, ref int at)
             {
                 var tokens = new Queue<Token>(expression.Length);
                 var pt = TokenTypes.None;
                 var st = SolverBlock.SolverTypes.None;
                 var isSolver = false;
+                int solverStart = -1, solverOpen = -1;
                 var isInput = false;
                 var isSubscript = false;
                 var bracketCounter = 0;
@@ -150,7 +147,15 @@ namespace Calcpad.Core
                         continue;
 
                     if (tt == TokenTypes.Error)
-                        throw Exceptions.InvalidSymbol(c);
+                    {
+                        var symbolError = c == '}' ? Exceptions.MissingLeftSolverBracket() : Exceptions.InvalidSymbol(c);
+                        if (trackPositions)
+                        {
+                            symbolError.Position = i;
+                            symbolError.EndPosition = i + 1;
+                        }
+                        throw symbolError;
+                    }
 
                     if (tt == TokenTypes.Constant &&
                         unitsLiteral.IsEmpty ||
@@ -260,6 +265,8 @@ namespace Calcpad.Core
                                 if (tt == TokenTypes.BracketLeft)
                                 {
                                     t = MakeFunctionToken(s, _parser.IsCalculation && tokens.Count != 0);
+                                    if (trackPositions)
+                                        t.Start = tokenLiteral.Start;
                                     if (_isComplex &&
                                            (t.Type == TokenTypes.VectorFunction ||
                                             t.Type == TokenTypes.VectorFunction2 ||
@@ -362,14 +369,23 @@ namespace Calcpad.Core
                                             var token = tokens.Peek();
                                             if (token is VariableToken vt)
                                             {
-                                                if (c == '←')
-                                                    GetVariable(vt, true);
-                                                else
-                                                    CreateVariable(vt);
+                                                try
+                                                {
+                                                    if (c == '←')
+                                                        GetVariable(vt, true);
+                                                    else
+                                                        CreateVariable(vt);
 
-                                                if (vt.Variable.IsReadOnly)
-                                                    throw Exceptions.CannotModifyConstant(vt.Content);
-
+                                                    if (vt.Variable.IsReadOnly)
+                                                        throw Exceptions.CannotModifyConstant(vt.Content);
+                                                }
+                                                catch (MathParserException ex) when (trackPositions && ex.Position < 0)
+                                                {
+                                                    var name = expression[..i];
+                                                    ex.Position = name.Length - name.TrimStart().Length;
+                                                    ex.EndPosition = name.TrimEnd().Length;
+                                                    throw;
+                                                }
                                                 vt.Variable.IsReadOnly = _parser.IsConst;
                                             }
                                         }
@@ -383,6 +399,8 @@ namespace Calcpad.Core
                                     throw Exceptions.ComplexVectorsAndMatricesNotSupported();
 
                                 t = new Token(c.ToString(), tt);
+                                if (trackPositions)
+                                    t.Start = i;
                             }
                             tokens.Enqueue(t);
                         }
@@ -395,20 +413,39 @@ namespace Calcpad.Core
                 if (!isSolver)
                     return tokens;
 
-                if (st == SolverBlock.SolverTypes.None)
-                    throw Exceptions.MissingLeftSolverBracket();
-
-                throw Exceptions.MissingRightSolverBracket();
+                var solverError = st == SolverBlock.SolverTypes.None
+                    ? Exceptions.MissingLeftSolverBracket()
+                    : Exceptions.MissingRightSolverBracket();
+                // From '$' to its '{', or to the end of the name when there is none
+                if (trackPositions && solverStart >= 0)
+                {
+                    var end = solverOpen >= 0 ? solverOpen + 1 : solverStart + 1;
+                    while (solverOpen < 0 && end < n && char.IsLetter(expression[end]))
+                        ++end;
+                    solverError.Position = solverStart;
+                    solverError.EndPosition = end;
+                }
+                throw solverError;
 
                 bool InputSolver(char c, TokenTypes tt, ref TextSpan ts, TextSpan tokenLiteral, int i)
                 {
                     if (tt == TokenTypes.Solver && !isSolver)
                     {
                         if (!tokenLiteral.IsEmpty)
-                            throw Exceptions.InvalidMacro(tokenLiteral.ToString());
+                        {
+                            var macroError = Exceptions.InvalidMacro(tokenLiteral.ToString());
+                            if (trackPositions)
+                            {
+                                macroError.Position = tokenLiteral.Start;
+                                macroError.EndPosition = i + 1;
+                            }
+                            throw macroError;
+                        }
 
                         ts.Reset(i);
                         isSolver = true;
+                        solverStart = i;
+                        solverOpen = -1;
                     }
                     if (isSolver)
                     {
@@ -422,6 +459,7 @@ namespace Calcpad.Core
                                     if (st == SolverBlock.SolverTypes.Error)
                                         throw Exceptions.InvalidSolver(s.ToString());
 
+                                    solverOpen = i;
                                     ts.Reset(i + 1);
                                 }
                                 else
@@ -433,10 +471,17 @@ namespace Calcpad.Core
                                 --bracketCounter;
                                 if (bracketCounter == 0)
                                 {
-                                    t = new Token(string.Empty, TokenTypes.Solver)
+                                    int index;
+                                    try
                                     {
-                                        Index = AddSolver(ts.ToString(), st)
-                                    };
+                                        index = AddSolver(ts.ToString(), st);
+                                    }
+                                    catch (MathParserException ex)
+                                    {
+                                        ex.Shift(trackPositions ? solverOpen + 1 : -1);
+                                        throw;
+                                    }
+                                    t = new Token(string.Empty, TokenTypes.Solver) { Index = index };
                                     tokens.Enqueue(t);
                                     st = SolverBlock.SolverTypes.None;
                                     isSolver = false;
@@ -691,12 +736,15 @@ namespace Calcpad.Core
                 foreach (var variables in _localVariables)
                     if (variables.TryGetValue(s, out var v))
                     {
+                        if (ReferenceEquals(variables, _variables))
+                            _parser.RecordReadName(s);
                         vt.Variable = v;
                         return;
                     }
                 if (mustExist)
                     throw Exceptions.VariableNotExist(vt.Content);
 
+                _parser.RecordReadName(s);
                 var topLocalVariables = _localVariables.Peek();
                 var newVar = new Variable();
                 topLocalVariables.Add(s, newVar);

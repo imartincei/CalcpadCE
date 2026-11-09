@@ -62,6 +62,17 @@ public class MacroErrorRecoveryTests
     }
 
     [Fact]
+    public void UnexpectedException_RejectsOnlyItsLine()
+    {
+        // A relative source path makes Path.GetFullPath throw on #include
+        var macros = new MacroParser { SourceFilePath = "relative.cpd" };
+        macros.Parse("#include other.cpd\n#def m$ = 2\ny = m$", out var expanded, null, 0, false);
+        var error = Assert.Single(macros.Errors);
+        Assert.Equal((1, "CPD-2200"), (error.SourceLine, error.Code));
+        Assert.Contains("y = 2", expanded);
+    }
+
+    [Fact]
     public void Lint_ChecksTheRestOfADocumentWithMacroErrors()
     {
         var staged = new ContentResolver().GetStagedContent("#def m$ = 1\ny = undefined$(1)\nz = 1 + * 2");

@@ -7,8 +7,8 @@ Diagnostics appear as squiggles in the editor and entries in the Problems panel.
 
 ## Where diagnostics come from
 
-- **As you type**, the linter checks the document without running it.
-- **When the preview runs** the document's calculation errors also appear in the Problems panel. `#include` and `#def` errors come from the run only.
+- **As you type**, the linter checks the document without running it, including `#include` and `#def` errors and code in branches and loops that don't run.
+- **When the preview runs** the document's calculation errors also appear in the Problems panel.
 
 ## Diagnostic codes
 
@@ -63,7 +63,6 @@ The tables below group them by the kind of problem.
 | CPD-3201 | Error | Invalid variable name (must start with a letter) |
 | CPD-3202 | Error | Invalid function name |
 | CPD-3203 | Error | Function name conflicts with a built-in function |
-| CPD-3204 | Error | Variable name conflicts with a keyword |
 | CPD-3205 | Error | Variable name conflicts with a built-in constant |
 | CPD-3206 | Error | Function must have at least one parameter |
 | CPD-3207 | Error | Required parameter after optional parameter in function definition |
@@ -77,10 +76,8 @@ The tables below group them by the kind of problem.
 | CPD-3303 | Error | Undefined macro |
 | CPD-3304 | Error | Macro called with the wrong number of parameters |
 | CPD-3305 | Error | Undefined function |
-| CPD-3306 | Warning | Invalid element access |
 | CPD-3307 | Error | Too few parameters |
 | CPD-3308 | Error | Too many parameters |
-| CPD-3309 | Warning | Parameter type mismatch |
 | CPD-3310 | Error | Undefined unit |
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
@@ -97,7 +94,7 @@ The tables below group them by the kind of problem.
 | CPD-3401 | Error | Invalid operator usage |
 | CPD-3402 | Error | Unknown command name |
 | CPD-3403 | Error | Unknown directive |
-| CPD-3404 | Warning | Invalid assignment |
+| CPD-3404 | Error | Invalid assignment |
 | CPD-3405 | Error | `#` directive not allowed inside a command block |
 | CPD-3406 | Error | Invalid command syntax |
 | CPD-3407 | Error | Incomplete expression |
@@ -148,6 +145,7 @@ Reported when the document runs. Errors that match a check above reuse its code.
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
 | CPD-5121 | Syntax | Invalid `#for` header |
+| CPD-5122 | Syntax | Assignment must follow a variable or function name |
 | CPD-5120 | Syntax | More than one delimiter in a plot command |
 | CPD-5201 | Blocks | Condition cannot be empty |
 | CPD-5202 | Blocks | Duplicate #else |

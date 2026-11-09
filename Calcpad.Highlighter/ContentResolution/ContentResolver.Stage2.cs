@@ -125,8 +125,23 @@ namespace Calcpad.Highlighter.ContentResolution
                 PathRoots = parser.PathRoots,
                 IncludedFileHashes = includedFileHashes,
                 MacroErrorLines = [.. trace.Errors.Where(e => e.SourceIndex >= 0).Select(e => e.SourceIndex)],
+                MacroErrors = [.. trace.Errors.Where(e => e.SourceIndex >= 0).Select(e => ToMacroError(trace, e))],
                 IsMacroParserComplete = trace.IsComplete
             };
+        }
+
+        // Columns only when the error is in its own line, not in a macro body defined elsewhere
+        private static MacroError ToMacroError(MacroTrace trace, MacroTraceError error)
+        {
+            int start = -1, end = -1;
+            if (trace.TryLocate(error.Start, out var line, out var column) && line == error.SourceIndex &&
+                trace.TryLocate(error.End - 1, out var endLine, out var endColumn) && endLine == line)
+            {
+                start = column;
+                end = endColumn + 1;
+            }
+            return new(error.SourceIndex, error.Code ?? "CPD-2200", error.Message, start, end,
+                trace.SourceLines[error.SourceIndex].File is not null);
         }
 
         private static (int, int)[] Locate(MacroTrace trace, IReadOnlyList<int> offsets)

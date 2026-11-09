@@ -140,10 +140,10 @@ Response includes error counts and diagnostics:
   "diagnostics": [
     {
       "line": 0,
-      "column": 4,
+      "column": 0,
       "endColumn": 17,
       "code": "CPD-3301",
-      "message": "Undefined variable: 'undefined_var'",
+      "message": "Undefined variable or units: \"undefined_var\".",
       "severity": "error",
       "severityId": 0,
       "source": "Calcpad Linter"

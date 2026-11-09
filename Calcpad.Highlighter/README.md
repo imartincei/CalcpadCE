@@ -61,7 +61,6 @@ When Calcpad.Core runs a document in `Debug` mode, `ExpressionParser.Trace` reco
 
 - `TypeTracker` takes variable types from the run, and `GetVariableInfoAt` gives the type just before a given line.
 - Lines the run never reached (an untaken `#if` branch) skip type checks.
-- The output mode (`#noc`) of each line comes from the run rather than `DirectiveState`.
 
 Without a matching trace, everything falls back to static inference. The server only applies a trace when the lint or definitions request sets `useTrace`, which the editors do while auto-run is on.
 
@@ -105,8 +104,8 @@ Twelve validators run in stage order:
 | Stage | Validators |
 |-------|-----------|
 | 1 | `IncludeValidator` — `#include` syntax and file resolution |
-| 2 | `MacroValidator` — duplicates, parameter syntax, naming, nesting |
-| 3 | `BalanceValidator`, `NamingValidator`, `UsageValidator`, `SemanticValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `FormatValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator`, `CoreCheckValidator` (Core's check pass) |
+| 2 | `MacroValidator` — checks MacroParser accepts; `MacroErrorValidator` — MacroParser's own errors |
+| 3 | `NamingValidator`, `UsageValidator`, `FunctionTypeValidator`, `CommandBlockValidator`, `HtmlCommentValidator`, `SettingsValidator`, `UiValidator`, `CoreCheckValidator` (Core's check pass) |
 
 Every diagnostic code, its severity, and the `LintIgnore`/`EndLintIgnore` markers that `LintIgnoreRegionParser` reads are documented in [docs/new-linter.md](../docs/new-linter.md). Codes are defined in [Linter/Constants/ErrorCodes.cs](Linter/Constants/ErrorCodes.cs) — keep the two in sync when adding one.
 

@@ -57,9 +57,6 @@ namespace Calcpad.Highlighter.ContentResolution
             return _trace.IsComplete ? LineExecution.NotExecuted : LineExecution.Unknown;
         }
 
-        public TraceOutputMode? GetOutputMode(int stage3Line) =>
-            TryGetState(stage3Line, out var state) ? state.Output : null;
-
         /// <summary>
         /// The kind of the last assignment before the line, or the final kind when none
         /// precedes it. Null when the trace never assigned the variable.

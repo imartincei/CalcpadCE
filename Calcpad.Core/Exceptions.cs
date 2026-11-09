@@ -108,7 +108,7 @@ namespace Calcpad.Core
             new(Messages.Both_values_must_be_integers, "CPD-5413", K.Values);
 
         internal static MathParserException VariableNotExist(string name) =>
-            new(string.Format(Messages.Variable_0_does_not_exist, name), "CPD-3410", K.Names);
+            new(string.Format(Messages.Variable_0_does_not_exist, name), "CPD-3410", K.Names) { Name = name };
 
         internal static MathParserException UnitNotExist(string name) =>
             new(string.Format(Messages.Unit_0_does_not_exist, name), "CPD-3310", K.Names);
@@ -126,7 +126,7 @@ namespace Calcpad.Core
             new(Messages.Missing_operand, "CPD-5103", K.Syntax);
 
         internal static MathParserException InvalidFunction(string s) =>
-            new(string.Format(Messages.Invalid_function_0, s), "CPD-3305", K.Names);
+            new(string.Format(Messages.Invalid_function_0, s), "CPD-3305", K.Names) { Name = s };
 
         internal static MathParserException InvalidVariableName(string s) =>
             new(string.Format(Messages.Invalid_variable_name_0, s), "CPD-3201", K.Syntax);
@@ -204,7 +204,7 @@ namespace Calcpad.Core
             new(string.Format(Messages.Recursion_is_not_allowed_in_function_definition_0, s), "CPD-5305", K.Names);
 
         internal static MathParserException AssignmentPreceded() =>
-            new(Messages.The_assignment_equals_must_be_preceded_by_custom_function_or_variable, "CPD-3203", K.Syntax);
+            new(Messages.The_assignment_equals_must_be_preceded_by_custom_function_or_variable, "CPD-5122", K.Syntax);
 
         internal static MathParserException AssignmentNotFirst() =>
             new(Messages.Assignment_equals_must_be_the_first_operator_in_the_expression, "CPD-3404", K.Syntax);

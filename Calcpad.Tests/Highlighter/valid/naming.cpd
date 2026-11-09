@@ -27,3 +27,8 @@ x_Ø = 15
 R_u,max = 100
 distance_m = 10
 myLength = 5
+
+' Keyword names are valid variable names
+if = 1
+for = 2
+keywordSum = if + for
