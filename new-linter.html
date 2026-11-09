@@ -3269,8 +3269,8 @@ Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can
 <p>Diagnostics appear as squiggles in the editor and entries in the Problems panel.</p>
 <h2 id="where-diagnostics-come-from">Where diagnostics come from<a class="headerlink" href="#where-diagnostics-come-from" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>As you type</strong>, the linter checks the document without running it.</li>
-<li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel. <code>#include</code> and <code>#def</code> errors come from the run only.</li>
+<li><strong>As you type</strong>, the linter checks the document without running it, including <code>#include</code> and <code>#def</code> errors and code in branches and loops that don't run.</li>
+<li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel.</li>
 </ul>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
@@ -3462,11 +3462,6 @@ The tables below group them by the kind of problem.</p>
 <td>Function name conflicts with a built-in function</td>
 </tr>
 <tr>
-<td>CPD-3204</td>
-<td>Error</td>
-<td>Variable name conflicts with a keyword</td>
-</tr>
-<tr>
 <td>CPD-3205</td>
 <td>Error</td>
 <td>Variable name conflicts with a built-in constant</td>
@@ -3519,11 +3514,6 @@ The tables below group them by the kind of problem.</p>
 <td>Undefined function</td>
 </tr>
 <tr>
-<td>CPD-3306</td>
-<td>Warning</td>
-<td>Invalid element access</td>
-</tr>
-<tr>
 <td>CPD-3307</td>
 <td>Error</td>
 <td>Too few parameters</td>
@@ -3532,11 +3522,6 @@ The tables below group them by the kind of problem.</p>
 <td>CPD-3308</td>
 <td>Error</td>
 <td>Too many parameters</td>
-</tr>
-<tr>
-<td>CPD-3309</td>
-<td>Warning</td>
-<td>Parameter type mismatch</td>
 </tr>
 <tr>
 <td>CPD-3310</td>
@@ -3607,7 +3592,7 @@ The tables below group them by the kind of problem.</p>
 </tr>
 <tr>
 <td>CPD-3404</td>
-<td>Warning</td>
+<td>Error</td>
 <td>Invalid assignment</td>
 </tr>
 <tr>
@@ -3824,6 +3809,11 @@ The tables below group them by the kind of problem.</p>
 <td>CPD-5121</td>
 <td>Syntax</td>
 <td>Invalid <code>#for</code> header</td>
+</tr>
+<tr>
+<td>CPD-5122</td>
+<td>Syntax</td>
+<td>Assignment must follow a variable or function name</td>
 </tr>
 <tr>
 <td>CPD-5120</td>
