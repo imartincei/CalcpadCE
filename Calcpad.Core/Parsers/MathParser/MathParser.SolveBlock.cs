@@ -140,7 +140,7 @@ namespace Calcpad.Core
 
                 const string delimiters = "@=:";
                 var items = new SolverItem[n + 1];
-                int current = 0, bracketCounter = 0, equalityIndex = -1;
+                int current = 0, bracketCounter = 0, equalityIndex = -1, start = 0;
                 var ts = new TextSpan(script);
                 var len = script.Length;
                 for (int i = 0; i < len; ++i)
@@ -162,6 +162,8 @@ namespace Calcpad.Core
                     {
                         ts.ExpandTo(i);
                         items[current].Input = ts.Cut().ToString();
+                        items[current].Offset = start;
+                        start = i + 1;
                         ts.Reset(i + 1);
                         ++current;
                     }
@@ -170,6 +172,7 @@ namespace Calcpad.Core
                 }
                 ts.ExpandTo(len);
                 items[current].Input = ts.Cut().ToString();
+                items[current].Offset = start;
                 for (int i = 0; i <= n; ++i)
                     if (string.IsNullOrWhiteSpace(items[i].Input))
                     {
@@ -179,7 +182,7 @@ namespace Calcpad.Core
 
                 if (_type == SolverTypes.Repeat)
                 {
-                    var additionalItems = ParseBlockOrInline(items[0].Input);
+                    var additionalItems = ParseBlockOrInline(items[0].Input, items[0].Offset);
                     len = additionalItems.Length - 1;
                     if (len > 0)
                     {
@@ -200,22 +203,21 @@ namespace Calcpad.Core
                         item.Input = s[..equalityIndex];
                         Array.Resize(ref items, 5);
                         items[4].Input = s[(equalityIndex + 1)..];
+                        items[4].Offset = item.Offset + equalityIndex + 1;
                         n = 4;
                     }
                 }
                 var allowAssignment = _type == SolverTypes.Repeat || _type == SolverTypes.Root;
                 for (int i = 0; i <= n; ++i)
                 {
-                    ref var item = ref items[i];
-                    item.Input = item.Input.Trim();
-                    _parser.Parse(item.Input, (i == 0 || i > 3) && allowAssignment);
-                    item.Rpn = _parser._rpn;
+                    ParseItem(ref items[i], (i == 0 || i > 3) && allowAssignment);
                 }
                 var rpn = items[1].Rpn;
                 Parameter[] parameters;
                 if (rpn.Length == 1 && rpn[0] is VariableToken vt)
                 {
                     parameters = [new(vt.Content)];
+                    _parser.BindName(vt.Content);
                     vt.Variable = parameters[0].Variable;
                     _var = vt.Variable;
                 }
@@ -265,9 +267,26 @@ namespace Calcpad.Core
                 return items;
             }
 
-            private SolverItem[] ParseBlockOrInline(string script)
+            private void ParseItem(ref SolverItem item, bool allowAssignment)
             {
-                int bracketCounter = 0, curlyBracketCounter = 0, squareBracketCounter = 0;
+                var trimmed = item.Input.TrimStart();
+                item.Offset += item.Input.Length - trimmed.Length;
+                item.Input = trimmed.TrimEnd();
+                try
+                {
+                    _parser.Parse(item.Input, allowAssignment);
+                }
+                catch (MathParserException ex)
+                {
+                    ex.Shift(item.Offset);
+                    throw;
+                }
+                item.Rpn = _parser._rpn;
+            }
+
+            private SolverItem[] ParseBlockOrInline(string script, int offset = 0)
+            {
+                int bracketCounter = 0, curlyBracketCounter = 0, squareBracketCounter = 0, start = 0;
                 var ts = new TextSpan(script);
                 var len = script.Length;
                 var itemList = new List<SolverItem>();
@@ -293,30 +312,35 @@ namespace Calcpad.Core
                         c == ';')
                     {
                         ts.ExpandTo(i);
-                        itemList.Add(new SolverItem() { Input = ts.Cut().ToString() });
+                        itemList.Add(new SolverItem() { Input = ts.Cut().ToString(), Offset = offset + start });
+                        start = i + 1;
                         ts.Reset(i + 1);
                     }
                     else
                         ts.Expand();
                 }
                 ts.ExpandTo(len);
-                itemList.Add(new SolverItem() { Input = ts.Cut().ToString() });
-                var n = itemList.Count - 1;
+                itemList.Add(new SolverItem() { Input = ts.Cut().ToString(), Offset = offset + start });
                 var itemArray = itemList.ToArray();
-                for (int i = 0; i <= n; ++i)
-                {
-                    ref var item = ref itemArray[i];
-                    item.Input = item.Input.Trim();
-                    _parser.Parse(item.Input, true);
-                    item.Rpn = _parser._rpn;
-                }
+                for (int i = 0; i < itemArray.Length; ++i)
+                    ParseItem(ref itemArray[i], true);
                 return itemArray;
             }
 
             private void RenderOutput()
             {
                 for (int i = 0, n = _items.Length; i < n; ++i)
-                    _items[i].Render(_parser);
+                {
+                    try
+                    {
+                        _items[i].Render(_parser);
+                    }
+                    catch (MathParserException ex)
+                    {
+                        ex.Shift(_items[i].Offset);
+                        throw;
+                    }
+                }
 
                 if (IsFigure)
                 {
@@ -841,6 +865,8 @@ namespace Calcpad.Core
             private struct SolverItem
             {
                 internal string Input;
+                // Where Input starts in the solver's script
+                internal int Offset;
                 internal string Html;
                 internal string Xml;
                 internal Token[] Rpn;

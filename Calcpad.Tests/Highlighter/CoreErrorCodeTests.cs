@@ -52,6 +52,14 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal(["CPD-3301", "CPD-5422", "CPD-3105"], parser.Errors.Select(e => e.Code));
         }
 
+        [Fact]
+        public void AssignmentAfterNonName_IsNotTheBuiltInNameCode()
+        {
+            var parser = new ExpressionParser { Debug = true };
+            parser.Parse("2 = 3", true, false);
+            Assert.Equal("CPD-5122", Assert.Single(parser.Errors).Code);
+        }
+
         [Theory]
         [InlineData("#def m$\n#def n$\n#end def\n#end def", "CPD-2207")]
         [InlineData("#def m$ = 1\n#def m$ = 2", "CPD-2201")]

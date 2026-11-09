@@ -58,6 +58,8 @@ namespace Calcpad.Core
             }
             input[1] = input[1].Trim();
             input[4] = input[4].Trim();
+            Variables.Add(input[1]);
+            Variables.Add(input[4]);
             if (calculate)
             {
                 Parser.Parse(input[2]);

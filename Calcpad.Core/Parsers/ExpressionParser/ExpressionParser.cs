@@ -25,6 +25,18 @@ namespace Calcpad.Core
         private int _decimals;
         private bool _calculate;
         private bool _isCheck;
+        // Check pass: names each line read, and names only the run would define
+        private sealed class ReadName(string name, int line, int sourceLine, int start, int end)
+        {
+            internal readonly string Name = name;
+            internal readonly int Line = line, SourceLine = sourceLine, Start = start, End = end;
+            // Whether the name had a definition when read; null until known
+            internal bool? Defined;
+        }
+        private readonly List<ReadName> _readNames = [];
+        private readonly List<ReadName> _loopReads = [];
+        private readonly List<(ReadName Read, MathParserException Error)> _loopErrors = [];
+        private readonly HashSet<string> _checkDefined = new(StringComparer.Ordinal);
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
@@ -121,6 +133,8 @@ namespace Calcpad.Core
             {
                 while (++_currentLine < lineCount)
                 {
+                    if (_isCheck)
+                        TakeReadNames(_currentLine - 1, _parser.Line);
                     try
                     {
                         // #UI metadata is scoped to the line that declared it. Clearing here
@@ -281,6 +295,11 @@ namespace Calcpad.Core
                     }
                 }
                 FlushMarkdown();
+                if (_isCheck)
+                {
+                    TakeReadNames(_currentLine - 1, _parser.Line);
+                    ReportUndefinedNames();
+                }
                 if (_currentLine == lineCount)
                 {
                     if (_condition.OpenIf is { } opening)
@@ -342,10 +361,12 @@ namespace Calcpad.Core
                         {
                             _parser.IsPlotting = true;
                             var s1 = plotParser.Parse(s, _calculate);
+                            _parser.ReadNames?.RemoveAll(plotParser.Variables.Contains);
                             _sb.Append(InsertAttribute(s1, HtmlId));
                         }
                         catch (MathParserException ex)
                         {
+                            _parser.ReadNames?.Clear();
                             AppendError(s.ToString(), ex, _currentLine);
                         }
                         finally
@@ -593,6 +614,12 @@ namespace Calcpad.Core
             _condition = new();
             _loops.Clear();
             _checkLoops.Clear();
+            _readNames.Clear();
+            _loopReads.Clear();
+            _checkDefined.Clear();
+            _loopErrors.Clear();
+            if (_isCheck)
+                _parser.ReadNames = [];
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
@@ -698,6 +725,14 @@ namespace Calcpad.Core
                             tokens[i].CacheID = _parser.WriteEquationToCache(isOutput, cacheID);
                         }
 
+                        if (_isVal == -1)
+                            _parser.ReadNames?.Clear();
+                        else if (_isCheck)
+                        {
+                            var (start, end) = ErrorColumns(token, -1);
+                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition);
+                        }
+
                         if (_calculate && _isVal > -1)
                         {
                             _parser.Calculate(isOutput, cacheID);
@@ -736,6 +771,7 @@ namespace Calcpad.Core
                     catch (MathParserException ex)
                     {
                         _parser.ResetStack();
+                        _parser.ReadNames?.Clear();
                         string errText;
                         if (!_calculate && expression.Contains('?'))
                             errText = expression.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
@@ -754,8 +790,10 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        var (start, end) = ErrorColumns(token, ui is null ? ex.Position : -1);
-                        if (RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end))
+                        var (start, end) = ErrorColumns(token, ui is null ? ex.Position : -1, ex.EndPosition);
+                        if (_isCheck && _checkLoops.Count != 0 && ex.Name is not null)
+                            _loopErrors.Add((new(ex.Name, _currentLine, _parser.Line, start, end), ex));
+                        else if (RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end))
                             ++_errorCount;
                         if (!_isCheck && (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences))
                             throw new MathParserException(Messages.Too_many_errors, "CPD-5904", CalcpadErrorKind.Values);
@@ -816,14 +854,72 @@ namespace Calcpad.Core
             return true;
         }
 
+        // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
+        // so those reads are judged at the end of the document or of the outermost loop.
+        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false)
+        {
+            if (_parser?.ReadNames is not { Count: > 0 } names)
+                return;
+
+            foreach (var name in names)
+            {
+                var read = new ReadName(name, line, sourceLine, start, end);
+                if (_checkLoops.Count != 0)
+                {
+                    if (!isFunction)
+                        _loopReads.Add(read);
+                }
+                else if (!isFunction)
+                    read.Defined = IsCheckDefined(name);
+                _readNames.Add(read);
+            }
+            names.Clear();
+        }
+
+        private void ResolveLoopReads()
+        {
+            foreach (var read in _loopReads)
+                read.Defined = IsCheckDefined(read.Name);
+            _loopReads.Clear();
+
+            // A later line of the loop may define it for the next pass
+            foreach (var (read, ex) in _loopErrors)
+            {
+                var defined = ex.Code == "CPD-3305" ? _parser.IsDefinedFunction(read.Name) : IsCheckDefined(read.Name);
+                if (!defined)
+                    RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
+            }
+            _loopErrors.Clear();
+        }
+
+        private bool IsCheckDefined(string name) => _checkDefined.Contains(name) || _parser.IsDefinedName(name);
+
+        // Names read before anything defines them, or that nothing defines at all
+        private void ReportUndefinedNames()
+        {
+            ResolveLoopReads();
+            foreach (var read in _readNames)
+            {
+                if (read.Defined ?? IsCheckDefined(read.Name))
+                    continue;
+
+                var ex = Exceptions.UndefinedVariableOrUnits(read.Name);
+                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
+            }
+            _readNames.Clear();
+            _loopReads.Clear();
+        }
+
         // The failing word when the tokenizer found the position, otherwise the whole expression
-        private (int Start, int End) ErrorColumns(Token token, int position)
+        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1)
         {
             if (_lineOffset < 0 || token.Start < 0)
                 return (-1, -1);
 
             var offset = _lineOffset + token.Start;
             var value = token.Value.AsSpan();
+            if (position >= 0 && endPosition > position && endPosition <= value.Length)
+                return (offset + position, offset + endPosition);
             if (position < 0 || position > value.Length)
             {
                 var trimmed = value.TrimStart();

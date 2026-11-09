@@ -89,17 +89,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
             defaults?.Count(d => d == null) ?? paramCount;
 
         /// <summary>
-        /// Names of required parameters that follow an optional one.
-        /// </summary>
-        public static IEnumerable<string> RequiredAfterOptional(List<string> names, List<string> defaults)
-        {
-            var first = defaults?.FindIndex(d => d != null) ?? -1;
-            for (var i = first + 1; first >= 0 && i < names.Count; i++)
-                if (defaults[i] == null)
-                    yield return names[i];
-        }
-
-        /// <summary>
         /// Parses a "name = value" call argument. "==" is a comparison, not a keyword argument.
         /// </summary>
         public static bool TryParseKeywordArg(string arg, out string name, out string value)
@@ -126,49 +115,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                     return false;
 
             return true;
-        }
-
-        /// <summary>
-        /// Extracts function parameter names from a function definition line.
-        /// For example: "square(x) = x^2" returns {"x"}
-        /// </summary>
-        public static HashSet<string> GetFunctionParamsFromLine(string line)
-        {
-            var result = new HashSet<string>(StringComparer.Ordinal);
-            var lineSpan = line.AsSpan();
-
-            // Look for function definition pattern: name(params) = ...
-            var parenOpen = line.IndexOf('(');
-            if (parenOpen < 0)
-                return result;
-
-            var parenClose = FindMatchingClose(lineSpan, parenOpen, '(', ')');
-            if (parenClose < 0)
-                return result;
-
-            var equalsSign = line.IndexOf('=', parenClose);
-            if (equalsSign < 0)
-                return result;
-
-            // Check that something comes before the paren (function name)
-            var beforeParen = lineSpan[..parenOpen].Trim();
-            if (beforeParen.Length == 0 || !char.IsLetter(beforeParen[0]))
-                return result;
-
-            // Extract the parameters using SplitEnumerator (zero-alloc splitting)
-            var paramsSection = lineSpan[(parenOpen + 1)..parenClose];
-            foreach (var paramSpan in new SplitEnumerator(paramsSection, ';'))
-            {
-                var trimmed = paramSpan.Trim();
-                if (trimmed.Length > 0)
-                {
-                    SplitParameterDefault(trimmed, out var name, out _);
-                    if (!name.IsEmpty)
-                        result.Add(name.ToString());
-                }
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -221,16 +167,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
             return closePos >= 0
                 ? line.Substring(start, closePos - start)
                 : line.Substring(start);
-        }
-
-        /// <summary>
-        /// Finds the position of the closing brace matching the opening brace at braceStart.
-        /// Returns the position of the closing }, or line.Length if unbalanced.
-        /// </summary>
-        public static int FindClosingBrace(string line, int braceStart)
-        {
-            var closePos = FindMatchingClose(line, braceStart, '{', '}');
-            return closePos >= 0 ? closePos : line.Length;
         }
     }
 }

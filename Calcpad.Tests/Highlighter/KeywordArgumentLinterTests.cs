@@ -109,18 +109,19 @@ namespace Calcpad.Tests.Highlighter
         [InlineData("r = f(1; z = 9)")]
         [InlineData("r = f(z = 9; x = 1)")]
         [InlineData("r = f(1; 2; 3)")]
-        public void CommandBlockFunction_CallUsingDefaults_ValidatesBody(string call)
+        public void CommandBlockFunction_UndefinedInBody_IsReportedOnTheDefinition(string call)
         {
             var (result, _) = Lint("f(x; y = 2; z = 3) = $Inline{a = x + y + z + q}\n" + call + "\n");
-            Assert.Single(result.Diagnostics, d => d.Code == "CPD-3301" && d.Line == 1);
+            Assert.Single(result.Diagnostics, d => d.Code == "CPD-3301");
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3301" && d.Line == 0);
         }
 
         [Fact]
-        public void CommandBlockFunction_TooFewArguments_SkipsBodyValidation()
+        public void CommandBlockFunction_TooFewArguments_ReportsTheCall()
         {
             var (result, _) = Lint("f(x; y; z = 3) = $Block{a = x + y + z + q}\nr = f(1)\n");
-            Assert.Contains("CPD-3302", Codes(result));
-            Assert.DoesNotContain("CPD-3301", Codes(result));
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3302" && d.Line == 1);
+            Assert.DoesNotContain(result.Diagnostics, d => d.Code == "CPD-3301" && d.Line == 1);
         }
 
         [Theory]

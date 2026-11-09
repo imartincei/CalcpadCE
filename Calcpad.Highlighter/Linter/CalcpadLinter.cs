@@ -15,13 +15,11 @@ namespace Calcpad.Highlighter.Linter
     {
         private readonly IncludeValidator _includeValidator = new();
         private readonly MacroValidator _macroValidator = new();
-        private readonly BalanceValidator _balanceValidator = new();
+        private readonly MacroErrorValidator _macroErrorValidator = new();
         private readonly NamingValidator _namingValidator = new();
         private readonly UsageValidator _usageValidator = new();
-        private readonly SemanticValidator _semanticValidator = new();
         private readonly FunctionTypeValidator _functionTypeValidator = new();
         private readonly CommandBlockValidator _commandBlockValidator = new();
-        private readonly FormatValidator _formatValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
         private readonly SettingsValidator _settingsValidator = new();
         private readonly UiValidator _uiValidator = new();
@@ -75,6 +73,7 @@ namespace Calcpad.Highlighter.Linter
             // Run validators
             ValidateStage1(stage1Context, result);
             ValidateStage2(stage2Context, result);
+            _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
             if (staged.CoreCheck is { } check)
                 _coreCheckValidator.Validate(stage3Context, check.Value, result);
@@ -252,13 +251,10 @@ namespace Calcpad.Highlighter.Linter
 
         private void ValidateStage3(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
-            _balanceValidator.Validate(stage3, result, tokenProvider);
             _namingValidator.Validate(stage3, result, tokenProvider);
             _usageValidator.Validate(stage3, result, tokenProvider);
-            _semanticValidator.Validate(stage3, result, tokenProvider);
             _functionTypeValidator.Validate(stage3, result, tokenProvider);
             _commandBlockValidator.Validate(stage3, result, tokenProvider);
-            _formatValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
             _settingsValidator.Validate(stage3, result, tokenProvider);
             _uiValidator.Validate(stage3, result, tokenProvider);

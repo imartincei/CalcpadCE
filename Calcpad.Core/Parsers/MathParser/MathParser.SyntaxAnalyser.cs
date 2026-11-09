@@ -101,6 +101,7 @@ namespace Calcpad.Core
                 var optionalFunctionStack = new Stack<MultiFunctionStackItem>();
                 var vectorStack = new Stack<MultiFunctionStackItem>();
                 var indexStack = new Stack<MultiFunctionStackItem>();
+                var openBrackets = new Stack<Token>();
                 var pt = new Token(string.Empty, TokenTypes.None);
                 var firstToken = input.Peek();
                 var position = 0;
@@ -162,11 +163,14 @@ namespace Calcpad.Core
                                     isFunctionInIndex = true;
                             }
                             ++countOfBrackets;
+                            openBrackets.Push(t);
                             break;
                         case TokenTypes.BracketRight:
                             --countOfBrackets;
                             if (countOfBrackets < 0)
-                                throw Exceptions.MissingLeftBracket();
+                                throw At(Exceptions.MissingLeftBracket(), t);
+
+                            openBrackets.TryPop(out _);
 
                             if (multiFunctionStack.TryPeek(out var mfStackItem) &&
                                 countOfBrackets == mfStackItem.CountOfBrackets)
@@ -175,7 +179,7 @@ namespace Calcpad.Core
                                 if (mfStackItem.Token is FunctionToken ft)
                                     ft.ParameterCount = countOfDivisors - mfStackItem.CountOfDivisors + 1;
                                 else
-                                    throw Exceptions.InvalidFunction(mfStackItem.Token.Content);
+                                    throw AtName(Exceptions.InvalidFunction(mfStackItem.Token.Content), mfStackItem.Token);
 
                                 countOfDivisors = mfStackItem.CountOfDivisors;
                             }
@@ -220,10 +224,10 @@ namespace Calcpad.Core
                         case TokenTypes.SquareBracketRight:
 
                             if (!vectorStack.TryPop(out var vecstItem))
-                                throw Exceptions.MissingVectorOpeningBracket();
+                                throw At(Exceptions.MissingVectorOpeningBracket(), t);
 
                             if (countOfBrackets != vecstItem.CountOfBrackets)
-                                throw Exceptions.BracketMismatch();
+                                throw At(Exceptions.BracketMismatch(), t);
 
                             countOfDivisors = vecstItem.CountOfDivisors;
                             break;
@@ -304,25 +308,45 @@ namespace Calcpad.Core
                     pt.Type != TokenTypes.Solver &&
                     pt.Type != TokenTypes.Error &&
                     pt.Content != "!")
-                    throw Exceptions.IncompleteExpression();
+                    throw At(Exceptions.IncompleteExpression(), pt);
 
                 if (firstToken.Type == TokenTypes.CustomFunction &&
                     firstToken.Index < 0 &&
                     !isFunctionDefinition &&
                     isCalculating)
-                    throw Exceptions.InvalidFunction(firstToken.Content);
+                    throw AtName(Exceptions.InvalidFunction(firstToken.Content), firstToken);
 
                 if (countOfBrackets > 0)
-                    throw Exceptions.MissingRightBracket();
+                    throw At(Exceptions.MissingRightBracket(), openBrackets.Count > 0 ? openBrackets.Peek() : null);
 
                 if (vectorStack.Count > 0)
-                    throw Exceptions.MissingVectorClosingBracket();
+                    throw At(Exceptions.MissingVectorClosingBracket(), vectorStack.Peek().Token);
 
                 if (countOfDivisors > 0)
                     throw Exceptions.UnexpectedDelimiter();
 
                 if (countOfDivisors < 0)
                     throw Exceptions.InvalidNumberOfArguments();
+            }
+
+            private static MathParserException At(MathParserException ex, Token bracket)
+            {
+                if (bracket?.Start >= 0)
+                {
+                    ex.Position = bracket.Start;
+                    ex.EndPosition = bracket.Start + 1;
+                }
+                return ex;
+            }
+
+            internal static MathParserException AtName(MathParserException ex, Token name)
+            {
+                if (name.Start >= 0)
+                {
+                    ex.Position = name.Start;
+                    ex.EndPosition = name.Start + name.Content.Length;
+                }
+                return ex;
             }
 
             private static void CheckOrder(Token pt, Token ct)

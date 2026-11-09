@@ -126,7 +126,7 @@ namespace Calcpad.Core
             internal Mapped[] ResolveArguments(List<Mapped> positional, Dictionary<string, Mapped> keywords)
             {
                 if (positional.Count > ParameterCount)
-                    throw new MathParserException(Messages.Invalid_number_of_arguments, "CPD-3304", CalcpadErrorKind.Names);
+                    throw WrongArgumentCount();
 
                 var result = new Mapped[ParameterCount];
                 positional.CopyTo(result);
@@ -143,10 +143,13 @@ namespace Calcpad.Core
                 }
                 for (var i = 0; i < result.Length; ++i)
                     if (result[i].Text is null)
-                        result[i] = new(_defaults[i] ?? throw Exceptions.InvalidNumberOfArguments(), Origins.None);
+                        result[i] = new(_defaults[i] ?? throw WrongArgumentCount(), Origins.None);
 
                 return result;
             }
+
+            private static MathParserException WrongArgumentCount() =>
+                new(Messages.Invalid_number_of_arguments, "CPD-3304", CalcpadErrorKind.Names);
 
             // One pass, so inserted arguments are never substituted again
             internal Mapped Run(Mapped[] arguments, bool track)
@@ -352,8 +355,19 @@ namespace Calcpad.Core
                         AppendLine(sourceLine);
                         continue;
                     }
-                    if (lineContent[0] == '#' && ParseKeyword(lineContent, sourceLine))
+                    try
+                    {
+                        if (lineContent[0] == '#' && ParseKeyword(lineContent, sourceLine))
+                            continue;
+                    }
+                    // Only this line is rejected, so the rest of the document is still checked
+                    catch (Exception ex)
+                    {
+                        if (traceSource < 0 && TryGetIncludePath(lineContent, out var start, out var length))
+                            TraceFailedInclude(lineContent.Slice(start, length).ToString());
+                        AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200", (ex as MathParserException)?.Kind ?? CalcpadErrorKind.Structure);
                         continue;
+                    }
 
                     if (macroDefCount > 0)
                     {
@@ -386,7 +400,9 @@ namespace Calcpad.Core
                         catch (Exception ex)
                         {
                             Trace?.OutputLines.Add(new() { Text = traceText, SourceIndex = traceSource });
-                            AppendError(lineContent, ex.Message, (ex as MathParserException)?.Code ?? "CPD-2200", (ex as MathParserException)?.Kind ?? CalcpadErrorKind.Structure);
+                            var mpe = ex as MathParserException;
+                            AppendError(lineContent, ex.Message, mpe?.Code ?? "CPD-2200", mpe?.Kind ?? CalcpadErrorKind.Structure,
+                                mpe?.Position ?? -1, mpe?.EndPosition ?? -1);
                         }
                         continue;
                     }
@@ -404,7 +420,7 @@ namespace Calcpad.Core
                     sb.AppendLine();
                     ++_parsedLineNumber;
                     hasErrors = true;
-                    Trace?.Errors.Add(new(defTraceSource, message));
+                    Trace?.Errors.Add(new(defTraceSource, message, "CPD-2206"));
                     _errorList.Add(new CalcpadError
                     {
                         SourceLine = defLine,
@@ -760,7 +776,7 @@ namespace Calcpad.Core
                 AppendError(lineContent, string.Format(Messages.Invalid_symbol_0_in_macro_name, c), code, CalcpadErrorKind.Syntax);
             }
 
-            void AppendError(ReadOnlySpan<char> lineContent, string errorMessage, string code, CalcpadErrorKind kind)
+            void AppendError(ReadOnlySpan<char> lineContent, string errorMessage, string code, CalcpadErrorKind kind, int start = -1, int end = -1)
             {
                 sb.Append(ErrorLine(code, lineContent, errorMessage));
                 if (addLineNumbers)
@@ -768,7 +784,7 @@ namespace Calcpad.Core
                 sb.AppendLine();
                 ++_parsedLineNumber;
                 hasErrors = true;
-                Trace?.Errors.Add(new(traceSource, errorMessage));
+                Trace?.Errors.Add(new(traceSource, errorMessage, code, start, end));
                 _errorList.Add(new CalcpadError
                 {
                     SourceLine = lineNumber,
@@ -869,6 +885,7 @@ namespace Calcpad.Core
             var emptyMacro = new Macro(null, Origins.None, null, null);
             var macro = emptyMacro;
             string macroKey = null;
+            int callStart = -1, callEnd = -1;
             Queue<string> fields = null;
             if (index >= 0)
             {
@@ -880,11 +897,14 @@ namespace Calcpad.Core
                 fields = GetFields(s[..n], ';');
             }
             var textSpan = new TextSpan(lineContent);
+            try
+            {
             for (int i = 0, len = lineContent.Length; i < len; ++i)
             {
                 var c = lineContent[i];
                 if (insideArgList)
                 {
+                    callEnd = i + 1;
                     if (c == '(')
                     {
                         if (bracketCount == 0)
@@ -942,6 +962,8 @@ namespace Calcpad.Core
                         }
                     }
 
+                    callStart = textSpan.Start + (macro.IsEmpty ? 0 : j);
+                    callEnd = i + 1;
                     if (macro.IsEmpty)
                         throw Exceptions.UndefinedMacro(macroName);
                     else if (j > 0)
@@ -996,6 +1018,17 @@ namespace Calcpad.Core
             {
                 var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding, expanded);
                 stringBuilder.Append(s);
+            }
+            }
+            catch (MathParserException ex) when (ex.Position < 0 && callStart >= 0 && callEnd > callStart)
+            {
+                int start = origins[callStart], last = origins[callEnd - 1];
+                if (start >= 0 && last >= start)
+                {
+                    ex.Position = start;
+                    ex.EndPosition = last + 1;
+                }
+                throw;
             }
             return stringBuilder.ToMapped();
         }

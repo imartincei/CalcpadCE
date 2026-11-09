@@ -60,8 +60,13 @@ namespace Calcpad.Core
                 for (var k = 0; k < starts.Count; ++k)
                     hasKeyword |= isKeyword[k] = IsKeywordArgument(tokens, starts[k]);
 
-                if (!hasKeyword && starts.Count >= n)
-                    continue;
+                if (!hasKeyword)
+                {
+                    if (starts.Count > n)
+                        throw At(Exceptions.InvalidNumberOfArguments(), t, tokens[close]);
+                    if (starts.Count == n)
+                        continue;
+                }
 
                 var map = new int[starts.Count];
                 var isSupplied = new bool[n];
@@ -72,18 +77,19 @@ namespace Calcpad.Core
                     if (isKeyword[k])
                     {
                         var name = tokens[starts[k]].Content;
+                        UnrecordReadName(name);
                         index = cf.IndexOfParameter(name);
                         if (index < 0)
-                            throw Exceptions.UnknownKeywordArgument(name);
+                            throw At(Exceptions.UnknownKeywordArgument(name), t, tokens[close]);
 
                         if (isSupplied[index])
-                            throw Exceptions.DuplicateArgument(name);
+                            throw At(Exceptions.DuplicateArgument(name), t, tokens[close]);
 
                         removed ??= new bool[len];
                         removed[starts[k]] = removed[starts[k] + 1] = true;
                     }
                     else if (k > positionalCount || positionalCount >= n)
-                        throw Exceptions.InvalidNumberOfArguments();
+                        throw At(Exceptions.InvalidNumberOfArguments(), t, tokens[close]);
                     else
                         index = positionalCount++;
 
@@ -92,7 +98,7 @@ namespace Calcpad.Core
                 }
                 for (var p = 0; p < n; ++p)
                     if (!isSupplied[p] && cf.Defaults?[p] is null)
-                        throw Exceptions.InvalidNumberOfArguments();
+                        throw At(Exceptions.InvalidNumberOfArguments(), t, tokens[close]);
 
                 isResolved = true;
                 tokens[i] = new FunctionToken(t.Content)
@@ -116,6 +122,17 @@ namespace Calcpad.Core
                     --_assignmentIndex;
 
             return output;
+        }
+
+        // Spans the call from its name to its closing bracket
+        private static MathParserException At(MathParserException ex, Token name, Token close)
+        {
+            if (name.Start >= 0 && close.Start > name.Start)
+            {
+                ex.Position = name.Start;
+                ex.EndPosition = close.Start + 1;
+            }
+            return ex;
         }
 
         private static bool IsKeywordArgument(Token[] tokens, int start) =>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Calcpad.Core
 {
@@ -6,6 +7,9 @@ namespace Calcpad.Core
     {
         protected MathParser Parser;
         protected PlotSettings Settings;
+
+        /// <summary>The names after @, set by <see cref="Parse"/>.</summary>
+        internal List<string> Variables { get; } = [];
 
         protected PlotParser(MathParser parser, PlotSettings settings)
         {

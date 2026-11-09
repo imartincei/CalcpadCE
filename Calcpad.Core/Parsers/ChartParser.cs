@@ -47,6 +47,7 @@ namespace Calcpad.Core
                 if (string.IsNullOrWhiteSpace(input[j]))
                     throw Exceptions.MissingPlotItem(Parts[j], script.ToString());
 
+            Variables.Add(input[1].Trim());
             string result;
             if (calculate)
             {

@@ -333,6 +333,8 @@ namespace Calcpad.Core
                 AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
             else if (_checkLoops.Pop().Id != _condition.Id)
                 AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
+            if (_checkLoops.Count == 0)
+                ResolveLoopReads();
         }
 
         private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
@@ -374,17 +376,21 @@ namespace Calcpad.Core
             if (expr.IsWhiteSpace())
                 return true;
 
-            if (!_calculate)
+            if (!_calculate && !_isCheck)
                 return false;
 
             try
             {
                 _parser.Parse(expr);
+                if (_isCheck)
+                    return false;
+
                 _parser.Calculate();
                 return Condition.IsTrue(_parser.Result);
             }
             catch (MathParserException ex)
             {
+                _parser.ReadNames?.Clear();
                 AppendError(s.ToString(), ex, _currentLine);
                 return false;
             }
@@ -507,6 +513,8 @@ namespace Calcpad.Core
             }
             var startExpr = expression[(loopStart + 1)..loopEnd].Trim();
             var endExpr = expression[(loopEnd + 1)..].Trim();
+            if (_isCheck)
+                _checkDefined.Add(varName);
             if (_calculate)
             {
                 if (_condition.IsSatisfied)
@@ -860,7 +868,7 @@ namespace Calcpad.Core
                 }
             }
             else if (_isCheck)
-                _ = new ReadWriteOptions(s, 0, null, _pathRoots);
+                _checkDefined.Add(new ReadWriteOptions(s, 0, null, _pathRoots).Name.ToString());
             else if (_isVisible)
                 _sb.Append($"<p><span{HtmlId} class=\"cond\">#read</span> {s[KeywordLength(Keyword.Read)..]}</p>");
         }

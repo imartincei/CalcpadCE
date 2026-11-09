@@ -20,14 +20,6 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage1
                 var includeKeywordEndIndex = line.AsSpan().IndexOf("#include".AsSpan(), StringComparison.OrdinalIgnoreCase) + 8;
 
                 ValidateInputFields(i, line, includeKeywordEndIndex, result);
-
-                // Core reports a missing path (CPD-1102)
-                if (trimmedSpan.Length <= 8 || trimmedSpan[8..].Trim().Length == 0)
-                    continue;
-
-                if (!CalcpadPatterns.IncludeStatement.IsMatch(line))
-                    result.AddError(i, 0, line.Length, "CPD-1101",
-                        "'" + line.AsSpan().Trim().ToString() + "'", LineStage.Stage1);
             }
         }
 

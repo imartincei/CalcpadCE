@@ -539,7 +539,6 @@ interface LintDiagnostic {
 | CPD-3201 | Naming | Invalid variable name (must start with a letter) |
 | CPD-3202 | Naming | Invalid function name |
 | CPD-3203 | Naming | Function name conflicts with a built-in function |
-| CPD-3204 | Naming | Variable name conflicts with a keyword |
 | CPD-3205 | Naming | Variable name conflicts with a built-in constant |
 | CPD-3206 | Naming | Function must have at least one parameter |
 | CPD-3207 | Naming | Required parameter after optional parameter in function definition |
@@ -549,10 +548,8 @@ interface LintDiagnostic {
 | CPD-3303 | Usage | Undefined macro |
 | CPD-3304 | Usage | Macro called with the wrong number of parameters |
 | CPD-3305 | Usage | Undefined function |
-| CPD-3306 | Usage | Invalid element access |
 | CPD-3307 | Usage | Too few parameters |
 | CPD-3308 | Usage | Too many parameters |
-| CPD-3309 | Usage | Parameter type mismatch |
 | CPD-3310 | Usage | Undefined unit |
 | CPD-3311 | Usage | Empty parameter in a function call |
 | CPD-3312 | Usage | Unused variable |
@@ -606,6 +603,7 @@ interface LintDiagnostic {
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
 | CPD-5121 | Syntax | Invalid `#for` header |
+| CPD-5122 | Syntax | Assignment must follow a variable or function name |
 | CPD-5120 | Syntax | More than one delimiter in a plot command |
 | CPD-5201 | Blocks | Condition cannot be empty |
 | CPD-5202 | Blocks | Duplicate #else |
