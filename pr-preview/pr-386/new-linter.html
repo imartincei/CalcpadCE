@@ -3269,8 +3269,8 @@ Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can
 <p>Diagnostics appear as squiggles in the editor and entries in the Problems panel.</p>
 <h2 id="where-diagnostics-come-from">Where diagnostics come from<a class="headerlink" href="#where-diagnostics-come-from" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>As you type</strong>, the linter checks the document without running it.</li>
-<li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel. <code>#include</code> and <code>#def</code> errors come from the run only.</li>
+<li><strong>As you type</strong>, the linter checks the document without running it, including <code>#include</code> and <code>#def</code> errors and code in branches and loops that don't run.</li>
+<li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel.</li>
 </ul>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
@@ -3514,11 +3514,6 @@ The tables below group them by the kind of problem.</p>
 <td>Undefined function</td>
 </tr>
 <tr>
-<td>CPD-3306</td>
-<td>Warning</td>
-<td>Invalid element access</td>
-</tr>
-<tr>
 <td>CPD-3307</td>
 <td>Error</td>
 <td>Too few parameters</td>
@@ -3527,11 +3522,6 @@ The tables below group them by the kind of problem.</p>
 <td>CPD-3308</td>
 <td>Error</td>
 <td>Too many parameters</td>
-</tr>
-<tr>
-<td>CPD-3309</td>
-<td>Warning</td>
-<td>Parameter type mismatch</td>
 </tr>
 <tr>
 <td>CPD-3310</td>
