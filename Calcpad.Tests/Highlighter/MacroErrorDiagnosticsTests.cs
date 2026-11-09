@@ -55,6 +55,26 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
+        public void StaticDiagnosticsInIncludes_MarkTheWholeIncludeLine()
+        {
+            var dir = Directory.CreateTempSubdirectory();
+            try
+            {
+                File.WriteAllText(Path.Combine(dir.FullName, "inc.cpd"), "'Title\nEUR = 1\n");
+                var content = "y = 2\n  #include inc.cpd  \ny";
+                var d = Assert.Single(new CalcpadLinter().Lint(
+                    new ContentResolver().GetStagedContent(content, Path.Combine(dir.FullName, "main.cpd"))).Diagnostics);
+                Assert.Equal((1, "CPD-3312"), (d.Line, d.Code));
+                Assert.Equal("#include inc.cpd", Marked(content, d));
+                Assert.StartsWith("inc.cpd line 2: ", d.Message);
+            }
+            finally
+            {
+                dir.Delete(true);
+            }
+        }
+
+        [Fact]
         public void MissingInclude_IsReportedWithoutAFilePrefix()
         {
             var dir = Directory.CreateTempSubdirectory();
