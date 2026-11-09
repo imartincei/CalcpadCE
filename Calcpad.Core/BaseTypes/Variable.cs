@@ -13,6 +13,7 @@ namespace Calcpad.Core
         internal bool IsInitialized => _isIntialised;
         internal bool IsReadOnly;
         private bool _isIntialised;
+        private object _subscribed;
         // Counts first assignments, so cached equations know when to recheck
         internal static int Initializations => Volatile.Read(ref _initializations);
         private static int _initializations;
@@ -85,10 +86,25 @@ namespace Calcpad.Core
             _value = value;
             Initialize();
             OnChange?.Invoke();
+            if (ReferenceEquals(_subscribed, value))
+                return;
+
+            if (_subscribed is Vector oldVector)
+                oldVector.OnChange -= Change;
+            else if (_subscribed is Matrix oldMatrix)
+                oldMatrix.OnChange -= Change;
+
+            _subscribed = null;
             if (value is Vector vector)
+            {
                 vector.OnChange += Change;
+                _subscribed = vector;
+            }
             else if (value is Matrix matrix)
+            {
                 matrix.OnChange += Change;
+                _subscribed = matrix;
+            }
         }
     }
 }
