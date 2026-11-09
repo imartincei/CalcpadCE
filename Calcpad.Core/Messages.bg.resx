@@ -373,9 +373,6 @@
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
         <value>Липсва разделител "{0}" в команда за 2D графика "{1}".</value>
     </data>
-  <data name="Function_redefined" xml:space="preserve">
-        <value> Внимание! Функцията е предефинирана.</value>
-    </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>Степенуване</value>
   </data>

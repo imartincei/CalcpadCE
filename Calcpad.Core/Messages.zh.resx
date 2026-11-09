@@ -370,9 +370,6 @@
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
     <value>曲面投影命令 "{1}" 中缺少分隔符 "{0}"</value>
   </data>
-  <data name="Function_redefined" xml:space="preserve">
-    <value> 警告！函数已重新定义.</value>
-  </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>求平方</value>
   </data>

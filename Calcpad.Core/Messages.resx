@@ -394,9 +394,6 @@
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
         <value>Missing delimiter "{0}" in surface map command "{1}".</value>
     </data>
-  <data name="Function_redefined" xml:space="preserve">
-        <value> Warning! Function redefined.</value>
-    </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>Raise to square</value>
   </data>
