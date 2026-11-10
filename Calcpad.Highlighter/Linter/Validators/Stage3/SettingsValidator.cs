@@ -8,10 +8,7 @@ using Calcpad.Highlighter.Tokenizer.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Validates the JSON payload of the #settings directive (`#settings {...}`), reporting
-    /// malformed JSON, non-object payloads, unrecognized keys, wrong value types and out-of-range
-    /// values. Recognized keys, types and ranges come from <see cref="SettingsDto"/> so the linter
-    /// and the runtime parser stay in sync.
+    /// Unrecognized keys in the #settings JSON payload. Core's check pass reports the rest.
     /// </summary>
     public class SettingsValidator
     {
@@ -43,31 +40,15 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
             var reporter = new DirectiveJsonReporter(
                 result, lineIndex, token.Column, token.Column + token.Length, Code, "#settings");
-
-            using (var doc = reporter.TryParse(json))
-            {
-                if (doc is null)
-                    return;
-
-                if (!reporter.RequireObject(doc.RootElement))
-                    return;
-
-                reporter.CheckKnownKeys(doc.RootElement, SettingsDto.KnownKeys.Contains, "setting");
-            }
-
-            SettingsDto dto;
             try
             {
-                dto = SettingsDto.Parse(json);
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                    reporter.CheckKnownKeys(doc.RootElement, SettingsDto.KnownKeys.Contains, "setting");
             }
             catch (JsonException)
             {
-                reporter.Warn("a #settings value has the wrong type");
-                return;
             }
-
-            foreach (var error in dto.Validate())
-                reporter.Warn(error.Message);
         }
     }
 }

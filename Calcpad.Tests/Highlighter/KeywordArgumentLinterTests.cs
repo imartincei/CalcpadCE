@@ -109,11 +109,11 @@ namespace Calcpad.Tests.Highlighter
         [InlineData("r = f(1; z = 9)")]
         [InlineData("r = f(z = 9; x = 1)")]
         [InlineData("r = f(1; 2; 3)")]
-        public void CommandBlockFunction_UndefinedInBody_IsReportedOnTheDefinition(string call)
+        public void CommandBlockFunction_UndefinedInBody_IsReportedOnTheDefinitionAndTheCall(string call)
         {
             var (result, _) = Lint("f(x; y = 2; z = 3) = $Inline{a = x + y + z + q}\n" + call + "\n");
-            Assert.Single(result.Diagnostics, d => d.Code == "CPD-3301");
-            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3301" && d.Line == 0);
+            var lines = result.Diagnostics.Where(d => d.Code == "CPD-3301").Select(d => d.Line).Order();
+            Assert.Equal([0, 1], lines);
         }
 
         [Fact]

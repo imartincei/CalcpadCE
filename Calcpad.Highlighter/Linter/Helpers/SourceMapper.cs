@@ -96,6 +96,24 @@ namespace Calcpad.Highlighter.Linter.Helpers
             };
         }
 
+        /// <summary>Maps columns on a Stage 2 line to the original source; a negative column covers the whole line.</summary>
+        public static MappedPosition MapStage2PositionToOriginal(int stage2Line, int column, int endColumn, Stage2Context stage2, Stage1Context stage1)
+        {
+            var stage1Line = stage2.Stage2ToStage1Map.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
+            if (column < 0)
+                return MapWholeLineToOriginal(stage1Line, stage1);
+
+            if (stage1.LineContinuationSegments.TryGetValue(stage1Line, out var segments) && segments.Count > 1)
+                return MapPositionWithContinuations(column, endColumn, segments);
+
+            return new MappedPosition
+            {
+                Line = stage1.SourceMap.TryGetValue(stage1Line, out var orig) ? orig : stage1Line,
+                Column = column,
+                EndColumn = endColumn
+            };
+        }
+
         private static bool TryProjectToCallSite(MacroExpansionInfo expansion, SourceInfo source, ref int column, ref int endColumn)
         {
             var columns = expansion.SourceColumns;

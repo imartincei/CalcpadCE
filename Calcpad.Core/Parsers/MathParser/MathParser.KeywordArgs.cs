@@ -28,6 +28,9 @@ namespace Calcpad.Core
         // "f(3; z = 4)" → supplied arguments "3; 4" with map [0, 2]; omitted ones are filled from defaults.
         private Queue<Token> ResolveCallArguments(Queue<Token> input)
         {
+            if (FunctionCalls is not null)
+                RecordFunctionCalls(input);
+
             var hasCall = false;
             foreach (var t in input)
                 hasCall |= t.Type == TokenTypes.CustomFunction && t.Index >= 0;
@@ -122,6 +125,26 @@ namespace Calcpad.Core
                     --_assignmentIndex;
 
             return output;
+        }
+
+        private void RecordFunctionCalls(Queue<Token> input)
+        {
+            Token[] tokens = null;
+            var i = 0;
+            foreach (var t in input)
+            {
+                if (t.Type == TokenTypes.CustomFunction)
+                {
+                    tokens ??= input.ToArray();
+                    var close = i + 1 < tokens.Length && tokens[i + 1].Type == TokenTypes.BracketLeft
+                        ? IndexOfClosingBracket(tokens, i + 1)
+                        : -1;
+                    var isHead = i == 0 && close >= 0 && close + 1 < tokens.Length && IsAssignment(tokens[close + 1].Content);
+                    if (!isHead)
+                        RecordFunctionCall(t.Content, t.Start, close >= 0 && tokens[close].Start >= 0 ? tokens[close].Start + 1 : -1);
+                }
+                ++i;
+            }
         }
 
         // Spans the call from its name to its closing bracket

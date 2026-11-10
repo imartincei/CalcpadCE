@@ -62,10 +62,10 @@ namespace Calcpad.Tests
         }
 
         [Fact]
-        public void UndefinedName_CoversTheExpression()
+        public void UndefinedName_CoversTheName()
         {
             var error = new ExpressionParser().Check("'Text' c = 2*zz 'more'").Single();
-            Assert.Equal((7, 15), (error.StartColumn, error.EndColumn));
+            Assert.Equal((13, 15), (error.StartColumn, error.EndColumn));
         }
 
         [Fact]
@@ -100,6 +100,37 @@ namespace Calcpad.Tests
         public void FunctionBody_IsCheckedOnTheDefinitionLine()
         {
             Assert.Equal([(1, "CPD-3407")], Check("f(x) = x +\ny = 1"));
+        }
+
+        [Theory]
+        [InlineData("f(x) = x + qq\ny = f(2)\nqq = 3", "f", 2, 4, 8)]
+        [InlineData("f(x) = x + qq\ny = 1 + f(2)\nqq = 3\nz = f(1)", "f", 2, 8, 12)]
+        [InlineData("f(x) = x + qq\ng(x) = 2*f(x)\ny = g(2)\nqq = 3", "f", 3, 4, 8)]
+        [InlineData("f(x) = x + qq\n#if f(1) > 0\n#end if\nqq = 3", "f", 2, 4, 8)]
+        public void FunctionBody_IsJudgedAtTheFirstCall(string code, string function, int callLine, int start, int end)
+        {
+            var error = new ExpressionParser().Check(code).Single();
+            Assert.Equal((1, "CPD-3301"), (error.SourceLine, error.Code));
+            Assert.Equal((11, 13), (error.StartColumn, error.EndColumn));
+            Assert.Equal(new CalcpadCallSite(function, callLine, start, end), error.CallSite);
+        }
+
+        [Theory]
+        [InlineData("f(x) = x + qq\nqq = 3\ny = f(2)")]
+        [InlineData("f(x) = x + qq\nqq = 3")]
+        [InlineData("f(x) = x + qq\n#for i = 1 : 2\ny = f(2)\nqq = 3\n#loop")]
+        [InlineData("f(x) = x + qq\nqq = 1\nf(x) = x + ww\nww = 1\ny = f(1)")]
+        public void FunctionBody_DefinedByTheFirstCall_IsNotReported(string code)
+        {
+            Assert.Empty(Check(code));
+        }
+
+        [Fact]
+        public void FunctionBody_NeverCalled_IsJudgedAtTheEnd()
+        {
+            var error = new ExpressionParser().Check("f(x) = x + qq").Single();
+            Assert.Equal((1, "CPD-3301"), (error.SourceLine, error.Code));
+            Assert.Null(error.CallSite);
         }
 
         [Fact]

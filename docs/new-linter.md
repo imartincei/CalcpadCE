@@ -10,6 +10,16 @@ Diagnostics appear as squiggles in the editor and entries in the Problems panel.
 - **As you type**, the linter checks the document without running it, including `#include` and `#def` errors and code in branches and loops that don't run.
 - **When the preview runs** the document's calculation errors also appear in the Problems panel.
 
+## Errors inside macros and functions
+
+A macro body is checked with the arguments of each call.
+An error in the body is marked on the call, and the first call also marks the place in the `#def` where the error is.
+Each mark links to the other.
+
+A custom function body is checked at its first call: every variable the body uses must be defined by then.
+If one is not, the linter marks both the call and the variable in the function body.
+A function that is never called is checked at the end of the document.
+
 ## Diagnostic codes
 
 Every diagnostic has a `CPD-` code.
@@ -81,7 +91,7 @@ The tables below group them by the kind of problem.
 | CPD-3310 | Error | Undefined unit |
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
-| CPD-3313 | Error | Redefinition of existing function |
+| CPD-3313 | Warning | Redefinition of existing function |
 | CPD-3314 | Error | Unknown keyword argument in a macro call |
 | CPD-3315 | Error | Unknown keyword argument in a function call |
 | CPD-3316 | Error | Duplicate keyword argument in a macro call |
@@ -103,9 +113,9 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
-| CPD-3413 | Warning | Invalid #settings JSON |
+| CPD-3413 | Error | Invalid #settings JSON (an unrecognized key is a warning) |
 | CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
-| CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3415 | Error | Invalid `#UI` format (an unrecognized property is a warning) |
 | CPD-3416 | Warning | `uiOverrides` metadata comment not at the end of the file |
 | CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
 | CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |

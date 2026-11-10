@@ -502,6 +502,11 @@ namespace Calcpad.Core
                 {
                     throw Exceptions.ComplexFunctionInRealMode(cf.Name);
                 }
+                catch (MathParserException ex)
+                {
+                    ex.InFunction(cf.Name, cf.SourceLine);
+                    throw;
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunction1 cf, in IValue x)
@@ -516,6 +521,11 @@ namespace Calcpad.Core
                 catch (ComplexInRealModeException)
                 {
                     throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
+                catch (MathParserException ex)
+                {
+                    ex.InFunction(cf.Name, cf.SourceLine);
+                    throw;
                 }
             }
 
@@ -532,6 +542,11 @@ namespace Calcpad.Core
                 {
                     throw Exceptions.ComplexFunctionInRealMode(cf.Name);
                 }
+                catch (MathParserException ex)
+                {
+                    ex.InFunction(cf.Name, cf.SourceLine);
+                    throw;
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunction3 cf, in IValue x, in IValue y, in IValue z)
@@ -547,6 +562,11 @@ namespace Calcpad.Core
                 {
                     throw Exceptions.ComplexFunctionInRealMode(cf.Name);
                 }
+                catch (MathParserException ex)
+                {
+                    ex.InFunction(cf.Name, cf.SourceLine);
+                    throw;
+                }
             }
 
             internal IValue EvaluateFunction(CustomFunctionN cf, IValue[] arguments)
@@ -561,6 +581,11 @@ namespace Calcpad.Core
                 catch (ComplexInRealModeException)
                 {
                     throw Exceptions.ComplexFunctionInRealMode(cf.Name);
+                }
+                catch (MathParserException ex)
+                {
+                    ex.InFunction(cf.Name, cf.SourceLine);
+                    throw;
                 }
             }
 

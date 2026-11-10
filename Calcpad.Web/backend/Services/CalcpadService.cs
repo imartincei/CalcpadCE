@@ -21,6 +21,59 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
+        /// Core's columns are in the line it parsed. They are kept where that line is the source line,
+        /// shifted for indentation, and dropped where a macro or include changed it.
+        /// </summary>
+        internal static List<CalcpadError> AlignColumns(List<CalcpadError> errors, string source, string output)
+        {
+            string[]? sourceLines = null, outputLines = null;
+            for (var i = 0; i < errors.Count; i++)
+            {
+                var e = errors[i];
+                if (e.StartColumn < 0 || e.Source != CalcpadErrorSource.Expression)
+                    continue;
+
+                sourceLines ??= source.Split('\n');
+                outputLines ??= output.Split('\n');
+                var shift = Shift(Line(sourceLines, e.SourceLine), Line(outputLines, e.OutputLine));
+                errors[i] = new CalcpadError
+                {
+                    SourceLine = e.SourceLine,
+                    OutputLine = e.OutputLine,
+                    Message = e.Message,
+                    Source = e.Source,
+                    Code = e.Code,
+                    Kind = e.Kind,
+                    StartColumn = shift is { } d ? e.StartColumn + d : -1,
+                    EndColumn = shift is { } d2 ? e.EndColumn + d2 : -1,
+                    CallSite = e.CallSite,
+                    IsFunctionBody = e.IsFunctionBody,
+                    Functions = e.Functions
+                };
+            }
+            return errors;
+
+            static string? Line(string[] lines, int number)
+            {
+                if (number < 1 || number > lines.Length)
+                    return null;
+                var line = lines[number - 1];
+                var eol = line.IndexOf('\v');
+                return (eol >= 0 ? line[..eol] : line).TrimEnd();
+            }
+
+            static int? Shift(string? sourceLine, string? outputLine)
+            {
+                if (sourceLine is null || outputLine is null)
+                    return null;
+                var trimmed = sourceLine.TrimStart();
+                return trimmed == outputLine.TrimStart()
+                    ? sourceLine.Length - trimmed.Length - (outputLine.Length - outputLine.TrimStart().Length)
+                    : null;
+            }
+        }
+
+        /// <summary>
         /// Creates the Include delegate for MacroParser. Core only invokes this when the
         /// resolved path exists on disk, so a bare File.ReadAllText is sufficient and any I/O
         /// failure surfaces through the catch as a Calcpad error comment (URL-hosted includes
@@ -162,6 +215,8 @@ namespace Calcpad.Server.Services
                         htmlResult = ConvertCodeToHtml(outputText, errors);
                     }
                 }
+
+                errors = AlignColumns(errors, calcpadContent, outputText);
 
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);

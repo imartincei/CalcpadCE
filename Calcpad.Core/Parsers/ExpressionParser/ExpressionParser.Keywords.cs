@@ -107,7 +107,7 @@ namespace Calcpad.Core
         private static Keyword GetKeyword(ReadOnlySpan<char> s)
         {
             var n = Math.Min(MaxKeywordLength, s.Length - 1);
-            if (n < 3)
+            if (n < 2)
                 return Keyword.None;
 
             var i = char.ToLowerInvariant(s[1]) - 'a';
@@ -170,7 +170,10 @@ namespace Calcpad.Core
                 if (_condition.IsSatisfied || !_calculate)
                 {
                     var end = s.IndexOfAny(' ', '\t');
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, (end < 0 ? s : s[..end]).ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax);
+                    if (end < 0)
+                        end = s.Length;
+                    var (from, to) = KeywordColumns(0, end);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, s[..end].ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax, from, to);
                 }
                 return KeywordResult.Continue;
             }
@@ -220,6 +223,10 @@ namespace Calcpad.Core
                 case Keyword.Const:
                     _parser.IsConst = true;
                     return KeywordResult.None;
+                case Keyword.Split or Keyword.Wrap or Keyword.Deg or Keyword.Rad or Keyword.Gra or
+                     Keyword.Round or Keyword.Format or Keyword.Md or Keyword.Phasor or Keyword.Complex
+                     when !IsEnabled():
+                    break;
                 case Keyword.Split:
                     _parser.Split = true;
                     break;
@@ -345,7 +352,7 @@ namespace Calcpad.Core
             var kwdLength = KeywordLength(keyword);
             var hasCondition = s.Length > kwdLength && !s[kwdLength..].IsWhiteSpace();
             // Only the inline condition suppresses; an unsatisfied #if already disables the lines
-            if (hasCondition && _calculate && _condition.IsSatisfied && !IsDirectiveConditionMet(s, keyword))
+            if (hasCondition && _calculate && IsEnabled() && !IsDirectiveConditionMet(s, keyword))
                 _modeSuppressed = true;
         }
 
@@ -365,7 +372,7 @@ namespace Calcpad.Core
 
         private bool IsDirectiveConditionMet(ReadOnlySpan<char> s, Keyword keyword)
         {
-            if (!_condition.IsSatisfied)
+            if (!IsEnabled())
                 return false;
 
             var kwdLength = KeywordLength(keyword);
@@ -390,7 +397,7 @@ namespace Calcpad.Core
             }
             catch (MathParserException ex)
             {
-                _parser.ReadNames?.Clear();
+                ClearReads();
                 AppendError(s.ToString(), ex, _currentLine);
                 return false;
             }
@@ -438,6 +445,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordRepeat(ReadOnlySpan<char> s)
         {
+            if (SkipLoopStart())
+                return;
+
             var kwdLength = KeywordLength(Keyword.Repeat);
             ReadOnlySpan<char> expression = s.Length > kwdLength ?
                 s[kwdLength..].Trim() :
@@ -491,6 +501,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordFor(ReadOnlySpan<char> s)
         {
+            if (SkipLoopStart())
+                return;
+
             var kwdLength = KeywordLength(Keyword.For);
             ReadOnlySpan<char> expression = s.Length > kwdLength ?
                 s[kwdLength..].Trim() :
@@ -576,6 +589,9 @@ namespace Calcpad.Core
 
         private void ParseKeywordWhile(ReadOnlySpan<char> s)
         {
+            if (SkipLoopStart())
+                return;
+
             var kwdLength = KeywordLength(Keyword.While);
             ReadOnlySpan<char> expression = s.Length > kwdLength ?
                 s[kwdLength..].Trim() :
@@ -632,7 +648,9 @@ namespace Calcpad.Core
         {
             if (_calculate)
             {
-                if (_condition.IsSatisfied)
+                if (_skippedLoops.TryPeek(out var skippedId) && skippedId == _condition.Id)
+                    _skippedLoops.Pop();
+                else if (_condition.IsSatisfied)
                 {
                     if (_loops.Count == 0)
                         AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
@@ -646,7 +664,13 @@ namespace Calcpad.Core
                     }
                 }
                 else if (_condition.IsLoop)
+                {
+                    // #continue found the #while condition false
+                    if (_loops.TryPeek(out var loop) && loop.Id == _condition.Id)
+                        _loops.Pop();
+
                     _condition.SetCondition(Condition.RemoveConditionKeyword);
+                }
             }
             else if (_isVisible)
                 _sb.Append($"</div><p{HtmlId} class=\"cond\">#loop</p>");
@@ -656,6 +680,11 @@ namespace Calcpad.Core
         {
             if (loop is ForLoop forLoop)
                 forLoop.IncrementCounter();
+            else if (loop is WhileLoop && loop.IsBroken)
+            {
+                if (removeWhileCondition)
+                    _condition.SetCondition(Condition.RemoveConditionKeyword);
+            }
             else if (loop is WhileLoop whileLoop)
             {
                 var expression = whileLoop.Condition;
@@ -692,7 +721,7 @@ namespace Calcpad.Core
         {
             if (_calculate)
             {
-                if (_condition.IsSatisfied)
+                if (IsEnabled())
                 {
                     if (_loops.Count != 0)
                         _loops.Peek().Break();
@@ -710,7 +739,7 @@ namespace Calcpad.Core
         {
             if (_calculate)
             {
-                if (_condition.IsSatisfied)
+                if (IsEnabled())
                 {
                     if (_loops.Count == 0)
                         AppendError("#continue", Messages.continue_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
@@ -798,10 +827,16 @@ namespace Calcpad.Core
             // Pushed even when invalid so each #end settings pairs with its opener.
             SettingsDto prior = new();
             _settingsStack.Push(prior);
+            if (!IsEnabled())
+                return;
+
             var json = s[SettingsKeyword.Length..].Trim();
+            var jsonStart = s.Length - s[SettingsKeyword.Length..].TrimStart().Length;
+            var (from, to) = json.IsEmpty ? KeywordColumns(0, s.Length) : KeywordColumns(jsonStart, jsonStart + json.Length);
+            var text = s.ToString();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
                 return;
             }
             try
@@ -815,7 +850,7 @@ namespace Calcpad.Core
                 foreach (var error in dto.Validate())
                 {
                     (invalid ??= []).Add(error.Key);
-                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                    SettingsError(error.Message);
                 }
 
                 foreach (SettingKey key in Enum.GetValues<SettingKey>())
@@ -824,8 +859,11 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(IsJson(json) ? Messages.A_settings_value_has_the_wrong_type : string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
             }
+
+            void SettingsError(string message) =>
+                AppendError(text, message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax, from, to);
         }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)
@@ -849,7 +887,7 @@ namespace Calcpad.Core
         {
             if (_calculate)
             {
-                if (_condition.IsSatisfied)
+                if (IsEnabled())
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;
@@ -877,7 +915,7 @@ namespace Calcpad.Core
         {
             if (_calculate)
             {
-                if (_condition.IsSatisfied)
+                if (IsEnabled())
                 {
                     var sourceDir = !string.IsNullOrEmpty(SourceFilePath)
                         ? System.IO.Path.GetDirectoryName(SourceFilePath) : null;

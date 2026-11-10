@@ -547,7 +547,14 @@ namespace Calcpad.Server.Controllers
                         Severity = d.Severity == Highlighter.Linter.Models.LinterSeverity.Error ? "error"
                             : d.Severity == Highlighter.Linter.Models.LinterSeverity.Information ? "information" : "warning",
                         SeverityId = (int)d.Severity,
-                        Source = d.Source
+                        Source = d.Source,
+                        Related = d.Related?.Select(r => new LintRelatedLocation
+                        {
+                            Line = r.Line,
+                            Column = r.Column,
+                            EndColumn = r.EndColumn,
+                            Message = r.Message
+                        }).ToList()
                     }).ToList()
                 };
 
@@ -1154,6 +1161,24 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Source of the diagnostic (default: "Calcpad Linter")</summary>
         public string Source { get; set; } = "Calcpad Linter";
+
+        /// <summary>Linked locations, such as the macro or function body behind an error at a call. Null when none.</summary>
+        public List<LintRelatedLocation>? Related { get; set; }
+    }
+
+    public class LintRelatedLocation
+    {
+        /// <summary>Zero-based line number</summary>
+        public int Line { get; set; }
+
+        /// <summary>Zero-based start column</summary>
+        public int Column { get; set; }
+
+        /// <summary>Zero-based end column</summary>
+        public int EndColumn { get; set; }
+
+        /// <summary>What this location is</summary>
+        public string Message { get; set; } = string.Empty;
     }
 
     public class DefinitionsRequest

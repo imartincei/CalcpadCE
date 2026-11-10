@@ -2,6 +2,7 @@ import * as monaco from 'monaco-editor';
 import { CalcpadApiClient } from 'calcpad-frontend/api/client';
 import { CalcpadLintService } from 'calcpad-frontend/services/linter';
 import type { CalcpadError, LintDiagnostic } from 'calcpad-frontend/types/api';
+import { expandRunErrors } from 'calcpad-frontend/services/run-errors';
 
 export type LintSeverity = 'error' | 'warning' | 'information';
 
@@ -79,6 +80,14 @@ async function lintAndMark(
             startColumn: diag.column + 1,
             endLineNumber: diag.line + 1,
             endColumn: diag.endColumn + 1,
+            relatedInformation: diag.related?.map(r => ({
+                resource: model.uri,
+                message: r.message,
+                startLineNumber: r.line + 1,
+                startColumn: r.column + 1,
+                endLineNumber: r.line + 1,
+                endColumn: r.endColumn + 1,
+            })),
         })
     );
 
@@ -89,16 +98,28 @@ async function lintAndMark(
 export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: CalcpadError[]): void {
     if (model.isDisposed()) return;
     const lineCount = model.getLineCount();
-    monaco.editor.setModelMarkers(model, 'calcpad-run', errors.map(err => {
-        const line = Math.min(Math.max(err.sourceLine, 1), lineCount);
+    const lineOf = (sourceLine: number) => Math.min(Math.max(sourceLine, 1), lineCount);
+    monaco.editor.setModelMarkers(model, 'calcpad-run', expandRunErrors(errors).map(err => {
+        const line = lineOf(err.sourceLine);
+        const start = err.startColumn ?? -1;
+        const end = err.endColumn ?? -1;
+        const hasColumns = start >= 0 && end > start && end < model.getLineMaxColumn(line);
         return {
             severity: monaco.MarkerSeverity.Error,
             message: `[Runtime] ${err.message}`,
             code: err.code,
             startLineNumber: line,
-            startColumn: model.getLineFirstNonWhitespaceColumn(line) || 1,
+            startColumn: hasColumns ? start + 1 : model.getLineFirstNonWhitespaceColumn(line) || 1,
             endLineNumber: line,
-            endColumn: model.getLineMaxColumn(line),
+            endColumn: hasColumns ? end + 1 : model.getLineMaxColumn(line),
+            relatedInformation: err.related.map(r => ({
+                resource: model.uri,
+                message: r.message,
+                startLineNumber: lineOf(r.line),
+                startColumn: model.getLineFirstNonWhitespaceColumn(lineOf(r.line)) || 1,
+                endLineNumber: lineOf(r.line),
+                endColumn: model.getLineMaxColumn(lineOf(r.line)),
+            })),
         };
     }));
 }

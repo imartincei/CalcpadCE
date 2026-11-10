@@ -1,11 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Calcpad.Core
 {
     public partial class ExpressionParser
     {
         private readonly Stack<Loop> _loops = new();
+        // Condition ids of loops opened in skipped lines, so their #loop does nothing
+        private readonly Stack<int> _skippedLoops = new();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsEnabled() => _condition.IsSatisfied &&
+            (_loops.Count == 0 || !_loops.Peek().IsBroken) ||
+            !_calculate;
+
+        private bool SkipLoopStart()
+        {
+            if (!_calculate || IsEnabled())
+                return false;
+
+            _skippedLoops.Push(_condition.Id);
+            return true;
+        }
         private abstract class Loop
         {
             internal const int MaxCount = 100000000;

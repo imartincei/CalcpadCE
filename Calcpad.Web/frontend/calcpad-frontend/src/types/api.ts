@@ -27,6 +27,15 @@ export interface LintDiagnostic {
     severity: string;    // Severity name: "error" or "warning"
     severityId: number;  // Severity ID: 0=Error, 1=Warning
     source: string;      // Source of the diagnostic (default: "Calcpad Linter")
+    /** Linked locations, such as the macro or function body behind an error at a call. */
+    related?: LintRelatedLocation[];
+}
+
+export interface LintRelatedLocation {
+    line: number;        // Zero-based line number
+    column: number;      // Zero-based start column
+    endColumn: number;   // Zero-based end column
+    message: string;
 }
 
 // ============================================
@@ -318,6 +327,17 @@ export interface CalcpadError {
     source: CalcpadErrorSource;
     /** CPD-xxxx code, shared with the linter where both report the same problem. */
     code?: string;
+    /** 0-based columns on the source line, end exclusive; -1 when the error covers the whole line. */
+    startColumn?: number;
+    endColumn?: number;
+    /** Custom functions being calculated when the error was raised, innermost first. */
+    functions?: CalcpadFunctionFrame[];
+}
+
+/** A custom function and the first source line (1-based) of its definition. */
+export interface CalcpadFunctionFrame {
+    name: string;
+    sourceLine: number;
 }
 
 export interface ConvertResult {

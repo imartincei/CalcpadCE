@@ -74,6 +74,8 @@ namespace Calcpad.Core
         internal bool HasInputFields;
         // If MathParser has input, the line is not cached in ExpressionParser
         internal int Line;
+        // First source line of a statement continued over several lines
+        internal int StatementLine;
         internal VariableSubstitutionOptions VariableSubstitution { get; set; }
         internal Unit Units { get; private set; }
         internal bool IsCanceled { get; private set; }
@@ -81,7 +83,6 @@ namespace Calcpad.Core
         internal bool IsPlotting { get; set; }
         internal bool IsCalculation { get; set; }
         internal bool Split { get; set; }
-        internal bool ShowWarnings { get; set; } = true;
         internal bool Phasor { get; set; } = false;
         public int Degrees { get => _calc.Degrees;  set => _calc.Degrees = value; }
         internal double PlotSVG => GetSettingsVariable("PlotSVG", double.NaN);
@@ -515,24 +516,48 @@ namespace Calcpad.Core
         }
 
         /// <summary>Check pass only: global names read by each parsed expression, less its own parameters and counters.</summary>
-        internal List<string> ReadNames { get; set; }
-        private readonly List<string> _pendingNames = [];
+        internal List<ReadName> ReadNames { get; set; }
+        private readonly List<ReadName> _pendingNames = [];
+
+        /// <summary>A name and its offset in the outermost parsed expression, or -1.</summary>
+        internal readonly record struct ReadName(string Name, int Start);
+
+        /// <summary>Check pass only: custom functions each parsed expression calls.</summary>
+        internal List<FunctionCall> FunctionCalls { get; set; }
+
+        /// <summary>A call from the function name to its closing bracket, as offsets in the outermost parsed expression, or -1.</summary>
+        internal readonly record struct FunctionCall(string Name, int Start, int End);
+
+        /// <summary>Where the expression being parsed starts in the outermost one.</summary>
+        internal int NameOffset { get; set; }
         private readonly HashSet<string> _boundNames = new(StringComparer.Ordinal);
         private int _parseDepth;
         // lu() creates "ind" when it runs
         private bool _hasLu;
 
-        internal void RecordReadName(string name)
+        internal void RecordReadName(string name, int start)
         {
             if (ReadNames is not null)
-                _pendingNames.Add(name);
+                _pendingNames.Add(new(name, Offset(start)));
         }
 
         internal void UnrecordReadName(string name)
         {
-            if (ReadNames is not null)
-                _pendingNames.Remove(name);
+            if (ReadNames is null)
+                return;
+            var i = _pendingNames.FindIndex(n => n.Name == name);
+            if (i >= 0)
+                _pendingNames.RemoveAt(i);
         }
+
+        private void RecordFunctionCall(string name, int start, int end)
+        {
+            start = Offset(start);
+            end = start >= 0 && end > 0 ? Offset(end) : -1;
+            FunctionCalls.Add(new(name, start, end));
+        }
+
+        private int Offset(int start) => start >= 0 && NameOffset >= 0 ? NameOffset + start : -1;
 
         internal void BindName(string name)
         {
@@ -543,6 +568,8 @@ namespace Calcpad.Core
         internal bool IsFunctionDefinition => _functionDefinitionIndex >= 0;
 
         internal bool IsDefinedFunction(string name) => _functions.IndexOf(name) >= 0;
+
+        internal string DefinedFunctionName => IsFunctionDefinition ? _functions.LastName : null;
 
         internal bool IsDefinedName(string name) =>
             _input.DefinedVariables.Contains(name) ||
@@ -564,7 +591,7 @@ namespace Calcpad.Core
                 ParseExpression(expression, allowAssignment);
                 if (isOuter)
                     foreach (var name in _pendingNames)
-                        if (!_boundNames.Contains(name))
+                        if (!_boundNames.Contains(name.Name))
                             ReadNames.Add(name);
             }
             finally
@@ -836,6 +863,7 @@ namespace Calcpad.Core
                             cf.Clear();
 
                         cf.Name = name;
+                        cf.SourceLine = StatementLine > 0 && StatementLine <= Line ? StatementLine : Line;
                         _functionDefinitionIndex = _functions.Add(name, cf);
                         return;
                     }

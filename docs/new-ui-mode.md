@@ -458,7 +458,7 @@ The step is not saved with the values, so the form starts again from the first s
 
 ## Diagnostics
 
-`#UI` problems are reported under `CPD-3415` by the linter and also appear at the offending line by the calculation engine when you run the document:
+`#UI` problems are reported under `CPD-3415`.
 
 | Message | Cause |
 | ------- | ----- |

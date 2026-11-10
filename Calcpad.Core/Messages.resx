@@ -374,7 +374,7 @@
         <value>Invalid inside macro definition.</value>
     </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-        <value>"There is no matching "#def".</value>
+        <value>There is no matching "#def".</value>
     </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
         <value>Invalid symbol "{0}" in macro name.</value>
@@ -393,9 +393,6 @@
     </data>
   <data name="Missing_delimiter_0_in_surface_map_command_1" xml:space="preserve">
         <value>Missing delimiter "{0}" in surface map command "{1}".</value>
-    </data>
-  <data name="Function_redefined" xml:space="preserve">
-        <value> Warning! Function redefined.</value>
     </data>
   <data name="Raise_to_square" xml:space="preserve">
     <value>Raise to square</value>
@@ -657,6 +654,9 @@
   </data>
   <data name="A_UI_value_has_the_wrong_type" xml:space="preserve">
     <value>A #UI value has the wrong type.</value>
+  </data>
+  <data name="A_settings_value_has_the_wrong_type" xml:space="preserve">
+    <value>A #settings value has the wrong type.</value>
   </data>
   <data name="Missing_path_value_0" xml:space="preserve">
     <value>{0} requires a path.</value>

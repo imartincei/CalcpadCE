@@ -140,8 +140,13 @@ Array<{
   message: string;
   source: "Macro" | "Expression";
   code: string;         // CPD-xxxx, shared with /lint where both report the same problem
+  kind: "Syntax" | "Structure" | "Names" | "Values";
+  startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
+  endColumn: number;
 }>
 ```
+
+Columns are in the text Core ran, so on lines changed by macros or `#include` they may not line up with the source.
 
 The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 
@@ -499,8 +504,18 @@ interface LintDiagnostic {
   severity: string;    // "error", "warning", or "information"
   severityId: number;  // 0=Error, 1=Warning, 2=Information
   source: string;      // Default: "Calcpad Linter"
+  related?: LintRelatedLocation[];  // Linked locations; null when none
+}
+
+interface LintRelatedLocation {
+  line: number;
+  column: number;
+  endColumn: number;
+  message: string;
 }
 ```
+
+An error in a macro or custom function body found at a call is reported on the call, with `related` pointing at the body. The first call that finds it also gets a diagnostic on the body text, with `related` pointing back at the call. A custom function body is judged at its first call: a name it reads must be defined by then.
 
 **Error Codes:**
 

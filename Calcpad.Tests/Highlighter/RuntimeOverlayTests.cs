@@ -23,6 +23,24 @@ namespace Calcpad.Tests.Highlighter
             return withTrace ? ContentResolver.ApplyRuntimeTrace(staged, RunCore(source)) : staged;
         }
 
+        [Theory]
+        [InlineData("#def m$(x$) = x$ + zzq\nr = m$(2)", 0, 1)]
+        [InlineData("#def m$(x$)\n\ty = x$ + zzq\n#end def\nm$(2)", 1, 3)]
+        [InlineData("f(x) = x + zzq\nr = f(2)\nzzq = 1", 0, 1)]
+        public void BodyErrorOnExecutedLine_IsKeptWithTheTrace(string source, int bodyLine, int callLine)
+        {
+            var lines = new CalcpadLinter().Lint(Resolve(source, withTrace: true)).Diagnostics
+                .Where(d => d.Code == "CPD-3301").Select(d => d.Line).Order();
+            Assert.Equal([bodyLine, callLine], lines);
+        }
+
+        [Fact]
+        public void UncalledFunctionBodyError_IsKeptWithTheTrace()
+        {
+            var diagnostics = new CalcpadLinter().Lint(Resolve("f(x) = x + zzq\ny = 1", withTrace: true)).Diagnostics;
+            Assert.Single(diagnostics, d => d.Code == "CPD-3301" && d.Line == 0);
+        }
+
         [Fact]
         public void TypeChanges_StartOnTheirAssignmentLines()
         {

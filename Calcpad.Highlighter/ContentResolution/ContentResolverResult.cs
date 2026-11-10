@@ -176,6 +176,9 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>Column in the call site line of each character, or -1 for macro body text.</summary>
         public IReadOnlyList<int> SourceColumns { get; set; }
+
+        /// <summary>Stage 2 line and column of each character, or (-1, -1) when it was not read from the source.</summary>
+        public IReadOnlyList<(int Line, int Column)> Origins { get; set; }
     }
 
     /// <summary>A line a macro call expanded to.</summary>

@@ -50,5 +50,14 @@ namespace Calcpad.Highlighter.Linter.Models
         /// Line/Column/EndColumn range.
         /// </summary>
         public List<DiagnosticRange> AdditionalRanges { get; set; }
+
+        /// <summary>Other places this error involves, such as the macro or function body behind a call.</summary>
+        public List<DiagnosticRelated> Related { get; set; }
+    }
+
+    /// <summary>An original source location linked to a diagnostic.</summary>
+    public class DiagnosticRelated : DiagnosticRange
+    {
+        public string Message { get; set; }
     }
 }

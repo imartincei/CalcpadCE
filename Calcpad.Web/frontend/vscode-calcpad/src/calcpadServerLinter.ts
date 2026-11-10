@@ -37,7 +37,7 @@ export class CalcpadServerLinter {
             const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`, useTrace);
 
             if (lintResponse) {
-                const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics);
+                const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics, document.uri);
                 this.diagnosticCollection.set(document.uri, diagnostics);
             } else {
                 this.diagnosticCollection.set(document.uri, []);
@@ -59,7 +59,7 @@ export class CalcpadServerLinter {
         }
     }
 
-    private convertToDiagnostics(serverDiagnostics: LintDiagnostic[]): vscode.Diagnostic[] {
+    private convertToDiagnostics(serverDiagnostics: LintDiagnostic[], uri: vscode.Uri): vscode.Diagnostic[] {
         const minSeverity = this.getMinimumSeverity();
 
         return serverDiagnostics
@@ -78,6 +78,9 @@ export class CalcpadServerLinter {
                 );
                 diagnostic.code = d.code;
                 diagnostic.source = d.source;
+                diagnostic.relatedInformation = d.related?.map(r => new vscode.DiagnosticRelatedInformation(
+                    new vscode.Location(uri, new vscode.Range(r.line, r.column, r.line, r.endColumn)),
+                    r.message));
                 return diagnostic;
             })
             .filter(d => d.severity <= minSeverity);

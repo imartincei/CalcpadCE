@@ -144,7 +144,7 @@ namespace Calcpad.Core
             new(Messages.Undefined_input_field, "CPD-5107", K.Syntax);
 
         internal static MathParserException UndefinedVariableOrUnits(string s) =>
-            new(string.Format(Messages.Undefined_variable_or_units_0, s), "CPD-3301", K.Names);
+            new(string.Format(Messages.Undefined_variable_or_units_0, s), "CPD-3301", K.Names) { Name = s };
 
         internal static MathParserException ErrorEvaluatingAsFunction(string s) =>
             new(string.Format(Messages.Error_evaluating_0_as_function, s), "CPD-5301", K.Names);
