@@ -5137,7 +5137,7 @@ A <a href="#multi-story-frame">five-storey three-bay reinforced concrete frame</
 <p><span class="eq"><var>z</var><sub>J</sub> ( <var>j</var> )  = <b>slice</b> ( <var><span class="vec">⃗</span>Z</var>; 3 · <var>j</var> − 2; 3 · <var>j</var> ) </span></p>
 <p><span class="eq"><var>z</var> ( <var>j</var> )  = <b>round</b><span class="b1">(</span><span class="dvc"><var>z</var><sub>J</sub>  ( <var>j</var> ) <span class="dvl"></span><var>δz</var></span><span class="b1">)</span> · <var>δz</var> · 1000 · <span class="b0">[</span><var>mm</var>; <var>mm</var>; 1<span class="b0">]</span></span></p>
 <p><b>Support reactions</b></p> 
-<p><span class="eq"><var>r</var> ( <var>i</var> )  = <b>row</b> ( <b><var>c</var></b>; <var>i</var> ) </span> , <span class="eq"><var>j</var> ( <var>i</var> )  = <b>take</b> ( 1; <var>r</var>  ( <var>i</var> )  ) <b class="err" title = " Warning! Function redefined."> !!!</b></span></p>
+<p><span class="eq"><var>r</var> ( <var>i</var> )  = <b>row</b> ( <b><var>c</var></b>; <var>i</var> ) </span> , <span class="eq"><var>j</var> ( <var>i</var> )  = <b>take</b> ( 1; <var>r</var>  ( <var>i</var> )  ) </span></p>
 <p><span class="eq"><var>R</var> ( <var>i</var> )  = -<var>z</var><sub>J</sub>  ( <var>j</var>  ( <var>i</var> )  )  · <span class="b0">[</span><var>m</var>; <var>m</var>; 1<span class="b0">]</span> · <b>last</b> ( <var>r</var>  ( <var>i</var> ) ; 3 ) </span></p>
 <p>Joint <b>J1 -</b> <span class="eq"><var>R</var>  ( 1 )  = <b class="b0">[</b>8.2 <i>kN</i> 571.78 <i>kN</i> 0 <i>kNm</i><b class="b0">]</b></span> </p> 
 <p>Joint <b>J2 -</b> <span class="eq"><var>R</var>  ( 2 )  = <b class="b0">[</b>0.174 <i>kN</i> 1027.2 <i>kN</i> 0 <i>kNm</i><b class="b0">]</b></span> </p> 
