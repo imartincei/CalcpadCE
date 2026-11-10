@@ -98,6 +98,9 @@ namespace Calcpad.Highlighter.Linter.Models
                 case LineStage.Stage3:
                     if (Stage2Context != null && Stage3Context != null)
                     {
+                        if (TryMapToIncludeLine(diagnostic))
+                            break;
+
                         // Use full mapping with line continuation support
                         var mapped = SourceMapper.MapPositionToOriginal(
                             diagnostic.StageLine,
@@ -128,6 +131,26 @@ namespace Calcpad.Highlighter.Linter.Models
                     }
                     break;
             }
+        }
+
+        // The #include line has none of the included text, so all of it is marked
+        private bool TryMapToIncludeLine(LinterDiagnostic diagnostic)
+        {
+            if (!Stage3Context.IncludeMap.TryGetValue(diagnostic.StageLine, out var source) || source.Source != "include")
+                return false;
+
+            var stage2Line = Stage3Context.Stage3ToStage2Map.GetValueOrDefault(diagnostic.StageLine, diagnostic.StageLine);
+            var stage1Line = Stage2Context.Stage2ToStage1Map.GetValueOrDefault(stage2Line, stage2Line);
+            if (stage1Line < 0 || stage1Line >= Stage1Context.Lines.Count)
+                return false;
+
+            var text = Stage1Context.Lines[stage1Line];
+            diagnostic.Line = SourceMapper.MapStage1ToOriginal(stage1Line, Stage1Context);
+            diagnostic.Column = text.Length - text.TrimStart().Length;
+            diagnostic.EndColumn = text.TrimEnd().Length;
+            diagnostic.AdditionalRanges = null;
+            diagnostic.Message = $"{System.IO.Path.GetFileName(source.SourceFile)} line {source.OriginalLine + 1}: {diagnostic.Message}";
+            return true;
         }
     }
 }
