@@ -9,10 +9,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
     /// Reports Core's check pass. Names and Values errors on lines the last run executed are
-    /// left to the run, which knows the order and values.
+    /// left to the run, which knows the order and values, and so are #settings and #UI errors.
     /// </summary>
     public class CoreCheckValidator
     {
+        private static readonly HashSet<string> DirectiveCodes = ["CPD-3413", "CPD-3415"];
+
         public void Validate(Stage3Context stage3, IReadOnlyList<CalcpadError> errors, LinterResult result)
         {
             foreach (var error in errors)
@@ -21,7 +23,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (line < 0 || line >= stage3.Lines.Count)
                     continue;
 
-                if (error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
+                if ((error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values || DirectiveCodes.Contains(error.Code)) &&
                     stage3.Runtime?.GetExecution(line) == LineExecution.Executed)
                     continue;
 

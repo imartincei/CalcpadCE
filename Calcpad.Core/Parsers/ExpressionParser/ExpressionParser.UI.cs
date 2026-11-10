@@ -54,31 +54,39 @@ namespace Calcpad.Core
         private KeywordResult ParseKeywordUi(ReadOnlySpan<char> s)
         {
             ResetUiState();
+            // A skipped line is neither checked nor run
+            if (_calculate && !(_condition.IsSatisfied && (_loops.Count == 0 || !_loops.Peek().IsBroken)))
+            {
+                _uiSkipChars = s.Length;
+                return KeywordResult.None;
+            }
             var cursor = UiKeyword.Length;
             while (cursor < s.Length && s[cursor] == ' ')
                 ++cursor;
 
             var properties = new UiDto();
+            int jsonStart = cursor, jsonEnd = cursor;
             if (cursor < s.Length && s[cursor] == '{')
             {
                 var braceEnd = s.IndexOf('}');
                 if (braceEnd < 0)
                 {
-                    AppendError(s.ToString(), Messages.Improper_format_for_UI_keyword_Missing_closing_brace, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                    UiError(s, Messages.Improper_format_for_UI_keyword_Missing_closing_brace, cursor, s.Length);
                     _uiSkipChars = s.Length;
                     return KeywordResult.None;
                 }
+                jsonEnd = braceEnd + 1;
                 try
                 {
-                    properties = UiDto.Parse(s[cursor..(braceEnd + 1)].ToString()) ?? new UiDto();
+                    properties = UiDto.Parse(s[cursor..jsonEnd].ToString()) ?? new UiDto();
                 }
                 catch (JsonException)
                 {
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, UiKeyword), _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
-                    _uiSkipChars = SkipSpaces(s, braceEnd + 1);
+                    UiError(s, IsJson(s[cursor..jsonEnd]) ? Messages.A_UI_value_has_the_wrong_type : string.Format(Messages.Invalid_JSON_in_0, UiKeyword), jsonStart, jsonEnd);
+                    _uiSkipChars = SkipSpaces(s, jsonEnd);
                     return KeywordResult.None;
                 }
-                _uiSkipChars = SkipSpaces(s, braceEnd + 1);
+                _uiSkipChars = SkipSpaces(s, jsonEnd);
             }
             else
                 _uiSkipChars = cursor;
@@ -87,7 +95,7 @@ namespace Calcpad.Core
             if (errors.Count > 0)
             {
                 foreach (var error in errors)
-                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                    UiError(s, error.Message, jsonStart, jsonEnd);
 
                 return KeywordResult.None;
             }
@@ -99,25 +107,25 @@ namespace Calcpad.Core
             {
                 if (assignment.Name.EndsWith('$'))
                 {
-                    AppendError(s.ToString(), Messages.Only_numbers_are_supported_by_the_UI_keyword, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                    UiError(s, Messages.Only_numbers_are_supported_by_the_UI_keyword, _uiSkipChars, s.Length);
                     return KeywordResult.None;
                 }
                 var type = UiSyntax.ResolveType(properties.Type, assignment.Rhs);
                 if (!UiSyntax.IsValue(assignment.Rhs, type, properties.AllowsExpression))
                 {
-                    AppendError(s.ToString(), Messages.UI_expressions_require_allowExpression, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                    UiError(s, Messages.UI_expressions_require_allowExpression, _uiSkipChars, s.Length);
                     return KeywordResult.None;
                 }
                 if (UiSyntax.TypeMismatch(properties.Type, assignment.Rhs, properties.AllowsExpression) is { } mismatch)
                 {
-                    AppendError(s.ToString(), mismatch, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                    UiError(s, mismatch, _uiSkipChars, s.Length);
                     return KeywordResult.None;
                 }
                 var typeErrors = properties.ValidateResolvedType(type);
                 if (typeErrors.Count > 0)
                 {
                     foreach (var error in typeErrors)
-                        AppendError(s.ToString(), error.Message, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                        UiError(s, error.Message, _uiSkipChars, s.Length);
 
                     return KeywordResult.None;
                 }
@@ -138,7 +146,9 @@ namespace Calcpad.Core
                     }
                     catch (MathParserException ex)
                     {
-                        AppendError(s.ToString(), ex, _currentLine);
+                        var (from, to) = hasDeclaredShape ? (jsonStart, jsonEnd) : (_uiSkipChars, s.Length);
+                        (from, to) = from < to ? KeywordColumns(from, to) : KeywordColumns(0, s.Length);
+                        AppendError(s.ToString(), ex, _currentLine, from, to);
                         _lineUiControls = null;
                         return KeywordResult.None;
                     }
@@ -171,9 +181,29 @@ namespace Calcpad.Core
             if (_lineUiControls.Count == 0)
             {
                 _lineUiControls = null;
-                AppendError(s.ToString(), Messages.The_UI_keyword_requires_a_variable_assignment, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax);
+                UiError(s, Messages.The_UI_keyword_requires_a_variable_assignment, _uiSkipChars, s.Length);
             }
             return KeywordResult.None;
+        }
+
+        private static bool IsJson(ReadOnlySpan<char> s)
+        {
+            try
+            {
+                using var _ = JsonDocument.Parse(s.ToString());
+                return true;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+        }
+
+        // An empty span, as with nothing after #UI, covers the whole directive
+        private void UiError(ReadOnlySpan<char> s, string message, int from, int to)
+        {
+            var (start, end) = from < to ? KeywordColumns(from, to) : KeywordColumns(0, s.Length);
+            AppendError(s.ToString(), message, _currentLine, "CPD-3415", CalcpadErrorKind.Syntax, start, end);
         }
 
         private UiPropertyMetadata TakeUiControl(string expression)

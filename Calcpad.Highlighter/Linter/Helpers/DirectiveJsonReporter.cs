@@ -49,23 +49,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
         public void WarnInvalidJson() =>
             Warn(string.Format(Messages.Invalid_JSON_in_0, _directive));
 
-        /// <summary>
-        /// Parses the payload, returning null and reporting the failure when it is malformed.
-        /// The caller owns the returned document.
-        /// </summary>
-        public JsonDocument TryParse(string json)
-        {
-            try
-            {
-                return JsonDocument.Parse(json);
-            }
-            catch (JsonException)
-            {
-                WarnInvalidJson();
-                return null;
-            }
-        }
-
         public bool RequireObject(JsonElement root)
         {
             if (root.ValueKind == JsonValueKind.Object)

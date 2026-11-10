@@ -21,6 +21,8 @@ namespace Calcpad.Core
         private int _currentLine;
         // Column of the parsed text in the current line, or -1 when unknown
         private int _lineOffset = -1;
+        // Column where the keyword line's trimmed text starts, or -1
+        private int _keywordOffset = -1;
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
@@ -140,7 +142,7 @@ namespace Calcpad.Core
                         // #UI metadata is scoped to the line that declared it. Clearing here
                         // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
                         ResetUiState();
-                        _lineOffset = -1;
+                        _lineOffset = _keywordOffset = -1;
                         ref var currentLineCache = ref _lineCache[_currentLine];
                         var keyword = currentLineCache.Keyword;
                         if (keyword == Keyword.SkipLine)
@@ -232,6 +234,7 @@ namespace Calcpad.Core
                         _parser.IsConst = false;
                         if (Trace is not null)
                             TraceExpression(null);
+                        _keywordOffset = lineOffset;
                         var result = ParseKeyword(textSpan, ref keyword);
                         if (keyword != currentLineCache.Keyword)
                             _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
@@ -256,7 +259,7 @@ namespace Calcpad.Core
                             continue;
                         }
                         _parser.IsCalculation = _isVal != -1;
-                        if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
+                        if ((textSpan[0] != '$' || !ParsePlot(textSpan, lineOffset)) &&
                             ParseCondition(textSpan, keyword))
                         {
                             List<Token> tokens;
@@ -344,7 +347,7 @@ namespace Calcpad.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool CheckIsLineExtension(char c) => c < 128 && IsLineExtension[c];
 
-            bool ParsePlot(ReadOnlySpan<char> s)
+            bool ParsePlot(ReadOnlySpan<char> s, int lineOffset)
             {
                 if (s.StartsWith("$plot", StringComparison.OrdinalIgnoreCase) ||
                     s.StartsWith("$map", StringComparison.OrdinalIgnoreCase))
@@ -361,13 +364,16 @@ namespace Calcpad.Core
                         {
                             _parser.IsPlotting = true;
                             var s1 = plotParser.Parse(s, _calculate);
-                            _parser.ReadNames?.RemoveAll(plotParser.Variables.Contains);
+                            _parser.ReadNames?.RemoveAll(n => plotParser.Variables.Contains(n.Name));
+                            if (_isCheck)
+                                TakeReadNames(_currentLine, _parser.Line, nameColumn: lineOffset);
                             _sb.Append(InsertAttribute(s1, HtmlId));
                         }
                         catch (MathParserException ex)
                         {
                             _parser.ReadNames?.Clear();
-                            AppendError(s.ToString(), ex, _currentLine);
+                            var (start, end) = lineOffset < 0 ? (-1, -1) : ErrorColumns(lineOffset, s, ex.Position, ex.EndPosition);
+                            AppendError(s.ToString(), ex, _currentLine, start, end);
                         }
                         finally
                         {
@@ -730,7 +736,8 @@ namespace Calcpad.Core
                         else if (_isCheck)
                         {
                             var (start, end) = ErrorColumns(token, -1);
-                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition);
+                            var nameColumn = ui is null && _lineOffset >= 0 && token.Start >= 0 ? _lineOffset + token.Start : -1;
+                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition, nameColumn);
                         }
 
                         if (_calculate && _isVal > -1)
@@ -804,15 +811,15 @@ namespace Calcpad.Core
             }
         }
 
-        void AppendError(string lineContent, MathParserException ex, int line) =>
-            AppendError(lineContent, ex.Message, line, ex.Code, ex.Kind);
+        void AppendError(string lineContent, MathParserException ex, int line, int startColumn = -1, int endColumn = -1) =>
+            AppendError(lineContent, ex.Message, line, ex.Code, ex.Kind, startColumn, endColumn);
 
-        void AppendError(string lineContent, string text, int line, string code, CalcpadErrorKind kind)
+        void AppendError(string lineContent, string text, int line, string code, CalcpadErrorKind kind, int startColumn = -1, int endColumn = -1)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
             if (_isVisible)
                 _sb.Append(ErrHtml(FormatError(s, text, line), line));
-            RecordError(line, text, Debug, code, kind);
+            RecordError(line, text, Debug, code, kind, 0, startColumn, endColumn);
         }
 
         // MacroParser.Errors already lists it, so it only goes to the HTML and the summary
@@ -856,14 +863,17 @@ namespace Calcpad.Core
 
         // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
         // so those reads are judged at the end of the document or of the outermost loop.
-        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false)
+        /// <param name="nameColumn">Column of the parsed expression's start, to point at each name, or -1.</param>
+        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false, int nameColumn = -1)
         {
             if (_parser?.ReadNames is not { Count: > 0 } names)
                 return;
 
-            foreach (var name in names)
+            foreach (var (name, at) in names)
             {
-                var read = new ReadName(name, line, sourceLine, start, end);
+                var read = nameColumn >= 0 && at >= 0
+                    ? new ReadName(name, line, sourceLine, nameColumn + at, nameColumn + at + name.Length)
+                    : new ReadName(name, line, sourceLine, start, end);
                 if (_checkLoops.Count != 0)
                 {
                     if (!isFunction)
@@ -911,13 +921,13 @@ namespace Calcpad.Core
         }
 
         // The failing word when the tokenizer found the position, otherwise the whole expression
-        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1)
-        {
-            if (_lineOffset < 0 || token.Start < 0)
-                return (-1, -1);
+        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1) =>
+            _lineOffset < 0 || token.Start < 0
+                ? (-1, -1)
+                : ErrorColumns(_lineOffset + token.Start, token.Value, position, endPosition);
 
-            var offset = _lineOffset + token.Start;
-            var value = token.Value.AsSpan();
+        private static (int Start, int End) ErrorColumns(int offset, ReadOnlySpan<char> value, int position, int endPosition)
+        {
             if (position >= 0 && endPosition > position && endPosition <= value.Length)
                 return (offset + position, offset + endPosition);
             if (position < 0 || position > value.Length)
@@ -942,6 +952,9 @@ namespace Calcpad.Core
 
             static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '.';
         }
+
+        private (int Start, int End) KeywordColumns(int from, int to) =>
+            _keywordOffset < 0 || to <= from ? (-1, -1) : (_keywordOffset + from, _keywordOffset + to);
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";
         private string FormatError(string expr, string msg, int line) =>

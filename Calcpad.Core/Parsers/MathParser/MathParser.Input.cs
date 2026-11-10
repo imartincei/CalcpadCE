@@ -247,6 +247,8 @@ namespace Calcpad.Core
                                 else
                                 {
                                     t = MakeRealValueToken(tokenLiteral.ToString());
+                                    if (trackPositions)
+                                        t.Start = tokenLiteral.Start;
                                     tokens.Enqueue(t);
                                     tokenLiteral.Reset(i);
                                     if (!unitsLiteral.IsEmpty)
@@ -294,10 +296,12 @@ namespace Calcpad.Core
                                         if (!tokenLiteral.IsEmpty)
                                             t = MakeUnitToken(s, true);
                                     }
-                                    else if (Validator.UnitChars.Contains(s[0]))
-                                        t = MakeUnitToken(s, true);
                                     else
-                                        t = new VariableToken(s, null);
+                                    {
+                                        t = Validator.UnitChars.Contains(s[0]) ? MakeUnitToken(s, true) : new VariableToken(s, null);
+                                        if (trackPositions)
+                                            t.Start = tokenLiteral.Start;
+                                    }
                                 }
                                 tokens.Enqueue(t);
                                 if (t.Type == TokenTypes.Array)
@@ -472,6 +476,8 @@ namespace Calcpad.Core
                                 if (bracketCounter == 0)
                                 {
                                     int index;
+                                    var nameOffset = _parser.NameOffset;
+                                    _parser.NameOffset = trackPositions && nameOffset >= 0 ? nameOffset + solverOpen + 1 : -1;
                                     try
                                     {
                                         index = AddSolver(ts.ToString(), st);
@@ -480,6 +486,10 @@ namespace Calcpad.Core
                                     {
                                         ex.Shift(trackPositions ? solverOpen + 1 : -1);
                                         throw;
+                                    }
+                                    finally
+                                    {
+                                        _parser.NameOffset = nameOffset;
                                     }
                                     t = new Token(string.Empty, TokenTypes.Solver) { Index = index };
                                     tokens.Enqueue(t);
@@ -737,14 +747,14 @@ namespace Calcpad.Core
                     if (variables.TryGetValue(s, out var v))
                     {
                         if (ReferenceEquals(variables, _variables))
-                            _parser.RecordReadName(s);
+                            _parser.RecordReadName(s, vt.Start);
                         vt.Variable = v;
                         return;
                     }
                 if (mustExist)
                     throw Exceptions.VariableNotExist(vt.Content);
 
-                _parser.RecordReadName(s);
+                _parser.RecordReadName(s, vt.Start);
                 var topLocalVariables = _localVariables.Peek();
                 var newVar = new Variable();
                 topLocalVariables.Add(s, newVar);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Frozen;
+﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 
 namespace Calcpad.Core
@@ -364,8 +365,21 @@ namespace Calcpad.Core
 
                 var correctOrder = CorrectOrder[OrderIndex[ptt], OrderIndex[ctt]];
                 if (!correctOrder)
-                    throw Exceptions.InvalidSyntax(pt.Content, ct.Content);
+                {
+                    var ex = Exceptions.InvalidSyntax(pt.Content, ct.Content);
+                    var start = pt.Start >= 0 ? pt.Start : ct.Start;
+                    if (start >= 0)
+                    {
+                        ex.Position = start;
+                        ex.EndPosition = ct.Start >= 0 ? ct.Start + SourceLength(ct) : start + SourceLength(pt);
+                    }
+                    throw ex;
+                }
             }
+
+            // Units are stored as <i>name</i>
+            private static int SourceLength(Token t) =>
+                Math.Max(1, t.Content.StartsWith("<i>") ? t.Content.Length - 7 : t.Content.Length);
         }
     }
 }

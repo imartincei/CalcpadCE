@@ -107,7 +107,7 @@ namespace Calcpad.Core
         private static Keyword GetKeyword(ReadOnlySpan<char> s)
         {
             var n = Math.Min(MaxKeywordLength, s.Length - 1);
-            if (n < 3)
+            if (n < 2)
                 return Keyword.None;
 
             var i = char.ToLowerInvariant(s[1]) - 'a';
@@ -170,7 +170,10 @@ namespace Calcpad.Core
                 if (_condition.IsSatisfied || !_calculate)
                 {
                     var end = s.IndexOfAny(' ', '\t');
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, (end < 0 ? s : s[..end]).ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax);
+                    if (end < 0)
+                        end = s.Length;
+                    var (from, to) = KeywordColumns(0, end);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, s[..end].ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax, from, to);
                 }
                 return KeywordResult.Continue;
             }
@@ -799,9 +802,12 @@ namespace Calcpad.Core
             SettingsDto prior = new();
             _settingsStack.Push(prior);
             var json = s[SettingsKeyword.Length..].Trim();
+            var jsonStart = s.Length - s[SettingsKeyword.Length..].TrimStart().Length;
+            var (from, to) = json.IsEmpty ? KeywordColumns(0, s.Length) : KeywordColumns(jsonStart, jsonStart + json.Length);
+            var text = s.ToString();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
                 return;
             }
             try
@@ -815,7 +821,7 @@ namespace Calcpad.Core
                 foreach (var error in dto.Validate())
                 {
                     (invalid ??= []).Add(error.Key);
-                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                    SettingsError(error.Message);
                 }
 
                 foreach (SettingKey key in Enum.GetValues<SettingKey>())
@@ -824,8 +830,11 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(IsJson(json) ? Messages.A_settings_value_has_the_wrong_type : string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
             }
+
+            void SettingsError(string message) =>
+                AppendError(text, message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax, from, to);
         }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)

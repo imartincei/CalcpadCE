@@ -350,7 +350,7 @@
     <value>无效的内部宏定义.</value>
   </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-    <value>"没有匹配的 "#def".</value>
+    <value>没有匹配的 "#def".</value>
   </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
     <value>宏名称中的符号 "{0}" 无效.</value>

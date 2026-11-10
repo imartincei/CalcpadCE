@@ -60,7 +60,7 @@
             internal long Index = -1;
             internal TokenTypes Type;
             internal sbyte Order = DefaultOrder;
-            // Offset in the line's expression; only set for function names and brackets
+            // Offset in the line's expression, or -1
             internal int Start = -1;
             internal const sbyte DefaultOrder = -1;
             internal Token(string content, TokenTypes type)

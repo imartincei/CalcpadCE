@@ -95,20 +95,20 @@ namespace Calcpad.Highlighter.Linter
             return Task.Run(() => Lint(staged, ignoreRegions));
         }
 
-        // One diagnostic per line and code, keeping the static check's
+        // Static checks hide the Core codes they cover on their line; Core's own repeats share a span
         private static void RemoveDuplicates(LinterResult result)
         {
-            var seen = new HashSet<(int, string)>();
+            var covered = new HashSet<(int, string)>();
+            var spans = new HashSet<(int, string, int, int)>();
             var duplicates = new HashSet<LinterDiagnostic>();
             foreach (var d in result.Diagnostics.OrderBy(d => d.Origin))
             {
                 if (d.Origin == DiagnosticOrigin.Static)
                 {
-                    seen.Add((d.Line, d.Code));
                     foreach (var code in CoveredCoreCodes.GetValueOrDefault(d.Code, []))
-                        seen.Add((d.Line, code));
+                        covered.Add((d.Line, code));
                 }
-                else if (!seen.Add((d.Line, d.Code)))
+                else if (covered.Contains((d.Line, d.Code)) || !spans.Add((d.Line, d.Code, d.Column, d.EndColumn)))
                     duplicates.Add(d);
             }
             if (duplicates.Count > 0)

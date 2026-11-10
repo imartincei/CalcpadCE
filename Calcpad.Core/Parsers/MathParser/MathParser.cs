@@ -515,23 +515,32 @@ namespace Calcpad.Core
         }
 
         /// <summary>Check pass only: global names read by each parsed expression, less its own parameters and counters.</summary>
-        internal List<string> ReadNames { get; set; }
-        private readonly List<string> _pendingNames = [];
+        internal List<ReadName> ReadNames { get; set; }
+        private readonly List<ReadName> _pendingNames = [];
+
+        /// <summary>A name and its offset in the outermost parsed expression, or -1.</summary>
+        internal readonly record struct ReadName(string Name, int Start);
+
+        /// <summary>Where the expression being parsed starts in the outermost one.</summary>
+        internal int NameOffset { get; set; }
         private readonly HashSet<string> _boundNames = new(StringComparer.Ordinal);
         private int _parseDepth;
         // lu() creates "ind" when it runs
         private bool _hasLu;
 
-        internal void RecordReadName(string name)
+        internal void RecordReadName(string name, int start)
         {
             if (ReadNames is not null)
-                _pendingNames.Add(name);
+                _pendingNames.Add(new(name, start >= 0 && NameOffset >= 0 ? NameOffset + start : -1));
         }
 
         internal void UnrecordReadName(string name)
         {
-            if (ReadNames is not null)
-                _pendingNames.Remove(name);
+            if (ReadNames is null)
+                return;
+            var i = _pendingNames.FindIndex(n => n.Name == name);
+            if (i >= 0)
+                _pendingNames.RemoveAt(i);
         }
 
         internal void BindName(string name)
@@ -564,7 +573,7 @@ namespace Calcpad.Core
                 ParseExpression(expression, allowAssignment);
                 if (isOuter)
                     foreach (var name in _pendingNames)
-                        if (!_boundNames.Contains(name))
+                        if (!_boundNames.Contains(name.Name))
                             ReadNames.Add(name);
             }
             finally

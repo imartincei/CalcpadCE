@@ -1582,7 +1582,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &quot;There is no matching &quot;#def&quot;..
+        // /   Looks up a localized string similar to There is no matching &quot;#def&quot;..
         // / </summary>
         public static string There_is_no_matching_def {
             get {
@@ -1857,6 +1857,15 @@ namespace Calcpad.Core {
         public static string A_UI_value_has_the_wrong_type {
             get {
                 return ResourceManager.GetString("A_UI_value_has_the_wrong_type", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to A #settings value has the wrong type..
+        // / </summary>
+        public static string A_settings_value_has_the_wrong_type {
+            get {
+                return ResourceManager.GetString("A_settings_value_has_the_wrong_type", resourceCulture);
             }
         }
 

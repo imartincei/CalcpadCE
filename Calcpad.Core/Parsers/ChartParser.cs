@@ -12,34 +12,7 @@ namespace Calcpad.Core
         {
             const int n = 4;
             ReadOnlySpan<char> delimiters = ['{', '@', '=', ':', '}'];
-            var input = new string[4];
-            var index = 0;
-            var bracketCount = 0;
-            var ts = new TextSpan(script);
-            var del = delimiters[0];
-            for (int i = 0, len = script.Length; i < len; ++i)
-            {
-                var c = script[i];
-                if (c == '{')
-                    ++bracketCount;
-
-                if (c == del && bracketCount == 1)
-                {
-                    if (index > 0)
-                        input[index - 1] = ts.Cut().Trim().ToString();
-
-                    ++index;
-                    if (index > n)
-                        break;
-                    del = delimiters[index];
-                    ts.Reset(i + 1);
-                }
-                else
-                    ts.Expand();
-
-                if (c == '}')
-                    --bracketCount;
-            }
+            var input = Split(script, delimiters, out var index);
             if (index <= 4)
                 throw Exceptions.MissingPlotDelimiter(delimiters[index], script.ToString());
 
@@ -51,34 +24,30 @@ namespace Calcpad.Core
             string result;
             if (calculate)
             {
-                var charts = input[0].Split('&');
+                var charts = Split(input[0], Offsets[0], '&');
                 input[1] = input[1].Trim();
-                ReadOnlySpan<Parameter> parameters = [new(input[1])];
+                Parameter[] parameters = [new(input[1])];
                 var count = charts.Length;
                 _fx = new Func<IValue>[count];
                 _fy = new Func<IValue>[count];
                 for (int i = 0; i < count; ++i)
                 {
-                    var xy = charts[i].Split('|');
+                    var xy = Split(charts[i].Text, charts[i].Offset, '|');
                     if (xy.Length > 2)
                         throw Exceptions.MultiplePlotDelimiters(script.ToString());
                     else if (xy.Length > 0)
                     {
                         if (xy.Length == 1)
-                            _fy[i] = Parser.Compile(xy[0], parameters);
+                            _fy[i] = Compile(xy[0].Text, xy[0].Offset, parameters);
                         else
                         {
-                            _fx[i] = Parser.Compile(xy[0], parameters);
-                            _fy[i] = Parser.Compile(xy[1], parameters);
+                            _fx[i] = Compile(xy[0].Text, xy[0].Offset, parameters);
+                            _fy[i] = Compile(xy[1].Text, xy[1].Offset, parameters);
                         }
                     }
                 }
-                Parser.Parse(input[2]);
-                var left = Parser.CalculateReal();
-                var leftUnits = Parser.Units;
-                Parser.Parse(input[3]);
-                var right = Parser.CalculateReal();
-                var rightUnits = Parser.Units;
+                var left = Calculate(input[2], Offsets[2], out var leftUnits);
+                var right = Calculate(input[3], Offsets[3], out var rightUnits);
                 if (!Unit.IsConsistent(leftUnits, rightUnits))
                     throw Exceptions.InconsistentUnits(Unit.GetText(leftUnits), Unit.GetText(rightUnits));
 
@@ -104,40 +73,32 @@ namespace Calcpad.Core
 
         private string GetHtmlText(string[] input)
         {
-            var charts = input[0].Split('&');
-            var index = 0;
+            var charts = Split(input[0], Offsets[0], '&');
+            var html = new string[charts.Length];
             input[1] = input[1].Trim();
-            foreach (var s in charts)
+            for (int i = 0; i < charts.Length; ++i)
             {
-                var xy = s.Split('|');
+                var xy = Split(charts[i].Text, charts[i].Offset, '|');
                 if (xy.Length > 2)
                     throw Exceptions.MultiplePlotDelimiters(input[0]);
-                else if (xy.Length > 0)
+
+                string sx, sy;
+                if (xy.Length == 1)
                 {
-                    string sx, sy;
-                    if (xy.Length == 1)
-                    {
-                        Parser.Parse(input[1]);
-                        sx = Parser.ToHtml();
-                        Parser.Parse(xy[0]);
-                        sy = Parser.ToHtml();
-                    }
-                    else
-                    {
-                        Parser.Parse(xy[0]);
-                        sx = Parser.ToHtml();
-                        Parser.Parse(xy[1]);
-                        sy = Parser.ToHtml();
-                    }
-                    charts[index] = string.Concat(sx," | ", sy);
-                    index++;
+                    sx = ToHtml(input[1], Offsets[1]);
+                    sy = ToHtml(xy[0].Text, xy[0].Offset);
                 }
+                else
+                {
+                    sx = ToHtml(xy[0].Text, xy[0].Offset);
+                    sy = ToHtml(xy[1].Text, xy[1].Offset);
+                }
+                html[i] = string.Concat(sx, " | ", sy);
             }
-            input[0] = string.Join(" & ", charts);
+            input[0] = string.Join(" & ", html);
             for (int i = 1, len = input.Length; i < len; ++i)
             {
-                Parser.Parse(input[i]);
-                input[i] = Parser.ToHtml();
+                input[i] = ToHtml(input[i], Offsets[i]);
             }
             return string.Concat("<span class = \"eq\"><span class=\"cond\">$Plot</span>{", input[0], " @ ", input[1], " ∈ [", input[2], "; ", input[3] + "]}</span>");
         }

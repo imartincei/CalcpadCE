@@ -272,6 +272,8 @@ namespace Calcpad.Core
                 var trimmed = item.Input.TrimStart();
                 item.Offset += item.Input.Length - trimmed.Length;
                 item.Input = trimmed.TrimEnd();
+                var nameOffset = _parser.NameOffset;
+                _parser.NameOffset = nameOffset >= 0 ? nameOffset + item.Offset : -1;
                 try
                 {
                     _parser.Parse(item.Input, allowAssignment);
@@ -280,6 +282,10 @@ namespace Calcpad.Core
                 {
                     ex.Shift(item.Offset);
                     throw;
+                }
+                finally
+                {
+                    _parser.NameOffset = nameOffset;
                 }
                 item.Rpn = _parser._rpn;
             }

@@ -140,8 +140,13 @@ Array<{
   message: string;
   source: "Macro" | "Expression";
   code: string;         // CPD-xxxx, shared with /lint where both report the same problem
+  kind: "Syntax" | "Structure" | "Names" | "Values";
+  startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
+  endColumn: number;
 }>
 ```
+
+Columns are in the text Core ran, so on lines changed by macros or `#include` they may not line up with the source.
 
 The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 
