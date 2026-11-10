@@ -334,11 +334,6 @@ namespace Calcpad.Core
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            bool IsEnabled() => _condition.IsSatisfied &&
-                (_loops.Count == 0 || !_loops.Peek().IsBroken) ||
-                !_calculate;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool HasLineExtension(ReadOnlySpan<char> s) => s.EndsWith(" _") || s.Length > 0 && CheckIsLineExtension(s[^1]) && !Validator.IsComment(s);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -451,6 +446,10 @@ namespace Calcpad.Core
             bool ParseCondition(ReadOnlySpan<char> s, Keyword keyword)
             {
                 _condition.SetCondition(keyword - Keyword.If, _currentLine, _parser.Line);
+                // Unclosed skipped loops inside a closed #if block
+                while (_skippedLoops.Count > 0 && _skippedLoops.Peek() > _condition.Id)
+                    _skippedLoops.Pop();
+
                 if (IsEnabled())
                 {
                     if (_condition.KeywordLength == s.Length)
@@ -617,6 +616,7 @@ namespace Calcpad.Core
             _readNames.Clear();
             _loopReads.Clear();
             _checkDefined.Clear();
+            _skippedLoops.Clear();
             _loopErrors.Clear();
             if (_isCheck)
                 _parser.ReadNames = [];
