@@ -81,7 +81,7 @@ The tables below group them by the kind of problem.
 | CPD-3310 | Error | Undefined unit |
 | CPD-3311 | Error | Empty parameter in a function call |
 | CPD-3312 | Information | Unused variable |
-| CPD-3313 | Error | Redefinition of existing function |
+| CPD-3313 | Warning | Redefinition of existing function |
 | CPD-3314 | Error | Unknown keyword argument in a macro call |
 | CPD-3315 | Error | Unknown keyword argument in a function call |
 | CPD-3316 | Error | Duplicate keyword argument in a macro call |
