@@ -26,19 +26,6 @@ namespace Calcpad.Core
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
-        private bool _isCheck;
-        // Check pass: names each line read, and names only the run would define
-        private sealed class ReadName(string name, int line, int sourceLine, int start, int end)
-        {
-            internal readonly string Name = name;
-            internal readonly int Line = line, SourceLine = sourceLine, Start = start, End = end;
-            // Whether the name had a definition when read; null until known
-            internal bool? Defined;
-        }
-        private readonly List<ReadName> _readNames = [];
-        private readonly List<ReadName> _loopReads = [];
-        private readonly List<(ReadName Read, MathParserException Error)> _loopErrors = [];
-        private readonly HashSet<string> _checkDefined = new(StringComparer.Ordinal);
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
@@ -96,24 +83,6 @@ namespace Calcpad.Core
 
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
             Parse(sourceCode.AsSpan(), calculate, getXml);
-
-        /// <summary>
-        /// Checks every line without calculating, including untaken branches and loop bodies, and never stops.
-        /// It reads and writes no files, and it changes <see cref="Settings"/> as #settings and #round lines do.
-        /// </summary>
-        public IReadOnlyList<CalcpadError> Check(string sourceCode)
-        {
-            _isCheck = true;
-            try
-            {
-                Parse(sourceCode.AsSpan(), false, false);
-            }
-            finally
-            {
-                _isCheck = false;
-            }
-            return _errorList;
-        }
 
         private void Parse(ReadOnlySpan<char> code, bool calculate, bool getXml)
         {
@@ -619,13 +588,7 @@ namespace Calcpad.Core
             _sb.Clear();
             _condition = new();
             _loops.Clear();
-            _checkLoops.Clear();
-            _readNames.Clear();
-            _loopReads.Clear();
-            _checkDefined.Clear();
-            _loopErrors.Clear();
-            if (_isCheck)
-                _parser.ReadNames = [];
+            ResetCheckState();
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
@@ -859,84 +822,6 @@ namespace Calcpad.Core
                 EndColumn = endColumn
             });
             return true;
-        }
-
-        private void RecordWarning(string message, string code, int startColumn, int endColumn)
-        {
-            if (!_isCheck || !_errorKeys.Add((_currentLine, code, message)))
-                return;
-
-            _errorList.Add(new CalcpadError
-            {
-                SourceLine = _parser?.Line > 0 ? _parser.Line : _currentLine + 1,
-                OutputLine = _currentLine + 1,
-                Message = message,
-                Source = CalcpadErrorSource.Expression,
-                Code = code,
-                Kind = CalcpadErrorKind.Syntax,
-                Severity = CalcpadErrorSeverity.Warning,
-                StartColumn = startColumn,
-                EndColumn = endColumn
-            });
-        }
-
-        // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
-        // so those reads are judged at the end of the document or of the outermost loop.
-        /// <param name="nameColumn">Column of the parsed expression's start, to point at each name, or -1.</param>
-        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false, int nameColumn = -1)
-        {
-            if (_parser?.ReadNames is not { Count: > 0 } names)
-                return;
-
-            foreach (var (name, at) in names)
-            {
-                var read = nameColumn >= 0 && at >= 0
-                    ? new ReadName(name, line, sourceLine, nameColumn + at, nameColumn + at + name.Length)
-                    : new ReadName(name, line, sourceLine, start, end);
-                if (_checkLoops.Count != 0)
-                {
-                    if (!isFunction)
-                        _loopReads.Add(read);
-                }
-                else if (!isFunction)
-                    read.Defined = IsCheckDefined(name);
-                _readNames.Add(read);
-            }
-            names.Clear();
-        }
-
-        private void ResolveLoopReads()
-        {
-            foreach (var read in _loopReads)
-                read.Defined = IsCheckDefined(read.Name);
-            _loopReads.Clear();
-
-            // A later line of the loop may define it for the next pass
-            foreach (var (read, ex) in _loopErrors)
-            {
-                var defined = ex.Code == "CPD-3305" ? _parser.IsDefinedFunction(read.Name) : IsCheckDefined(read.Name);
-                if (!defined)
-                    RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
-            }
-            _loopErrors.Clear();
-        }
-
-        private bool IsCheckDefined(string name) => _checkDefined.Contains(name) || _parser.IsDefinedName(name);
-
-        // Names read before anything defines them, or that nothing defines at all
-        private void ReportUndefinedNames()
-        {
-            ResolveLoopReads();
-            foreach (var read in _readNames)
-            {
-                if (read.Defined ?? IsCheckDefined(read.Name))
-                    continue;
-
-                var ex = Exceptions.UndefinedVariableOrUnits(read.Name);
-                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
-            }
-            _readNames.Clear();
-            _loopReads.Clear();
         }
 
         // The failing word when the tokenizer found the position, otherwise the whole expression

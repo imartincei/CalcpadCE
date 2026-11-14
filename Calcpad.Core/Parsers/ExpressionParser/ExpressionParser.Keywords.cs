@@ -321,25 +321,6 @@ namespace Calcpad.Core
                 _isVisible = value || _isCheck;
         }
 
-        // The check pass doesn't run loops, so it tracks only their structure
-        private readonly Stack<(int Id, int Line, int SourceLine)> _checkLoops = new();
-
-        private void CheckLoopStart()
-        {
-            if (_isCheck)
-                _checkLoops.Push((_condition.Id, _currentLine, _parser.Line));
-        }
-
-        private void CheckLoopEnd(ReadOnlySpan<char> s)
-        {
-            if (_checkLoops.Count == 0)
-                AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            else if (_checkLoops.Pop().Id != _condition.Id)
-                AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            if (_checkLoops.Count == 0)
-                ResolveLoopReads();
-        }
-
         private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
         {
             FlushMarkdown();
