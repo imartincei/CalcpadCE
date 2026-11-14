@@ -366,6 +366,20 @@ Turn on **Show UI Override Hints** in [Settings](new-settings.md#editor-features
 This is the value itself on a `#UI` line with one control, or the count for a loop, macro call or `#include` line.
 Click a hint to open those values in the Properties tab.
 
+### Moving saved values into the source
+
+The **Saved #UI values** list in the [Properties tab](new-calcpad-panel.md#properties) has two buttons that act on the values listed:
+
+- **Override Defaults** writes each UI override into its `#UI` line and removes the override. Values in loops, macros and `#include` files are unaffected. If filtering by selected lines, only the selected lines have their defaults updated.
+- **Revert to defaults** removes #UI overrides so the Input form is reverted to default values. If filtering by selected lines, only the selected lines are reverted.
+
+### Auto-syncing values with the source
+
+Turn on **Auto-Sync #UI Values** in [Settings](new-settings.md#editor-features) to keep `#UI` lines in this file (excluding overrides in loops, macros, and `#include` lines) in sync with the Input form:
+
+- A value entered in the Input form is written into its `#UI` line as the default instead of being saved as an override.
+- Editing the default value on a `#UI` line removes its saved override.
+
 ## Exporting
 
 A document with `#UI` controls exports like any other — see [Exports](new-exports.md) for the
