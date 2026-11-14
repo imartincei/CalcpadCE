@@ -72,9 +72,11 @@ namespace Calcpad.Highlighter.ContentResolution
                     {
                         Source = "include",
                         SourceFile = includeNames.GetValueOrDefault(source.File, source.File),
+                        FilePath = source.File,
                         OriginalLine = includes.TryGetValue(source.File, out var included)
                             ? included.SourceMap.GetValueOrDefault(source.FileLine, source.FileLine)
-                            : source.FileLine
+                            : source.FileLine,
+                        Segments = included?.LineContinuationSegments?.GetValueOrDefault(source.FileLine)
                     };
             }
 

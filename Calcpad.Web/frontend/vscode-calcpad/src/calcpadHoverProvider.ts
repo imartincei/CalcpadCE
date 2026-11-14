@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import type { ILogger } from 'calcpad-frontend';
 import { CalcpadDefinitionsService } from './calcpadDefinitionsService';
+import { VSCodeFileSystem } from './adapters';
+import { resolveIncludeDirectiveLocation, resolveDocumentPathRoots } from './calcpadLocationResolver';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { buildBuiltinDocMarkdown, extractFunctionName } from './calcpadBuiltinDocs';
 import { getVariableTypeAt } from 'calcpad-frontend';
@@ -11,6 +13,9 @@ import type {
     CustomUnitDefinition,
 } from 'calcpad-frontend';
 
+/** Where an error the document reports at a position is, in an included file named like `sourceFile`. */
+export type IncludedErrorFinder = (uri: vscode.Uri, position: vscode.Position, sourceFile: string) => vscode.Uri | undefined;
+
 /**
  * Provides hover tooltips for Calcpad symbols (macros, functions, variables, custom units).
  * Uses cached definitions from CalcpadDefinitionsService for user-defined symbols and falls
@@ -20,22 +25,26 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
     private definitionsService: CalcpadDefinitionsService;
     private insertManager: CalcpadInsertManager;
     private outputChannel: ILogger;
+    private findIncludedError?: IncludedErrorFinder;
+    private fileSystem = new VSCodeFileSystem();
 
     constructor(
         definitionsService: CalcpadDefinitionsService,
         insertManager: CalcpadInsertManager,
-        outputChannel: ILogger
+        outputChannel: ILogger,
+        findIncludedError?: IncludedErrorFinder,
     ) {
         this.definitionsService = definitionsService;
         this.insertManager = insertManager;
         this.outputChannel = outputChannel;
+        this.findIncludedError = findIncludedError;
     }
 
-    provideHover(
+    async provideHover(
         document: vscode.TextDocument,
         position: vscode.Position,
         _token: vscode.CancellationToken
-    ): vscode.Hover | null {
+    ): Promise<vscode.Hover | null> {
         // Match identifiers including $ suffix (macros) and Unicode (Greek letters etc.)
         const wordRange = document.getWordRangeAtPosition(
             position,
@@ -50,11 +59,15 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         // Search user-defined symbols first (macros, functions, variables, custom units),
         // then fall back to built-in functions from the insert manager.
         const definitions = this.definitionsService.getCachedDefinitions(document.uri.toString());
+        const link = (symbol: { source: string; sourceFile?: string }) =>
+            symbol.source !== 'local' && symbol.sourceFile
+                ? this.sourceLink(document, position, symbol.sourceFile)
+                : Promise.resolve(undefined);
         if (definitions) {
             const macro = definitions.macros.find(m => m.name === word);
             if (macro) {
                 this.outputChannel.appendLine('[Hover] Macro: ' + word, 'verbose');
-                return new vscode.Hover(this.buildMacroHover(macro), wordRange);
+                return new vscode.Hover(this.buildMacroHover(macro, await link(macro)), wordRange);
             }
 
             // As in Core, a name is a function only when "(" directly follows it.
@@ -63,18 +76,18 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
             const isCall = document.lineAt(position.line).text[wordRange.end.character] === '(';
             if (func && (!variable || isCall)) {
                 this.outputChannel.appendLine('[Hover] Function: ' + word, 'verbose');
-                return new vscode.Hover(this.buildFunctionHover(func), wordRange);
+                return new vscode.Hover(this.buildFunctionHover(func, await link(func)), wordRange);
             }
 
             if (variable) {
                 this.outputChannel.appendLine('[Hover] Variable: ' + word, 'verbose');
-                return new vscode.Hover(this.buildVariableHover(variable, position.line), wordRange);
+                return new vscode.Hover(this.buildVariableHover(variable, position.line, await link(variable)), wordRange);
             }
 
             const unit = definitions.customUnits.find(u => u.name === word);
             if (unit) {
                 this.outputChannel.appendLine('[Hover] Custom unit: ' + word, 'verbose');
-                return new vscode.Hover(this.buildCustomUnitHover(unit), wordRange);
+                return new vscode.Hover(this.buildCustomUnitHover(unit, await link(unit)), wordRange);
             }
         }
 
@@ -93,7 +106,22 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         return null;
     }
 
-    private buildMacroHover(macro: MacroDefinition): vscode.MarkdownString {
+    // The error this position reports from the file, else the file itself
+    private async sourceLink(document: vscode.TextDocument, position: vscode.Position, sourceFile: string): Promise<vscode.Uri | undefined> {
+        const error = this.findIncludedError?.(document.uri, position, sourceFile);
+        if (error) return error;
+        const roots = resolveDocumentPathRoots(document, this.definitionsService.getCachedPathRoots(document.uri.toString()));
+        const location = await resolveIncludeDirectiveLocation(document, sourceFile, this.fileSystem, this.outputChannel, '[Hover]', roots);
+        return location?.uri;
+    }
+
+    private appendSource(md: vscode.MarkdownString, sourceFile: string, link?: vscode.Uri): void {
+        md.appendMarkdown(link
+            ? `Source: [\`${sourceFile}\`](<${link.toString()}>)\n\n`
+            : `Source: \`${sourceFile}\`\n\n`);
+    }
+
+    private buildMacroHover(macro: MacroDefinition, link?: vscode.Uri): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         md.isTrusted = true;
 
@@ -101,7 +129,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         md.appendCodeblock(`${macro.name}${paramStr}`, 'calcpad');
 
         if (macro.source !== 'local' && macro.sourceFile) {
-            md.appendMarkdown(`Source: \`${macro.sourceFile}\`\n\n`);
+            this.appendSource(md, macro.sourceFile, link);
         }
 
         if (macro.description) {
@@ -113,7 +141,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         return md;
     }
 
-    private buildFunctionHover(func: FunctionDefinition): vscode.MarkdownString {
+    private buildFunctionHover(func: FunctionDefinition, link?: vscode.Uri): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         md.isTrusted = true;
 
@@ -121,7 +149,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         md.appendCodeblock(`${func.name}${paramStr}`, 'calcpad');
 
         if (func.source !== 'local' && func.sourceFile) {
-            md.appendMarkdown(`Source: \`${func.sourceFile}\`\n\n`);
+            this.appendSource(md, func.sourceFile, link);
         }
 
         if (func.description) {
@@ -142,14 +170,14 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         return md;
     }
 
-    private buildVariableHover(variable: VariableDefinition, line: number): vscode.MarkdownString {
+    private buildVariableHover(variable: VariableDefinition, line: number, link?: vscode.Uri): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         md.isTrusted = true;
 
         md.appendCodeblock(`${variable.name} = ${variable.expression || ''}`, 'calcpad');
 
         if (variable.source !== 'local' && variable.sourceFile) {
-            md.appendMarkdown(`Source: \`${variable.sourceFile}\`\n\n`);
+            this.appendSource(md, variable.sourceFile, link);
         }
 
         const type = getVariableTypeAt(variable, line);
@@ -164,14 +192,14 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         return md;
     }
 
-    private buildCustomUnitHover(unit: CustomUnitDefinition): vscode.MarkdownString {
+    private buildCustomUnitHover(unit: CustomUnitDefinition, link?: vscode.Uri): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         md.isTrusted = true;
 
         md.appendCodeblock(`.${unit.name} = ${unit.expression || ''}`, 'calcpad');
 
         if (unit.source !== 'local' && unit.sourceFile) {
-            md.appendMarkdown(`Source: \`${unit.sourceFile}\`\n\n`);
+            this.appendSource(md, unit.sourceFile, link);
         }
 
         if (unit.description) {
@@ -214,9 +242,10 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
     static register(
         definitionsService: CalcpadDefinitionsService,
         insertManager: CalcpadInsertManager,
-        outputChannel: ILogger
+        outputChannel: ILogger,
+        findIncludedError?: IncludedErrorFinder,
     ): vscode.Disposable {
-        const provider = new CalcpadHoverProvider(definitionsService, insertManager, outputChannel);
+        const provider = new CalcpadHoverProvider(definitionsService, insertManager, outputChannel, findIncludedError);
         return vscode.languages.registerHoverProvider(
             { language: 'calcpad' },
             provider

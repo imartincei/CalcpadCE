@@ -537,25 +537,8 @@ namespace Calcpad.Server.Controllers
                 {
                     ErrorCount = lintResult.ErrorCount,
                     WarningCount = lintResult.WarningCount,
-                    Diagnostics = lintResult.Diagnostics.Select(d => new LintDiagnostic
-                    {
-                        Line = d.Line,
-                        Column = d.Column,
-                        EndColumn = d.EndColumn,
-                        Code = d.Code,
-                        Message = d.Message,
-                        Severity = d.Severity == Highlighter.Linter.Models.LinterSeverity.Error ? "error"
-                            : d.Severity == Highlighter.Linter.Models.LinterSeverity.Information ? "information" : "warning",
-                        SeverityId = (int)d.Severity,
-                        Source = d.Source,
-                        Related = d.Related?.Select(r => new LintRelatedLocation
-                        {
-                            Line = r.Line,
-                            Column = r.Column,
-                            EndColumn = r.EndColumn,
-                            Message = r.Message
-                        }).ToList()
-                    }).ToList()
+                    Diagnostics = lintResult.Diagnostics.Select(ToLintDiagnostic).ToList(),
+                    IncludeOnly = lintResult.IncludeOnlyDiagnostics.Select(ToLintDiagnostic).ToList()
                 };
 
                 return Ok(response);
@@ -570,6 +553,34 @@ namespace Calcpad.Server.Controllers
                 return StatusCode(500, "Error linting content: " + ex.Message);
             }
         }
+
+        private static LintDiagnostic ToLintDiagnostic(Highlighter.Linter.Models.LinterDiagnostic d) => new()
+            {
+                Line = d.Line,
+                Column = d.Column,
+                EndColumn = d.EndColumn,
+                Code = d.Code,
+                Message = d.Message,
+                Severity = d.Severity == Highlighter.Linter.Models.LinterSeverity.Error ? "error"
+                    : d.Severity == Highlighter.Linter.Models.LinterSeverity.Information ? "information" : "warning",
+                SeverityId = (int)d.Severity,
+                Source = d.Source,
+                Related = d.Related?.Select(r => new LintRelatedLocation
+                {
+                    Line = r.Line,
+                    Column = r.Column,
+                    EndColumn = r.EndColumn,
+                    Message = r.Message
+                }).ToList(),
+                IncludeOrigins = d.IncludeOrigins?.Select(o => new LintIncludeOrigin
+                {
+                    FilePath = o.FilePath,
+                    Line = o.Line,
+                    Column = o.Column,
+                    EndColumn = o.EndColumn,
+                    Message = o.Message
+                }).ToList()
+            };
 
         /// <summary>
         /// Get detailed definitions (macros, functions, variables, custom units) from Calcpad source code.
@@ -1134,6 +1145,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>List of diagnostics (errors and warnings)</summary>
         public List<LintDiagnostic> Diagnostics { get; set; } = new();
+
+        /// <summary>Errors in included files that this file's run already shows, for editors to mark in those files</summary>
+        public List<LintDiagnostic> IncludeOnly { get; set; } = new();
     }
 
     public class LintDiagnostic
@@ -1164,6 +1178,27 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Linked locations, such as the macro or function body behind an error at a call. Null when none.</summary>
         public List<LintRelatedLocation>? Related { get; set; }
+
+        /// <summary>For a diagnostic on an #include line, where its errors are in the included files. Null when none.</summary>
+        public List<LintIncludeOrigin>? IncludeOrigins { get; set; }
+    }
+
+    public class LintIncludeOrigin
+    {
+        /// <summary>Absolute path of the included file</summary>
+        public string FilePath { get; set; } = string.Empty;
+
+        /// <summary>Zero-based line in the included file</summary>
+        public int Line { get; set; }
+
+        /// <summary>Zero-based start column, or -1 for the whole line</summary>
+        public int Column { get; set; }
+
+        /// <summary>Zero-based end column, or -1 for the whole line</summary>
+        public int EndColumn { get; set; }
+
+        /// <summary>The message without its included file and line prefix</summary>
+        public string Message { get; set; } = string.Empty;
     }
 
     public class LintRelatedLocation

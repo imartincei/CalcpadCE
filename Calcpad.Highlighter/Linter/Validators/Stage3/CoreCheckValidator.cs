@@ -31,6 +31,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var isFunctionBody = callLine >= 0 || error.IsFunctionBody;
                 var isMacroBody = !isFunctionBody && diagnostic.Stage == LineStage.Stage3 &&
                     BodyDiagnostics.FindBodyText(stage3, stage2, line, diagnostic.Column, diagnostic.EndColumn).Line >= 0;
+                var isIncludedMacroBody = !isFunctionBody && !isMacroBody && diagnostic.Stage == LineStage.Stage3 &&
+                    BodyDiagnostics.IsIncludedBodyText(stage3, stage2, line, diagnostic.Column, diagnostic.EndColumn);
                 if (error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run)
                 {
                     if (isFunctionBody)
@@ -40,6 +42,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     }
                     else if (isMacroBody)
                         diagnostic.IsBodyOnly = run.ReportedError(line, error.Code);
+                    else if (isIncludedMacroBody && run.ReportedError(line, error.Code))
+                        diagnostic.IsIncludeOnly = true;
                     else if (run.ReportedError(line, error.Code) ||
                         error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
                         run.GetExecution(line) == LineExecution.Executed && !run.ReportedAnyError(line))
@@ -75,6 +79,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             };
             var bodyDiagnostic = BodyDiagnostics.Link(callDiagnostic, callPosition, bodyPosition, call.Function,
                 $"At the first call to {call.Function} on line {{0}}.", true);
+            if (body.IncludeOrigins is [var origin])
+            {
+                bodyDiagnostic.IncludeOrigins = [new IncludeOrigin { FilePath = origin.FilePath, Line = origin.Line, Column = origin.Column, EndColumn = origin.EndColumn }];
+                bodyDiagnostic.IncludeMessageStart = body.IncludeMessageStart;
+            }
             result.AppendDiagnostic(callDiagnostic);
             return bodyDiagnostic;
         }
@@ -92,8 +101,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     text = stage1Lines[stage1Line];
 
                 var (s, e) = WholeLine(text);
-                var message = $"{System.IO.Path.GetFileName(source.SourceFile)} line {source.OriginalLine + 1}: {error.Message}";
-                return Diagnostic(LineStage.Stage1, stage1Line, s, e, message);
+                var included = Diagnostic(LineStage.Stage1, stage1Line, s, e, error.Message);
+                var hasColumns = stage3.MacroExpansions?.ContainsKey(line) != true;
+                SourceMapper.MarkIncluded(included, source, hasColumns ? error.StartColumn : -1, error.EndColumn);
+                return included;
             }
             if (error.StartColumn >= 0)
             {

@@ -494,6 +494,7 @@ interface LintResponse {
   errorCount: number;
   warningCount: number;
   diagnostics: LintDiagnostic[];
+  includeOnly: LintDiagnostic[];  // Errors for included files only; the run already shows them here
 }
 
 interface LintDiagnostic {
@@ -506,6 +507,7 @@ interface LintDiagnostic {
   severityId: number;  // 0=Error, 1=Warning, 2=Information
   source: string;      // Default: "Calcpad Linter"
   related?: LintRelatedLocation[];  // Linked locations; null when none
+  includeOrigins?: LintIncludeOrigin[];  // Places in included files; null when none
 }
 
 interface LintRelatedLocation {
@@ -514,7 +516,17 @@ interface LintRelatedLocation {
   endColumn: number;
   message: string;
 }
+
+interface LintIncludeOrigin {
+  filePath: string;    // Absolute path of the included file
+  line: number;        // Zero-based line in the included file
+  column: number;      // -1 for the whole line
+  endColumn: number;   // -1 for the whole line
+  message: string;     // The message without its "file line N: " prefix
+}
 ```
+
+An error in an included file is reported on its `#include` line, with the message prefixed by the file name and line. An error in the body of a macro from an included file is reported, prefixed the same way, on the call. `includeOrigins` gives its place in the included file, so an editor with that file open can mark it there too. `includeOnly` holds such macro body errors that the run already reported at the call; they are not shown in this file, only in the included one.
 
 An error in a macro or custom function body found at a call is reported on the call, with `related` pointing at the body. The first call that finds it also gets a diagnostic on the body text, with `related` pointing back at the call. A custom function body is judged at its first call: a name it reads must be defined by then.
 

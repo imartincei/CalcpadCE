@@ -55,10 +55,10 @@ export class CalcpadLintService {
      * severityId: 0=Error, 1=Warning
      * Returns diagnostics at or above the minimum severity (lower number = higher severity).
      */
-    public static filterBySeverity(
-        diagnostics: LintDiagnostic[],
+    public static filterBySeverity<T extends Pick<LintDiagnostic, 'severityId'>>(
+        diagnostics: T[],
         minimumSeverity: 'error' | 'warning' | 'information'
-    ): LintDiagnostic[] {
+    ): T[] {
         switch (minimumSeverity) {
             case 'error':
                 return diagnostics.filter(d => d.severityId === 0);

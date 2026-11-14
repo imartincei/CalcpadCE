@@ -70,6 +70,8 @@ namespace Calcpad.Highlighter.Linter
 
             // Map all diagnostics from stage lines to original lines
             result.MapDiagnosticsToOriginal();
+            result.IncludeOnlyDiagnostics.AddRange(result.Diagnostics.Where(d => d.IsIncludeOnly && d.IncludeOrigins != null));
+            result.RemoveDiagnostics(d => d.IsIncludeOnly);
             RemoveDuplicates(result);
 
             // Suppress diagnostics covered by LintIgnore regions
@@ -100,6 +102,9 @@ namespace Calcpad.Highlighter.Linter
                 foreach (var r in d.Related ?? [])
                     if (first.Related?.Exists(f => f.Line == r.Line && f.Column == r.Column && f.EndColumn == r.EndColumn) != true)
                         (first.Related ??= []).Add(r);
+                foreach (var o in d.IncludeOrigins ?? [])
+                    if (first.IncludeOrigins?.Exists(f => f.FilePath == o.FilePath && f.Line == o.Line && f.Column == o.Column && f.Message == o.Message) != true)
+                        (first.IncludeOrigins ??= []).Add(o);
             }
             if (duplicates.Count > 0)
                 result.RemoveDiagnostics(duplicates.Contains);

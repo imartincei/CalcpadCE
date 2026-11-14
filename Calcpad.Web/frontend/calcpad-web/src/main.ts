@@ -43,7 +43,10 @@ import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhen
 import { uiText } from './editor/ui-text';
 import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
-import { setupDiagnostics, setRunErrorMarkers } from './editor/diagnostics';
+import { setupDiagnostics, setRunErrorMarkers, setIncludedMarkers, type FileLinker } from './editor/diagnostics';
+import { IncludedLintStore } from 'calcpad-frontend/services/included-lint';
+import { CalcpadLintService } from 'calcpad-frontend/services/linter';
+import type { LintDiagnostic } from 'calcpad-frontend/types/api';
 import { registerCompletionProvider } from './editor/completions';
 import { registerIncludeCompletionProvider } from './editor/include-completions';
 import { registerHoverProvider } from './editor/hover';
@@ -490,6 +493,50 @@ async function bootstrap(): Promise<void> {
         }));
         items.sort((a, b) => b.severity - a.severity);
         appInstance.setProblems(group.id, items);
+    }
+
+    const linterMinSeverity = () => {
+        const sev = editorBridge.getExtraSetting('linterMinSeverity');
+        return (sev === 'error' || sev === 'warning') ? sev : 'information';
+    };
+
+    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition on
+    // Ctrl+hover just to draw the underline, so the provider gets a pure URI and the real
+    // open happens in the editor opener. The resolved absolute path is stashed under the
+    // exact URI string we mint, since fsPath would re-case the Windows drive letter and
+    // break the tab lookup's strict path compare.
+    const includeUriToPath = new Map<string, string>();
+    function includeUri(absPath: string): monaco.Uri {
+        const uri = monaco.Uri.parse(`calcpad-include:${encodeURIComponent(absPath)}`);
+        includeUriToPath.set(uri.toString(), absPath);
+        return uri;
+    }
+    // A link opener gets no selection, so the position rides in the fragment
+    const linkFile: FileLinker = (path, line, column) =>
+        tauriBridge && path ? includeUri(path).with({ fragment: `L${line},${column}` }) : null;
+
+    // Lint errors each open file found in the files it includes, keyed by its model URI
+    const includedLint = new IncludedLintStore();
+
+    function publishIncludedLint(): void {
+        const open = new Map<string, { model: monaco.editor.ITextModel; filePath: string | null }>();
+        for (const g of groups.values())
+            for (const t of g.tabs.all) {
+                const model = g.tabs.modelForTab(t.id);
+                if (model) open.set(model.uri.toString(), { model, filePath: t.filePath });
+            }
+        includedLint.prune(base => open.has(base));
+        for (const [uri, { model, filePath }] of open) {
+            const diagnostics = filePath ? includedLint.get(filePath, base => base !== uri) : [];
+            setIncludedMarkers(model, CalcpadLintService.filterBySeverity(diagnostics, linterMinSeverity()), linkFile);
+        }
+    }
+
+    function onLinted(model: monaco.editor.ITextModel, diagnostics: LintDiagnostic[]): void {
+        const filePath = [...groups.values()]
+            .flatMap(g => g.tabs.all.filter(t => g.tabs.modelForTab(t.id) === model))[0]?.filePath;
+        includedLint.set(model.uri.toString(), filePath ?? '', filePath ? diagnostics : []);
+        publishIncludedLint();
     }
 
     // Auto-run makes lint and definitions use the run's trace, so they wait for it.
@@ -1066,10 +1113,8 @@ async function bootstrap(): Promise<void> {
         registerFormattingCommands(ed, editorBridge);
 
         // Per-group diagnostics.
-        group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
-            const sev = editorBridge.getExtraSetting('linterMinSeverity');
-            return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext, `lint:${group.id}`, useTrace, runFollows);
+        group.diagnostics = setupDiagnostics(ed, activeBridge.api, linterMinSeverity,
+            getFileContext, `lint:${group.id}`, useTrace, runFollows, onLinted, linkFile);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1211,6 +1256,7 @@ async function bootstrap(): Promise<void> {
             appInstance.setTabs(group.id, snapshots);
             if (group === activeGroup) refreshWindowTitle();
             syncOpenFiles();
+            publishIncludedLint();
         });
 
         // On tab switch within this group, re-emit markers + re-lint + repaint.
@@ -1374,19 +1420,10 @@ async function bootstrap(): Promise<void> {
         }
         : undefined;
 
-    // Go-to-Definition must stay side-effect free — Monaco calls provideDefinition on
-    // Ctrl+hover just to draw the underline, so the provider gets a pure URI and the real
-    // open happens in the editor opener. The resolved absolute path is stashed under the
-    // exact URI string we mint, since fsPath would re-case the Windows drive letter and
-    // break the tab lookup's strict path compare.
-    const includeUriToPath = new Map<string, string>();
     const resolveIncludeUri: IncludeUriResolver | undefined = tauriBridge
         ? async (rawFileName: string): Promise<monaco.Uri | null> => {
             try {
-                const absPath = await tauriBridge.resolveIncludePath(rawFileName);
-                const uri = monaco.Uri.parse(`calcpad-include:${encodeURIComponent(absPath)}`);
-                includeUriToPath.set(uri.toString(), absPath);
-                return uri;
+                return includeUri(await tauriBridge.resolveIncludePath(rawFileName));
             } catch {
                 return null;
             }
@@ -1472,9 +1509,10 @@ async function bootstrap(): Promise<void> {
 
         monaco.editor.registerLinkOpener({
             open(resource) {
-                const absPath = includeUriToPath.get(resource.toString());
+                const absPath = includeUriToPath.get(resource.with({ fragment: '' }).toString());
                 if (absPath === undefined) return false; // not one of ours — let Monaco's default opener handle it
-                return openIncludeAt(absPath).then(() => true);
+                const at = /^L(\d+),(\d+)$/.exec(resource.fragment);
+                return openIncludeAt(absPath, at ? { lineNumber: +at[1], column: +at[2] } : undefined).then(() => true);
             },
         });
     }
@@ -1492,7 +1530,16 @@ async function bootstrap(): Promise<void> {
             getServerPathRoots: () => editorBridge.definitions.getCachedPathRoots(getActiveDocumentKey()),
         });
     }
-    registerHoverProvider(editorBridge);
+    // Hover markdown drops links with schemes it doesn't know, so these are file: URIs the include opener claims
+    registerHoverProvider(editorBridge, async (model, position, sourceFile) => {
+        if (!tauriBridge) return null;
+        const error = includedLint.errorAt(model.uri.toString(), position.lineNumber - 1, position.column - 1, sourceFile);
+        const absPath = error?.filePath ?? await tauriBridge.resolveIncludePath(sourceFile).catch(() => null);
+        if (!absPath) return null;
+        const uri = monaco.Uri.file(absPath);
+        includeUriToPath.set(uri.toString(), absPath);
+        return error ? uri.with({ fragment: `L${error.line + 1},${Math.max(error.column, 0) + 1}` }) : uri;
+    });
     registerDefinitionProvider(editorBridge, getFileContext, resolveIncludeUri);
     registerIncludeLinkProvider(resolveIncludeUri);
     registerReferenceProvider(editorBridge, getFileContext, openIncludeFile);
@@ -2565,6 +2612,8 @@ async function bootstrap(): Promise<void> {
                     : tabs.activeModel?.getValue() ?? '';
                 await tauriBridge!.saveFile(active.filePath, content);
                 tabs.markActiveSaved();
+                // Another group's file may include this one
+                for (const g of groups.values()) if (g !== activeGroup) void g.diagnostics?.refresh();
                 await deleteDraft(active.id);
                 return true;
             }

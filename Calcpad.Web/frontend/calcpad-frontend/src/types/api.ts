@@ -16,6 +16,8 @@ export interface LintResponse {
     errorCount: number;
     warningCount: number;
     diagnostics: LintDiagnostic[];
+    /** Errors for included files only, since this file's run already shows them. */
+    includeOnly?: LintDiagnostic[];
 }
 
 export interface LintDiagnostic {
@@ -29,6 +31,8 @@ export interface LintDiagnostic {
     source: string;      // Source of the diagnostic (default: "Calcpad Linter")
     /** Linked locations, such as the macro or function body behind an error at a call. */
     related?: LintRelatedLocation[];
+    /** For a diagnostic on an #include line, where its errors are in the included files. */
+    includeOrigins?: LintIncludeOrigin[];
 }
 
 export interface LintRelatedLocation {
@@ -36,6 +40,14 @@ export interface LintRelatedLocation {
     column: number;      // Zero-based start column
     endColumn: number;   // Zero-based end column
     message: string;
+}
+
+export interface LintIncludeOrigin {
+    filePath: string;    // Absolute path of the included file
+    line: number;        // Zero-based line in the included file
+    column: number;      // Zero-based start column, or -1 for the whole line
+    endColumn: number;   // Zero-based end column, or -1 for the whole line
+    message: string;     // The message without its "file line N: " prefix
 }
 
 // ============================================

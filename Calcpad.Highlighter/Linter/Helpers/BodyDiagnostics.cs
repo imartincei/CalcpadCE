@@ -26,9 +26,16 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 if (d.Stage != LineStage.Stage3)
                     continue;
 
-                var (bodyLine, bodyStart, bodyEnd) = FindBodyText(stage3, stage2, d.StageLine, d.Column, d.EndColumn);
+                var (bodyLine, bodyStart, bodyEnd) = FindAnyBodyText(stage3, stage2, d.StageLine, d.Column, d.EndColumn);
                 if (bodyLine < 0)
                     continue;
+
+                // An included body stays at the call, which records its place in the include
+                if (stage2.IncludeMap.GetValueOrDefault(bodyLine) is { Source: not "local" } source)
+                {
+                    SourceMapper.MarkIncluded(d, source, bodyStart, bodyEnd);
+                    continue;
+                }
 
                 var expansion = stage3.MacroExpansions[d.StageLine];
                 var callLine = expansion.CallSiteStage2Line;
@@ -53,6 +60,17 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// <summary>Stage 2 line and columns of the local macro body text in a range of an expanded line, or line -1.</summary>
         internal static (int Line, int Start, int End) FindBodyText(Stage3Context stage3, Stage2Result stage2, int stage3Line, int column, int endColumn)
         {
+            var body = FindAnyBodyText(stage3, stage2, stage3Line, column, endColumn);
+            return body.Line >= 0 && stage2.IncludeMap.GetValueOrDefault(body.Line) is { Source: not "local" } ? (-1, -1, -1) : body;
+        }
+
+        /// <summary>Whether a range of an expanded line is macro body text from an included file.</summary>
+        internal static bool IsIncludedBodyText(Stage3Context stage3, Stage2Result stage2, int stage3Line, int column, int endColumn) =>
+            FindAnyBodyText(stage3, stage2, stage3Line, column, endColumn).Line is var line and >= 0 &&
+            stage2.IncludeMap.GetValueOrDefault(line) is { Source: not "local" };
+
+        private static (int Line, int Start, int End) FindAnyBodyText(Stage3Context stage3, Stage2Result stage2, int stage3Line, int column, int endColumn)
+        {
             if (stage2 is null ||
                 !stage3.MacroExpansions.TryGetValue(stage3Line, out var expansion) ||
                 expansion.Origins is not { Count: > 0 } origins ||
@@ -71,7 +89,7 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 bodyStart = Math.Min(bodyStart, c);
                 bodyEnd = Math.Max(bodyEnd, c + 1);
             }
-            if (bodyLine < 0 || stage2.IncludeMap.GetValueOrDefault(bodyLine) is { Source: not "local" })
+            if (bodyLine < 0)
                 return (-1, -1, -1);
 
             if (bodyLine < stage2.Lines.Count)

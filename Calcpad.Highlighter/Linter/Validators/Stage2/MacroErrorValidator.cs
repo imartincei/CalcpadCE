@@ -21,8 +21,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                 {
                     // The #include line has none of the included text, so all of it is marked
                     var (s, e) = WholeLine(stage1.Lines[stage1Line]);
-                    var message = $"{System.IO.Path.GetFileName(source.SourceFile)} line {source.OriginalLine + 1}: {error.Message}";
-                    result.AppendDiagnostic(Diagnostic(error, LineStage.Stage1, stage1Line, s, e, message));
+                    var included = Diagnostic(error, LineStage.Stage1, stage1Line, s, e, error.Message);
+                    SourceMapper.MarkIncluded(included, source, error.StartColumn, error.EndColumn);
+                    result.AppendDiagnostic(included);
                     continue;
                 }
 

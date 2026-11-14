@@ -197,6 +197,12 @@ namespace Calcpad.Highlighter.ContentResolution
         /// -1 means not applicable (local source).
         /// </summary>
         public int OriginalLine { get; set; } = -1;
+
+        /// <summary>Resolved path of the included file; null for local lines and failed includes.</summary>
+        public string FilePath { get; set; }
+
+        /// <summary>The included file's lines a continued line was merged from; null when not continued.</summary>
+        public List<LineContinuationSegment> Segments { get; set; }
     }
 
     /// <summary>
