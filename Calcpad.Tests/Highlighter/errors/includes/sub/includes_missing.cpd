@@ -1,0 +1,3 @@
+' Line 3 includes a file that does not exist
+subBefore = 1
+#include ../not_there.cpd

@@ -129,6 +129,15 @@ namespace Calcpad.Highlighter.ContentResolution
             return false;
         }
 
+        public bool ReportedAnyError(int stage3Line)
+        {
+            foreach (var line in GetLines(stage3Line))
+                if (_trace.HasError(line))
+                    return true;
+
+            return false;
+        }
+
         private int[] GetLines(int stage3Line) =>
             stage3Line >= 0 && stage3Line < _traceLines.Length ? _traceLines[stage3Line] : [];
 

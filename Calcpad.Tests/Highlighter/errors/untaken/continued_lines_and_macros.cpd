@@ -1,0 +1,43 @@
+' Continued lines, $Block bodies, macros and includes in branches that never run
+x = 1
+#if x > 100
+'expect+2: CPD-3301[undefinedW]
+    r = 1 + _
+    2 + _
+    undefinedW
+'expect+1: CPD-3301[undefinedV]
+    v = [1; 2;
+    3; undefinedV]
+'expect+2: CPD-3301[qq]
+    f(t) = $Block{a = t; _
+    b = a*2; _
+    b + qq}
+'expect+1: CPD-3308[sin(a; 2)]
+    g(t) = $Block{a = t; _
+    b = sin(a; 2); _
+    b}
+#end if
+
+' An inline macro expanded in a branch that never runs
+#def twice$(e$) = 2*(e$)
+#if x > 100
+'expect: CPD-3301[undefinedM]
+    w = twice$(undefinedM)
+'expect: CPD-3308[sin(1; 2)]
+    w2 = twice$(sin(1; 2))
+#end if
+
+' A multi-line macro whose own #if branch does not run for this call
+#def check$(v$)
+#if v$ > 10
+    checkValue = undefinedInMacro
+#end if
+#end def
+'expect: CPD-3301
+check$(1)
+
+' A relative include inside a branch that never runs
+#if x > 100
+'expect: CPD-3301, CPD-3308
+    #include ../includes/check_errors_lib.cpd
+#end if

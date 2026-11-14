@@ -1,0 +1,13 @@
+' CPD-2203: macro parameter must end with $
+'expect: CPD-2203
+#def twice$(a) = 2*a
+
+' One bad parameter among good ones
+'expect: CPD-2203
+#def mix$(a$; b; c$) = a$ + c$
+
+' A multi-line definition
+'expect: CPD-2203
+#def calc$(len$; width)
+calcArea = len$*2
+#end def

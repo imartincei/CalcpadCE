@@ -1,0 +1,13 @@
+' CPD-2210: invalid character in macro name
+'expect: CPD-2210
+#def m-x$ = 1
+
+' With parameters
+'expect: CPD-2210
+#def sc@le$(a$) = a$
+
+' A multi-line definition
+'expect: CPD-2210
+#def my.block$
+blockValue = 1
+#end def

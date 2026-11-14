@@ -1,0 +1,12 @@
+' CPD-3312: unused variable (information)
+'expect: CPD-3312[unused]
+unused = 1
+
+' Reassigned and never read again
+used = 1
+check = used + 1
+'expect: CPD-3312[used]
+used = 2
+' A real error keeps this file in the error set
+'expect: CPD-3301
+z = check + undefinedName

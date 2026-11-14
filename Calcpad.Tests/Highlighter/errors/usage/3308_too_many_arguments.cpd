@@ -1,0 +1,24 @@
+' CPD-3308: built-in function called with too many arguments
+'expect: CPD-3308[sin(1; 2; 3)]
+a = sin(1; 2; 3)
+
+' A vector function
+v = [1; 2]
+'expect: CPD-3308[len(v; v)]
+b = len(v; v)
+
+' A call whose arguments continue on the next line
+'expect: CPD-3308[sin(]
+c = sin(
+1; 2)
+
+' Inside a $Block function body continued with an underscore
+'expect+1: CPD-3308[sin(a; 2)]
+f(x) = $Block{a = x; _
+b = sin(a; 2); _
+b}
+
+' In a macro argument
+#def twice$(e$) = 2*(e$)
+'expect: CPD-3308[sin(1; 2)]
+d = twice$(sin(1; 2))

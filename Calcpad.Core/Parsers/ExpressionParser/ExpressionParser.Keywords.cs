@@ -123,11 +123,21 @@ namespace Calcpad.Core
             for (int j = 0; j < ind.Count; ++j)
             {
                 var k = ind[j];
-                if (lower.StartsWith(KeywordNames[k]))
+                var name = KeywordNames[k];
+                // Whole word only, so #rounds is not #round
+                if (lower.StartsWith(name) && (s.Length <= name.Length + 1 || !IsKeywordLetter(s[name.Length + 1])))
                     return KeywordValues[k];
             }
             return Keyword.None;
         }
+
+        private static int KeywordEnd(ReadOnlySpan<char> s, int start)
+        {
+            var end = s[start..].IndexOfAny(' ', '\t');
+            return end < 0 ? s.Length : start + end;
+        }
+
+        private static bool IsKeywordLetter(char c) => char.IsLetter(c) || c == '_';
 
         /// <summary>
         /// The number of characters a keyword occupies in the source line, including the leading '#'.
@@ -169,9 +179,13 @@ namespace Calcpad.Core
 
                 if (_condition.IsSatisfied || !_calculate)
                 {
-                    var end = s.IndexOfAny(' ', '\t');
-                    if (end < 0)
-                        end = s.Length;
+                    var end = KeywordEnd(s, 0);
+                    if (s[..end].Equals("#end", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var next = s[end..].TrimStart();
+                        if (!next.IsEmpty)
+                            end = KeywordEnd(s, s.Length - next.Length);
+                    }
                     var (from, to) = KeywordColumns(0, end);
                     AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, s[..end].ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax, from, to);
                 }
@@ -411,8 +425,11 @@ namespace Calcpad.Core
                     try
                     {
                         _parser.Parse(expr);
-                        _parser.Calculate();
-                        Settings.Math.Decimals = (int)Math.Round(_parser.Real, MidpointRounding.AwayFromZero);
+                        if (_calculate)
+                        {
+                            _parser.Calculate();
+                            Settings.Math.Decimals = (int)Math.Round(_parser.Real, MidpointRounding.AwayFromZero);
+                        }
                     }
                     catch (MathParserException ex)
                     {

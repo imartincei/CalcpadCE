@@ -1,0 +1,10 @@
+' CPD-3421: fileInfo metadata comment not on the last line (warning)
+'expect: CPD-3421
+'<!--{"fileInfo": {"a": "b"}}-->
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = undefinedName
+' Followed only by a comment
+'expect: CPD-3421
+'<!--{"fileInfo": {"version": "2"}}-->
+' trailing note

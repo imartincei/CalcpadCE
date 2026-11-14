@@ -1,0 +1,17 @@
+' CPD-5112: duplicate keyword argument in a function call
+f(x; y = 2) = x + y
+'expect: CPD-5112[f(1; y = 3; y = 4)]
+a = f(1; y = 3; y = 4)
+
+' Given by position and by name
+'expect: CPD-5112[f(1; 2; y = 3)]
+b = f(1; 2; y = 3)
+
+' Inside another function body
+'expect: CPD-5112
+g(z) = $Block{t = f(z; y = 1; y = 2); t}
+
+' A function from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-5112
+c = libScale(2; k = 3; k = 4) + libLength

@@ -1,0 +1,16 @@
+' CPD-3103: unmatched opening square bracket
+'expect: CPD-3103[[]
+v = [1; 2; 3
+
+' In a custom function body
+'expect: CPD-3103[[]
+f(x) = [x; x^2
+
+' Inside a $Block
+'expect: CPD-3103[[]
+r = $Block{w = [1; 2; w}
+
+' An index left open
+u = [1; 2; 3]
+'expect: CPD-3103
+el = u.[2

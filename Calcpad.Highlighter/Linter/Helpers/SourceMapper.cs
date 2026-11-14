@@ -103,13 +103,23 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 return false;
 
             int start = int.MaxValue, end = -1;
+            var hasBodyText = false;
             for (int i = Math.Max(column, 0), to = Math.Min(Math.Max(endColumn, column + 1), columns.Count); i < to; i++)
             {
                 if (columns[i] < 0)
+                {
+                    hasBodyText = true;
                     continue;
+                }
 
                 start = Math.Min(start, columns[i]);
                 end = Math.Max(end, columns[i] + 1);
+            }
+            // An argument with text from the macro body widens to the call
+            if (hasBodyText && end >= 0 && TryFindCall(expansion, start, end, out var callStart, out var callEnd))
+            {
+                start = callStart;
+                end = callEnd;
             }
             if (end < 0)
                 return false;
@@ -117,6 +127,45 @@ namespace Calcpad.Highlighter.Linter.Helpers
             column = start;
             endColumn = end;
             return true;
+        }
+
+        // The macro call on the call site line that contains [start, end)
+        private static bool TryFindCall(MacroExpansionInfo expansion, int start, int end, out int callStart, out int callEnd)
+        {
+            callStart = callEnd = -1;
+            var line = expansion.CallSiteLine;
+            if (line is null)
+                return false;
+
+            foreach (var name in expansion.MacroNames)
+            {
+                for (var at = line.IndexOf(name, StringComparison.Ordinal); at >= 0; at = line.IndexOf(name, at + 1, StringComparison.Ordinal))
+                {
+                    var stop = CallEnd(line, at + name.Length);
+                    if (start >= at && end <= stop)
+                    {
+                        (callStart, callEnd) = (at, stop);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static int CallEnd(string line, int afterName)
+        {
+            if (afterName >= line.Length || line[afterName] != '(')
+                return afterName;
+
+            var depth = 0;
+            for (var i = afterName; i < line.Length; i++)
+            {
+                if (line[i] == '(')
+                    depth++;
+                else if (line[i] == ')' && --depth == 0)
+                    return i + 1;
+            }
+            return line.TrimEnd().Length;
         }
 
         /// <summary>

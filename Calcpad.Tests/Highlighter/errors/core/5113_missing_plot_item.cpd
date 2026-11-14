@@ -1,0 +1,15 @@
+' CPD-5113: missing part in a $Plot or $Map command
+'expect: CPD-5113
+$Plot{x @ x = : 1}
+
+' No variable name
+'expect: CPD-5113
+$Plot{x @ = 0 : 1}
+
+' No function
+'expect: CPD-5113
+$Plot{ @ x = 0 : 1}
+
+' A map without its right limit
+'expect: CPD-5113
+$Map{x*y @ x = 0 : 1 & y = 0 : }

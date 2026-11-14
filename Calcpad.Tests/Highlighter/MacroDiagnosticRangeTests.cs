@@ -6,7 +6,8 @@ namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Columns reported on a macro-expanded line map back through the expansion: text from a call
-    /// argument keeps its range, and text from the macro body covers the whole call site line.
+    /// argument keeps its range, an argument with body text covers its call, and text only from
+    /// the macro body covers the whole call site line.
     /// </summary>
     public class MacroDiagnosticRangeTests : IClassFixture<HighlighterLinterFixture>
     {
@@ -118,10 +119,10 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Theory]
-        [InlineData("#def call$(x$) = f(x$)", "z = call$(1)", "1")]
+        [InlineData("#def call$(x$) = f(x$)", "z = call$(1)", "call$(1)")]
         [InlineData("#def call$(x$) = x$", "z = call$(f(1))", "f(1)")]
         [InlineData("#def call$(x$) = x$", "z = call$(2 + f(1; 2; 3))", "f(1; 2; 3)")]
-        public void WrongArgumentCount_HighlightsArgument(string def, string call, string highlighted)
+        public void WrongArgumentCount_HighlightsArgumentOrCall(string def, string call, string highlighted)
         {
             var source = string.Join('\n', "f(a; b) = a + b", def, call);
             var diagnostic = Assert.Single(Lint(source).Diagnostics, d => d.Code == "CPD-3302");

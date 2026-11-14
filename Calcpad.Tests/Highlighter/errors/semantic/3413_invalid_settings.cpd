@@ -1,0 +1,19 @@
+' CPD-3413: invalid #settings
+'expect: CPD-3413[{"decimals": "four"}]
+#settings {"decimals": "four"}
+
+' JSON without its closing brace
+'expect: CPD-3413[{"decimals": 4]
+#settings {"decimals": 4
+
+' Not JSON
+'expect: CPD-3413[{nope}]
+#settings {nope}
+
+' Nothing after the keyword
+'expect: CPD-3413[#settings]
+#settings
+
+' An unknown setting is a warning
+'expect: CPD-3413[{"colour": 1}]
+#settings {"colour": 1}

@@ -1,0 +1,22 @@
+' CPD-3102: unmatched closing parenthesis
+'expect: CPD-3102[)]
+a = 1 + 2)
+
+' In a custom function body
+'expect: CPD-3102[)]
+f(x) = (x + 1))*2
+
+' Inside $Inline
+'expect: CPD-3102[)]
+r = $Inline{c = 1; c + 2)}
+
+' On the last line of an expression continued with an underscore
+'expect+2: CPD-3102[)]
+s = 1 + _
+2 + _
+3)
+
+' From an inline macro
+#def half$(x$) = x$/2)
+'expect: CPD-3102
+h = half$(4)

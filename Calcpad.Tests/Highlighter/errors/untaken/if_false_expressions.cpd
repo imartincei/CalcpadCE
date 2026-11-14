@@ -1,0 +1,52 @@
+' Expression errors in an #if branch that never runs. The check pass still reports them.
+x = 1
+#if x > 100
+'expect: CPD-3301[undefinedA]
+    a1 = undefinedA
+'expect: CPD-3305[noFunc]
+    a2 = noFunc(1)
+    sq(t) = t^2
+'expect: CPD-3302[sq(1; 2)]
+    a3 = sq(1; 2)
+'expect: CPD-3308[sin(1; 2)]
+    a4 = sin(1; 2)
+'expect: CPD-3307[root(2)]
+    a5 = root(2)
+'expect: CPD-3310[kgg]
+    a6 = 5 kgg
+'expect: CPD-3311[; ;]
+    a7 = max(1; ; 2)
+'expect: CPD-3401[++]
+    a8 = 5 ++ 3
+'expect: CPD-3404[=]
+    a9 = 1 = 2
+'expect: CPD-3407[+]
+    b1 = 5 +
+'expect: CPD-5108[1.2.3]
+    b2 = 1.2.3
+'expect: CPD-5110
+    b3 = 1;2
+'expect: CPD-3303[noMacro$]
+    b4 = noMacro$
+    kw(t; y = 2) = t + y
+'expect: CPD-3315[kw(1; q = 3)]
+    b5 = kw(1; q = 3)
+'expect: CPD-5112[kw(1; y = 2; y = 3)]
+    b6 = kw(1; y = 2; y = 3)
+#end if
+
+' Unbalanced brackets in a branch with a literal false condition
+#if 0
+'expect: CPD-3101[(]
+    c1 = (1 + 2
+'expect: CPD-3102[)]
+    c2 = 1 + 2)
+'expect: CPD-3103[[]
+    c3 = [1; 2
+'expect: CPD-3104[]]
+    c4 = 1; 2]
+'expect: CPD-3105[$Block{]
+    c5 = $Block{d = 1; d
+'expect: CPD-3106[}]
+    c6 = x}
+#end if

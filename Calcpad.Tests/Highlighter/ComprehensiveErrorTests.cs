@@ -1,10 +1,32 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Calcpad.Highlighter.Linter.Constants;
+using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
+    /// <summary>
+    /// Every errors/*.cpd sample declares its diagnostics with <c>'expect:</c> markers
+    /// (see <see cref="ErrorExpectations"/>). Files under errors/includes are only include targets.
+    /// </summary>
     public class ComprehensiveErrorTests : IClassFixture<HighlighterLinterFixture>
     {
+        private const string IncludesFolder = "includes";
+        private const string UntakenFolder = "untaken";
+        private const int MinCasesPerCode = 2;
+
+        // Only a run reports these, or the check pass has no line that reaches them
+        private static readonly HashSet<string> UncoveredCodes =
+        [
+            "CPD-2200", // Fallback for an uncoded MacroParser exception
+            "CPD-5101", "CPD-5103", "CPD-5104", "CPD-5105", "CPD-5106", "CPD-5107",
+            "CPD-5111", "CPD-5117", "CPD-5118",
+            "CPD-5301", "CPD-5302", "CPD-5303", "CPD-5304",
+        ];
+
+        private static readonly string[] RunOnlyPrefixes = ["CPD-54", "CPD-55", "CPD-56", "CPD-57", "CPD-59"];
+
         private readonly HighlighterLinterFixture _fixture;
 
         public ComprehensiveErrorTests(HighlighterLinterFixture fixture)
@@ -15,110 +37,110 @@ namespace Calcpad.Tests.Highlighter
         public static TheoryData<string> ErrorFiles()
         {
             var data = new TheoryData<string>();
-            var fixture = new HighlighterLinterFixture();
-            foreach (var path in Directory.GetFiles(fixture.ErrorsDir, "*.cpd", SearchOption.AllDirectories))
-                data.Add(Path.GetRelativePath(fixture.ErrorsDir, path));
+            foreach (var path in SamplePaths(new HighlighterLinterFixture().ErrorsDir))
+                data.Add(path);
             return data;
         }
+
+        private static IEnumerable<string> SamplePaths(string errorsDir) =>
+            Directory.GetFiles(errorsDir, "*.cpd", SearchOption.AllDirectories)
+                .Select(p => Path.GetRelativePath(errorsDir, p).Replace('\\', '/'))
+                .Where(p => !p.StartsWith(IncludesFolder + "/"))
+                .Order();
+
+        private static string[] ReadLines(string fullPath) =>
+            File.ReadAllText(fullPath).Split('\n').Select(l => l.TrimEnd('\r')).ToArray();
 
         [Theory]
         [MemberData(nameof(ErrorFiles))]
-        public void ErrorExample_ProducesAtLeastOneError(string relativePath)
+        public void ErrorSample_ReportsExactlyItsExpectedDiagnostics(string relativePath)
         {
             var fullPath = Path.Combine(_fixture.ErrorsDir, relativePath);
+            var lines = ReadLines(fullPath);
             var result = _fixture.LintFile(fullPath);
-            var errors = result.Diagnostics
-                .Where(d => d.Severity == Calcpad.Highlighter.Linter.Models.LinterSeverity.Error)
-                .ToList();
 
-            Assert.True(
-                errors.Count > 0,
-                $"Expected at least one Error-level diagnostic in '{relativePath}' but found none.");
+            Assert.True(ErrorExpectations.Parse(lines).Count > 0,
+                $"'{relativePath}' has no 'expect: markers.");
+            Assert.True(result.Diagnostics.Any(d => d.Severity == LinterSeverity.Error),
+                $"'{relativePath}' should report at least one Error-level diagnostic.");
+
+            var problems = ErrorExpectations.Check(lines, result.Diagnostics);
+            Assert.True(problems.Count == 0,
+                $"'{relativePath}' does not match its markers:\n  " + string.Join("\n  ", problems));
         }
 
-        public static TheoryData<string, string> ExpectedErrorCodes()
+        public static TheoryData<string> UntakenFiles()
         {
-            var data = new TheoryData<string, string>
-            {
-                // Balance errors (CPD-31xx)
-                { "balance_errors.cpd", "CPD-3101" },
-                { "balance_errors.cpd", "CPD-3102" },
-                { "balance_errors.cpd", "CPD-3103" },
-                { "balance_errors.cpd", "CPD-3104" },
-                { "balance_errors.cpd", "CPD-3105" },
-                { "balance_errors.cpd", "CPD-3106" },
-
-                // Include errors (CPD-11xx)
-                { "include_errors.cpd", "CPD-1103" }, // Warning: deprecated #include input values
-
-                // Macro errors (CPD-22xx)
-                { "macro_errors.cpd", "CPD-2209" },
-                { "macro_errors.cpd", "CPD-3314" },
-
-                // Naming errors (CPD-32xx)
-                { "naming_errors.cpd", "CPD-3205" }, // Warning: conflict with built-in constant is allowed
-                { "naming_errors.cpd", "CPD-3206" },
-                { "naming_errors.cpd", "CPD-3207" },
-
-                // Usage errors (CPD-33xx)
-                { "usage_errors.cpd", "CPD-3301" },
-                { "usage_errors.cpd", "CPD-3302" },
-                { "usage_errors.cpd", "CPD-3303" },
-                { "usage_errors.cpd", "CPD-3307" },
-                { "usage_errors.cpd", "CPD-3308" },
-                { "usage_errors.cpd", "CPD-3310" },
-                { "usage_errors.cpd", "CPD-3311" },
-                { "usage_errors.cpd", "CPD-3315" },
-
-                // Semantic errors (CPD-34xx)
-                { "semantic_errors.cpd", "CPD-3401" },
-                { "semantic_errors.cpd", "CPD-3403" },
-                { "semantic_errors.cpd", "CPD-3405" },
-                { "semantic_errors.cpd", "CPD-3407" },
-                { "semantic_errors.cpd", "CPD-3408" },
-                { "semantic_errors.cpd", "CPD-3410" },
-                { "semantic_errors.cpd", "CPD-3419" }, // Warning: deprecated stored input value
-
-                // Reassignment
-                { "reassignment_errors.cpd", "CPD-3409" },
-                { "reassignment_errors.cpd", "CPD-3410" },
-
-                // #UI directive
-                { "ui_errors.cpd", "CPD-3415" },
-            };
+            var data = new TheoryData<string>();
+            foreach (var path in SamplePaths(new HighlighterLinterFixture().ErrorsDir).Where(p => p.StartsWith(UntakenFolder + "/")))
+                data.Add(path);
             return data;
         }
 
-        // Reported by Core's MacroParser, so the linter doesn't repeat them
+        // The check pass is the only source for lines the run skipped, so each marker must stay visible after a run
         [Theory]
-        [InlineData("include_errors.cpd", "CPD-1102")]
-        [InlineData("macro_errors.cpd", "CPD-2201")]
-        [InlineData("macro_errors.cpd", "CPD-2202")]
-        [InlineData("macro_errors.cpd", "CPD-2204")]
-        [InlineData("macro_errors.cpd", "CPD-2206")]
-        [InlineData("macro_errors.cpd", "CPD-2207")]
-        [InlineData("macro_errors.cpd", "CPD-2212")]
-        [InlineData("macro_errors.cpd", "CPD-2213")]
-        public void ErrorExample_ProducesExpectedMacroParserCode(string filename, string expectedCode)
+        [MemberData(nameof(UntakenFiles))]
+        public void UntakenSample_KeepsItsErrorsAfterARun(string relativePath)
         {
-            var parser = new MacroParser();
-            parser.Parse(File.ReadAllText(Path.Combine(_fixture.ErrorsDir, filename)), out _, null, 0, true);
-            Assert.Contains(expectedCode, parser.Errors.Select(e => e.Code));
+            var fullPath = Path.Combine(_fixture.ErrorsDir, relativePath);
+            var lines = ReadLines(fullPath);
+            var (result, runErrors, notRunLines) = _fixture.LintFileAfterRun(fullPath);
+
+            var shown = ErrorExpectations.WithRunErrors(lines, result.Diagnostics, runErrors);
+            var problems = ErrorExpectations.Check(lines, shown);
+            problems.AddRange(ErrorExpectations.Parse(lines)
+                .Where(e => !notRunLines.Contains(e.Line))
+                .Select(e => $"Line {e.Line + 1}: {e.Code} is marked on a line the run executed"));
+
+            Assert.True(problems.Count == 0,
+                $"'{relativePath}' after a run:\n  " + string.Join("\n  ", problems));
         }
 
-        [Theory]
-        [MemberData(nameof(ExpectedErrorCodes))]
-        public void ErrorExample_ProducesExpectedErrorCode(string filename, string expectedCode)
+        [Fact]
+        public void ErrorSamples_CoverEveryStaticCodeAtLeastTwice()
         {
-            var fullPath = Path.Combine(_fixture.ErrorsDir, filename);
-            var result = _fixture.LintFile(fullPath);
-            var matching = result.Diagnostics.Where(d => d.Code == expectedCode).ToList();
+            var counts = SamplePaths(_fixture.ErrorsDir)
+                .SelectMany(p => ErrorExpectations.Parse(ReadLines(Path.Combine(_fixture.ErrorsDir, p))))
+                .GroupBy(e => e.Code)
+                .ToDictionary(g => g.Key, g => g.Count());
 
-            Assert.True(
-                matching.Count > 0,
-                $"Expected diagnostic '{expectedCode}' in '{filename}' but it was not produced. " +
-                $"Diagnostics found: " +
-                string.Join("; ", result.Diagnostics.Select(d => $"[{d.Code}] {d.Severity} Line {d.Line + 1}")));
+            var required = ErrorCodes.Descriptions.Keys
+                .Where(c => !UncoveredCodes.Contains(c) && !RunOnlyPrefixes.Any(c.StartsWith))
+                .Order()
+                .ToList();
+
+            var missing = required.Where(c => counts.GetValueOrDefault(c) < MinCasesPerCode)
+                .Select(c => $"{c} ({counts.GetValueOrDefault(c)})")
+                .ToList();
+            Assert.True(missing.Count == 0,
+                $"Codes with fewer than {MinCasesPerCode} cases in errors/: {string.Join(", ", missing)}");
+
+            var nowCovered = UncoveredCodes.Where(counts.ContainsKey).Order().ToList();
+            Assert.True(nowCovered.Count == 0,
+                $"Remove these from UncoveredCodes, samples now cover them: {string.Join(", ", nowCovered)}");
+        }
+
+        [Fact]
+        public void ErrorExpectations_ParsesMarkerTargetsAndSpans()
+        {
+            string[] lines =
+            [
+                "'expect: CPD-3301[a], CPD-3305",
+                "'expect+2: CPD-3104[]]",
+                "x = a",
+                "y = 1 + _",
+                "2]",
+            ];
+
+            var expectations = ErrorExpectations.Parse(lines);
+
+            Assert.Equal(
+                [
+                    new ErrorExpectation(2, "CPD-3301", "a", 0),
+                    new ErrorExpectation(2, "CPD-3305", null, 0),
+                    new ErrorExpectation(4, "CPD-3104", "]", 1),
+                ],
+                expectations);
         }
     }
 }

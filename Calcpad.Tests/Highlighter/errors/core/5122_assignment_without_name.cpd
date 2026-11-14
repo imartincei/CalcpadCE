@@ -1,0 +1,7 @@
+' CPD-5122: an assignment with nothing before it
+'expect: CPD-5122[=]
+= 5
+
+' Indented, with an expression after it
+'expect: CPD-5122[=]
+    = 3 + 1

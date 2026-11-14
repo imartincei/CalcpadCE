@@ -1,0 +1,21 @@
+' CPD-3404: invalid use of the assignment operator
+'expect: CPD-3404[=]
+r = 1 = 2
+
+' An assignment that is not the first operator
+'expect: CPD-3404[=]
+s = 2 + a1 = 3
+
+' Statements in a $Block need semicolons between them
+'expect+1: CPD-3404[=]
+f(x) = $Block{a = x _
+b = a*2 _
+b + 1}
+
+' A function defined inside a command
+'expect: CPD-3404[=]
+t = $Sum{g(k) = k @ k = 1 : 2}
+
+' $Find takes an expression, not an equation
+'expect: CPD-3404[=]
+u = $Find{h(x) = 1 @ x = 0 : 2}

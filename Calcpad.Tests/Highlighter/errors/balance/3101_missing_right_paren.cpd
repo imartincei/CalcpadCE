@@ -1,0 +1,33 @@
+' CPD-3101: unmatched opening parenthesis
+'expect: CPD-3101[(]
+a = (1 + 2
+
+' In a custom function body
+'expect: CPD-3101[(]
+f(x) = sqr(x*(x + 1)
+
+' On the second line of a $Block continued with an underscore
+'expect+1: CPD-3101[(]
+r = $Block{c = 1; _
+d = (c + 2; _
+d*2}
+
+' In a multi-line macro body, reported where it expands
+#def calc$(x$)
+calcValue = (x$*2
+#end def
+'expect: CPD-3101
+calc$(3)
+
+' Nested parentheses in a function call
+'expect: CPD-3101
+b = max(1; min(2; (3 + 4))
+
+' An unclosed macro argument list
+#def cube$(x$) = x$^3
+'expect: CPD-3101[(]
+r = cube$((2 + 1)
+
+' An open bracket on the last line has nothing to continue onto
+'expect: CPD-3101[(]
+atEnd = sin(

@@ -1,0 +1,13 @@
+' CPD-2213: required macro parameter after an optional one
+'expect: CPD-2213
+#def opt$(a$ = 1; b$) = a$ + b$
+
+' After a required and an optional parameter
+'expect: CPD-2213
+#def opt2$(a$; b$ = 2; c$) = a$ + b$ + c$
+
+' A multi-line definition
+'expect: CPD-2213
+#def opt3$(len$ = 1; width$)
+optValue = len$*width$
+#end def

@@ -60,7 +60,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 // Check for function definitions
                 var funcMatch = CalcpadPatterns.FunctionDefinition.Match(trimmed);
-                if (funcMatch.Success)
+                if (funcMatch.Success && HasParameterNames(funcMatch.Groups[2].Value))
                 {
                     var funcName = funcMatch.Groups[1].Value;
 
@@ -80,6 +80,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 }
             }
         }
+
+        // k(2) = 3 is not a definition; Core reports it
+        private static bool HasParameterNames(string parameters) =>
+            ParsingHelpers.ParseParamList(parameters).Names.TrueForAll(name =>
+                CalcpadPatterns.Identifier.Match(name.Trim()) is { Success: true } m && m.Length == name.Trim().Length);
 
         private void ValidateIdentifierName(string identifier, string line, int stage3Line, LinterResult result)
         {

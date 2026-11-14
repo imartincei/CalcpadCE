@@ -1,0 +1,21 @@
+' CPD-3303: undefined macro
+'expect: CPD-3303
+a = undefinedMacro$
+
+' With arguments
+'expect: CPD-3303
+b = undefinedMacro$(5; 6)
+
+' A $ in a variable name reads as a macro
+'expect: CPD-3303
+a$b = 5
+
+' Inside a $Block function body
+'expect: CPD-3303
+f(x) = $Block{t = helper$(x); t*2}
+
+' A macro used before it is defined
+'expect: CPD-3303
+c = later$
+#def later$ = 1
+d = later$

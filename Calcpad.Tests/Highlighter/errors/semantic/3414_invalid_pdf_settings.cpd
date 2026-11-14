@@ -1,0 +1,9 @@
+' CPD-3414: invalid PDF settings in a metadata comment (warning)
+'expect: CPD-3414
+'<!--{"pdf": {"bogus": 1}}-->
+
+'expect: CPD-3414
+'<!--{"pdf": {"margins": "wide"}}-->
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = undefinedName

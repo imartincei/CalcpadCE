@@ -1,0 +1,18 @@
+' CPD-3205: variable name conflicts with a built-in constant (warning)
+'expect: CPD-3205[e]
+e = 2.71
+
+' A function named after a constant
+'expect: CPD-3205[e]
+e(x) = x
+
+' Pi is protected too, so the assignment is also an error
+'expect: CPD-3205[π], CPD-3409[π]
+π = 3
+
+' Inside a multi-line macro, reported where it expands
+#def setE$
+e = 3
+#end def
+'expect: CPD-3205
+setE$

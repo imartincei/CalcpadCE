@@ -1,0 +1,30 @@
+' CPD-3302: custom function called with the wrong number of arguments
+square(x) = x^2
+'expect: CPD-3302[square(1; 2; 3)]
+a = square(1; 2; 3)
+
+' Too few, with only an optional parameter supplied by name
+f(x; y = 2) = x + y
+'expect: CPD-3302[f(y = 3)]
+b = f(y = 3)
+
+' Inside a $Block of another function
+g(x; y) = x*y
+'expect: CPD-3302[g(x)]
+h(x) = $Block{t = g(x); t + 1}
+
+' A call continued over three lines
+'expect: CPD-3302
+c = g(1; _
+2; _
+3)
+
+' A function from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-3302[libSquare(1; 2)]
+d = libSquare(1; 2) + libLength
+
+' From a macro body, the whole call is marked
+#def callSquare$(a$) = square(a$; 1)
+'expect: CPD-3302[callSquare$(2)]
+fromMacro = callSquare$(2)
