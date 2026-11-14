@@ -98,4 +98,37 @@ Respect `prefers-reduced-motion`. When adding a CSS animation or transition, add
 4. **Follow existing patterns** - Match code style and architecture
 5. **Implement** - Start with types, then service/client, then UI
 6. **Build shared lib first** - If you changed calcpad-frontend, rebuild it before testing consumers
-7. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README)
+7. **Verify** - Run the checks below for what you changed
+8. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README). On Linux, `tools/desktop-test/linux-tests.sh` runs the GTK regression tests, and `tools/desktop-linux-ci/run.sh` runs the whole Linux desktop CI job in a container (see Full suite)
+
+## Verification
+
+Run only the checks for the sub-projects and files you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from that sub-project's folder unless noted) |
+|---------|-----|
+| `calcpad-frontend/src/` | `npx tsc --noEmit -p .`, then `npm run build` so consumers see the change |
+| `calcpad-frontend/scripts/` | `npx tsc -p tsconfig.scripts.json` |
+| `calcpad-web/src/` | `npx vue-tsc --noEmit -p .` |
+| `calcpad-web` Vite/node config | `npx tsc -p tsconfig.node.json` |
+| `calcpad-web/src/editor/language.ts` | `node --test tools/monaco-language.test.mjs` (repo root) |
+| `calcpad-web/src/editor/navigation-history.ts` | `node --test tools/navigation-history.test.mjs` (repo root) |
+| Theme colors or UI tokens | `npm run check:contrast` (in `calcpad-web`) |
+| `vscode-calcpad/src/` | `npx tsc --noEmit -p .` (build `calcpad-frontend` first if it changed) |
+| `vscode-calcpad/CalcpadVuePanel/` | `npx vue-tsc --noEmit -p tsconfig.vue.json` |
+
+### Desktop (Rust)
+
+After changing anything in `calcpad-desktop/src-tauri/`, run from that folder:
+```bash
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+### Full suite (user runs)
+
+VS Code task **Check: All** (every TypeScript, Rust and .NET check), or **Run All Verifications** to add the .NET tests and Compare Renderings.
+
+For desktop changes, `tools/desktop-linux-ci/run.sh` (repo root) runs `build-desktop-linux.yml` locally in an Ubuntu 22.04 container.
+It covers the build, the X11, scaled and Wayland GTK tests, the deb/rpm/Arch packages and the notices check.
+`--skip-tests` and `--only=<steps>` run part of it; see `tools/desktop-linux-ci/README.md`.

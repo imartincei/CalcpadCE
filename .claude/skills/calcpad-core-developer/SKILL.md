@@ -89,4 +89,25 @@ After adding, update `CalcpadBuiltIns.Units` in Highlighter.
 3. **Load `reference/architecture-and-testing.md`** for structure, class hierarchy, and testing
 4. **Implement in Core** - Add to appropriate calculator class
 5. **Sync Highlighter** - Update function lists and signatures
-6. **Test** - Run Calcpad.Tests and verify manually
+6. **Verify** - Run the checks below for what you changed
+
+## Verification
+
+Run only the tests for what you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from repo root) |
+|---------|-----|
+| Any C# file | `dotnet format Calcpad.Core/Calcpad.Core.csproj --verify-no-changes --include <changed files>` |
+| Calculator / function code | `dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "FullyQualifiedName~<TestClass>"` for the classes covering it (`Scalars`, `Vectors`, `Matrices`, ...) |
+| Matrix code | Filter to the specific class; avoid the `*Kprod*` tests (~3 GB each) |
+| Parser / macro / include code | `--filter "FullyQualifiedName~ExpressionParser"` or `~Macros` / `~Filepaths` |
+| Function names, parameter counts, units | Also `--filter "FullyQualifiedName~Calcpad.Tests.Highlighter"` |
+| Rendered output | Convert a small snippet through the dev server (see `reference/architecture-and-testing.md`) |
+
+### Full suite (user runs)
+
+```bash
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj
+bash .github/scripts/compare-renderings.sh
+```
+Or the VS Code task **Run All Verifications**.
