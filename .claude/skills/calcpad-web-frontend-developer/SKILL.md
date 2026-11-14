@@ -99,7 +99,7 @@ Respect `prefers-reduced-motion`. When adding a CSS animation or transition, add
 5. **Implement** - Start with types, then service/client, then UI
 6. **Build shared lib first** - If you changed calcpad-frontend, rebuild it before testing consumers
 7. **Verify** - Run the checks below for what you changed
-8. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README)
+8. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README). On Linux, `tools/desktop-test/linux-tests.sh` runs the GTK regression tests, and `tools/desktop-linux-ci/run.sh` runs the whole Linux desktop CI job in a container (see Full suite)
 
 ## Verification
 
@@ -128,3 +128,7 @@ cargo fmt --check
 ### Full suite (user runs)
 
 VS Code task **Check: All** (every TypeScript, Rust and .NET check), or **Run All Verifications** to add the .NET tests and Compare Renderings.
+
+For desktop changes, `tools/desktop-linux-ci/run.sh` (repo root) runs `build-desktop-linux.yml` locally in an Ubuntu 22.04 container.
+It covers the build, the X11, scaled and Wayland GTK tests, the deb/rpm/Arch packages and the notices check.
+`--skip-tests` and `--only=<steps>` run part of it; see `tools/desktop-linux-ci/README.md`.
