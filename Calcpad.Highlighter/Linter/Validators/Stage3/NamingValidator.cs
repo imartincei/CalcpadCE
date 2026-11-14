@@ -36,7 +36,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 {
                     var varName = varMatch.Groups[1].Value;
                     // Pass Stage3 line index - diagnostic extensions handle mapping
-                    ValidateIdentifierName(varName, line, i, true, result);
+                    ValidateIdentifierName(varName, line, i, result);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     var funcName = funcMatch.Groups[1].Value;
 
                     // Redefining a user-defined function is allowed - warn rather than error.
-                    // Built-in conflicts (CPD-3203) and macros ($) are handled separately.
+                    // Core reports built-in conflicts (CPD-3203); macros ($) are skipped.
                     if (!funcName.EndsWith("$") && !CalcpadBuiltIns.Functions.Contains(funcName)
                         && !definedNames.Add(funcName))
                     {
@@ -76,12 +76,12 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     }
 
                     // Pass Stage3 line index - diagnostic extensions handle mapping
-                    ValidateIdentifierName(funcName, line, i, false, result);
+                    ValidateIdentifierName(funcName, line, i, result);
                 }
             }
         }
 
-        private void ValidateIdentifierName(string identifier, string line, int stage3Line, bool isVariable, LinterResult result)
+        private void ValidateIdentifierName(string identifier, string line, int stage3Line, LinterResult result)
         {
             // Skip macros (they end with $)
             if (identifier.EndsWith("$"))
@@ -91,21 +91,11 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             var endPos = startPos >= 0 ? startPos + identifier.Length : line.Length;
             var col = startPos >= 0 ? startPos : 0;
 
-            // Variable names CAN overlap with built-in function names (e.g., vector = [1;2;3])
-            // But user-defined function names cannot - they would shadow the built-in
-            if (!isVariable && CalcpadBuiltIns.Functions.Contains(identifier))
-            {
-                result.AddError(stage3Line, col, endPos, "CPD-3203",
-                    "Function name '" + identifier + "' conflicts with built-in function");
-                return;
-            }
-
             // Check for conflict with built-in constants (WARNING - redefinition is allowed)
             if (CalcpadBuiltIns.CommonConstants.Contains(identifier))
             {
                 result.AddWarning(stage3Line, col, endPos, "CPD-3205",
                     "Variable name '" + identifier + "' conflicts with built-in constant");
-                return; // Don't report additional conflicts
             }
 
             // Note: Variable names shadowing built-in units is common and usually intentional

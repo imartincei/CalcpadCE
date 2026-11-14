@@ -1573,7 +1573,7 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to &quot;There is no matching &quot;#def&quot;..
+        // /   Looks up a localized string similar to There is no matching &quot;#def&quot;..
         // / </summary>
         public static string There_is_no_matching_def {
             get {
@@ -1852,6 +1852,15 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
+        // /   Looks up a localized string similar to A #settings value has the wrong type..
+        // / </summary>
+        public static string A_settings_value_has_the_wrong_type {
+            get {
+                return ResourceManager.GetString("A_settings_value_has_the_wrong_type", resourceCulture);
+            }
+        }
+
+        // / <summary>
         // /   Looks up a localized string similar to {0} requires a path..
         // / </summary>
         public static string Missing_path_value_0 {
@@ -1902,6 +1911,78 @@ namespace Calcpad.Core {
         public static string Invalid_for_loop_header {
             get {
                 return ResourceManager.GetString("Invalid_for_loop_header", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' takes {1} argument(s), got {2}..
+        // / </summary>
+        public static string Function_0_takes_1_arguments_got_2 {
+            get {
+                return ResourceManager.GetString("Function_0_takes_1_arguments_got_2", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' needs at least {1} argument(s), got {2}..
+        // / </summary>
+        public static string Function_0_needs_at_least_1_arguments_got_2 {
+            get {
+                return ResourceManager.GetString("Function_0_needs_at_least_1_arguments_got_2", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' takes at most {1} argument(s), got {2}..
+        // / </summary>
+        public static string Function_0_takes_at_most_1_arguments_got_2 {
+            get {
+                return ResourceManager.GetString("Function_0_takes_at_most_1_arguments_got_2", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to Argument {0} of '{1}' is empty..
+        // / </summary>
+        public static string Argument_0_of_1_is_empty {
+            get {
+                return ResourceManager.GetString("Argument_0_of_1_is_empty", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '#' directives are not allowed inside command blocks. Use if(), $Repeat, etc. instead..
+        // / </summary>
+        public static string Directives_are_not_allowed_inside_command_blocks {
+            get {
+                return ResourceManager.GetString("Directives_are_not_allowed_inside_command_blocks", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' is a built-in function and cannot be redefined..
+        // / </summary>
+        public static string Built_in_function_0_cannot_be_redefined {
+            get {
+                return ResourceManager.GetString("Built_in_function_0_cannot_be_redefined", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' is not a recognized setting..
+        // / </summary>
+        public static string Unrecognized_setting_0 {
+            get {
+                return ResourceManager.GetString("Unrecognized_setting_0", resourceCulture);
+            }
+        }
+
+        // / <summary>
+        // /   Looks up a localized string similar to '{0}' is not a recognized #UI property..
+        // / </summary>
+        public static string Unrecognized_UI_property_0 {
+            get {
+                return ResourceManager.GetString("Unrecognized_UI_property_0", resourceCulture);
             }
         }
     }

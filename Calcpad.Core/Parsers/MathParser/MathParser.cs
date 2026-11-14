@@ -513,68 +513,12 @@ namespace Calcpad.Core
             _complexVariables = null;
         }
 
-        /// <summary>Check pass only: global names read by each parsed expression, less its own parameters and counters.</summary>
-        internal List<string> ReadNames { get; set; }
-        private readonly List<string> _pendingNames = [];
-        private readonly HashSet<string> _boundNames = new(StringComparer.Ordinal);
-        private int _parseDepth;
-        // lu() creates "ind" when it runs
-        private bool _hasLu;
-
-        internal void RecordReadName(string name)
-        {
-            if (ReadNames is not null)
-                _pendingNames.Add(name);
-        }
-
-        internal void UnrecordReadName(string name)
-        {
-            if (ReadNames is not null)
-                _pendingNames.Remove(name);
-        }
-
-        internal void BindName(string name)
-        {
-            if (ReadNames is not null)
-                _boundNames.Add(name);
-        }
-
-        internal bool IsFunctionDefinition => _functionDefinitionIndex >= 0;
-
-        internal bool IsDefinedFunction(string name) => _functions.IndexOf(name) >= 0;
-
-        internal bool IsDefinedName(string name) =>
-            _input.DefinedVariables.Contains(name) ||
-            _hasLu && name == "ind" ||
-            _units.ContainsKey(name) ||
-            Unit.TryGet(name, IsUs, out _);
-
         public void Parse(ReadOnlySpan<char> expression, bool allowAssignment = true)
         {
             if (ReadNames is null)
-            {
                 ParseExpression(expression, allowAssignment);
-                return;
-            }
-            var isOuter = _parseDepth++ == 0;
-            _hasLu = _hasLu || System.Text.RegularExpressions.Regex.IsMatch(expression, @"(?<![\w.])lu\s*\(");
-            try
-            {
-                ParseExpression(expression, allowAssignment);
-                if (isOuter)
-                    foreach (var name in _pendingNames)
-                        if (!_boundNames.Contains(name))
-                            ReadNames.Add(name);
-            }
-            finally
-            {
-                --_parseDepth;
-                if (isOuter)
-                {
-                    _pendingNames.Clear();
-                    _boundNames.Clear();
-                }
-            }
+            else
+                ParseRecordingNames(expression, allowAssignment);
         }
 
         private void ParseExpression(ReadOnlySpan<char> expression, bool allowAssignment)
@@ -583,7 +527,8 @@ namespace Calcpad.Core
             _isCalculated = false;
             _functionDefinitionIndex = -1;
             var input = ResolveCallArguments(_input.GetInput(expression, allowAssignment, true));
-            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled, out var isFunctionDefinition);
+            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled,
+                IsCalculation && (IsEnabled || ReadNames is not null), out var isFunctionDefinition);
             _input.OrderOperators(input, isFunctionDefinition || _isSolver > 0 || IsPlotting, _assignmentIndex);
             if (isFunctionDefinition)
             {
@@ -880,7 +825,7 @@ namespace Calcpad.Core
                 return null;
 
             var input = ResolveCallArguments(_input.GetInput(expression, false));
-            new SyntaxAnalyser(_functions).Check(input, IsEnabled, out _);
+            new SyntaxAnalyser(_functions).Check(input, IsEnabled, IsEnabled, out _);
             _input.OrderOperators(input, true, 0);
             var rpn = Input.GetRpn(input);
             BindParameters(parameters, rpn);

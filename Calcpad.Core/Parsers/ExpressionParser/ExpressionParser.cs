@@ -21,22 +21,11 @@ namespace Calcpad.Core
         private int _currentLine;
         // Column of the parsed text in the current line, or -1 when unknown
         private int _lineOffset = -1;
+        // Column where the keyword line's trimmed text starts, or -1
+        private int _keywordOffset = -1;
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
-        private bool _isCheck;
-        // Check pass: names each line read, and names only the run would define
-        private sealed class ReadName(string name, int line, int sourceLine, int start, int end)
-        {
-            internal readonly string Name = name;
-            internal readonly int Line = line, SourceLine = sourceLine, Start = start, End = end;
-            // Whether the name had a definition when read; null until known
-            internal bool? Defined;
-        }
-        private readonly List<ReadName> _readNames = [];
-        private readonly List<ReadName> _loopReads = [];
-        private readonly List<(ReadName Read, MathParserException Error)> _loopErrors = [];
-        private readonly HashSet<string> _checkDefined = new(StringComparer.Ordinal);
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
@@ -94,24 +83,6 @@ namespace Calcpad.Core
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
             Parse(sourceCode.AsSpan(), calculate, getXml);
 
-        /// <summary>
-        /// Checks every line without calculating, including untaken branches and loop bodies, and never stops.
-        /// It reads and writes no files, and it changes <see cref="Settings"/> as #settings and #round lines do.
-        /// </summary>
-        public IReadOnlyList<CalcpadError> Check(string sourceCode)
-        {
-            _isCheck = true;
-            try
-            {
-                Parse(sourceCode.AsSpan(), false, false);
-            }
-            finally
-            {
-                _isCheck = false;
-            }
-            return _errorList;
-        }
-
         private void Parse(ReadOnlySpan<char> code, bool calculate, bool getXml)
         {
             var lines = new List<int> { 0 };
@@ -139,7 +110,7 @@ namespace Calcpad.Core
                         // #UI metadata is scoped to the line that declared it. Clearing here
                         // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
                         ResetUiState();
-                        _lineOffset = -1;
+                        _lineOffset = _keywordOffset = -1;
                         ref var currentLineCache = ref _lineCache[_currentLine];
                         var keyword = currentLineCache.Keyword;
                         if (keyword == Keyword.SkipLine)
@@ -231,6 +202,7 @@ namespace Calcpad.Core
                         _parser.IsConst = false;
                         if (Trace is not null)
                             TraceExpression(null);
+                        _keywordOffset = lineOffset;
                         var result = ParseKeyword(textSpan, ref keyword);
                         if (keyword != currentLineCache.Keyword)
                             _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
@@ -255,7 +227,7 @@ namespace Calcpad.Core
                             continue;
                         }
                         _parser.IsCalculation = _isVal != -1;
-                        if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
+                        if ((textSpan[0] != '$' || !ParsePlot(textSpan, lineOffset)) &&
                             ParseCondition(textSpan, keyword))
                         {
                             List<Token> tokens;
@@ -338,7 +310,7 @@ namespace Calcpad.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool CheckIsLineExtension(char c) => c < 128 && IsLineExtension[c];
 
-            bool ParsePlot(ReadOnlySpan<char> s)
+            bool ParsePlot(ReadOnlySpan<char> s, int lineOffset)
             {
                 if (s.StartsWith("$plot", StringComparison.OrdinalIgnoreCase) ||
                     s.StartsWith("$map", StringComparison.OrdinalIgnoreCase))
@@ -355,13 +327,16 @@ namespace Calcpad.Core
                         {
                             _parser.IsPlotting = true;
                             var s1 = plotParser.Parse(s, _calculate);
-                            _parser.ReadNames?.RemoveAll(plotParser.Variables.Contains);
+                            _parser.ReadNames?.RemoveAll(n => plotParser.Variables.Contains(n.Name));
+                            if (_isCheck)
+                                TakeReadNames(_currentLine, _parser.Line, nameColumn: lineOffset);
                             _sb.Append(InsertAttribute(s1, HtmlId));
                         }
                         catch (MathParserException ex)
                         {
                             _parser.ReadNames?.Clear();
-                            AppendError(s.ToString(), ex, _currentLine);
+                            var (start, end) = lineOffset < 0 ? (-1, -1) : ErrorColumns(lineOffset, s, ex.Position, ex.EndPosition);
+                            AppendError(s.ToString(), ex, _currentLine, start, end);
                         }
                         finally
                         {
@@ -608,14 +583,8 @@ namespace Calcpad.Core
             _sb.Clear();
             _condition = new();
             _loops.Clear();
-            _checkLoops.Clear();
-            _readNames.Clear();
-            _loopReads.Clear();
-            _checkDefined.Clear();
             _skippedLoops.Clear();
-            _loopErrors.Clear();
-            if (_isCheck)
-                _parser.ReadNames = [];
+            ResetCheckState();
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
@@ -726,7 +695,8 @@ namespace Calcpad.Core
                         else if (_isCheck)
                         {
                             var (start, end) = ErrorColumns(token, -1);
-                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition);
+                            var nameColumn = ui is null && _lineOffset >= 0 && token.Start >= 0 ? _lineOffset + token.Start : -1;
+                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition, nameColumn);
                         }
 
                         if (_calculate && _isVal > -1)
@@ -800,15 +770,15 @@ namespace Calcpad.Core
             }
         }
 
-        void AppendError(string lineContent, MathParserException ex, int line) =>
-            AppendError(lineContent, ex.Message, line, ex.Code, ex.Kind);
+        void AppendError(string lineContent, MathParserException ex, int line, int startColumn = -1, int endColumn = -1) =>
+            AppendError(lineContent, ex.Message, line, ex.Code, ex.Kind, startColumn, endColumn);
 
-        void AppendError(string lineContent, string text, int line, string code, CalcpadErrorKind kind)
+        void AppendError(string lineContent, string text, int line, string code, CalcpadErrorKind kind, int startColumn = -1, int endColumn = -1)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
             if (_isVisible)
                 _sb.Append(ErrHtml(FormatError(s, text, line), line));
-            RecordError(line, text, Debug, code, kind);
+            RecordError(line, text, Debug, code, kind, 0, startColumn, endColumn);
         }
 
         // MacroParser.Errors already lists it, so it only goes to the HTML and the summary
@@ -836,6 +806,8 @@ namespace Calcpad.Core
                 _errors.Enqueue(line);
             if (sourceLine <= 0)
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
+            if (!_isCheck)
+                Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
@@ -850,70 +822,14 @@ namespace Calcpad.Core
             return true;
         }
 
-        // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
-        // so those reads are judged at the end of the document or of the outermost loop.
-        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false)
-        {
-            if (_parser?.ReadNames is not { Count: > 0 } names)
-                return;
-
-            foreach (var name in names)
-            {
-                var read = new ReadName(name, line, sourceLine, start, end);
-                if (_checkLoops.Count != 0)
-                {
-                    if (!isFunction)
-                        _loopReads.Add(read);
-                }
-                else if (!isFunction)
-                    read.Defined = IsCheckDefined(name);
-                _readNames.Add(read);
-            }
-            names.Clear();
-        }
-
-        private void ResolveLoopReads()
-        {
-            foreach (var read in _loopReads)
-                read.Defined = IsCheckDefined(read.Name);
-            _loopReads.Clear();
-
-            // A later line of the loop may define it for the next pass
-            foreach (var (read, ex) in _loopErrors)
-            {
-                var defined = ex.Code == "CPD-3305" ? _parser.IsDefinedFunction(read.Name) : IsCheckDefined(read.Name);
-                if (!defined)
-                    RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
-            }
-            _loopErrors.Clear();
-        }
-
-        private bool IsCheckDefined(string name) => _checkDefined.Contains(name) || _parser.IsDefinedName(name);
-
-        // Names read before anything defines them, or that nothing defines at all
-        private void ReportUndefinedNames()
-        {
-            ResolveLoopReads();
-            foreach (var read in _readNames)
-            {
-                if (read.Defined ?? IsCheckDefined(read.Name))
-                    continue;
-
-                var ex = Exceptions.UndefinedVariableOrUnits(read.Name);
-                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
-            }
-            _readNames.Clear();
-            _loopReads.Clear();
-        }
-
         // The failing word when the tokenizer found the position, otherwise the whole expression
-        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1)
-        {
-            if (_lineOffset < 0 || token.Start < 0)
-                return (-1, -1);
+        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1) =>
+            _lineOffset < 0 || token.Start < 0
+                ? (-1, -1)
+                : ErrorColumns(_lineOffset + token.Start, token.Value, position, endPosition);
 
-            var offset = _lineOffset + token.Start;
-            var value = token.Value.AsSpan();
+        private static (int Start, int End) ErrorColumns(int offset, ReadOnlySpan<char> value, int position, int endPosition)
+        {
             if (position >= 0 && endPosition > position && endPosition <= value.Length)
                 return (offset + position, offset + endPosition);
             if (position < 0 || position > value.Length)
@@ -938,6 +854,9 @@ namespace Calcpad.Core
 
             static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '.';
         }
+
+        private (int Start, int End) KeywordColumns(int from, int to) =>
+            _keywordOffset < 0 || to <= from ? (-1, -1) : (_keywordOffset + from, _keywordOffset + to);
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";
         private string FormatError(string expr, string msg, int line) =>

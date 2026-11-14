@@ -62,10 +62,10 @@ namespace Calcpad.Tests
         }
 
         [Fact]
-        public void UndefinedName_CoversTheExpression()
+        public void UndefinedName_CoversTheName()
         {
             var error = new ExpressionParser().Check("'Text' c = 2*zz 'more'").Single();
-            Assert.Equal((7, 15), (error.StartColumn, error.EndColumn));
+            Assert.Equal((13, 15), (error.StartColumn, error.EndColumn));
         }
 
         [Fact]

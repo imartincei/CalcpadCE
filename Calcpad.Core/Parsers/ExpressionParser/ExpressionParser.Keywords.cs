@@ -107,7 +107,7 @@ namespace Calcpad.Core
         private static Keyword GetKeyword(ReadOnlySpan<char> s)
         {
             var n = Math.Min(MaxKeywordLength, s.Length - 1);
-            if (n < 3)
+            if (n < 2)
                 return Keyword.None;
 
             var i = char.ToLowerInvariant(s[1]) - 'a';
@@ -170,7 +170,10 @@ namespace Calcpad.Core
                 if (_condition.IsSatisfied || !_calculate)
                 {
                     var end = s.IndexOfAny(' ', '\t');
-                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, (end < 0 ? s : s[..end]).ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax);
+                    if (end < 0)
+                        end = s.Length;
+                    var (from, to) = KeywordColumns(0, end);
+                    AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, s[..end].ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax, from, to);
                 }
                 return KeywordResult.Continue;
             }
@@ -320,25 +323,6 @@ namespace Calcpad.Core
             // The check pass validates hidden lines too
             if (IsDirectiveConditionMet(s, keyword))
                 _isVisible = value || _isCheck;
-        }
-
-        // The check pass doesn't run loops, so it tracks only their structure
-        private readonly Stack<(int Id, int Line, int SourceLine)> _checkLoops = new();
-
-        private void CheckLoopStart()
-        {
-            if (_isCheck)
-                _checkLoops.Push((_condition.Id, _currentLine, _parser.Line));
-        }
-
-        private void CheckLoopEnd(ReadOnlySpan<char> s)
-        {
-            if (_checkLoops.Count == 0)
-                AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            else if (_checkLoops.Pop().Id != _condition.Id)
-                AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            if (_checkLoops.Count == 0)
-                ResolveLoopReads();
         }
 
         private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
@@ -828,11 +812,18 @@ namespace Calcpad.Core
                 return;
 
             var json = s[SettingsKeyword.Length..].Trim();
+            var jsonStart = s.Length - s[SettingsKeyword.Length..].TrimStart().Length;
+            var (from, to) = json.IsEmpty ? KeywordColumns(0, s.Length) : KeywordColumns(jsonStart, jsonStart + json.Length);
+            var text = s.ToString();
             if (json.IsEmpty)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
                 return;
             }
+            if (_isCheck)
+                foreach (var key in SettingsDto.UnknownKeys(json.ToString()))
+                    RecordWarning(string.Format(Messages.Unrecognized_setting_0, key), "CPD-3413", from, to);
+
             try
             {
                 var dto = SettingsDto.Parse(json.ToString());
@@ -844,7 +835,7 @@ namespace Calcpad.Core
                 foreach (var error in dto.Validate())
                 {
                     (invalid ??= []).Add(error.Key);
-                    AppendError(s.ToString(), error.Message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                    SettingsError(error.Message);
                 }
 
                 foreach (SettingKey key in Enum.GetValues<SettingKey>())
@@ -853,8 +844,11 @@ namespace Calcpad.Core
             }
             catch (JsonException)
             {
-                AppendError(s.ToString(), string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword), _currentLine, "CPD-3413", CalcpadErrorKind.Syntax);
+                SettingsError(IsJson(json) ? Messages.A_settings_value_has_the_wrong_type : string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
             }
+
+            void SettingsError(string message) =>
+                AppendError(text, message, _currentLine, "CPD-3413", CalcpadErrorKind.Syntax, from, to);
         }
 
         private void ParseKeywordMd(ReadOnlySpan<char> s)

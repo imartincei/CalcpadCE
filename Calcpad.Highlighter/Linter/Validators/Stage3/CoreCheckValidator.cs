@@ -8,8 +8,8 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Reports Core's check pass. Names and Values errors on lines the last run executed are
-    /// left to the run, which knows the order and values.
+    /// Reports Core's check pass, minus errors the last run reported on the same line. Names and
+    /// Values errors on lines the run executed are left to it too, since it knows the order and values.
     /// </summary>
     public class CoreCheckValidator
     {
@@ -21,8 +21,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (line < 0 || line >= stage3.Lines.Count)
                     continue;
 
-                if (error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
-                    stage3.Runtime?.GetExecution(line) == LineExecution.Executed)
+                if (error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run &&
+                    (run.ReportedError(line, error.Code) ||
+                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values && run.GetExecution(line) == LineExecution.Executed))
                     continue;
 
                 result.AppendDiagnostic(ToDiagnostic(error, line, stage3, result));
@@ -63,8 +64,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 EndColumn = end,
                 Code = error.Code,
                 Message = message,
-                Severity = LinterSeverity.Error,
-                Origin = DiagnosticOrigin.Check
+                Severity = error.Severity == CalcpadErrorSeverity.Warning ? LinterSeverity.Warning : LinterSeverity.Error
             };
         }
 

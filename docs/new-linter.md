@@ -103,9 +103,9 @@ The tables below group them by the kind of problem.
 | CPD-3410 | Error | Outer-scope assignment (`←`) to an undefined variable |
 | CPD-3411 | Warning | Invalid `paramType` value in a metadata comment |
 | CPD-3412 | Warning | Invalid metadata-comment JSON |
-| CPD-3413 | Warning | Invalid #settings JSON |
+| CPD-3413 | Error | Invalid #settings JSON (an unrecognized key is a warning) |
 | CPD-3414 | Warning | Invalid PDF settings in a metadata comment |
-| CPD-3415 | Warning | Invalid `#UI` format |
+| CPD-3415 | Error | Invalid `#UI` format (an unrecognized property is a warning) |
 | CPD-3416 | Warning | `uiOverrides` metadata comment not at the end of the file |
 | CPD-3417 | Warning | Duplicate `uiOverrides` metadata comment |
 | CPD-3418 | Warning | `uiOverrides` sharing a comment with another key |

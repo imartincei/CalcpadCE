@@ -350,7 +350,7 @@
     <value>无效的内部宏定义.</value>
   </data>
   <data name="There_is_no_matching_def" xml:space="preserve">
-    <value>"没有匹配的 "#def".</value>
+    <value>没有匹配的 "#def".</value>
   </data>
   <data name="Invalid_symbol_0_in_macro_name" xml:space="preserve">
     <value>宏名称中的符号 "{0}" 无效.</value>
@@ -591,5 +591,29 @@
   </data>
   <data name="Invalid_for_loop_header" xml:space="preserve">
     <value>无效的 "#for" 语句。应为 "#for 计数器 = 起始 : 结束"。</value>
+  </data>
+  <data name="Function_0_takes_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' 需要 {1} 个参数，实际为 {2} 个。</value>
+  </data>
+  <data name="Function_0_needs_at_least_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' 至少需要 {1} 个参数，实际为 {2} 个。</value>
+  </data>
+  <data name="Function_0_takes_at_most_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' 最多接受 {1} 个参数，实际为 {2} 个。</value>
+  </data>
+  <data name="Argument_0_of_1_is_empty" xml:space="preserve">
+    <value>'{1}' 的第 {0} 个参数为空。</value>
+  </data>
+  <data name="Directives_are_not_allowed_inside_command_blocks" xml:space="preserve">
+    <value>命令块中不允许使用 '#' 指令。请改用 if()、$Repeat 等。</value>
+  </data>
+  <data name="Built_in_function_0_cannot_be_redefined" xml:space="preserve">
+    <value>'{0}' 是内置函数，不能重新定义。</value>
+  </data>
+  <data name="Unrecognized_setting_0" xml:space="preserve">
+    <value>'{0}' 不是可识别的设置。</value>
+  </data>
+  <data name="Unrecognized_UI_property_0" xml:space="preserve">
+    <value>'{0}' 不是可识别的 #UI 属性。</value>
   </data>
 </root>

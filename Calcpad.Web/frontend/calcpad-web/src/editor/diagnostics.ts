@@ -91,14 +91,17 @@ export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: Calc
     const lineCount = model.getLineCount();
     monaco.editor.setModelMarkers(model, 'calcpad-run', errors.map(err => {
         const line = Math.min(Math.max(err.sourceLine, 1), lineCount);
+        const start = err.startColumn ?? -1;
+        const end = err.endColumn ?? -1;
+        const hasColumns = start >= 0 && end > start && end < model.getLineMaxColumn(line);
         return {
             severity: monaco.MarkerSeverity.Error,
             message: `[Runtime] ${err.message}`,
             code: err.code,
             startLineNumber: line,
-            startColumn: model.getLineFirstNonWhitespaceColumn(line) || 1,
+            startColumn: hasColumns ? start + 1 : model.getLineFirstNonWhitespaceColumn(line) || 1,
             endLineNumber: line,
-            endColumn: model.getLineMaxColumn(line),
+            endColumn: hasColumns ? end + 1 : model.getLineMaxColumn(line),
         };
     }));
 }

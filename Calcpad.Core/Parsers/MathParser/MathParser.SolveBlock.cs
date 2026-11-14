@@ -272,6 +272,8 @@ namespace Calcpad.Core
                 var trimmed = item.Input.TrimStart();
                 item.Offset += item.Input.Length - trimmed.Length;
                 item.Input = trimmed.TrimEnd();
+                var nameOffset = _parser.NameOffset;
+                _parser.NameOffset = nameOffset >= 0 ? nameOffset + item.Offset : -1;
                 try
                 {
                     _parser.Parse(item.Input, allowAssignment);
@@ -280,6 +282,10 @@ namespace Calcpad.Core
                 {
                     ex.Shift(item.Offset);
                     throw;
+                }
+                finally
+                {
+                    _parser.NameOffset = nameOffset;
                 }
                 item.Rpn = _parser._rpn;
             }
@@ -323,7 +329,17 @@ namespace Calcpad.Core
                 itemList.Add(new SolverItem() { Input = ts.Cut().ToString(), Offset = offset + start });
                 var itemArray = itemList.ToArray();
                 for (int i = 0; i < itemArray.Length; ++i)
+                {
+                    var hash = itemArray[i].Input.IndexOf('#');
+                    if (hash >= 0)
+                    {
+                        var ex = Exceptions.DirectiveInBlock();
+                        ex.Position = itemArray[i].Offset + hash;
+                        ex.EndPosition = ex.Position + 1;
+                        throw ex;
+                    }
                     ParseItem(ref itemArray[i], true);
+                }
                 return itemArray;
             }
 

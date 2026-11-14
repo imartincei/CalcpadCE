@@ -75,8 +75,9 @@ namespace Calcpad.Highlighter.ContentResolution
             try
             {
                 var code = JoinLines(lines);
-                var complex = Check(true).Select(e => e.SourceLine).ToHashSet();
-                return Check(false).Where(e => complex.Contains(e.SourceLine)).ToList();
+                var complex = Check(true).Where(e => e.Severity == Calcpad.Core.CalcpadErrorSeverity.Error)
+                    .Select(e => e.SourceLine).ToHashSet();
+                return Check(false).Where(e => e.Severity == Calcpad.Core.CalcpadErrorSeverity.Warning || complex.Contains(e.SourceLine)).ToList();
 
                 IReadOnlyList<Calcpad.Core.CalcpadError> Check(bool isComplex) =>
                     new Calcpad.Core.ExpressionParser

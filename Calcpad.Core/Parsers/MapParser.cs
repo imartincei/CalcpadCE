@@ -13,35 +13,8 @@ namespace Calcpad.Core
         {
             const int n = 7;
             ReadOnlySpan<char> delimiters = ['{', '@', '=', ':', '&', '=', ':', '}'];
-            var input = new string[n];
             string result;
-            var index = 0;
-            var bracketCount = 0;
-            var ts = new TextSpan(script);
-            var del = delimiters[0];
-            for (int i = 0, len = script.Length; i < len; ++i)
-            {
-                var c = script[i];
-                if (c == '{')
-                    ++bracketCount;
-
-                if (c == del && bracketCount == 1)
-                {
-                    if (index > 0)
-                        input[index - 1] = ts.Cut().Trim().ToString();
-
-                    ++index;
-                    if (index > n)
-                        break;
-                    del = delimiters[index];
-                    ts.Reset(i + 1);
-                }
-                else
-                    ts.Expand();
-
-                if (c == '}')
-                    --bracketCount;
-            }
+            var input = Split(script, delimiters, out var index);
             if (index <= n)
                 throw Exceptions.MissingMapDelimiter(delimiters[index], script.ToString());
 
@@ -62,12 +35,8 @@ namespace Calcpad.Core
             Variables.Add(input[4]);
             if (calculate)
             {
-                Parser.Parse(input[2]);
-                var startX = Parser.CalculateReal();
-                var xUnits = Parser.Units;
-                Parser.Parse(input[3]);
-                var endX = Parser.CalculateReal();
-                var endUnits = Parser.Units;
+                var startX = Calculate(input[2], Offsets[2], out var xUnits);
+                var endX = Calculate(input[3], Offsets[3], out var endUnits);
                 if (!Unit.IsConsistent(xUnits, endUnits))
                     throw Exceptions.InconsistentUnits(Unit.GetText(xUnits), Unit.GetText(endUnits));
 
@@ -76,12 +45,8 @@ namespace Calcpad.Core
                     var factor = endUnits.ConvertTo(xUnits);
                     endX *= factor;
                 }
-                Parser.Parse(input[5]);
-                var startY = Parser.CalculateReal();
-                var yUnits = Parser.Units;
-                Parser.Parse(input[6]);
-                var endY = Parser.CalculateReal();
-                endUnits = Parser.Units;
+                var startY = Calculate(input[5], Offsets[5], out var yUnits);
+                var endY = Calculate(input[6], Offsets[6], out endUnits);
                 if (!Unit.IsConsistent(yUnits, endUnits))
                     throw Exceptions.InconsistentUnits(Unit.GetText(yUnits), Unit.GetText(endUnits));
 
@@ -93,12 +58,12 @@ namespace Calcpad.Core
                 if (startX.AlmostEquals(endX) || startY.AlmostEquals(endY))
                     throw Exceptions.PlotLimitsIdentical();
 
-                ReadOnlySpan<Parameter> parameters =
+                Parameter[] parameters =
                 [
                     new(input[1]),
                     new(input[4])
                 ];
-                _function = Parser.Compile(input[0], parameters);
+                _function = Compile(input[0], Offsets[0], parameters);
                 result = GetHtmlImage(parameters[0].Variable, parameters[1].Variable, startX, endX, startY, endY, xUnits, yUnits);
             }
             else
@@ -122,8 +87,7 @@ namespace Calcpad.Core
         {
             for (int i = 0, len = input.Length; i < len; ++i)
             {
-                Parser.Parse(input[i]);
-                input[i] = Parser.ToHtml();
+                input[i] = ToHtml(input[i], Offsets[i]);
             }
             return string.Concat("<span class = \"eq\"><span class=\"cond\">$Map</span>", '{', input[0], " @ ", input[1], " ∈ [", input[2], "; ", input[3], "]}</span>");
         }

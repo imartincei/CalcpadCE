@@ -23,6 +23,8 @@ namespace Calcpad.Highlighter.ContentResolution
         private readonly int[][] _traceLines;
         // Last line of a continued statement → its first line, both 1-based.
         private readonly Dictionary<int, int> _statementStarts = [];
+        // Trace lines more than one Stage 3 line maps to, as with multi-line macros and includes
+        private readonly HashSet<int> _sharedLines = [];
 
         public RuntimeOverlay(RuntimeTrace trace, StagedResolvedContent staged)
         {
@@ -39,18 +41,26 @@ namespace Calcpad.Highlighter.ContentResolution
 
             var stage3 = staged.Stage3;
             _traceLines = new int[stage3.Lines.Count][];
+            var seen = new HashSet<int>();
             for (var i = 0; i < _traceLines.Length; i++)
             {
                 var lines = _traceLines[i] = GetTraceLines(staged, i);
                 if (lines.Length > 1)
                     _statementStarts[lines[^1]] = lines[0];
+                else if (lines.Length == 1 && !seen.Add(lines[0]))
+                    _sharedLines.Add(lines[0]);
             }
         }
 
         public RuntimeTrace Trace => _trace;
 
+        /// <summary>Unknown for lines that share their trace line, since the trace can't tell them apart.</summary>
         public LineExecution GetExecution(int stage3Line)
         {
+            var lines = GetLines(stage3Line);
+            if (lines.Length == 1 && _sharedLines.Contains(lines[0]))
+                return LineExecution.Unknown;
+
             if (TryGetState(stage3Line, out _))
                 return LineExecution.Executed;
 
@@ -109,6 +119,15 @@ namespace Calcpad.Highlighter.ContentResolution
 
         public TraceVariable GetFirstDefinition(string name) =>
             _trace.Variables.GetValueOrDefault(name);
+
+        public bool ReportedError(int stage3Line, string code)
+        {
+            foreach (var line in GetLines(stage3Line))
+                if (_trace.HasError(line, code))
+                    return true;
+
+            return false;
+        }
 
         private int[] GetLines(int stage3Line) =>
             stage3Line >= 0 && stage3Line < _traceLines.Length ? _traceLines[stage3Line] : [];
