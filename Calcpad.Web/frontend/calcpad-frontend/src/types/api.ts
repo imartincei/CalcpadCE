@@ -10,6 +10,8 @@ export interface LintRequest {
     sourceFilePath?: string;
     /** Use the last debug run of this exact content. Static when false. */
     useTrace?: boolean;
+    /** The editor's complex mode, which the document starts in until a #settings changes it. */
+    isComplex?: boolean;
 }
 
 export interface LintResponse {

@@ -34,10 +34,11 @@ export function setupDiagnostics(
     deferToRun: () => boolean = () => false,
     onLinted?: (model: monaco.editor.ITextModel, diagnostics: LintDiagnostic[]) => void,
     linkFile?: FileLinker,
+    isComplex: () => boolean = () => false,
 ): DiagnosticsHandle {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext, key, useTrace(), onLinted, linkFile);
+    const run = () => lintAndMark(editor, apiClient, getMinSeverity(), getFileContext, key, useTrace(), onLinted, linkFile, isComplex());
 
     const listener = editor.onDidChangeModelContent(() => {
         if (debounceTimer) clearTimeout(debounceTimer);
@@ -64,13 +65,14 @@ async function lintAndMark(
     useTrace?: boolean,
     onLinted?: (model: monaco.editor.ITextModel, diagnostics: LintDiagnostic[]) => void,
     linkFile?: FileLinker,
+    isComplex?: boolean,
 ): Promise<void> {
     const model = editor.getModel();
     if (!model) return;
 
     const content = model.getValue();
     const ctx = getFileContext ? await getFileContext(content) : {};
-    const response = await apiClient.lint(content, ctx.sourceFilePath, { key, useTrace });
+    const response = await apiClient.lint(content, ctx.sourceFilePath, { key, useTrace, isComplex });
 
     if (model.isDisposed()) return;
     onLinted?.(model, [...response?.diagnostics ?? [], ...response?.includeOnly ?? []]);

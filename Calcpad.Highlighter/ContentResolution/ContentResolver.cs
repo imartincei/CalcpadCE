@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Calcpad.Highlighter.Parsing;
 
@@ -36,7 +35,7 @@ namespace Calcpad.Highlighter.ContentResolution
                 Stage1 = stage1,
                 Stage2 = stage2,
                 Stage3 = stage3,
-                CoreCheck = new(() => RunCoreCheck(stage2, stage3))
+                CoreCheck = new(isComplex => RunCoreCheck(stage2, stage3, isComplex))
             };
         }
 
@@ -59,7 +58,7 @@ namespace Calcpad.Highlighter.ContentResolution
             };
         }
 
-        private static IReadOnlyList<Calcpad.Core.CalcpadError> RunCoreCheck(Stage2Result stage2, Stage3Result stage3)
+        private static IReadOnlyList<Calcpad.Core.CalcpadError> RunCoreCheck(Stage2Result stage2, Stage3Result stage3, bool isComplex)
         {
             if (!stage2.IsMacroParserComplete)
                 return [];
@@ -71,20 +70,14 @@ namespace Calcpad.Highlighter.ContentResolution
                     stage3.SourceMap.TryGetValue(i, out var stage2Line) &&
                     stage2.MacroErrorLines.Contains(stage2Line) ? string.Empty : stage3.Lines[i]);
 
-            // Complex mode can be set outside the document, so only lines that fail in both modes count
+            // Starts in the editor's mode; #settings switches it where the run would
             try
             {
-                var code = JoinLines(lines);
-                var complex = Check(true).Where(e => e.Severity == Calcpad.Core.CalcpadErrorSeverity.Error)
-                    .Select(e => e.SourceLine).ToHashSet();
-                return Check(false).Where(e => e.Severity == Calcpad.Core.CalcpadErrorSeverity.Warning || complex.Contains(e.SourceLine)).ToList();
-
-                IReadOnlyList<Calcpad.Core.CalcpadError> Check(bool isComplex) =>
-                    new Calcpad.Core.ExpressionParser
-                    {
-                        PathRoots = stage2.PathRoots,
-                        Settings = new Calcpad.Core.Settings { Math = { IsComplex = isComplex } }
-                    }.Check(code);
+                return new Calcpad.Core.ExpressionParser
+                {
+                    PathRoots = stage2.PathRoots,
+                    Settings = new Calcpad.Core.Settings { Math = { IsComplex = isComplex } }
+                }.Check(JoinLines(lines));
             }
             catch (Exception)
             {

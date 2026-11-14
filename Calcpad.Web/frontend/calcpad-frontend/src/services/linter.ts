@@ -25,6 +25,7 @@ export class CalcpadLintService {
         sourceFilePath?: string,
         key?: string,
         useTrace?: boolean,
+        isComplex?: boolean,
     ): Promise<LintResponse | null> {
         const reqId = ++this.requestId;
         const startTime = Date.now();
@@ -37,7 +38,7 @@ export class CalcpadLintService {
         }
 
         const truncated = truncateBase64Content(content);
-        const response = await this.apiClient.lint(truncated, sourceFilePath, { key, useTrace });
+        const response = await this.apiClient.lint(truncated, sourceFilePath, { key, useTrace, isComplex });
 
         if (response) {
             this.logger?.appendLine(

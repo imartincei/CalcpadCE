@@ -38,7 +38,8 @@ export class CalcpadServerLinter {
 
         try {
             const sourceFilePath = document.uri.fsPath;
-            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`, useTrace);
+            const isComplex = CalcpadSettingsManager.getInstance().getSettings().math.isComplex;
+            const lintResponse = await this.lintService.lintContent(content, sourceFilePath, `lint:${document.uri.toString()}`, useTrace, isComplex);
 
             if (lintResponse) {
                 const diagnostics = this.convertToDiagnostics(lintResponse.diagnostics, document.uri);

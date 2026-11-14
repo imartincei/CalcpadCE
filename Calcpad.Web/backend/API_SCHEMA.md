@@ -486,6 +486,7 @@ interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
   useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  isComplex?: boolean;      // Editor's complex mode; Core's check starts in it until a #settings changes it (default false)
 }
 ```
 

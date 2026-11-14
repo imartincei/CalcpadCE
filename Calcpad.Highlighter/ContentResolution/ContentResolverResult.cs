@@ -416,7 +416,16 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>What Core executed for this content; null when no trace matched.</summary>
         public RuntimeOverlay Runtime { get; set; }
 
-        /// <summary>Core's check pass over the Stage 3 lines, run once on first use.</summary>
-        public Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> CoreCheck { get; set; }
+        /// <summary>Core's check pass over the Stage 3 lines, run once per starting mode on first use.</summary>
+        public CoreCheckResults CoreCheck { get; set; }
+    }
+
+    /// <summary>The check pass for each complex mode the document can start in; #settings may switch it later.</summary>
+    public sealed class CoreCheckResults(Func<bool, IReadOnlyList<Calcpad.Core.CalcpadError>> check)
+    {
+        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _real = new(() => check(false));
+        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _complex = new(() => check(true));
+
+        public IReadOnlyList<Calcpad.Core.CalcpadError> Get(bool isComplex) => (isComplex ? _complex : _real).Value;
     }
 }

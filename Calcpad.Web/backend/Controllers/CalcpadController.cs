@@ -531,7 +531,7 @@ namespace Calcpad.Server.Controllers
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
-                var lintResult = linter.Lint(staged, ignoreRegions);
+                var lintResult = linter.Lint(staged, ignoreRegions, request.IsComplex);
 
                 var response = new LintResponse
                 {
@@ -1133,6 +1133,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Use what the last debug /convert of this exact content executed. Static analysis when false.</summary>
         public bool UseTrace { get; set; }
+
+        /// <summary>The editor's complex mode, which the document starts in until a #settings changes it.</summary>
+        public bool IsComplex { get; set; }
     }
 
     public class LintResponse

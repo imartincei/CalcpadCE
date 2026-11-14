@@ -31,8 +31,9 @@ namespace Calcpad.Highlighter.Linter
         /// Optional source-level regions in which specific diagnostic codes are suppressed, with
         /// 0-based original source line numbers. Applied after all diagnostics are mapped back.
         /// </param>
+        /// <param name="isComplex">The complex mode the document starts in, from the editor's settings.</param>
         public LinterResult Lint(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null, bool isComplex = false)
         {
             if (staged == null)
             {
@@ -65,7 +66,7 @@ namespace Calcpad.Highlighter.Linter
                 _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
             if (staged.CoreCheck is { } check)
-                _coreCheckValidator.Validate(stage3Context, check.Value, result, staged.Stage2);
+                _coreCheckValidator.Validate(stage3Context, check.Get(isComplex), result, staged.Stage2);
             BodyDiagnostics.MapMacroBodies(result, staged.Stage2);
 
             // Map all diagnostics from stage lines to original lines
@@ -82,9 +83,9 @@ namespace Calcpad.Highlighter.Linter
         }
 
         public Task<LinterResult> LintAsync(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null, bool isComplex = false)
         {
-            return Task.Run(() => Lint(staged, ignoreRegions));
+            return Task.Run(() => Lint(staged, ignoreRegions, isComplex));
         }
 
         // Errors from included or macro lines can land on the same source span; the kept one takes the others' links

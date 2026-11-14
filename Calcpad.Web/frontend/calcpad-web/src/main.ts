@@ -1114,7 +1114,8 @@ async function bootstrap(): Promise<void> {
 
         // Per-group diagnostics.
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, linterMinSeverity,
-            getFileContext, `lint:${group.id}`, useTrace, runFollows, onLinted, linkFile);
+            getFileContext, `lint:${group.id}`, useTrace, runFollows, onLinted, linkFile,
+            () => activeBridge.getSettings().math.isComplex);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1736,6 +1737,9 @@ async function bootstrap(): Promise<void> {
             || data.type === 'previewUiOverridesChanged' || data.type === 'previewPdfChanged') {
             if (!fromHost) return;
             refreshAllPreviews();
+            // Lint follows each run when tracing; otherwise it would keep the old complex mode
+            if (data.type === 'settingsChanged' && !useTrace())
+                for (const g of groups.values()) void g.diagnostics?.refresh();
             return;
         }
 
