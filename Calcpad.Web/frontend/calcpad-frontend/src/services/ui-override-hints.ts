@@ -1,4 +1,5 @@
 import type { UiControl, UiOverrides } from './ui-overrides';
+import { effectiveUiOverrideKey } from './ui-source-sync';
 
 /** A saved `#UI` value (or several) shown above the source line it applies to. */
 export interface UiOverrideHint {
@@ -24,14 +25,6 @@ export function uiOverrideHintTitle(hint: UiOverrideHint, labels: UiOverrideHint
     return hint.value ? labels.value(hint.value.name, hint.value.value) : labels.count(hint.keys.length);
 }
 
-/** The saved key a control renders with, narrowest first as `ExpressionParser.ApplyUiOverride` picks it. */
-function effectiveKey(overrides: UiOverrides, key: string): string | null {
-    const [name, ordinal] = key.split(':');
-    for (const candidate of [key, `${name}:${ordinal}`, name])
-        if (Object.prototype.hasOwnProperty.call(overrides, candidate)) return candidate;
-    return null;
-}
-
 const UI_LINE = /^\s*#ui\b/i;
 
 /**
@@ -53,7 +46,7 @@ export function computeUiOverrideHints(
     const hints: UiOverrideHint[] = [];
     for (const [line, lineControls] of byLine) {
         const keys = [...new Set(lineControls
-            .map(c => effectiveKey(overrides, c.key))
+            .map(c => effectiveUiOverrideKey(overrides, c.key))
             .filter((k): k is string => k !== null))];
         if (!keys.length) continue;
         const only = lineControls.length === 1 ? lineControls[0] : null;
@@ -136,7 +129,8 @@ export class UiOverrideHintTracker {
         this.options.changed(docKey);
     }
 
-    applyEdits(docKey: string, edits: SourceEdit[]): void {
+    /** Returns the controls as they were before the edits. */
+    applyEdits(docKey: string, edits: SourceEdit[]): UiControl[] | undefined {
         const current = this.controls.get(docKey);
         if (current) {
             const shifted = shiftUiControls(current, edits);
@@ -153,6 +147,7 @@ export class UiOverrideHintTracker {
             this.timers.delete(docKey);
             void this.ensure(docKey);
         }, this.options.idleMs ?? 1500));
+        return current;
     }
 
     /** Renders the document when its controls are unknown or older than its last edit. */

@@ -18,6 +18,9 @@
         <label for="fileInfoProject"><CalcpadSearchHighlight :text="t('Project')" :query="query" /></label>
         <input id="fileInfoProject" v-model="draft.project" type="text" :placeholder="t('(none)')" @keyup.enter="apply" />
       </div>
+      <p v-if="changeCount" v-show="rowVisible('title') || rowVisible('project')" class="pending">
+        {{ t('Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes', { n: changeCount }, changeCount) }}
+      </p>
       <div v-show="rowVisible('title') || rowVisible('project')" class="actions">
         <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
         <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
@@ -98,6 +101,11 @@ const sameFields = (a: FileInfoDraft, b: FileInfoDraft) => a.title === b.title &
 
 const draft = reactive<FileInfoDraft>({ ...(getFileInfoDraft(props.docKey) ?? savedFields(props.info)) })
 const dirty = computed(() => !!props.info && !sameFields(draft, savedFields(props.info)))
+const changeCount = computed(() => {
+  if (!props.info) return 0
+  const saved = savedFields(props.info)
+  return (draft.title !== saved.title ? 1 : 0) + (draft.project !== saved.project ? 1 : 0)
+})
 let boundDocKey = props.docKey
 
 // The host prompts before closing a document with an unapplied form.
@@ -237,5 +245,11 @@ function formatTimestamp(iso: string): string {
   color: var(--vscode-textLink-foreground);
   font: inherit;
   text-decoration: underline;
+}
+
+.pending {
+  margin: 8px 0 0 0;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  font-style: italic;
 }
 </style>

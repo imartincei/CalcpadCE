@@ -85,6 +85,7 @@
         :initial-enable-preview-pdf="enablePreviewPdf"
         :initial-show-file-metadata="showFileMetadata"
         :initial-show-ui-override-hints="showUiOverrideHints"
+        :initial-auto-sync-ui-values="autoSyncUiValues"
         :initial-dark-background="darkBackground"
         :initial-linter-min-severity="linterMinSeverity"
         :initial-log-level="logLevel"
@@ -117,6 +118,7 @@
         @update-preview-pdf="handleUpdatePreviewPdf"
         @update-show-file-metadata="handleUpdateShowFileMetadata"
         @update-show-ui-override-hints="handleUpdateShowUiOverrideHints"
+        @update-auto-sync-ui-values="handleUpdateAutoSyncUiValues"
         @update-dark-background="handleUpdateDarkBackground"
         @update-linter-min-severity="handleUpdateLinterMinSeverity"
         @update-log-level="handleUpdateLogLevel"
@@ -194,6 +196,7 @@
         @open-settings="openSetting(pane, 'user', 'userName')"
         @file-info-draft-dirty="handleDraftDirty($event, 'info')"
         @update-ui-overrides="handleUpdateUiOverrides"
+        @override-ui-defaults="postMessage({ type: 'overrideUiDefaults', keys: $event })"
         @ui-overrides-draft-dirty="handleDraftDirty($event, 'uiOverrides')"
       />
     </div>
@@ -274,6 +277,7 @@ const enablePreviewUiOverrides = ref(false)
 const enablePreviewPdf = ref(false)
 const showFileMetadata = ref(false)
 const showUiOverrideHints = ref(false)
+const autoSyncUiValues = ref(false)
 const darkBackground = ref('#1e1e1e')
 const linterMinSeverity = ref('information')
 const logLevel = ref('warning')
@@ -615,6 +619,11 @@ const handleUpdateShowFileMetadata = (enabled: boolean) => {
   postMessage({ type: 'updateShowFileMetadata', enabled })
 }
 
+const handleUpdateAutoSyncUiValues = (enabled: boolean) => {
+  autoSyncUiValues.value = enabled
+  postMessage({ type: 'updateAutoSyncUiValues', enabled })
+}
+
 const handleUpdateShowUiOverrideHints = (enabled: boolean) => {
   showUiOverrideHints.value = enabled
   postMessage({ type: 'updateShowUiOverrideHints', enabled })
@@ -836,6 +845,7 @@ const handleMessage = (event: MessageEvent) => {
       if (typeof message.enablePreviewPdf === 'boolean') enablePreviewPdf.value = message.enablePreviewPdf
       if (typeof message.showFileMetadata === 'boolean') showFileMetadata.value = message.showFileMetadata
       if (typeof message.showUiOverrideHints === 'boolean') showUiOverrideHints.value = message.showUiOverrideHints
+      if (typeof message.autoSyncUiValues === 'boolean') autoSyncUiValues.value = message.autoSyncUiValues
       darkBackground.value = message.darkBackground || '#1e1e1e'
       linterMinSeverity.value = message.linterMinSeverity || 'information'
       logLevel.value = message.logLevel || 'warning'
