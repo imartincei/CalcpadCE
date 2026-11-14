@@ -32,6 +32,13 @@ namespace Calcpad.Core
             }
         }
 
+        // Applied by MacroParser before expressions are parsed.
+        private sealed class MacroParserBinding : ISettingBinding
+        {
+            public void Apply(ExpressionParser p, SettingsDto dto) { }
+            public void Capture(ExpressionParser p, SettingsDto dto, SettingsDto prior) { }
+        }
+
         private static SettingBinding<T> Plain<T>(
             Func<SettingsDto, T?> get, Action<SettingsDto, T> set,
             Func<Settings, T> read, Action<Settings, T> write) where T : struct =>
@@ -119,6 +126,7 @@ namespace Calcpad.Core
                 s => s.Math.Precision, (s, v) => s.Math.Precision = v),
             [SettingKey.Tol] = NumberVar("Tol", d => d.Tol, (d, v) => d.Tol = v,
                 s => s.Math.Tol, (s, v) => s.Math.Tol = v),
+            [SettingKey.MacroCalls] = new MacroParserBinding(),
         };
 
         private void ApplySetting(SettingKey key, SettingsDto dto) => SettingBindings[key].Apply(this, dto);

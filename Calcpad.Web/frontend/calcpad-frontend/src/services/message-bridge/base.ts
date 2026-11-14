@@ -123,7 +123,12 @@ export abstract class BaseMessageBridge {
     protected apiClient: CalcpadApiClient;
     protected snippetService: CalcpadSnippetService;
     protected definitionsService: CalcpadDefinitionsService;
-    protected settings: CalcpadSettings;
+    private _settings!: CalcpadSettings;
+    protected get settings(): CalcpadSettings { return this._settings; }
+    protected set settings(value: CalcpadSettings) {
+        this._settings = value;
+        this.apiClient.setMacroCalls(value.macroCalls);
+    }
     protected _onInsertText: ((text: string) => void) | null = null;
     protected _onGoToLine: ((line: number) => boolean) | null = null;
     protected quickPick: QuickPickFn | null = null;

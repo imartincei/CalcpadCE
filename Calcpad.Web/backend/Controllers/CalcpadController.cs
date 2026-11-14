@@ -150,7 +150,7 @@ namespace Calcpad.Server.Controllers
         {
             try
             {
-                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath);
+                var result = PortableWorksheet.Build(request.Content, request.SourceFilePath, request.MacroCalls);
                 if (result.Errors.Count > 0)
                     return BadRequest(new { error = "The worksheet is not self-contained", messages = result.Errors });
 
@@ -494,7 +494,7 @@ namespace Calcpad.Server.Controllers
 
                 var tokenizer = new CalcpadTokenizer();
                 tokenizer.SetResolvedContent(
-                    _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath));
+                    _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, macroCalls: request.MacroCalls));
 
                 var result = tokenizer.Tokenize(request.Content);
                 return Ok(MapTokensToResponse(result.Tokens, request.IncludeText));
@@ -527,7 +527,7 @@ namespace Calcpad.Server.Controllers
 
                 var linter = new CalcpadLinter();
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.UseTrace);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.UseTrace, request.MacroCalls);
 
                 // Extract LintIgnore regions from raw source, then lint with suppression
                 var ignoreRegions = _lintIgnoreRegionParser.ExtractRegions(request.Content);
@@ -580,7 +580,7 @@ namespace Calcpad.Server.Controllers
 
                 FileLogger.LogVerbose("Definitions request received", "Length: " + request.Content.Length);
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.UseTrace);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, request.UseTrace, request.MacroCalls);
 
                 var typeTracker = staged.Stage3.TypeTracker;
 
@@ -698,7 +698,7 @@ namespace Calcpad.Server.Controllers
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath);
+                var staged = _contentResolutionCache.GetOrResolve(request.Content, request.SourceFilePath, macroCalls: request.MacroCalls);
                 var hit = SymbolResolver.ResolveSymbolAt(staged.Stage3, request.Line, request.Column);
                 if (hit == null) return Ok(null);
 
@@ -1031,6 +1031,9 @@ namespace Calcpad.Server.Controllers
         /// paths resolve against its folder, as they do when the worksheet runs.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>App-level macro call mode, before any <c>#settings</c>.</summary>
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     public class PortableBundleResponse
@@ -1069,6 +1072,9 @@ namespace Calcpad.Server.Controllers
         /// Full path of the source file on disk.
         /// </summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>App-level macro call mode, before any <c>#settings</c>.</summary>
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     public class HighlightResponse
@@ -1115,6 +1121,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Use what the last debug /convert of this exact content executed. Static analysis when false.</summary>
         public bool UseTrace { get; set; }
+
+        /// <summary>App-level macro call mode, before any <c>#settings</c>.</summary>
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     public class LintResponse
@@ -1166,6 +1175,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Use what the last debug /convert of this exact content executed. Static analysis when false.</summary>
         public bool UseTrace { get; set; }
+
+        /// <summary>App-level macro call mode, before any <c>#settings</c>.</summary>
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     public class DefinitionsResponse
@@ -1383,6 +1395,9 @@ namespace Calcpad.Server.Controllers
 
         /// <summary>Full path of the source file on disk (used to resolve #include).</summary>
         public string? SourceFilePath { get; set; }
+
+        /// <summary>App-level macro call mode, before any <c>#settings</c>.</summary>
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     public class SymbolAtPositionResponse

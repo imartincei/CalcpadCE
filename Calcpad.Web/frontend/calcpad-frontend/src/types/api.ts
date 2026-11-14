@@ -10,6 +10,8 @@ export interface LintRequest {
     sourceFilePath?: string;
     /** Use the last debug run of this exact content. Static when false. */
     useTrace?: boolean;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface LintResponse {
@@ -53,6 +55,8 @@ export interface HighlightRequest {
     content: string;
     includeText?: boolean;
     sourceFilePath?: string;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface HighlightResponse {
@@ -186,6 +190,8 @@ export interface DefinitionsRequest {
     sourceFilePath?: string;
     /** Use the last debug run of this exact content. Static when false. */
     useTrace?: boolean;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface DefinitionsResponse {
@@ -284,6 +290,8 @@ export interface SymbolAtPositionRequest {
     line: number;       // 0-based, in original source
     column: number;     // 0-based
     sourceFilePath?: string;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface SymbolAtPositionResponse {
