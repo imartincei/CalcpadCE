@@ -21,6 +21,9 @@ namespace Calcpad.Core
         public int StartColumn { get; init; } = -1;
         public int EndColumn { get; init; } = -1;
 
+        /// <summary>The error's parts on later lines of a continued statement, or null.</summary>
+        public IReadOnlyList<CalcpadErrorRange> AdditionalRanges { get; init; }
+
         /// <summary>For an error in a custom function body: the call it was found at.</summary>
         public CalcpadCallSite CallSite { get; init; }
 
@@ -30,6 +33,9 @@ namespace Calcpad.Core
         /// <summary>For an error raised while calculating custom functions: those functions, innermost first, or null.</summary>
         public IReadOnlyList<CalcpadFunctionFrame> Functions { get; init; }
     }
+
+    /// <summary>Part of an error on another line. Columns as in <see cref="CalcpadError"/>.</summary>
+    public sealed record CalcpadErrorRange(int SourceLine, int OutputLine, int StartColumn, int EndColumn);
 
     /// <summary>A custom function and the first source line of its definition.</summary>
     public sealed record CalcpadFunctionFrame(string Name, int SourceLine);

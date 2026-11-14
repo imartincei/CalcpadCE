@@ -152,19 +152,25 @@ export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: Calc
     if (model.isDisposed()) return;
     const lineCount = model.getLineCount();
     const lineOf = (sourceLine: number) => Math.min(Math.max(sourceLine, 1), lineCount);
+    // 1-based [line, start, end] on one line, or the whole line when the columns don't fit
+    const span = (sourceLine: number, start = -1, end = -1) => {
+        const line = lineOf(sourceLine);
+        return start >= 0 && end > start && end < model.getLineMaxColumn(line)
+            ? [line, start + 1, end + 1]
+            : [line, model.getLineFirstNonWhitespaceColumn(line) || 1, model.getLineMaxColumn(line)];
+    };
     monaco.editor.setModelMarkers(model, 'calcpad-run', expandRunErrors(errors).map(err => {
-        const line = lineOf(err.sourceLine);
-        const start = err.startColumn ?? -1;
-        const end = err.endColumn ?? -1;
-        const hasColumns = start >= 0 && end > start && end < model.getLineMaxColumn(line);
+        const [line, startColumn, endColumn] = span(err.sourceLine, err.startColumn, err.endColumn);
+        const last = err.additionalRanges?.[err.additionalRanges.length - 1];
+        const [endLine, , lastEnd] = last ? span(last.sourceLine, last.startColumn, last.endColumn) : [line, 0, endColumn];
         return {
             severity: monaco.MarkerSeverity.Error,
             message: `[Runtime] ${err.message}`,
             code: err.code,
             startLineNumber: line,
-            startColumn: hasColumns ? start + 1 : model.getLineFirstNonWhitespaceColumn(line) || 1,
-            endLineNumber: line,
-            endColumn: hasColumns ? end + 1 : model.getLineMaxColumn(line),
+            startColumn,
+            endLineNumber: endLine,
+            endColumn: lastEnd,
             relatedInformation: err.related.map(r => ({
                 resource: model.uri,
                 message: r.message,

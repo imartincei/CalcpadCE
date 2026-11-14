@@ -98,10 +98,10 @@ The analysis endpoints (`/highlight`, `/lint`, `/definitions`, `/symbol-at-posit
 Calculation errors come back alongside it in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
 
 ```typescript
-Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression", code, kind, startColumn, endColumn }>
+Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression", code, kind, startColumn, endColumn, additionalRanges? }>
 ```
 
-`startColumn` and `endColumn` mark the error on its source line, or are -1 when it covers the whole line.
+`startColumn` and `endColumn` mark the error on its source line, or are -1 when it covers the whole line. On macro lines they point at the argument, or cover the call when the error is in the macro's body. Errors in included code cover the whole `#include` line. `additionalRanges` holds the error's parts on later lines of a continued statement.
 
 `code` is the error's `CPD-xxxx` code (see [Linter and Diagnostics](new-linter.md)).
 The editors show these errors in their Problems panels.

@@ -16,7 +16,7 @@ export class CalcpadRunDiagnostics implements vscode.Disposable {
             diagnostic.code = err.code;
             if (err.related.length > 0) {
                 diagnostic.relatedInformation = err.related.map(r => new vscode.DiagnosticRelatedInformation(
-                    new vscode.Location(uri, this.range(document, { ...err, sourceLine: r.line, startColumn: -1, endColumn: -1 })),
+                    new vscode.Location(uri, this.lineRange(document, r.line, -1, -1)),
                     r.message));
             }
             return diagnostic;
@@ -32,9 +32,16 @@ export class CalcpadRunDiagnostics implements vscode.Disposable {
     }
 
     private range(document: vscode.TextDocument | undefined, err: CalcpadError): vscode.Range {
-        const line = Math.max(err.sourceLine - 1, 0);
-        const start = err.startColumn ?? -1;
-        const end = err.endColumn ?? -1;
+        const first = this.lineRange(document, err.sourceLine, err.startColumn ?? -1, err.endColumn ?? -1);
+        const more = err.additionalRanges ?? [];
+        if (more.length === 0)
+            return first;
+        const last = more[more.length - 1];
+        return new vscode.Range(first.start, this.lineRange(document, last.sourceLine, last.startColumn, last.endColumn).end);
+    }
+
+    private lineRange(document: vscode.TextDocument | undefined, sourceLine: number, start: number, end: number): vscode.Range {
+        const line = Math.max(sourceLine - 1, 0);
         if (!document) {
             return start >= 0 && end > start
                 ? new vscode.Range(line, start, line, end)

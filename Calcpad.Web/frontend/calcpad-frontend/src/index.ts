@@ -26,6 +26,7 @@ export type {
     PrettifyRequest,
     PrettifyResponse,
     CalcpadError,
+    CalcpadErrorRange,
     CalcpadFunctionFrame,
     CalcpadErrorSource,
     ConvertResult,

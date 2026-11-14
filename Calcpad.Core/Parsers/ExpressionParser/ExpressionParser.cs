@@ -24,7 +24,7 @@ namespace Calcpad.Core
         // Column where the keyword line's trimmed text starts, or -1
         private int _keywordOffset = -1;
         // Where each physical line of a continued statement starts in the joined text
-        private readonly List<(int Start, int Length, int Line, int Column)> _segments = [];
+        private readonly List<(int Start, int Length, int Line, int Column, int OutputLine)> _segments = [];
         private bool _isJoined;
         private int _htmlLines;
         private int _decimals;
@@ -175,7 +175,7 @@ namespace Calcpad.Core
                             textSpan = s.AsSpan();
                             if (_segments.Count > 0)
                                 _segments[^1] = _segments[^1] with { Length = Math.Min(_segments[^1].Length, start - _segments[^1].Start) };
-                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset));
+                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset, _currentLine + 1));
                             // The run maps joined columns back to each line; the check pass gets joined lines
                             _isJoined = !_isCheck;
                             lineOffset = _isJoined ? 0 : -1;
@@ -185,7 +185,7 @@ namespace Calcpad.Core
                             textSpan = lineSpan;
                             _parser.StatementLine = _parser.Line;
                             _segments.Clear();
-                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset));
+                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset, _currentLine + 1));
                         }
 
                         if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
@@ -835,24 +835,27 @@ namespace Calcpad.Core
             if (!enabled && !_isCheck) return true;
             if (_isVisible)
                 _errors.Enqueue(line);
+            var outputLine = line + 1;
+            List<CalcpadErrorRange> additionalRanges = null;
             if (sourceLine <= 0)
             {
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
                 if (_isJoined)
-                    (sourceLine, startColumn, endColumn) = MapJoinedColumns(startColumn, endColumn);
+                    (sourceLine, outputLine, startColumn, endColumn, additionalRanges) = MapJoinedColumns(startColumn, endColumn);
             }
             if (!_isCheck)
                 Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
-                OutputLine = line + 1,
+                OutputLine = outputLine,
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
                 Code = code,
                 Kind = kind,
                 StartColumn = startColumn,
                 EndColumn = endColumn,
+                AdditionalRanges = additionalRanges,
                 CallSite = callSite,
                 IsFunctionBody = isFunctionBody,
                 Functions = functions
@@ -860,19 +863,27 @@ namespace Calcpad.Core
             return true;
         }
 
-        // A span in a continued statement, cut to the line it starts on; the first line when unknown
-        private (int Line, int Start, int End) MapJoinedColumns(int start, int end)
+        // A span in a continued statement, split at its lines; the first line when unknown
+        private (int Line, int OutputLine, int Start, int End, List<CalcpadErrorRange> More) MapJoinedColumns(int start, int end)
         {
             if (start < 0)
-                return (_segments[0].Line, -1, -1);
+                return (_segments[0].Line, _segments[0].OutputLine, -1, -1, null);
 
             var i = _segments.Count - 1;
             while (i > 0 && _segments[i].Start > start)
                 --i;
-            var (segmentStart, length, line, column) = _segments[i];
+            var (segmentStart, length, line, column, outputLine) = _segments[i];
             var offset = Math.Min(start - segmentStart, length);
             var stop = Math.Min(Math.Max(end, start + 1) - segmentStart, length);
-            return (line, column + offset, column + Math.Max(stop, offset + 1));
+            List<CalcpadErrorRange> more = null;
+            for (var j = i + 1; j < _segments.Count && _segments[j].Start < end; ++j)
+            {
+                var next = _segments[j];
+                var count = Math.Min(end - next.Start, next.Length);
+                if (count > 0)
+                    (more ??= []).Add(new(next.Line, next.OutputLine, next.Column, next.Column + count));
+            }
+            return (line, outputLine, column + offset, column + Math.Max(stop, offset + 1), more);
         }
 
         // The failing word when the tokenizer found the position, otherwise the whole expression

@@ -743,7 +743,7 @@ namespace Calcpad.Core
 
                 ++_parsedLineNumber;
                 if (trace && Trace is not null)
-                    Trace.OutputLines.Add(new() { Text = line.ToString(), SourceIndex = traceSource });
+                    Trace.OutputLines.Add(new() { Text = line.ToString(), SourceIndex = traceSource, OutputLine = _parsedLineNumber });
             }
 
             void AppendExpansion(Mapped insertCode, List<string> expanded)
@@ -761,6 +761,7 @@ namespace Calcpad.Core
                     {
                         Text = line.ToString(),
                         SourceIndex = traceSource,
+                        OutputLine = _parsedLineNumber,
                         ExpandedMacros = expanded,
                         SourceOffsets = Debug ? insertCode.Origins.ToArray(start, line.Length) : null,
                         ContentIndex = index++,

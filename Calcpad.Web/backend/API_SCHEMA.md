@@ -144,10 +144,11 @@ Array<{
   severity: "Error" | "Warning"; // always "Error" from a run
   startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
   endColumn: number;
+  additionalRanges?: Array<{ sourceLine, outputLine, startColumn, endColumn }>; // later lines of a continued statement
 }>
 ```
 
-Columns are in the text Core ran, so on lines changed by macros or `#include` they may not line up with the source.
+Columns are on the source line. On a macro line, an error in an argument points at the argument and an error in the macro's body covers the call. Errors in `#include`d code cover the whole `#include` line. An error that runs onto later lines of a continued statement lists those parts in `additionalRanges`, and the editors underline from its start to the end of the last part.
 
 The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 

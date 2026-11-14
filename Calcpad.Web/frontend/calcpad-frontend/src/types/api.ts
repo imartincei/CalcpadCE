@@ -332,6 +332,14 @@ export enum CalcpadTypeId {
 
 export type CalcpadErrorSource = 'Macro' | 'Expression';
 
+/** Part of a run error on another line. Columns as in CalcpadError. */
+export interface CalcpadErrorRange {
+    sourceLine: number;
+    outputLine: number;
+    startColumn: number;
+    endColumn: number;
+}
+
 export interface CalcpadError {
     sourceLine: number;
     outputLine: number;
@@ -344,6 +352,8 @@ export interface CalcpadError {
     /** 0-based columns on the source line, end exclusive; -1 when the error covers the whole line. */
     startColumn?: number;
     endColumn?: number;
+    /** The error's parts on later lines of a continued statement. */
+    additionalRanges?: CalcpadErrorRange[];
     /** Custom functions being calculated when the error was raised, innermost first. */
     functions?: CalcpadFunctionFrame[];
 }

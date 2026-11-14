@@ -42,6 +42,7 @@ export function expandRunErrors(errors: CalcpadError[]): RunErrorMark[] {
                 sourceLine: f.sourceLine,
                 startColumn: -1,
                 endColumn: -1,
+                additionalRanges: undefined,
                 functions: undefined,
                 message: i === 0
                     ? `${err.message} At the call on line ${err.sourceLine}.`
