@@ -56,6 +56,13 @@ The two directives split a document into the part that is filled in and the part
 #end post
 ```
 
+Both are still calculated when hidden, so a variable defined in `#post` can be used by a `#pre` later in the file.
+If the `#post` calculations slow down the form and variables are not needed in the Input form, turn off **Calculate #post in Input Form** in [Settings](new-settings.md#math) or in the document using:
+
+```text
+#settings {"calculatePost": false}
+```
+
 **Preview** is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.
 
 Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
@@ -365,6 +372,20 @@ An `#include` line, macro call, or loop lists the overrides for every UI element
 Turn on **Show UI Override Hints** in [Settings](new-settings.md#editor-features) to show saved values above the lines they apply to.
 This is the value itself on a `#UI` line with one control, or the count for a loop, macro call or `#include` line.
 Click a hint to open those values in the Properties tab.
+
+### Moving saved values into the CalcpadCE file
+
+The **Saved #UI values** list in the [Properties tab](new-calcpad-panel.md#properties) has two buttons that act on the values listed:
+
+- **Override Defaults** writes each UI override into its `#UI` line and removes the override. Values in loops, macros and `#include` files are unaffected. If filtering by selected lines, only the selected lines have their defaults updated.
+- **Revert to defaults** removes #UI overrides so the Input form is reverted to default values. If filtering by selected lines, only the selected lines are reverted.
+
+### Auto-syncing values with the CalcpadCE file
+
+Turn on **Auto-Sync #UI Values** in [Settings](new-settings.md#editor-features) to keep `#UI` lines in this file (excluding overrides in loops, macros, and `#include` lines) in sync with the Input form:
+
+- A value entered in the Input form is written into its `#UI` line as the default instead of being saved as an override.
+- Editing the default value on a `#UI` line removes its saved override.
 
 ## Exporting
 

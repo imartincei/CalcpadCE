@@ -156,7 +156,7 @@ namespace Calcpad.Core
                             if (t.Index < 0)
                             {
                                 if (isFunctionDefinition && t.Content == firstToken.Content)
-                                    throw Exceptions.RecursionNotAllowed(t.Content);
+                                    throw AtName(Exceptions.RecursionNotAllowed(t.Content), t);
 
                                 if (t is FunctionToken)
                                     multiFunctionStack.Push(new MultiFunctionStackItem(t, countOfBrackets, countOfDivisors));
@@ -184,6 +184,10 @@ namespace Calcpad.Core
                                 enclosures.Push(new Enclosure(null, countOfDivisors, 0, int.MaxValue));
                             break;
                         case TokenTypes.BracketRight:
+                            // A [ opened after the matching ( is still open
+                            if (countOfBrackets > 0 && vectorStack.TryPeek(out var openVector) && openVector.CountOfBrackets == countOfBrackets)
+                                throw At(Exceptions.BracketMismatch(), t);
+
                             --countOfBrackets;
                             if (countOfBrackets < 0)
                                 throw At(Exceptions.MissingLeftBracket(), t);
@@ -320,6 +324,11 @@ namespace Calcpad.Core
                     }
                     pt = t;
                 }
+                if (pt.Type == TokenTypes.BracketLeft)
+                    throw At(Exceptions.MissingRightBracket(), pt);
+                if (pt.Type == TokenTypes.SquareBracketLeft)
+                    throw At(Exceptions.MissingVectorClosingBracket(), pt);
+
                 if (pt.Type != TokenTypes.None &&
                     pt.Type != TokenTypes.Constant &&
                     pt.Type != TokenTypes.Variable &&

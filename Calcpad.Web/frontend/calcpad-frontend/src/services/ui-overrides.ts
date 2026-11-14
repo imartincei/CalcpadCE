@@ -5,6 +5,7 @@ import {
     findStrayUiOverrides,
     planMetadataFooter,
 } from './metadata-footer';
+import { isSourceUiControl } from './ui-source-sync';
 
 /** Control key (the preview's `data-ui-var`) mapped to the entered value. */
 export type UiOverrides = Record<string, string>;
@@ -24,6 +25,8 @@ export interface UiControl {
     key: string;
     /** 1-based source line the control was declared on, from `data-ui-line`. */
     line: number;
+    /** Declared on a `#UI` line of this file, outside loops, macros and includes. */
+    inSource?: boolean;
 }
 
 /** A saved override paired with the control it resolves to, if any. */
@@ -119,6 +122,17 @@ export class UiOverrideStore {
         this.lastSeenSaved.clear();
     }
 
+    /**
+     * Drops {@link keys} after an edit that also removed them from the saved comment, so the next
+     * {@link syncFromSource} doesn't read that as a hand-edit and discard unsaved values.
+     */
+    public forget(docKey: string, keys: string[], source: string): void {
+        const map = this.byDocument.get(docKey);
+        for (const key of keys) map?.delete(key);
+        const saved = readUiOverrides(source);
+        this.lastSeenSaved.set(docKey, saved ? JSON.stringify(saved) : '');
+    }
+
     public replace(docKey: string, overrides: UiOverrides): void {
         this.byDocument.set(docKey, new Map(Object.entries(overrides)));
     }
@@ -178,7 +192,8 @@ const UI_CONTROL_TAG = /<[^>]+\sdata-ui-var="[^"]*"[^>]*>/g;
  * `#include`d files, macro expansions, taken `#if` branches and loop passes are all
  * already resolved by the time the engine emits the attributes.
  */
-export function extractUiControls(html: string): UiControl[] {
+export function extractUiControls(html: string, source?: string): UiControl[] {
+    const lines = source?.split(/\r?\n/);
     const controls: UiControl[] = [];
     const seen = new Set<string>();
     for (const [tag] of html.matchAll(UI_CONTROL_TAG)) {
@@ -186,7 +201,9 @@ export function extractUiControls(html: string): UiControl[] {
         const line = /\sdata-ui-line="(\d+)"/.exec(tag)?.[1];
         if (!key || !line || seen.has(key)) continue;
         seen.add(key);
-        controls.push({ key, line: Number(line) });
+        const control: UiControl = { key, line: Number(line) };
+        if (lines) control.inSource = isSourceUiControl(control, l => lines[l - 1]);
+        controls.push(control);
     }
     return controls;
 }

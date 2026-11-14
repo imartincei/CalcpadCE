@@ -1,0 +1,18 @@
+' CPD-3201: invalid variable name in #read and #write
+'expect: CPD-3201
+#read 1M from ../includes/data.csv
+
+' An operator in the name
+'expect: CPD-3201
+#read M-x from ../includes/data.csv@A1:B2
+
+' A name that starts with a digit in #write
+M = [1; 2 | 3; 4]
+'expect: CPD-3201
+#write 2M to ../includes/out.csv
+
+' Inside a conditional block
+#if M.(1; 1) > 0
+'expect: CPD-3201
+    #append 3N to ../includes/out.csv
+#end if

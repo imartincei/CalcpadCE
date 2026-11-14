@@ -1,0 +1,20 @@
+' CPD-3314: unknown keyword argument in a macro call
+#def kw$(a$; b$ = 1) = a$ + b$
+'expect: CPD-3314
+a = kw$(1; z$ = 2)
+
+' After a valid keyword
+'expect: CPD-3314
+b = kw$(1; b$ = 2; c$ = 3)
+
+' A multi-line macro
+#def block$(x$; y$ = 2)
+blockValue = x$*y$
+#end def
+'expect: CPD-3314
+block$(1; q$ = 3)
+
+' A macro from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-3314
+c = libTwice$(1; z$ = 2) + libLength

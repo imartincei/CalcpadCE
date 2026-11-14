@@ -1,0 +1,25 @@
+' CPD-3317: circular macro reference
+#def self$ = self$
+'expect: CPD-3317
+a = self$
+
+' Two macros that refer to each other
+#def ping$ = pong$
+#def pong$ = ping$
+'expect: CPD-3317
+b = ping$
+
+' A cycle of three with arguments
+#def m1$(n$) = m2$(n$) + 1
+#def m2$(n$) = m3$(n$) + 1
+#def m3$(n$) = m1$(n$) + 1
+'expect: CPD-3317
+c = m1$(1)
+
+' A multi-line macro that calls itself
+#def again$
+againValue = 1
+again$
+#end def
+'expect: CPD-3317
+again$

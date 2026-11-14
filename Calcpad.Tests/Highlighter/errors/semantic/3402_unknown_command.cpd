@@ -1,0 +1,15 @@
+' CPD-3402: unknown command or a command used where it cannot be
+'expect: CPD-3402
+r = $Bogus{x @ x = 1 : 2}
+
+' $Plot must stand on its own line
+'expect: CPD-3402
+y = $Plot{x @ x = 0 : 1}
+
+' A plot command without the @ part
+'expect: CPD-3402
+p = $Plot{x^2 x = 0 : 1}
+
+' In a custom function body
+'expect: CPD-3402
+f(n) = $Summ{k @ k = 1 : n}

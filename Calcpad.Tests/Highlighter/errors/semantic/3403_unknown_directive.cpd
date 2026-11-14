@@ -1,0 +1,33 @@
+' CPD-3403: unknown directive
+'expect: CPD-3403[#badDirective]
+#badDirective
+
+' An unknown keyword with an argument
+'expect: CPD-3403
+#tolerance 3
+
+' Inside a conditional block
+x = 1
+#if x > 0
+'expect: CPD-3403
+    #conceal
+#end if
+
+' Inside a multi-line macro, reported where it expands
+#def setup$
+#nonsense
+#end def
+'expect: CPD-3403
+setup$
+
+' Misspelled keywords are not read as the keyword they start with
+'expect: CPD-3403[#rounds]
+#rounds 3
+'expect: CPD-3403[#precision]
+#precision 3
+'expect: CPD-3403[#hidee]
+#hidee
+'expect: CPD-3403[#iff]
+#iff 1
+'expect: CPD-3403[#end iff]
+#end iff

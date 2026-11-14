@@ -19,6 +19,7 @@ import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
 import { extractUiControls, readUiOverrides, selectionLineRange } from '../ui-overrides';
 import { readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, stampFileInfoText, pdfDocumentTitle } from '../file-info';
 import { planMetadataFooter, toRangeEdits, type LineEdit } from '../metadata-footer';
+import { planUiOverridesToSource } from '../ui-source-sync';
 import type { LineRange, UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
 import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
@@ -257,7 +258,7 @@ export abstract class BaseMessageBridge {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const rendered = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
-        return rendered == null ? null : extractUiControls(rendered);
+        return rendered == null ? null : extractUiControls(rendered, content);
     }
 
     /** The `#UI` options an export of `variant` should render with. */
@@ -371,6 +372,9 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('uiOverrideHints', String(!!message.enabled));
                 this.postToVue({ type: 'showUiOverrideHintsChanged', enabled: !!message.enabled });
                 break;
+            case 'updateAutoSyncUiValues':
+                this.setExtraSetting('autoSyncUiValues', String(!!message.enabled));
+                break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
@@ -457,6 +461,9 @@ export abstract class BaseMessageBridge {
                 break;
             case 'updateUiOverrides':
                 this.handleUpdateUiOverrides(message.overrides);
+                break;
+            case 'overrideUiDefaults':
+                void this.handleOverrideUiDefaults(message.keys);
                 break;
             case 'markFileReviewed':
                 void this.handleMarkFileReviewed();
@@ -622,6 +629,7 @@ export abstract class BaseMessageBridge {
             enablePreviewPdf: this.getExtraSetting('previewPdf') === 'true',
             showFileMetadata: this.getExtraSetting('showFileMetadata') === 'true',
             showUiOverrideHints: this.getExtraSetting('uiOverrideHints') === 'true',
+            autoSyncUiValues: this.getExtraSetting('autoSyncUiValues') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
@@ -1260,6 +1268,22 @@ export abstract class BaseMessageBridge {
         const overrides = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, String(v)]));
         this.applyFooterEdits(planMetadataFooter(model.getValue().split(/\r?\n/), { uiOverrides: overrides }));
         this._uiOverridesSink?.(overrides);
+        this.refreshDocumentMetadata();
+    }
+
+    /** Moves saved values of plain `#UI` lines into the source; the controls are rendered afresh to match the text. */
+    private async handleOverrideUiDefaults(raw: unknown): Promise<void> {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model || !Array.isArray(raw)) return;
+        const content = model.getValue();
+        const controls = await this.resolveUiControls();
+        const saved = readUiOverrides(content);
+        if (!controls || !saved || model.getValue() !== content) return;
+        this._uiControlsSink?.(controls);
+        const plan = planUiOverridesToSource(content.split(/\r?\n/), saved, controls, raw.map(String));
+        if (!plan.removed.length) return;
+        this.applyFooterEdits(plan.edits);
+        this._uiOverridesSink?.(readUiOverrides(model.getValue()) ?? {});
         this.refreshDocumentMetadata();
     }
 

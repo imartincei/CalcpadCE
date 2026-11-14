@@ -30,6 +30,10 @@ import {
     MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
     MAX_INLINE_IMAGE_TOTAL_BYTES,
     toRangeEdits,
+    planMetadataFooter,
+    planUiValueToSource,
+    uiOverrideKeysFor,
+    uiControlsWithEditedValues,
     planFileInfoStamp,
     onlyReviewChanged,
     previewSizeLimitChars,
@@ -68,7 +72,7 @@ import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from
 import type { FileConflictChoice } from './services/file-change-tracker';
 import { setupTabDragging } from './tabs/tab-drag';
 import { toDisplayLogLevel } from 'calcpad-frontend';
-import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm } from 'calcpad-frontend';
+import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm, LineEdit, SourceEdit } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
@@ -762,6 +766,65 @@ async function bootstrap(): Promise<void> {
         if (group === activeGroup) activeBridge.refreshUiControls();
     }
 
+    const autoSyncUiValues = () => editorBridge.getExtraSetting('autoSyncUiValues') === 'true';
+
+    function sourceSyncable(group: EditorGroup): monaco.editor.ITextModel | null {
+        const activeId = group.tabs.activeId;
+        const path = activeId ? group.tabs.getFilePath(activeId) : null;
+        return autoSyncUiValues() && !(path && isCompiledPath(path)) ? group.editor.getModel() : null;
+    }
+
+    function applyModelLineEdits(model: monaco.editor.ITextModel, edits: LineEdit[], undoStop: boolean): void {
+        if (!edits.length) return;
+        const ranges = toRangeEdits(edits, model.getLineCount(), i => model.getLineMaxColumn(i + 1) - 1, model.getEOL());
+        if (undoStop) model.pushStackElement();
+        model.pushEditOperations([], ranges.map(r => ({
+            range: new monaco.Range(r.startLine + 1, r.startCharacter + 1, r.endLine + 1, r.endCharacter + 1),
+            text: r.text,
+        })), () => null);
+        if (undoStop) model.pushStackElement();
+    }
+
+    /** With auto-sync on, writes a form value into its `#UI` line. False when it stays an override. */
+    function syncUiValueToSource(group: EditorGroup, key: string, value: string): boolean {
+        const model = sourceSyncable(group);
+        const docKey = uiDocKeyFor(group);
+        const controls = uiHintControls.controlsFor(docKey) ?? uiControls.get(docKey);
+        const control = controls?.find(c => c.key === key);
+        if (!model || !controls || !control) return false;
+        const text = model.getValue();
+        const plan = planUiValueToSource(text.split(/\r?\n/), control, value, readUiOverrides(text) ?? {}, controls);
+        const entered = uiOverrideKeysFor(uiOverrides.toRecord(docKey) ?? {}, control, controls);
+        if (!plan || !entered) return false;
+        applyModelLineEdits(model, plan.edits, true);
+        uiOverrides.forget(docKey, [...plan.removed, ...entered], model.getValue());
+        return true;
+    }
+
+    /** With auto-sync on, typing into a `#UI` line's value drops the overrides that shadowed it. */
+    function clearEditedUiOverrides(group: EditorGroup, before: UiControl[], edits: SourceEdit[]): void {
+        const model = sourceSyncable(group);
+        if (!model) return;
+        const edited = uiControlsWithEditedValues(before, edits,
+            l => l >= 1 && l <= model.getLineCount() ? model.getLineContent(l) : undefined);
+        if (!edited.length) return;
+        // Edits can't be made from inside the change event.
+        setTimeout(() => {
+            if (model.isDisposed()) return;
+            const docKey = uiDocKeyFor(group);
+            const saved = readUiOverrides(model.getValue()) ?? {};
+            const entered = uiOverrides.toRecord(docKey) ?? {};
+            const savedKeys = new Set(edited.flatMap(c => uiOverrideKeysFor(saved, c, before) ?? []));
+            const enteredKeys = edited.flatMap(c => uiOverrideKeysFor(entered, c, before) ?? []);
+            if (!savedKeys.size && !enteredKeys.length) return;
+            const keep = Object.fromEntries(Object.entries(saved).filter(([k]) => !savedKeys.has(k)));
+            if (savedKeys.size)
+                applyModelLineEdits(model, planMetadataFooter(model.getValue().split(/\r?\n/), { uiOverrides: keep }), false);
+            uiOverrides.forget(docKey, [...savedKeys, ...enteredKeys], model.getValue());
+            if (group === activeGroup) activeBridge.refreshDocumentMetadata();
+        }, 0);
+    }
+
     const PREVIEW_LOADING_DELAY_MS = 400;
     const PREVIEW_LOADING_MIN_MS = 300;
     const previewLoadingSeq = new Map<string, number>();
@@ -918,7 +981,7 @@ async function bootstrap(): Promise<void> {
             }
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group), frameHtml);
             if (mode === 'ui') {
-                recordUiControls(uiDocKeyFor(group), extractUiControls(result.html));
+                recordUiControls(uiDocKeyFor(group), extractUiControls(result.html, content));
                 uiPause.update(uiDocKeyFor(group), result.pause);
                 appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
             }
@@ -1160,13 +1223,15 @@ async function bootstrap(): Promise<void> {
         group.disposables.push(
             new MetadataFooterView(ed, () => editorBridge.getExtraSetting('showFileMetadata') === 'true'),
             ed.onDidChangeModelContent((e) => {
-                uiHintControls.applyEdits(uiDocKeyFor(group), e.changes.map(c => ({
+                const sourceEdits = e.changes.map(c => ({
                     startLine: c.range.startLineNumber,
                     startColumn: c.range.startColumn,
                     endLine: c.range.endLineNumber,
                     endColumn: c.range.endColumn,
                     text: c.text,
-                })));
+                }));
+                const before = uiHintControls.applyEdits(uiDocKeyFor(group), sourceEdits);
+                if (before && !e.isFlush) clearEditedUiOverrides(group, before, sourceEdits);
                 if (definitionsTimer) clearTimeout(definitionsTimer);
                 definitionsTimer = setTimeout(() => {
                     invalidateUiControls(group);
@@ -1704,6 +1769,10 @@ async function bootstrap(): Promise<void> {
             if (!fromPreview) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
             const docKey = uiDocKeyFor(group);
+            if (syncUiValueToSource(group, String(data.varName), String(data.newValue))) {
+                void refreshPreviewFor(group);
+                return;
+            }
             if (!uiHistory.set(docKeyFor(group), uiOverrides, docKey, String(data.varName), String(data.newValue))) return;
             uiOverridesDirty.add(docKey);
             refreshUiDirtyIndicator();

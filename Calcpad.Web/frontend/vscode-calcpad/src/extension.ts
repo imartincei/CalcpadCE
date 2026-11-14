@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, readUiOverrides, planMetadataFooter, planUiValueToSource, uiOverrideKeysFor, uiControlsWithEditedValues, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit, SourceEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadRunDiagnostics } from './calcpadRunDiagnostics';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -201,6 +201,55 @@ async function saveUiValuesFor(document: vscode.TextDocument): Promise<number | 
     }
     uiOverridesDirty.delete(docKey);
     return Object.keys(overrides).length;
+}
+
+function autoSyncUiValues(document: vscode.TextDocument): boolean {
+    return CalcpadSettingsManager.getInstance().getExtraBool('autoSyncUiValues', false) && !isCompiledPath(document.fileName);
+}
+
+async function applyLineEdits(document: vscode.TextDocument, edits: LineEdit[]): Promise<boolean> {
+    if (!edits.length) return true;
+    const edit = new vscode.WorkspaceEdit();
+    edit.set(document.uri, metadataTextEdits(document, edits));
+    return vscode.workspace.applyEdit(edit);
+}
+
+/** With auto-sync on, writes a form value into its `#UI` line. False when it stays an override. */
+async function syncUiValueToSource(document: vscode.TextDocument, key: string, value: string): Promise<boolean> {
+    if (!autoSyncUiValues(document)) return false;
+    const docKey = document.uri.toString();
+    const controls = uiOverrideHints?.tracker.controlsFor(docKey) ?? uiControls.get(docKey);
+    const control = controls?.find(c => c.key === key);
+    if (!controls || !control) return false;
+    const text = document.getText();
+    const plan = planUiValueToSource(text.split(/\r?\n/), control, value, readUiOverrides(text) ?? {}, controls);
+    const entered = uiOverrideKeysFor(uiOverrides.toRecord(docKey) ?? {}, control, controls);
+    if (!plan || !entered || !await applyLineEdits(document, plan.edits)) return false;
+    uiOverrides.forget(docKey, [...plan.removed, ...entered], document.getText());
+    return true;
+}
+
+/** With auto-sync on, typing into a `#UI` line's value drops the overrides that shadowed it. */
+function clearEditedUiOverrides(document: vscode.TextDocument, before: UiControl[], edits: SourceEdit[]): void {
+    if (!autoSyncUiValues(document)) return;
+    const edited = uiControlsWithEditedValues(before, edits,
+        l => l >= 1 && l <= document.lineCount ? document.lineAt(l - 1).text : undefined);
+    if (!edited.length) return;
+    // Not from inside the change event.
+    setTimeout(async () => {
+        const docKey = document.uri.toString();
+        const saved = readUiOverrides(document.getText()) ?? {};
+        const entered = uiOverrides.toRecord(docKey) ?? {};
+        const savedKeys = new Set(edited.flatMap(c => uiOverrideKeysFor(saved, c, before) ?? []));
+        const enteredKeys = edited.flatMap(c => uiOverrideKeysFor(entered, c, before) ?? []);
+        if (!savedKeys.size && !enteredKeys.length) return;
+        if (savedKeys.size) {
+            const keep = Object.fromEntries(Object.entries(saved).filter(([k]) => !savedKeys.has(k)));
+            if (!await applyLineEdits(document, planMetadataFooter(document.getText().split(/\r?\n/), { uiOverrides: keep }))) return;
+        }
+        uiOverrides.forget(docKey, [...savedKeys, ...enteredKeys], document.getText());
+        vueUiProvider?.refreshDocumentMetadata();
+    }, 0);
 }
 
 // Version stamped into file info on save; set on activation.
@@ -1121,7 +1170,7 @@ async function renderPreviewContent(panel: vscode.WebviewPanel, content: string,
         // The controls this document really has, which is what tells the Properties tab
         // whether a saved #UI value still applies to anything.
         if (enableUi) {
-            uiControls.set(docKey, extractUiControls(apiResponse));
+            uiControls.set(docKey, extractUiControls(apiResponse, content));
             uiOverrideHints?.tracker.setControls(docKey, uiControls.get(docKey)!);
             vueUiProvider?.updateUiControls(uiControls.get(docKey) ?? null);
         }
@@ -1765,12 +1814,19 @@ function handlePreviewMessage(message: any, kind: PreviewKind) {
         case 'uiValueChange': {
             const sourceEditor = previewSourceEditor;
             if (!sourceEditor || kind !== 'ui') break;
-            const docKey = sourceEditor.document.uri.toString();
-            if (!uiHistory.set(docKey, uiOverrides, docKey, String(message.varName), String(message.newValue))) break;
-            uiOverridesDirty.add(docKey);
-            // Refreshes the form (so the control keeps the entered value) and the
-            // report panel beside it (so the result updates).
-            void refreshPreviewPanels(sourceEditor.document);
+            const document = sourceEditor.document;
+            const docKey = document.uri.toString();
+            const varName = String(message.varName);
+            const newValue = String(message.newValue);
+            void (async () => {
+                if (!await syncUiValueToSource(document, varName, newValue)) {
+                    if (!uiHistory.set(docKey, uiOverrides, docKey, varName, newValue)) return;
+                    uiOverridesDirty.add(docKey);
+                }
+                // Refreshes the form (so the control keeps the entered value) and the
+                // report panel beside it (so the result updates).
+                void refreshPreviewPanels(document);
+            })();
             break;
         }
         case 'uiUndo':
@@ -2384,8 +2440,9 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return null;
         try {
-            const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
-            const controls = extractUiControls(html);
+            const text = editor.document.getText();
+            const { html } = await renderForExport(text, editor.document.uri, 'input');
+            const controls = extractUiControls(html, text);
             uiControls.set(editor.document.uri.toString(), controls);
             uiOverrideHints?.tracker.setControls(editor.document.uri.toString(), controls);
             return controls;
@@ -2419,13 +2476,15 @@ export async function activate(context: vscode.ExtensionContext) {
         () => CalcpadSettingsManager.getInstance().getExtraBool('uiOverrideHints', false),
         async (document) => {
             try {
-                const { html } = await renderForExport(document.getText(), document.uri, 'input');
-                return extractUiControls(html);
+                const text = document.getText();
+                const { html } = await renderForExport(text, document.uri, 'input');
+                return extractUiControls(html, text);
             } catch (e) {
                 outputChannel.appendLine('[UI override hints] Render failed: ' + e, 'warning');
                 return null;
             }
-        });
+        },
+        clearEditedUiOverrides);
     vueUiProvider.onUiOverrideHintsChanged = () => uiOverrideHints?.refresh();
     context.subscriptions.push(uiOverrideHints, vscode.commands.registerCommand(REVEAL_UI_OVERRIDES_COMMAND,
         async (uri: vscode.Uri, line: number, keys: string[]) => {

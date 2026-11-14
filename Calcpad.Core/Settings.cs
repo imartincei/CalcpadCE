@@ -25,6 +25,7 @@ namespace Calcpad.Core
         PlotStep,
         Precision,
         Tol,
+        CalculatePost,
         MacroCalls
     }
 
@@ -62,6 +63,7 @@ namespace Calcpad.Core
         public int? PlotStep { get; set; }
         public double? Precision { get; set; }
         public double? Tol { get; set; }
+        public bool? CalculatePost { get; set; }
         public string MacroCalls { get; set; }
 
         internal MacroCallMode? ParsedMacroCalls => MacroCalls?.ToLowerInvariant() switch
@@ -101,6 +103,8 @@ namespace Calcpad.Core
         public MathSettings Math { get; set; } = new();
         public PlotSettings Plot { get; set; } = new();
         public bool IsUs { get; set; } = true;
+        // When false, #post blocks are skipped in the input form
+        public bool CalculatePost { get; set; } = true;
         public MacroCallMode MacroCalls { get; set; }
     }
 

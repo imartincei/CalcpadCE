@@ -115,5 +115,23 @@ public IActionResult NewEndpoint([FromBody] NewRequest request, CancellationToke
 4. **Implement service logic** - Business logic in Services/
 5. **Add models** - Request/response in Models/
 6. **Update frontend client** - Add corresponding method in `calcpad-frontend/src/api/client.ts`
-7. **Test** - Use curl, Swagger UI (Development only), or the web editor
+7. **Verify** - Run the checks below for what you changed
 8. **Update API_SCHEMA.md** - Anything that changes a request or response shape
+
+## Verification
+
+Run only the tests for what you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from repo root) |
+|---------|-----|
+| Any C# file | `dotnet format Calcpad.Web/backend/Calcpad.Server.csproj --verify-no-changes --include <changed files>` |
+| Services, caches, portable/cpdz logic | `dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "FullyQualifiedName~<TestClass>"` for the matching class in `Calcpad.Tests/Server/` |
+| An endpoint | `dotnet build Calcpad.Web/backend/Calcpad.Server.csproj`, then curl it on the dev server (see `reference/structure-config-deploy.md`) |
+| Request/response shapes | Also the frontend check for `calcpad-frontend` (`npx tsc --noEmit -p .`) if `client.ts` or `types/api.ts` changed |
+
+### Full suite (user runs)
+
+```bash
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj
+```
+Or the VS Code task **Run All Verifications**.

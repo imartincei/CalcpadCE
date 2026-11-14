@@ -33,7 +33,8 @@
             "mode": "auto"
         },
         "isUs": true,
-        "macroCalls": "auto"
+        "macroCalls": "auto",
+        "calculatePost": true
     },
     "extras": {
         "previewTheme": "system",
@@ -49,6 +50,7 @@
         "previewPdf": false,
         "showFileMetadata": false,
         "uiOverrideHints": false,
+        "autoSyncUiValues": false,
         "linterMinSeverity": "information",
         "logLevel": "warning",
         "maxOutputLines": 1000,

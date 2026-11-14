@@ -533,7 +533,12 @@ namespace Calcpad.Core
             if (isFunctionDefinition)
             {
                 if (_isSolver > 0)
-                    throw Exceptions.FunctionDefinitionInSolver();
+                {
+                    var ex = Exceptions.FunctionDefinitionInSolver();
+                    ex.Position = expression.Length - expression.TrimStart().Length;
+                    ex.EndPosition = expression.TrimEnd().Length;
+                    throw ex;
+                }
 
                 _rpn = null;
                 AddFunction(input);

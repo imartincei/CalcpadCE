@@ -1,0 +1,16 @@
+' CPD-3206: function must have at least one parameter
+'expect: CPD-3206[calc() = 43]
+calc() = 43
+
+' Whitespace between the parentheses
+'expect: CPD-3206
+g( ) = 1
+
+' A $Block body
+'expect: CPD-3206
+total() = $Block{a = 1; b = 2; a + b}
+
+' From an inline macro
+#def noArgs$(n$) = n$() = 1
+'expect: CPD-3206
+noArgs$(h)

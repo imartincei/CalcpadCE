@@ -1,0 +1,18 @@
+' CPD-5202: duplicate #else
+a = 2
+#if a > 1
+#else
+'expect: CPD-5202[#else]
+#else
+#end if
+
+' Inside a #while loop
+x = 1
+#while x > 0
+    x = x - 1
+    #if x < 0
+    #else
+'expect: CPD-5202
+    #else
+    #end if
+#loop

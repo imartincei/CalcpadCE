@@ -146,6 +146,8 @@ namespace Calcpad.Highlighter.Linter
                 context.SourceMap[kvp.Key] = stage1Result.SourceMap.GetValueOrDefault(kvp.Value, kvp.Value);
                 context.Stage2ToStage1Map[kvp.Key] = kvp.Value;
             }
+            if (stage2Result.IncludeMap != null)
+                context.IncludeMap = stage2Result.IncludeMap;
 
             // Convert macro definitions
             foreach (var macro in stage2Result.MacroDefinitions)

@@ -1,0 +1,21 @@
+' CPD-2201: duplicate macro definition
+#def dup$ = 1
+'expect: CPD-2201
+#def dup$ = 2
+
+' A multi-line macro redefined as an inline one
+#def block$(a$)
+blockTemp = a$*2
+#end def
+'expect: CPD-2201
+#def block$(a$) = a$
+
+' A macro from a relative include redefined here
+#include ../includes/lib.cpd
+'expect: CPD-2201
+#def libTwice$(x$) = x$ + x$
+
+' A duplicate inside the included file lands on the #include line
+'expect: CPD-2201, CPD-3301, CPD-3305
+#include ../includes/broken_lib.cpd
+value = dup$ + libLength + brokenOk

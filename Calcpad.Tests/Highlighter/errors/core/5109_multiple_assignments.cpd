@@ -1,0 +1,11 @@
+' CPD-5109: more than one = in a $Root equation
+'expect: CPD-5109
+r = $Root{x^2 = 2 = 3 @ x = 0 : 2}
+
+' In a custom function
+'expect: CPD-5109
+f(a) = $Root{x^2 = a = 1 @ x = 0 : 5}
+
+' Nested in $Block
+'expect: CPD-5109
+g(a) = $Block{t = a; $Root{x = t = 2 @ x = 0 : 5}}

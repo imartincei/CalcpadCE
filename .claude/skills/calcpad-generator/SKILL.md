@@ -42,3 +42,20 @@ Calcpad language reference, in `docs/` at the repo root. `quick-reference.md` co
    Rendering catches runtime calculation errors, full macro/loop expansion, and shows what the reviewer will see.
    If the user accepts, follow `Reviewing HTML Output.md`: render via `POST /api/calcpad/convert`, strip the script
    and style elements, read the stripped text, and report findings with their source lines.
+
+## Verification
+
+Check only the files you created or edited, never the whole repo. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from repo root) |
+|---------|-----|
+| Any `.cpd` file | `python tools/server/cpdlint.py "<file>"` (workflow step 5) |
+| Calculation results | Render review (workflow step 6) |
+
+### Full suite (user runs)
+
+If the file is under `Examples/` or `Tests/`, its committed render stub and lint baseline cover it:
+```bash
+bash .github/scripts/compare-renderings.sh
+dotnet test tools/highlighter-examples-test/HighlighterExamplesTest.csproj
+```

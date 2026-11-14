@@ -1,0 +1,17 @@
+' CPD-3315: unknown keyword argument in a function call
+kw(x; y = 2) = x + y
+'expect: CPD-3315[kw(1; q = 3)]
+a = kw(1; q = 3)
+
+' Inside another function body
+'expect: CPD-3315[kw(z; w = 1)]
+g(z) = kw(z; w = 1)
+
+' Inside $Block
+'expect: CPD-3315
+h(x) = $Block{t = kw(x; y = 1; k = 2); t}
+
+' A function from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-3315
+b = libScale(2; factor = 3) + libLength

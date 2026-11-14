@@ -1,0 +1,22 @@
+' CPD-3601: invalid format specifier
+'expect: CPD-3601
+#format X9
+
+' A format on a single value
+r = 5
+'expect: CPD-3601
+r:Z9
+
+' A format on an assignment
+'expect: CPD-3601
+s = 2*r:Q4
+
+' A third range part in a command reads as a format
+'expect: CPD-3601
+t = $Root{x^2 - 2 @ x = 0 : 2 : 3}
+
+' Inside a conditional block
+#if r > 1
+'expect: CPD-3601
+    #format bad
+#end if

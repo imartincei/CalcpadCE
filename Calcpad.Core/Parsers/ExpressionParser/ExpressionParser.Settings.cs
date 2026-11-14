@@ -126,6 +126,8 @@ namespace Calcpad.Core
                 s => s.Math.Precision, (s, v) => s.Math.Precision = v),
             [SettingKey.Tol] = NumberVar("Tol", d => d.Tol, (d, v) => d.Tol = v,
                 s => s.Math.Tol, (s, v) => s.Math.Tol = v),
+            [SettingKey.CalculatePost] = Plain(d => d.CalculatePost, (d, v) => d.CalculatePost = v,
+                s => s.CalculatePost, (s, v) => s.CalculatePost = v),
             [SettingKey.MacroCalls] = new MacroParserBinding(),
         };
 

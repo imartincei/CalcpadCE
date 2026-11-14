@@ -1,0 +1,13 @@
+' CPD-5102: empty expression
+'expect: CPD-5102[#while]
+#while
+#loop
+
+' An empty #while inside an #if
+x = 1
+#if x > 0
+'expect: CPD-5102
+    #while
+        x = x + 1
+    #loop
+#end if

@@ -583,7 +583,8 @@ namespace Calcpad.Core
                 if (Trace is null)
                     return;
 
-                traceSource = Trace.AddSource(traceText, lineNumber, traceFile, fileLine, lineOffset);
+                if (traceSource < 0)
+                    traceSource = Trace.AddSource(traceText, lineNumber, traceFile, fileLine, lineOffset);
                 Trace.OutputLines.Add(new() { Text = traceText, SourceIndex = traceSource, FailedInclude = fileName });
             }
 
@@ -814,6 +815,9 @@ namespace Calcpad.Core
                 sb.AppendLine();
                 ++_parsedLineNumber;
                 hasErrors = true;
+                // #include lines have no source until they fail
+                if (Trace is not null && traceSource < 0)
+                    traceSource = Trace.AddSource(traceText, lineNumber, traceFile, fileLine, lineOffset);
                 Trace?.Errors.Add(new(traceSource, errorMessage, code, start, end));
                 _errorList.Add(new CalcpadError
                 {
@@ -930,7 +934,7 @@ namespace Calcpad.Core
             var emptyMacro = new Macro(null, Origins.None, null, null);
             var macro = emptyMacro;
             string macroKey = null;
-            int callStart = -1, callEnd = -1;
+            int callStart = -1, callEnd = -1, argsOpen = -1;
             Queue<string> fields = null;
             if (index >= 0)
             {
@@ -953,7 +957,10 @@ namespace Calcpad.Core
                     if (c == '(')
                     {
                         if (bracketCount == 0)
+                        {
                             textSpan.Reset(i + 1);
+                            argsOpen = i;
+                        }
                         ++bracketCount;
                     }
                     else if (c == ')')
@@ -1063,6 +1070,16 @@ namespace Calcpad.Core
             {
                 var s = ExpandMacro(macro, macroArguments, keywordArguments, macroKey, ref currentlyExpanding, expanded);
                 stringBuilder.Append(s);
+            }
+            else if (bracketCount > 0)
+            {
+                var ex = Exceptions.MissingRightBracket();
+                if (origins[argsOpen] is var open and >= 0)
+                {
+                    ex.Position = open;
+                    ex.EndPosition = open + 1;
+                }
+                throw ex;
             }
             }
             catch (MathParserException ex) when (ex.Position < 0 && callStart >= 0 && callEnd > callStart)

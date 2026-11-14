@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { computeUiOverrideHints, readUiOverrides, uiOverrideHintTitle, UiOverrideHintTracker } from 'calcpad-frontend';
-import type { UiControl } from 'calcpad-frontend';
+import type { SourceEdit, UiControl } from 'calcpad-frontend';
 
 export const REVEAL_UI_OVERRIDES_COMMAND = 'vscode-calcpad.revealUiOverrides';
 
@@ -14,6 +14,8 @@ export class UiOverrideHintsProvider implements vscode.CodeLensProvider, vscode.
     constructor(
         private readonly isEnabled: () => boolean,
         render: (document: vscode.TextDocument) => Promise<UiControl[] | null>,
+        /** Edits in the coordinates before them, with the controls as they were then. */
+        onEdited?: (document: vscode.TextDocument, before: UiControl[], edits: SourceEdit[]) => void,
     ) {
         this.tracker = new UiOverrideHintTracker({
             resolve: async (docKey) => {
@@ -28,13 +30,15 @@ export class UiOverrideHintsProvider implements vscode.CodeLensProvider, vscode.
             vscode.languages.registerCodeLensProvider({ language: 'calcpad' }, this),
             vscode.workspace.onDidChangeTextDocument(e => {
                 if (e.document.languageId !== 'calcpad' || !e.contentChanges.length) return;
-                this.tracker.applyEdits(e.document.uri.toString(), e.contentChanges.map(c => ({
+                const edits = e.contentChanges.map(c => ({
                     startLine: c.range.start.line + 1,
                     startColumn: c.range.start.character + 1,
                     endLine: c.range.end.line + 1,
                     endColumn: c.range.end.character + 1,
                     text: c.text,
-                })));
+                }));
+                const before = this.tracker.applyEdits(e.document.uri.toString(), edits);
+                if (before) onEdited?.(e.document, before, edits);
             }),
             vscode.workspace.onDidCloseTextDocument(d => this.tracker.forget(d.uri.toString())),
         ];

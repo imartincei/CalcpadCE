@@ -15,6 +15,7 @@ In VS Code, do not use VS Code's own settings editor.
 | **Format Equations** | on/off | *Professional* (on) renders equations in stacked math form; *Inline* (off) renders them on a single line. |
 | **Zero Small Matrix Elements** | on/off | Show very small matrix/vector values as `0` instead of using scientific notation. |
 | **Show Hidden Output** | on/off | Ignore `#hide` so suppressed content is rendered anyway. For debugging. |
+| **Calculate #post in Input Form** | on/off *(default on)* | On: `#post` blocks are still calculated, just hidden, while the input form is on screen, so a later `#pre` can use their variables. Off: they are skipped entirely in the Input form, which keeps typing responsive. Reports and Preview always calculate `#post`. See [UI Mode](new-ui-mode.md#pre-and-post). |
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
 | **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
 | **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |
@@ -92,6 +93,7 @@ Pick the Monaco editor's font family from:
 - **Render Preview as PDF** *(default off)* — **Preview** and **Report** show the [PDF export](new-exports.md#pdf-export) itself in a built-in PDF viewer, with its exact pages, headers and footers, zoom (− / + / Fit, or Ctrl+Wheel) and a page counter. It follows **Auto-Run Preview**, but each render generates a PDF, so it is slower than the HTML preview. **Unwrapped** and the input form are unaffected.
 - **Show File Metadata** *(default off)* — show the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the end of the file. Edit it in the [Properties tab](new-calcpad-panel.md#properties).
 - **Show UI Override Hints** *(default off)* — show [saved input values](new-ui-mode.md#saving-what-was-entered) above the lines they apply to. Click one to edit it in the [Properties tab](new-calcpad-panel.md#properties).
+- **Auto-Sync #UI Values** *(default off)* — keep `#UI` line defaults and the input form in sync. See [Auto-syncing values with the CalcpadCE file](new-ui-mode.md#auto-syncing-values-with-the-calcpadce-file).
 
 ## Data output
 

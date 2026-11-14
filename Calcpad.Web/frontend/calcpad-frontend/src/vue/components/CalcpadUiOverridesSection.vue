@@ -40,6 +40,9 @@
         <button class="icon" :title="t('Remove')" @click="rows.splice(i, 1)">✕</button>
       </div>
 
+      <p v-if="changeCount" class="pending">
+        {{ t('Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes', { n: changeCount }, changeCount) }}
+      </p>
       <div class="actions">
         <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
         <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
@@ -50,6 +53,20 @@
           @click="purgeUnused"
         >{{ t('Purge unused') }}</button>
       </div>
+      <div class="actions">
+        <button
+          class="secondary"
+          :disabled="dirty || !sourceKeys.length"
+          :title="t('Write #UI overrides into the CalcpadCE file as defaults and remove the override. Values in loops, macros, and includes are unaffected.')"
+          @click="emit('override-defaults', sourceKeys)"
+        >{{ sourceKeys.length ? t('Override Defaults ({n})', { n: sourceKeys.length }) : t('Override Defaults') }}</button>
+        <button
+          class="secondary"
+          :disabled="!shownRows.length"
+          :title="t('Reverts displayed #UI overrides back to their default values.')"
+          @click="revertToDefaults"
+        >{{ t('Revert to defaults') }}</button>
+      </div>
     </template>
   </div>
 </template>
@@ -59,6 +76,7 @@ import { useI18n } from 'vue-i18n'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { classifyUiOverrides, rowInRange } from '../../services/ui-overrides'
+import { effectiveUiOverrideKey } from '../../services/ui-source-sync'
 import type { LineRange, UiControl, UiOverrideRow, UiOverrides } from '../../services/ui-overrides'
 import { getUiOverridesDraft, setUiOverridesDraft, clearUiOverridesDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { UiOverrideDraftRow } from '../metadata-drafts'
@@ -98,6 +116,7 @@ const emit = defineEmits<{
   'update': [overrides: UiOverrides]
   'go-to-line': [line: number]
   'refresh-ui-controls': []
+  'override-defaults': [keys: string[]]
   'draft-dirty': [payload: { docKey: string; dirty: boolean }]
 }>()
 
@@ -107,6 +126,13 @@ const sameRows = (a: UiOverrideDraftRow[], b: UiOverrideDraftRow[]) => JSON.stri
 
 const rows = ref<UiOverrideDraftRow[]>(getUiOverridesDraft(props.docKey) ?? savedRows(props.overrides))
 const dirty = computed(() => !sameRows(rows.value, savedRows(props.overrides)))
+
+// Values added, edited or removed since the last save.
+const changeCount = computed(() => {
+  const draft = new Map(rows.value.map(r => [r.key, r.value]))
+  const changed = [...draft].filter(([key, value]) => props.overrides[key] !== value).length
+  return changed + Object.keys(props.overrides).filter(key => !draft.has(key)).length
+})
 let boundDocKey = props.docKey
 
 function reportDirty(docKey: string, value: boolean) {
@@ -214,6 +240,25 @@ watch(classified, () => { if (pendingScroll) void nextTick(scrollToFlashed) })
 
 onBeforeUnmount(() => { if (flashTimer) clearTimeout(flashTimer) })
 
+const shownRows = computed(() => classified.value.filter(rowMatches))
+
+// Rows that are the only value a plain #UI line of this file renders with.
+const sourceKeys = computed(() => {
+  const controls = props.uiControls ?? []
+  const overrides = Object.fromEntries(rows.value.map(r => [r.key, r.value]))
+  return shownRows.value
+    .filter(row => {
+      const users = controls.filter(c => effectiveUiOverrideKey(overrides, c.key) === row.key)
+      return users.length === 1 && !!users[0].inSource
+    })
+    .map(row => row.key)
+})
+
+function revertToDefaults() {
+  const shown = new Set(shownRows.value.map(r => r.key))
+  rows.value = rows.value.filter(r => !shown.has(r.key))
+}
+
 function purgeUnused() {
   const stale = new Set(unusedRows.value.map(r => r.key))
   rows.value = rows.value.filter(r => !stale.has(r.key))
@@ -246,6 +291,12 @@ function reset() {
   color: var(--vscode-editorWarning-foreground, #cca700);
   margin: 0 0 12px 0;
   line-height: 1.5;
+}
+
+.pending {
+  margin: 8px 0 0 0;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  font-style: italic;
 }
 
 .selection-filter {

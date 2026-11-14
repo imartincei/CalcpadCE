@@ -91,7 +91,7 @@ Raw Source
 1. Define error code in `ErrorCodes.cs` (see code scheme in `reference/architecture.md`)
 2. Implement check in appropriate validator (see `reference/extending.md`)
 3. Add a case to a `.cpd` sample in `Calcpad.Tests/Highlighter/errors/`
-4. Run `dotnet test Calcpad.Tests/Calcpad.Tests.csproj` to verify
+4. Run the sample's tests (see Verification)
 
 ## Workflow
 
@@ -100,4 +100,24 @@ Raw Source
 3. **Load the relevant reference file** for architecture, extension recipes, or testing
 4. **Follow Patterns**: Match existing code style and patterns
 5. **Implement**: Make targeted changes
-6. **Test**: Run `dotnet test Calcpad.Tests/Calcpad.Tests.csproj` to verify
+6. **Verify**: Run the checks below for what you changed
+
+## Verification
+
+Run only the tests for what you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from repo root) |
+|---------|-----|
+| Any C# file | `dotnet format Calcpad.Highlighter/Calcpad.Highlighter.csproj --verify-no-changes --include <changed files>` (use `Calcpad.Tests/Calcpad.Tests.csproj` for test files) |
+| A `.cpd` sample | `dotnet test Calcpad.Tests/Calcpad.Tests.csproj --filter "DisplayName~<file>.cpd"` |
+| A validator or diagnostic | The `.cpd` samples that exercise it, plus `--filter "FullyQualifiedName~ComprehensiveErrorTests"` if error codes changed |
+| Tokenizer, type inference, symbol resolution | `--filter "FullyQualifiedName~<TestClass>"` for the matching class (see `testing.md`) |
+| `LinterResult` or other API-facing shapes | Also `--filter "FullyQualifiedName~Calcpad.Tests.Server"` |
+
+### Full suite (user runs)
+
+```bash
+dotnet test Calcpad.Tests/Calcpad.Tests.csproj
+dotnet test tools/highlighter-examples-test/HighlighterExamplesTest.csproj
+```
+Or the VS Code task **Run All Verifications**.
