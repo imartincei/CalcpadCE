@@ -64,14 +64,14 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 {
                     var funcName = funcMatch.Groups[1].Value;
 
-                    // Redefining a user-defined function is allowed - inform rather than error.
+                    // Redefining a user-defined function is allowed - warn rather than error.
                     // Core reports built-in conflicts (CPD-3203); macros ($) are skipped.
                     if (!funcName.EndsWith("$") && !CalcpadBuiltIns.Functions.Contains(funcName)
                         && !definedNames.Add(funcName))
                     {
                         var startPos = line.IndexOf(funcName, StringComparison.Ordinal);
                         var col = startPos >= 0 ? startPos : 0;
-                        result.AddInformation(i, col, col + funcName.Length, "CPD-3313",
+                        result.AddWarning(i, col, col + funcName.Length, "CPD-3313",
                             "Function '" + funcName + "' redefines an existing function");
                     }
 

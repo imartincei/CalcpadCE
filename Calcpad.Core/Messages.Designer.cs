@@ -574,15 +574,6 @@ namespace Calcpad.Core {
         }
 
         // / <summary>
-        // /   Looks up a localized string similar to  Warning! Function redefined..
-        // / </summary>
-        public static string Function_redefined {
-            get {
-                return ResourceManager.GetString("Function_redefined", resourceCulture);
-            }
-        }
-
-        // / <summary>
         // /   Looks up a localized string similar to Error: &quot;#if&quot; block not closed. Missing &quot;#end if&quot;..
         // / </summary>
         public static string if_block_not_closed_Missing_end_if {

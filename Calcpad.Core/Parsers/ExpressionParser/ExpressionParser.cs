@@ -59,7 +59,6 @@ namespace Calcpad.Core
         public IReadOnlyList<CalcpadError> Errors => _errorList;
         public bool Debug { get; set; }
         public bool ForPrint { get; set; }
-        public bool ShowWarnings { get; set; } = true;
         public bool ShowErrorLines { get; set; } = true;
         public readonly List<string> OpenXmlExpressions = new(100);
 
@@ -306,11 +305,6 @@ namespace Calcpad.Core
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            bool IsEnabled() => _condition.IsSatisfied &&
-                (_loops.Count == 0 || !_loops.Peek().IsBroken) ||
-                !_calculate;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool HasLineExtension(ReadOnlySpan<char> s) => s.EndsWith(" _") || s.Length > 0 && CheckIsLineExtension(s[^1]) && !Validator.IsComment(s);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -426,6 +420,10 @@ namespace Calcpad.Core
             bool ParseCondition(ReadOnlySpan<char> s, Keyword keyword)
             {
                 _condition.SetCondition(keyword - Keyword.If, _currentLine, _parser.Line);
+                // Unclosed skipped loops inside a closed #if block
+                while (_skippedLoops.Count > 0 && _skippedLoops.Peek() > _condition.Id)
+                    _skippedLoops.Pop();
+
                 if (IsEnabled())
                 {
                     if (_condition.KeywordLength == s.Length)
@@ -577,10 +575,7 @@ namespace Calcpad.Core
             _firstErrIndexByLine = new();
             _errorList = new();
             Settings.Math.FormatString = null;
-            _parser = new MathParser(Settings.Math)
-            {
-                ShowWarnings = ShowWarnings
-            };
+            _parser = new MathParser(Settings.Math);
             Trace = Debug ? new() : null;
             _parser.Trace = Trace;
             _decimals = Settings.Math.Decimals;
@@ -588,6 +583,7 @@ namespace Calcpad.Core
             _sb.Clear();
             _condition = new();
             _loops.Clear();
+            _skippedLoops.Clear();
             ResetCheckState();
             _isVal = 0;
             _outputModeStack.Clear();
