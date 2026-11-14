@@ -176,7 +176,7 @@ namespace Calcpad.Tests
         [InlineData("x = $Root{x - 1 @ x = 0 : 5", "CPD-3105", 4, 10)]
         [InlineData("x = $Root x - 1", "CPD-3106", 4, 9)]
         [InlineData("x = 1*2}", "CPD-3106", 7, 8)]
-        [InlineData("x = (1 + [2)]", "CPD-5114", 12, 13)]
+        [InlineData("x = (1 + [2)]", "CPD-5114", 11, 12)]
         public void BracketErrors_PointAtTheBracket(string code, string expected, int start, int end)
         {
             var error = Assert.Single(new ExpressionParser().Check(code));

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter.Models;
 
@@ -7,19 +8,19 @@ namespace Calcpad.Highlighter.Linter.Helpers
 {
     /// <summary>
     /// Splits an error found in a macro or custom function body into one at the call and,
-    /// for the first call, one at the body text, each linked to the other.
+    /// for the first call with that error, one at the body text, each linked to the other.
     /// </summary>
     internal static class BodyDiagnostics
     {
-        /// <summary>Moves Stage 3 diagnostics on macro body text to the macro call, adding one in the body for the first call.</summary>
+        /// <summary>Moves Stage 3 diagnostics on macro body text to the macro call, adding one in the body for the first call with it.</summary>
         internal static void MapMacroBodies(LinterResult result, Stage2Result stage2)
         {
             var stage3 = result.Stage3Context;
             if (stage3?.MacroExpansions is not { Count: > 0 } || result.Stage2Context is null || result.Stage1Context is null)
                 return;
 
-            var firstCalls = FirstCalls(stage3);
             var bodies = new List<LinterDiagnostic>();
+            var runMarked = new HashSet<LinterDiagnostic>();
             foreach (var d in result.Diagnostics)
             {
                 if (d.Stage != LineStage.Stage3)
@@ -36,14 +37,15 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 var call = SourceMapper.MapStage2PositionToOriginal(callLine, callStart, callEnd, result.Stage2Context, result.Stage1Context);
                 var body = SourceMapper.MapStage2PositionToOriginal(bodyLine, bodyStart, bodyEnd, result.Stage2Context, result.Stage1Context);
                 var name = FindMacroName(stage2, bodyLine) ?? expansion.MacroNames[0];
-                var bodyDiagnostic = Link(d, call, body, name, "With the arguments of the call on line {0}.",
-                    firstCalls.GetValueOrDefault(bodyLine, -1) == callLine);
-                if (bodyDiagnostic is not null)
-                    bodies.Add(bodyDiagnostic);
+                bodies.Add(Link(d, call, body, name, "With the arguments of the call on line {0}.", true));
+                if (d.IsBodyOnly)
+                    runMarked.Add(d);
             }
+            if (runMarked.Count > 0)
+                result.RemoveDiagnostics(runMarked.Contains);
 
             var seen = new HashSet<(int, int, int, string)>();
-            foreach (var d in bodies)
+            foreach (var d in bodies.OrderBy(b => (b.Related[0].Line, b.Related[0].Column)))
                 if (seen.Add((d.Line, d.Column, d.EndColumn, d.Code)))
                     result.AppendDiagnostic(d);
         }
@@ -72,6 +74,14 @@ namespace Calcpad.Highlighter.Linter.Helpers
             if (bodyLine < 0 || stage2.IncludeMap.GetValueOrDefault(bodyLine) is { Source: not "local" })
                 return (-1, -1, -1);
 
+            if (bodyLine < stage2.Lines.Count)
+            {
+                var text = stage2.Lines[bodyLine];
+                while (bodyStart < bodyEnd - 1 && bodyStart < text.Length && char.IsWhiteSpace(text[bodyStart]))
+                    bodyStart++;
+                while (bodyEnd - 1 > bodyStart && bodyEnd <= text.Length && char.IsWhiteSpace(text[bodyEnd - 1]))
+                    bodyEnd--;
+            }
             return (bodyLine, bodyStart, bodyEnd);
         }
 
@@ -89,6 +99,8 @@ namespace Calcpad.Highlighter.Linter.Helpers
             string name, string bodyNote, bool addBody)
         {
             var message = call.Message;
+            if (message.Length > 0 && !".!?".Contains(message[^1]))
+                message += ".";
             call.Stage = LineStage.Original;
             call.Line = callPosition.Line;
             call.Column = callPosition.Column;
@@ -112,25 +124,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 Source = call.Source,
                 Related = [Related(callPosition, $"Call to {name}")]
             };
-        }
-
-        // Per body line, the call site of the first expansion that reaches it
-        private static Dictionary<int, int> FirstCalls(Stage3Context stage3)
-        {
-            var firstCalls = new Dictionary<int, int>();
-            var lines = new List<int>(stage3.MacroExpansions.Keys);
-            lines.Sort();
-            foreach (var line in lines)
-            {
-                var expansion = stage3.MacroExpansions[line];
-                if (expansion.Origins is null)
-                    continue;
-
-                foreach (var (origin, _) in expansion.Origins)
-                    if (origin >= 0 && origin != expansion.CallSiteStage2Line)
-                        firstCalls.TryAdd(origin, expansion.CallSiteStage2Line);
-            }
-            return firstCalls;
         }
 
         private static string FindMacroName(Stage2Result stage2, int bodyLine)

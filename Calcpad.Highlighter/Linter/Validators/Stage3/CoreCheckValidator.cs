@@ -10,7 +10,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
     /// <summary>
     /// Reports Core's check pass, minus errors the last run reported on the same line. Names and
     /// Values errors on lines the run executed without errors are left to it too, since it knows the order and values.
-    /// Errors in a macro or function body are kept, as the run cannot point into the body.
+    /// For a body error the run reported at its call, a function's is left to the run, which marks the call
+    /// and body, and a macro's keeps only its body diagnostic, as the run cannot point into a macro body.
     /// </summary>
     public class CoreCheckValidator
     {
@@ -27,15 +28,25 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                     callLine = -1;
 
                 var diagnostic = ToDiagnostic(error, line, stage3, result);
-                var inBody = callLine >= 0 || error.IsFunctionBody || diagnostic.Stage == LineStage.Stage3 &&
+                var isFunctionBody = callLine >= 0 || error.IsFunctionBody;
+                var isMacroBody = !isFunctionBody && diagnostic.Stage == LineStage.Stage3 &&
                     BodyDiagnostics.FindBodyText(stage3, stage2, line, diagnostic.Column, diagnostic.EndColumn).Line >= 0;
-                if (!inBody && error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run &&
-                    (run.ReportedError(line, error.Code) ||
-                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
-                     run.GetExecution(line) == LineExecution.Executed && !run.ReportedAnyError(line)))
-                    continue;
+                if (error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run)
+                {
+                    if (isFunctionBody)
+                    {
+                        if (callLine >= 0 && run.ReportedError(callLine, error.Code))
+                            continue;
+                    }
+                    else if (isMacroBody)
+                        diagnostic.IsBodyOnly = run.ReportedError(line, error.Code);
+                    else if (run.ReportedError(line, error.Code) ||
+                        error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
+                        run.GetExecution(line) == LineExecution.Executed && !run.ReportedAnyError(line))
+                        continue;
+                }
 
-                if (callLine >= 0 && diagnostic.Stage == LineStage.Stage3)
+                if (callLine >= 0 && diagnostic.Stage is LineStage.Stage3 or LineStage.Stage1)
                     diagnostic = AtCall(diagnostic, error.CallSite, callLine, stage3, result);
                 result.AppendDiagnostic(diagnostic);
             }
@@ -52,7 +63,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 ? (Math.Min(call.StartColumn, text.Length), Math.Min(Math.Max(call.EndColumn, call.StartColumn + 1), text.Length))
                 : WholeLine(text);
             var callPosition = SourceMapper.MapPositionToOriginal(callLine, start, end, stage3, result.Stage2Context, result.Stage1Context);
-            var bodyPosition = SourceMapper.MapPositionToOriginal(body.StageLine, body.Column, body.EndColumn, stage3, result.Stage2Context, result.Stage1Context);
+            // An included body is on its #include line
+            var bodyPosition = body.Stage == LineStage.Stage1
+                ? new MappedPosition { Line = SourceMapper.MapStage1ToOriginal(body.StageLine, result.Stage1Context), Column = body.Column, EndColumn = body.EndColumn }
+                : SourceMapper.MapPositionToOriginal(body.StageLine, body.Column, body.EndColumn, stage3, result.Stage2Context, result.Stage1Context);
             var callDiagnostic = new LinterDiagnostic
             {
                 Code = body.Code,

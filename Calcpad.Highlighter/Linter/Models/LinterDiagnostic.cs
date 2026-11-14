@@ -35,6 +35,9 @@ namespace Calcpad.Highlighter.Linter.Models
         /// </summary>
         internal LineStage Stage { get; set; } = LineStage.Stage3;
 
+        /// <summary>A macro body error whose call the run already marked, so only the body is reported.</summary>
+        internal bool IsBodyOnly { get; set; }
+
         /// <summary>
         /// Additional ranges to highlight when the diagnostic spans multiple lines
         /// (e.g., due to line continuations). These are in addition to the primary

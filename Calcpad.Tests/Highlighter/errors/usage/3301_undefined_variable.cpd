@@ -22,11 +22,12 @@ undefinedW
 v = [1; 2;
 3; undefinedV]
 
-' In a $Block function body continued with an underscore
-'expect+2: CPD-3301[qq]
+' In a $Block function body continued with an underscore, judged and marked at its first call
+'expect+2: CPD-3301[qq]->+2[f(1)]
 f(x) = $Block{a = x; _
 b = a*2; _
 b + qq}
+'expect: CPD-3301[f(1)]->-2[qq]
 fr = f(1)
 
 ' In $Inline, $Sum and #if
@@ -44,20 +45,22 @@ u = $Sum{k*undefinedS @ k = 1 : 3}
 'expect: CPD-3301[undefinedM]
 w = twice$(undefinedM)
 
-' In a multi-line macro body, reported on the whole call
+' In a multi-line macro body, marked at the call and in the body
+'expect+2: CPD-3301[nope]->+3[calc\$(3)]
 #def calc$(x$)
 calcY1 = x$*2
 calcY2 = calcY1 + nope
 #end def
-'expect: CPD-3301
+'expect: CPD-3301[calc\$(3)]->-3[nope]
 calc$(3)
 
-' Parameters that share a prefix replace parts of each other
+' Parameters that share a prefix replace parts of each other, so only s is body text
 #def st$ = 'st'
+'expect+1: CPD-3301[s]->+3[test2\$(1; 2; 3)]
 #def test2$(sta$; t$; stat$)
 st$t$
 #end def
-'expect: CPD-3301
+'expect: CPD-3301[test2\$(1; 2; 3)]->-3[s]
 test2$(1; 2; 3)
 
 ' In a relative include, reported on the #include line

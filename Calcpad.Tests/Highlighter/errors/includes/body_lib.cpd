@@ -1,0 +1,3 @@
+' Library whose function and macro bodies read names nothing defines
+libBody(x) = x + libMissing
+#def libBad$(x$) = x$ + libNope

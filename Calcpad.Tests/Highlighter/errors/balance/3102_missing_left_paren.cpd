@@ -16,7 +16,8 @@ s = 1 + _
 2 + _
 3)
 
-' From an inline macro
+' From an inline macro, marked at the call and in the body
+'expect: CPD-3102[)]->+2[half\$(4)]
 #def half$(x$) = x$/2)
-'expect: CPD-3102
+'expect: CPD-3102[half\$(4)]->-2[)]
 h = half$(4)

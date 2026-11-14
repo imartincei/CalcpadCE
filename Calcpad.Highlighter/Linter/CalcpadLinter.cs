@@ -85,13 +85,22 @@ namespace Calcpad.Highlighter.Linter
             return Task.Run(() => Lint(staged, ignoreRegions));
         }
 
-        // Errors from included or macro lines can land on the same source span
+        // Errors from included or macro lines can land on the same source span; the kept one takes the others' links
         private static void RemoveDuplicates(LinterResult result)
         {
-            var seen = new HashSet<(int, string, int, int, LinterSeverity)>();
-            var duplicates = result.Diagnostics
-                .Where(d => !seen.Add((d.Line, d.Code, d.Column, d.EndColumn, d.Severity)))
-                .ToHashSet();
+            var kept = new Dictionary<(int, string, int, int, LinterSeverity), LinterDiagnostic>();
+            var duplicates = new HashSet<LinterDiagnostic>();
+            foreach (var d in result.Diagnostics)
+            {
+                if (kept.TryAdd((d.Line, d.Code, d.Column, d.EndColumn, d.Severity), d))
+                    continue;
+
+                duplicates.Add(d);
+                var first = kept[(d.Line, d.Code, d.Column, d.EndColumn, d.Severity)];
+                foreach (var r in d.Related ?? [])
+                    if (first.Related?.Exists(f => f.Line == r.Line && f.Column == r.Column && f.EndColumn == r.EndColumn) != true)
+                        (first.Related ??= []).Add(r);
+            }
             if (duplicates.Count > 0)
                 result.RemoveDiagnostics(duplicates.Contains);
         }

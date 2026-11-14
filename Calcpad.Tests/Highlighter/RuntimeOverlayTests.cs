@@ -23,15 +23,42 @@ namespace Calcpad.Tests.Highlighter
             return withTrace ? ContentResolver.ApplyRuntimeTrace(staged, RunCore(source)) : staged;
         }
 
+        private static LinterDiagnostic[] UndefinedAfterRun(string source) =>
+            new CalcpadLinter().Lint(Resolve(source, withTrace: true)).Diagnostics.Where(d => d.Code == "CPD-3301").ToArray();
+
+        // The run marks the call but cannot point into a macro body
         [Theory]
         [InlineData("#def m$(x$) = x$ + zzq\nr = m$(2)", 0, 1)]
         [InlineData("#def m$(x$)\n\ty = x$ + zzq\n#end def\nm$(2)", 1, 3)]
-        [InlineData("f(x) = x + zzq\nr = f(2)\nzzq = 1", 0, 1)]
-        public void BodyErrorOnExecutedLine_IsKeptWithTheTrace(string source, int bodyLine, int callLine)
+        public void MacroBodyErrorTheRunReported_KeepsOnlyTheBody(string source, int bodyLine, int callLine)
         {
-            var lines = new CalcpadLinter().Lint(Resolve(source, withTrace: true)).Diagnostics
-                .Where(d => d.Code == "CPD-3301").Select(d => d.Line).Order();
-            Assert.Equal([bodyLine, callLine], lines);
+            var body = Assert.Single(UndefinedAfterRun(source));
+            Assert.Equal(bodyLine, body.Line);
+            Assert.Equal(callLine, Assert.Single(body.Related).Line);
+        }
+
+        // Its function frames mark the call and the body
+        [Fact]
+        public void FunctionBodyErrorTheRunReported_IsLeftToTheRun()
+        {
+            Assert.Empty(UndefinedAfterRun("f(x) = x + zzq\nr = f(2)\nzzq = 1"));
+        }
+
+        [Theory]
+        [InlineData("f(x) = x + zzq\n#if 1 > 2\nr = f(2)\n#end if", 0, 2)]
+        [InlineData("#def m$(x$) = x$ + zzq\n#if 1 > 2\nr = m$(2)\n#end if", 0, 2)]
+        public void BodyErrorOnALineTheRunSkipped_KeepsCallAndBody(string source, int bodyLine, int callLine)
+        {
+            Assert.Equal([bodyLine, callLine], UndefinedAfterRun(source).Select(d => d.Line).Order());
+        }
+
+        // A later call the run did not mark still gets its own diagnostic
+        [Fact]
+        public void MacroCalledOnRunAndSkippedLines_KeepsTheSkippedCall()
+        {
+            var lines = UndefinedAfterRun("#def m$(x$) = x$ + zzq\na = m$(1)\n#if 1 > 2\nb = m$(2)\n#end if")
+                .Select(d => d.Line).Order();
+            Assert.Equal([0, 3], lines);
         }
 
         [Fact]

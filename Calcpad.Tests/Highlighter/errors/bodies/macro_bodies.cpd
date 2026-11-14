@@ -1,0 +1,65 @@
+' An error in macro body text marks every call, and the body once, linked to the first call with it
+'expect: CPD-3301[mbA]->+2[m1\$(1)]
+#def m1$(x$) = x$ + mbA
+'expect: CPD-3301[m1\$(1)]->-2[mbA]
+a1 = m1$(1)
+'expect: CPD-3301[m1\$(2)]->-4[mbA]
+b1 = m1$(2)
+
+' An error in an argument stays on the argument, with no link
+#def m2$(x$) = 2*(x$)
+'expect: CPD-3301[mbB]
+a2 = m2$(mbB)
+
+' Only the arguments of the second call break the body, so the body links to that call
+'expect: CPD-3401[2]->+3[m3\$(1)]
+#def m3$(x$) = x$ 2
+a3 = m3$(1+)
+'expect: CPD-3401[m3\$(1)]->-3[2]
+b3 = m3$(1)
+
+' A multi-line body called twice
+'expect+1: CPD-3301[mbC]->+3[m4\$]
+#def m4$
+y4 = 1 + mbC
+#end def
+'expect: CPD-3301[m4\$]->-3[mbC]
+m4$
+'expect: CPD-3301[m4\$]->-5[mbC]
+m4$
+
+' Two errors in one body: both link to the call
+'expect: CPD-3301[mbD]->+2[m5\$(1)], CPD-3301[mbE]->+2[m5\$(1)]
+#def m5$(x$) = x$ + mbD + mbE
+'expect: CPD-3301[m5\$(1)]->-2[mbD]
+a5 = m5$(1)
+
+' A macro inside another macro marks the outer call
+'expect: CPD-3301[mbF]->+3[out6\$(1)]
+#def in6$ = mbF
+#def out6$(x$) = x$ + in6$
+'expect: CPD-3301[out6\$(1)]->-3[mbF]
+a6 = out6$(1)
+
+' First called in a branch that does not run
+'expect: CPD-3301[mbG]->+3[m7\$(1)]
+#def m7$(x$) = x$ + mbG
+#if 1 > 2
+'expect: CPD-3301[m7\$(1)]->-3[mbG]
+a7 = m7$(1)
+#end if
+'expect: CPD-3301[m7\$(2)]->-6[mbG]
+b7 = m7$(2)
+
+' A call on a continued line
+'expect: CPD-3301[mbH]->+3[m8\$(1)]
+#def m8$(x$) = x$ + mbH
+'expect+1: CPD-3301[m8\$(1)]->-3[mbH]
+a8 = 1 + _
+m8$(1)
+
+' From an include, the whole call is marked with no link
+'expect: CPD-3301[#include ../includes/body_lib.cpd]
+#include ../includes/body_lib.cpd
+'expect: CPD-3301[a9 = libBad$(2)]
+a9 = libBad$(2)

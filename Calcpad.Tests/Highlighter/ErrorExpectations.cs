@@ -5,20 +5,25 @@ using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
-    /// <summary>A diagnostic an error sample expects: its 0-based line, code and, optionally, the underlined text.</summary>
-    public sealed record ErrorExpectation(int Line, string Code, string Span, int MarkerLine);
+    /// <summary>
+    /// A diagnostic an error sample expects: its 0-based line, code and, optionally, the underlined text,
+    /// and the line and text it links to.
+    /// </summary>
+    public sealed record ErrorExpectation(int Line, string Code, string Span, int MarkerLine, int? LinkLine = null, string LinkSpan = null);
 
     /// <summary>
     /// Reads <c>'expect: CPD-3301[name], CPD-3305</c> markers from error samples. A marker applies
     /// to the next line that isn't a marker, and <c>'expect+N:</c> to N lines below that one.
+    /// <c>CPD-3301[f(1)]-&gt;-2[qq]</c> expects a link to the text qq two lines up; without one, the diagnostic must have no links.
+    /// Write $ as \$ in spans, since macro names expand in comments too.
     /// </summary>
     public static partial class ErrorExpectations
     {
         [GeneratedRegex(@"^\s*'expect(?:\+(\d+))?:(.*)$")]
         private static partial Regex MarkerRegex();
 
-        // A span ends at the ] before a comma or the line end, so it may hold brackets
-        [GeneratedRegex(@"(CPD-\d{4})(?:\[(.*?)\](?=\s*(?:,|$)))?")]
+        // A span ends at the ] before a comma, a link or the line end, so it may hold brackets
+        [GeneratedRegex(@"(CPD-\d{4})(?:\[(.*?)\](?=\s*(?:,|->|$)))?(?:\s*->\s*([+-]\d+)(?:\[(.*?)\](?=\s*(?:,|$)))?)?")]
         private static partial Regex ItemRegex();
 
         public static bool IsMarker(string line) => MarkerRegex().IsMatch(line);
@@ -40,14 +45,19 @@ namespace Calcpad.Tests.Highlighter
 
                 foreach (Match item in ItemRegex().Matches(match.Groups[2].Value))
                     expectations.Add(new ErrorExpectation(target, item.Groups[1].Value,
-                        item.Groups[2].Success ? item.Groups[2].Value : null, i));
+                        Unescape(item.Groups[2]), i,
+                        item.Groups[3].Success ? target + int.Parse(item.Groups[3].Value) : null,
+                        Unescape(item.Groups[4])));
             }
             return expectations;
         }
 
+        private static string Unescape(Group span) => span.Success ? span.Value.Replace("\\$", "$") : null;
+
         /// <summary>
         /// Each expectation needs its own diagnostic, and every Error or Warning needs an expectation.
-        /// Information diagnostics may be expected but are otherwise ignored.
+        /// Information diagnostics may be expected but are otherwise ignored. Every link must also lead
+        /// to a diagnostic with the same code, as <see cref="CheckLinks"/> describes.
         /// </summary>
         public static List<string> Check(IReadOnlyList<string> lines, IReadOnlyList<LinterDiagnostic> diagnostics)
         {
@@ -56,10 +66,10 @@ namespace Calcpad.Tests.Highlighter
             var unmatched = diagnostics.ToList();
 
             // Expectations with a span claim their diagnostic first
-            foreach (var e in expectations.OrderBy(e => e.Span is null))
+            foreach (var e in expectations.OrderBy(e => e.Span is null).ThenBy(e => e.LinkSpan is null))
             {
                 var found = unmatched.FirstOrDefault(d => d.Line == e.Line && d.Code == e.Code &&
-                    (e.Span is null || SpanText(lines, d) == e.Span));
+                    (e.Span is null || SpanText(lines, d) == e.Span) && LinkMatches(lines, e, d));
                 if (found is not null)
                 {
                     unmatched.Remove(found);
@@ -68,15 +78,51 @@ namespace Calcpad.Tests.Highlighter
 
                 var sameCode = diagnostics.Where(d => d.Line == e.Line && d.Code == e.Code).ToList();
                 var detail = sameCode.Count > 0
-                    ? $" (it underlines {string.Join(", ", sameCode.Select(d => $"[{SpanText(lines, d)}]"))})"
+                    ? $" (it underlines {string.Join(", ", sameCode.Select(d => $"[{SpanText(lines, d)}]{Links(lines, d)}"))})"
                     : "";
                 problems.Add($"Line {e.Line + 1}: expected {e.Code}{(e.Span is null ? "" : $"[{e.Span}]")}" +
+                    (e.LinkLine is { } link ? $" linked to line {link + 1}{(e.LinkSpan is null ? "" : $"[{e.LinkSpan}]")}" : "") +
                     $" from the marker on line {e.MarkerLine + 1}{detail}");
             }
 
             foreach (var d in unmatched.Where(d => d.Severity != LinterSeverity.Information))
-                problems.Add($"Line {d.Line + 1}: unexpected {d.Code} {d.Severity} [{SpanText(lines, d)}] {d.Message}");
+                problems.Add($"Line {d.Line + 1}: unexpected {d.Code} {d.Severity} [{SpanText(lines, d)}]{Links(lines, d)} {d.Message}");
 
+            problems.AddRange(CheckLinks(lines, diagnostics));
+            return problems;
+        }
+
+        private static bool LinkMatches(IReadOnlyList<string> lines, ErrorExpectation e, LinterDiagnostic d) =>
+            e.LinkLine is not { } line
+                ? d.Related is not { Count: > 0 }
+                : d.Related?.Exists(r => r.Line == line && (e.LinkSpan is null || SpanText(lines, r) == e.LinkSpan)) == true;
+
+        private static string Links(IReadOnlyList<string> lines, LinterDiagnostic d) =>
+            d.Related is { Count: > 0 } related
+                ? string.Concat(related.Select(r => $" linked to line {r.Line + 1}[{SpanText(lines, r)}]"))
+                : "";
+
+        /// <summary>
+        /// Each link leads to a diagnostic with the same code on exactly the linked text, and the
+        /// message names the linked line. The call a body links to must link back to it.
+        /// </summary>
+        public static List<string> CheckLinks(IReadOnlyList<string> lines, IReadOnlyList<LinterDiagnostic> diagnostics)
+        {
+            var problems = new List<string>();
+            foreach (var d in diagnostics)
+                foreach (var r in d.Related ?? [])
+                {
+                    var where = $"Line {d.Line + 1}: {d.Code} [{SpanText(lines, d)}] links to line {r.Line + 1}[{SpanText(lines, r)}]";
+                    var target = diagnostics.FirstOrDefault(t => t != d && t.Code == d.Code &&
+                        t.Line == r.Line && t.Column == r.Column && t.EndColumn == r.EndColumn);
+                    if (target is null)
+                        problems.Add($"{where}, where no {d.Code} is reported");
+                    else if (r.Message.StartsWith("Call to") && target.Related?.Exists(b =>
+                        b.Line == d.Line && b.Column == d.Column && b.EndColumn == d.EndColumn) != true)
+                        problems.Add($"{where}, which does not link back to it");
+                    if (!d.Message.Contains($"line {r.Line + 1}"))
+                        problems.Add($"{where}, but its message does not name that line: {d.Message}");
+                }
             return problems;
         }
 
@@ -130,13 +176,19 @@ namespace Calcpad.Tests.Highlighter
             return lines;
         }
 
-        public static string SpanText(IReadOnlyList<string> lines, LinterDiagnostic d)
+        public static string SpanText(IReadOnlyList<string> lines, LinterDiagnostic d) =>
+            SpanText(lines, d.Line, d.Column, d.EndColumn);
+
+        public static string SpanText(IReadOnlyList<string> lines, DiagnosticRange r) =>
+            SpanText(lines, r.Line, r.Column, r.EndColumn);
+
+        private static string SpanText(IReadOnlyList<string> lines, int line, int column, int endColumn)
         {
-            if (d.Line < 0 || d.Line >= lines.Count)
+            if (line < 0 || line >= lines.Count)
                 return "";
-            var text = lines[d.Line];
-            var start = System.Math.Clamp(d.Column, 0, text.Length);
-            var end = System.Math.Clamp(d.EndColumn, start, text.Length);
+            var text = lines[line];
+            var start = System.Math.Clamp(column, 0, text.Length);
+            var end = System.Math.Clamp(endColumn, start, text.Length);
             return text[start..end];
         }
     }

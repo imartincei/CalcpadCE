@@ -28,12 +28,14 @@ x = 1
 #end if
 
 ' A multi-line macro whose own #if branch does not run for this call
+' The body is marked too, linked to the call
+'expect+2: CPD-3301[undefinedInMacro]->+4[check\$(1)]
 #def check$(v$)
 #if v$ > 10
     checkValue = undefinedInMacro
 #end if
 #end def
-'expect: CPD-3301
+'expect: CPD-3301[check\$(1)]->-4[undefinedInMacro]
 check$(1)
 
 ' A relative include inside a branch that never runs

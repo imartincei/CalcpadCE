@@ -10,7 +10,8 @@ g( ) = 1
 'expect: CPD-3206
 total() = $Block{a = 1; b = 2; a + b}
 
-' From an inline macro
+' From an inline macro, marked at the call and in the body
+'expect: CPD-3206[() = 1]->+2[noArgs\$(h)]
 #def noArgs$(n$) = n$() = 1
-'expect: CPD-3206
+'expect: CPD-3206[noArgs\$(h)]->-2[() = 1]
 noArgs$(h)

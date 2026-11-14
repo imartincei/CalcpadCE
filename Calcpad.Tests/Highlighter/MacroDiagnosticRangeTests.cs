@@ -144,6 +144,23 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
+        public void TwoErrorsInOneBody_CallLinksToBoth()
+        {
+            var lines = new[] { "#def m$(x$) = x$ + zzA + zzB", "a = m$(1)" };
+            var call = Assert.Single(Lint(string.Join('\n', lines)).Diagnostics, d => d.Line == 1 && d.Code == "CPD-3301");
+            Assert.Equal(["zzA", "zzB"], call.Related.Select(r => lines[r.Line][r.Column..r.EndColumn]).Order());
+        }
+
+        [Fact]
+        public void LinkNote_StartsANewSentence()
+        {
+            var source = "#def setE$\ne = 3\n#end def\nsetE$";
+            var diagnostics = Lint(source).Diagnostics.Where(d => d.Code == "CPD-3205").ToList();
+            Assert.Contains(diagnostics, d => d.Line == 3 && d.Message.EndsWith("constant. In the body of setE$ on line 2."));
+            Assert.Contains(diagnostics, d => d.Line == 1 && d.Message.EndsWith("constant. With the arguments of the call on line 4."));
+        }
+
+        [Fact]
         public void WrongArgumentCountInBody_HighlightsCallAndBody()
         {
             var lines = new[] { "f(a; b) = a + b", "#def call$(x$) = f(x$)", "z = call$(1)" };

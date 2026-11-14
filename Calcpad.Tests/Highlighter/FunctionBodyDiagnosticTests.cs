@@ -65,6 +65,17 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
+        public void TwoUndefinedNamesInOneBody_CallLinksToBoth()
+        {
+            var lines = new[] { "f(x) = x + qq + rr", "y = f(2)" };
+            var diagnostics = Lint(string.Join('\n', lines));
+
+            var call = Assert.Single(diagnostics, d => d.Line == 1);
+            Assert.Equal(["qq", "rr"], call.Related.Select(r => lines[r.Line][r.Column..r.EndColumn]).Order());
+            Assert.Equal(2, diagnostics.Count(d => d.Line == 0 && d.Related?.Single().Line == 1));
+        }
+
+        [Fact]
         public void NeverCalled_MarksOnlyTheBody()
         {
             var diagnostic = Assert.Single(Lint("f(x) = x + qq"));
