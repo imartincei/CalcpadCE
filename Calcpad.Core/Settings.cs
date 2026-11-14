@@ -24,7 +24,8 @@ namespace Calcpad.Core
         PlotHeight,
         PlotStep,
         Precision,
-        Tol
+        Tol,
+        CalculatePost
     }
 
     /// <summary>
@@ -52,6 +53,7 @@ namespace Calcpad.Core
         public int? PlotStep { get; set; }
         public double? Precision { get; set; }
         public double? Tol { get; set; }
+        public bool? CalculatePost { get; set; }
 
         /// <summary>
         /// Bounds mirror how <c>Calcpad.Core</c> constrains each value: <c>decimals</c> and
@@ -80,6 +82,8 @@ namespace Calcpad.Core
         public MathSettings Math { get; set; } = new();
         public PlotSettings Plot { get; set; } = new();
         public bool IsUs { get; set; } = true;
+        // When false, #post blocks are skipped in the input form
+        public bool CalculatePost { get; set; } = true;
     }
 
     [Serializable()]
