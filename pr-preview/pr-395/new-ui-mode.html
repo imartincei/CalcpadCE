@@ -1725,6 +1725,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#moving-saved-values-into-the-calcpadce-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving saved values into the CalcpadCE file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-syncing-values-with-the-calcpadce-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-syncing values with the CalcpadCE file
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3576,6 +3598,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#moving-saved-values-into-the-calcpadce-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving saved values into the CalcpadCE file
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auto-syncing-values-with-the-calcpadce-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-syncing values with the CalcpadCE file
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3717,6 +3761,10 @@ In <strong>Input</strong> and <strong>Report</strong>, a <strong>Print PDF</stro
 #post
 '&lt;p&gt;Span used: 'L'&lt;/p&gt;
 #end post
+</code></pre></div>
+<p>Both are still calculated when hidden, so a variable defined in <code>#post</code> can be used by a <code>#pre</code> later in the file.
+If the <code>#post</code> calculations slow down the form and variables are not needed in the Input form, turn off <strong>Calculate #post in Input Form</strong> in <a href="new-settings.html#math">Settings</a> or in the document using:</p>
+<div class="language-text highlight"><pre><span></span><code>#settings {"calculatePost": false}
 </code></pre></div>
 <p><strong>Preview</strong> is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.</p>
 <p>Turning on the <strong>Apply #UI Values in Preview</strong> setting will render the preview with the input values applied.
@@ -4074,6 +4122,18 @@ An <code>#include</code> line, macro call, or loop lists the overrides for every
 <p>Turn on <strong>Show UI Override Hints</strong> in <a href="new-settings.html#editor-features">Settings</a> to show saved values above the lines they apply to.
 This is the value itself on a <code>#UI</code> line with one control, or the count for a loop, macro call or <code>#include</code> line.
 Click a hint to open those values in the Properties tab.</p>
+<h3 id="moving-saved-values-into-the-calcpadce-file">Moving saved values into the CalcpadCE file<a class="headerlink" href="#moving-saved-values-into-the-calcpadce-file" title="Permanent link">&para;</a></h3>
+<p>The <strong>Saved #UI values</strong> list in the <a href="new-calcpad-panel.html#properties">Properties tab</a> has two buttons that act on the values listed:</p>
+<ul>
+<li><strong>Override Defaults</strong> writes each UI override into its <code>#UI</code> line and removes the override. Values in loops, macros and <code>#include</code> files are unaffected. If filtering by selected lines, only the selected lines have their defaults updated.</li>
+<li><strong>Revert to defaults</strong> removes #UI overrides so the Input form is reverted to default values. If filtering by selected lines, only the selected lines are reverted.</li>
+</ul>
+<h3 id="auto-syncing-values-with-the-calcpadce-file">Auto-syncing values with the CalcpadCE file<a class="headerlink" href="#auto-syncing-values-with-the-calcpadce-file" title="Permanent link">&para;</a></h3>
+<p>Turn on <strong>Auto-Sync #UI Values</strong> in <a href="new-settings.html#editor-features">Settings</a> to keep <code>#UI</code> lines in this file (excluding overrides in loops, macros, and <code>#include</code> lines) in sync with the Input form:</p>
+<ul>
+<li>A value entered in the Input form is written into its <code>#UI</code> line as the default instead of being saved as an override.</li>
+<li>Editing the default value on a <code>#UI</code> line removes its saved override.</li>
+</ul>
 <h2 id="exporting">Exporting<a class="headerlink" href="#exporting" title="Permanent link">&para;</a></h2>
 <p>A document with <code>#UI</code> controls exports like any other — see <a href="new-exports.html">Exports</a> for the
 variants, the formats, and where each one lives.</p>
