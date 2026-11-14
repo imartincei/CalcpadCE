@@ -882,7 +882,7 @@ const localSettings = ref<Settings>({ ...props.settings })
 // field order unchanged.
 const MATH_KEYS = [
   'decimals', 'degrees', 'returnAngleUnits', 'complex', 'substitute', 'formatEquations',
-  'zeroSmallMatrixElements', 'showHiddenOutput', 'calculatePost', 'maxOutputCount', 'precision', 'tol',
+  'zeroSmallMatrixElements', 'showHiddenOutput', 'calculatePost', 'maxOutputCount', 'precision', 'tol', 'macroCalls',
 ].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
@@ -981,7 +981,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       calculatePost: 'calculate post input form ui slow lag performance',
       maxOutputCount: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',
-      tol: 'solver tolerance pcg eigensolver iterative'
+      tol: 'solver tolerance pcg eigensolver iterative',
+      macroCalls: 'macro calls dollar $ def expansion'
     }
   },
   plot: {

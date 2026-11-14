@@ -33,7 +33,8 @@
             "mode": "auto"
         },
         "isUs": true,
-        "calculatePost": true
+        "calculatePost": true,
+        "macroCalls": "auto"
     },
     "extras": {
         "previewTheme": "system",

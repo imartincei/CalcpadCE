@@ -1960,6 +1960,10 @@ export async function activate(context: vscode.ExtensionContext) {
         // Create shared API client (uses remote URL initially, switches to local when server starts)
         const apiClient = new CalcpadApiClient(settingsManager.getServerUrl(), serverDebugChannel);
         sharedApiClient = apiClient;
+        const syncMacroCalls = () => apiClient.setMacroCalls(settingsManager.getSettings().macroCalls);
+        syncMacroCalls();
+        void settingsManager.ready.then(syncMacroCalls);
+        context.subscriptions.push(settingsManager.onDidChangeSettings(syncMacroCalls));
 
         // Continuous liveness, surfaced as the coloured dot in the CalcpadCE view title. The
         // server manager pushes lifecycle transitions in; the poll is the backstop for what it

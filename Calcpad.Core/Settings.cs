@@ -25,7 +25,17 @@ namespace Calcpad.Core
         PlotStep,
         Precision,
         Tol,
-        CalculatePost
+        CalculatePost,
+        MacroCalls
+    }
+
+    /// <summary>When <c>name$</c> is parsed as a macro call.</summary>
+    public enum MacroCallMode
+    {
+        /// <summary>Once a macro is defined.</summary>
+        Auto,
+        On,
+        Off
     }
 
     /// <summary>
@@ -54,6 +64,15 @@ namespace Calcpad.Core
         public double? Precision { get; set; }
         public double? Tol { get; set; }
         public bool? CalculatePost { get; set; }
+        public string MacroCalls { get; set; }
+
+        internal MacroCallMode? ParsedMacroCalls => MacroCalls?.ToLowerInvariant() switch
+        {
+            "auto" => MacroCallMode.Auto,
+            "on" => MacroCallMode.On,
+            "off" => MacroCallMode.Off,
+            _ => null
+        };
 
         /// <summary>
         /// Bounds mirror how <c>Calcpad.Core</c> constrains each value: <c>decimals</c> and
@@ -73,6 +92,8 @@ namespace Calcpad.Core
             CheckRange(errors, SettingKey.Tol, "tol", Tol, 1e-15, 1e-2);
             if (ColorScale is not null && !Enum.TryParse<PlotSettings.ColorScales>(ColorScale, true, out _))
                 errors.Add(new(SettingKey.ColorScale, $"'colorScale' must be one of: {string.Join(", ", Enum.GetNames(typeof(PlotSettings.ColorScales)))}"));
+            if (MacroCalls is not null && ParsedMacroCalls is null)
+                errors.Add(new(SettingKey.MacroCalls, "'macroCalls' must be one of: auto, on, off"));
         }
     }
 
@@ -84,6 +105,7 @@ namespace Calcpad.Core
         public bool IsUs { get; set; } = true;
         // When false, #post blocks are skipped in the input form
         public bool CalculatePost { get; set; } = true;
+        public MacroCallMode MacroCalls { get; set; }
     }
 
     [Serializable()]

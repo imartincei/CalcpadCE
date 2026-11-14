@@ -1689,6 +1689,12 @@ async function bootstrap(): Promise<void> {
             || data.type === 'previewUiOverridesChanged' || data.type === 'previewPdfChanged') {
             if (!fromHost) return;
             refreshAllPreviews();
+            if (data.type === 'settingsChanged') {
+                for (const g of groups.values()) {
+                    void g.diagnostics?.refresh();
+                    void refreshDefinitionsFor(g);
+                }
+            }
             return;
         }
 

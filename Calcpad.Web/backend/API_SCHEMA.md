@@ -394,6 +394,7 @@ interface HighlightRequest {
   content: string;          // The Calcpad source code to tokenize
   includeText?: boolean;    // Whether to include token text in response (default: false)
   sourceFilePath?: string;  // Full path of source file on client (for resolving relative #include)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -485,6 +486,7 @@ interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
   useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -750,6 +752,7 @@ interface DefinitionsRequest {
   content: string;          // The Calcpad source code to analyze
   sourceFilePath?: string;  // Full path of source file on client
   useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -941,6 +944,7 @@ interface SymbolAtPositionRequest {
   line: number;             // Zero-based line of the cursor in the original source
   column: number;           // Zero-based column of the cursor
   sourceFilePath?: string;  // Full path of source file on client (resolves #include)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -1067,6 +1071,7 @@ Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macro
 interface PortableBundleRequest {
   content: string;
   sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
+  macroCalls?: number;       // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 

@@ -24,7 +24,7 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <param name="Origins">Stage 2 line and column each character was read from, or -1; null without expansion.</param>
         private readonly record struct OutputLine(string Text, int Stage2Line, IReadOnlyList<string> ExpandedMacros, int ContentIndex, int ContentCount, (int Line, int Column)[] Origins);
 
-        private Stage2Result ProcessStage2(Stage1Result stage1, string sourceFilePath, out List<OutputLine> outputs)
+        private Stage2Result ProcessStage2(Stage1Result stage1, string sourceFilePath, MacroCallMode macroCalls, out List<OutputLine> outputs)
         {
             var trace = new MacroTrace();
             var includes = new Dictionary<string, Stage1Result>(PathComparer);
@@ -32,6 +32,7 @@ namespace Calcpad.Highlighter.ContentResolution
             var parser = new MacroParser
             {
                 SourceFilePath = sourceFilePath,
+                DefaultMacroCalls = macroCalls,
                 Trace = trace,
                 Debug = true,
                 Include = (path, _) =>

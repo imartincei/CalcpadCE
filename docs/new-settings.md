@@ -19,6 +19,7 @@ In VS Code, do not use VS Code's own settings editor.
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
 | **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
 | **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |
+| **Macro Calls** | Auto / On / Off | When `name$` is parsed as a macro call. See [In a document](#in-a-document). |
 
 ## Plot
 
@@ -150,6 +151,24 @@ x = 6.12345
 'Back to the previous decimals.
 y = 6.12345
 ```
+
+`macroCalls` controls when `name$` is parsed as a macro call.
+
+| Value | Behavior |
+| --- | --- |
+| `"auto"` (default) | Once a macro has been defined with `#def`. |
+| `"on"` | Always. An undefined `name$` is an error, even before any `#def`. |
+| `"off"` | Never. `$` stays as text, so `'name$` is safe after a `#def`. |
+
+```calcpad
+#def area$ = b*h
+#settings {"macroCalls": "off"}
+'name$'
+#end settings
+A = area$
+```
+
+Unlike the other keys, `macroCalls` in `#settings` is applied before the calculation runs, so it still runs in a false `#if` branch.
 
 ## See also
 
