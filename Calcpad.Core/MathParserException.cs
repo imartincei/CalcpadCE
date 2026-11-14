@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Calcpad.Core
 {
@@ -21,6 +22,16 @@ namespace Calcpad.Core
 
         /// <summary>The missing variable or function, for errors a later definition can fix.</summary>
         internal string Name { get; init; }
+
+        /// <summary>The custom functions being calculated when the error was raised, innermost first.</summary>
+        internal List<CalcpadFunctionFrame> Functions { get; private set; }
+
+        internal void InFunction(string name, int line)
+        {
+            Functions ??= [];
+            if (Functions.Count == 0 || Functions[^1].Name != name || Functions[^1].SourceLine != line)
+                Functions.Add(new(name, line));
+        }
 
         /// <summary>Moves the position into the text that contains the parsed one, or drops it when that offset is unknown.</summary>
         internal void Shift(int offset)

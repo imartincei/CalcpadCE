@@ -179,6 +179,8 @@ namespace Calcpad.Core
                                 {
                                     Type = TokenTypes.Array
                                 };
+                                if (trackPositions)
+                                    t.Start = tokenLiteral.Start;
                                 tokens.Enqueue(t);
                                 tokenLiteral.Reset(i);
                                 tt = t.Type switch

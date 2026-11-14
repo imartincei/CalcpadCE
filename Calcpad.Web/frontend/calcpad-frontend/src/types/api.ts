@@ -10,6 +10,8 @@ export interface LintRequest {
     sourceFilePath?: string;
     /** Use the last debug run of this exact content. Static when false. */
     useTrace?: boolean;
+    /** The editor's complex mode, which the document starts in until a #settings changes it. */
+    isComplex?: boolean;
     /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
     macroCalls?: number;
 }
@@ -18,6 +20,8 @@ export interface LintResponse {
     errorCount: number;
     warningCount: number;
     diagnostics: LintDiagnostic[];
+    /** Errors for included files only, since this file's run already shows them. */
+    includeOnly?: LintDiagnostic[];
 }
 
 export interface LintDiagnostic {
@@ -29,6 +33,25 @@ export interface LintDiagnostic {
     severity: string;    // Severity name: "error" or "warning"
     severityId: number;  // Severity ID: 0=Error, 1=Warning
     source: string;      // Source of the diagnostic (default: "Calcpad Linter")
+    /** Linked locations, such as the macro or function body behind an error at a call. */
+    related?: LintRelatedLocation[];
+    /** For a diagnostic on an #include line, where its errors are in the included files. */
+    includeOrigins?: LintIncludeOrigin[];
+}
+
+export interface LintRelatedLocation {
+    line: number;        // Zero-based line number
+    column: number;      // Zero-based start column
+    endColumn: number;   // Zero-based end column
+    message: string;
+}
+
+export interface LintIncludeOrigin {
+    filePath: string;    // Absolute path of the included file
+    line: number;        // Zero-based line in the included file
+    column: number;      // Zero-based start column, or -1 for the whole line
+    endColumn: number;   // Zero-based end column, or -1 for the whole line
+    message: string;     // The message without its "file line N: " prefix
 }
 
 // ============================================
@@ -319,6 +342,14 @@ export enum CalcpadTypeId {
 
 export type CalcpadErrorSource = 'Macro' | 'Expression';
 
+/** Part of a run error on another line. Columns as in CalcpadError. */
+export interface CalcpadErrorRange {
+    sourceLine: number;
+    outputLine: number;
+    startColumn: number;
+    endColumn: number;
+}
+
 export interface CalcpadError {
     sourceLine: number;
     outputLine: number;
@@ -331,6 +362,16 @@ export interface CalcpadError {
     /** 0-based columns on the source line, end exclusive; -1 when the error covers the whole line. */
     startColumn?: number;
     endColumn?: number;
+    /** The error's parts on later lines of a continued statement. */
+    additionalRanges?: CalcpadErrorRange[];
+    /** Custom functions being calculated when the error was raised, innermost first. */
+    functions?: CalcpadFunctionFrame[];
+}
+
+/** A custom function and the first source line (1-based) of its definition. */
+export interface CalcpadFunctionFrame {
+    name: string;
+    sourceLine: number;
 }
 
 export interface ConvertResult {

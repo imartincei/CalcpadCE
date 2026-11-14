@@ -12,11 +12,12 @@ r = $Block{c = 1; _
 d = (c + 2; _
 d*2}
 
-' In a multi-line macro body, reported where it expands
+' In a multi-line macro body, marked at the call and in the body
+'expect+1: CPD-3101[(]->+3[calc\$(3)]
 #def calc$(x$)
 calcValue = (x$*2
 #end def
-'expect: CPD-3101
+'expect: CPD-3101[calc\$(3)]->-3[(]
 calc$(3)
 
 ' Nested parentheses in a function call

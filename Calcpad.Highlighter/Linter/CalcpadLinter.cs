@@ -31,8 +31,9 @@ namespace Calcpad.Highlighter.Linter
         /// Optional source-level regions in which specific diagnostic codes are suppressed, with
         /// 0-based original source line numbers. Applied after all diagnostics are mapped back.
         /// </param>
+        /// <param name="isComplex">The complex mode the document starts in, from the editor's settings.</param>
         public LinterResult Lint(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null, bool isComplex = false)
         {
             if (staged == null)
             {
@@ -65,10 +66,13 @@ namespace Calcpad.Highlighter.Linter
                 _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
             if (staged.CoreCheck is { } check)
-                _coreCheckValidator.Validate(stage3Context, check.Value, result);
+                _coreCheckValidator.Validate(stage3Context, check.Get(isComplex), result, staged.Stage2);
+            BodyDiagnostics.MapMacroBodies(result, staged.Stage2);
 
             // Map all diagnostics from stage lines to original lines
             result.MapDiagnosticsToOriginal();
+            result.IncludeOnlyDiagnostics.AddRange(result.Diagnostics.Where(d => d.IsIncludeOnly && d.IncludeOrigins != null));
+            result.RemoveDiagnostics(d => d.IsIncludeOnly);
             RemoveDuplicates(result);
 
             // Suppress diagnostics covered by LintIgnore regions
@@ -79,18 +83,30 @@ namespace Calcpad.Highlighter.Linter
         }
 
         public Task<LinterResult> LintAsync(StagedResolvedContent staged,
-            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
+            IReadOnlyList<LintIgnoreRegion> ignoreRegions = null, bool isComplex = false)
         {
-            return Task.Run(() => Lint(staged, ignoreRegions));
+            return Task.Run(() => Lint(staged, ignoreRegions, isComplex));
         }
 
-        // Errors from included or macro lines can land on the same source span
+        // Errors from included or macro lines can land on the same source span; the kept one takes the others' links
         private static void RemoveDuplicates(LinterResult result)
         {
-            var seen = new HashSet<(int, string, int, int, LinterSeverity)>();
-            var duplicates = result.Diagnostics
-                .Where(d => !seen.Add((d.Line, d.Code, d.Column, d.EndColumn, d.Severity)))
-                .ToHashSet();
+            var kept = new Dictionary<(int, string, int, int, LinterSeverity), LinterDiagnostic>();
+            var duplicates = new HashSet<LinterDiagnostic>();
+            foreach (var d in result.Diagnostics)
+            {
+                if (kept.TryAdd((d.Line, d.Code, d.Column, d.EndColumn, d.Severity), d))
+                    continue;
+
+                duplicates.Add(d);
+                var first = kept[(d.Line, d.Code, d.Column, d.EndColumn, d.Severity)];
+                foreach (var r in d.Related ?? [])
+                    if (first.Related?.Exists(f => f.Line == r.Line && f.Column == r.Column && f.EndColumn == r.EndColumn) != true)
+                        (first.Related ??= []).Add(r);
+                foreach (var o in d.IncludeOrigins ?? [])
+                    if (first.IncludeOrigins?.Exists(f => f.FilePath == o.FilePath && f.Line == o.Line && f.Column == o.Column && f.Message == o.Message) != true)
+                        (first.IncludeOrigins ??= []).Add(o);
+            }
             if (duplicates.Count > 0)
                 result.RemoveDiagnostics(duplicates.Contains);
         }

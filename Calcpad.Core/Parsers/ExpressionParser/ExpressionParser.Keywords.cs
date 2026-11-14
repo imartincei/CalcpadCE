@@ -406,7 +406,7 @@ namespace Calcpad.Core
             }
             catch (MathParserException ex)
             {
-                _parser.ReadNames?.Clear();
+                ClearReads();
                 AppendError(s.ToString(), ex, _currentLine);
                 return false;
             }

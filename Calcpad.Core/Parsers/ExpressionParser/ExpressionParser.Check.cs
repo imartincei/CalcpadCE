@@ -14,7 +14,20 @@ namespace Calcpad.Core
             internal readonly int Line = line, SourceLine = sourceLine, Start = start, End = end;
             // Null until known
             internal bool? Defined;
+            // For a function body: the first call, where it was judged
+            internal CalcpadCallSite Call;
+            internal bool IsFunctionBody;
         }
+
+        // What a function body reads and calls, judged at its first call
+        private sealed class FunctionBody(List<ReadName> reads, List<string> callees)
+        {
+            internal readonly List<ReadName> Reads = reads;
+            internal readonly List<string> Callees = callees;
+            internal bool IsCalled;
+        }
+
+        private readonly Dictionary<string, FunctionBody> _functionBodies = new(StringComparer.Ordinal);
 
         private readonly List<ReadName> _readNames = [];
         private readonly List<ReadName> _loopReads = [];
@@ -52,8 +65,12 @@ namespace Calcpad.Core
             _checkDefined.Clear();
             _loopErrors.Clear();
             _recursiveFunctions.Clear();
+            _functionBodies.Clear();
             if (_isCheck)
+            {
                 _parser.ReadNames = [];
+                _parser.FunctionCalls = [];
+            }
         }
 
         private void CheckLoopStart()
@@ -91,29 +108,67 @@ namespace Calcpad.Core
             });
         }
 
-        // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
-        // so those reads are judged at the end of the document or of the outermost loop.
+        // Function bodies resolve names when first called, and loop bodies see later lines on the next pass,
+        // so those reads are judged then, or at the end of the outermost loop or of the document.
         /// <param name="nameColumn">Column of the parsed expression's start, to point at each name, or -1.</param>
         private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false, int nameColumn = -1)
         {
-            if (_parser?.ReadNames is not { Count: > 0 } names)
+            var calls = _parser?.FunctionCalls;
+            var function = isFunction ? _parser.DefinedFunctionName : null;
+            List<ReadName> bodyReads = function is null ? null : [];
+            if (_parser?.ReadNames is { Count: > 0 } names)
+            {
+                foreach (var (name, at) in names)
+                {
+                    var read = nameColumn >= 0 && at >= 0
+                        ? new ReadName(name, line, sourceLine, nameColumn + at, nameColumn + at + name.Length)
+                        : new ReadName(name, line, sourceLine, start, end);
+                    if (bodyReads is not null)
+                    {
+                        read.IsFunctionBody = true;
+                        bodyReads.Add(read);
+                    }
+                    else if (_checkLoops.Count != 0)
+                        _loopReads.Add(read);
+                    else
+                        read.Defined = IsCheckDefined(name);
+                    _readNames.Add(read);
+                }
+                names.Clear();
+            }
+            if (calls is not { Count: > 0 } && function is null)
                 return;
 
-            foreach (var (name, at) in names)
-            {
-                var read = nameColumn >= 0 && at >= 0
-                    ? new ReadName(name, line, sourceLine, nameColumn + at, nameColumn + at + name.Length)
-                    : new ReadName(name, line, sourceLine, start, end);
-                if (_checkLoops.Count != 0)
+            if (function is not null)
+                _functionBodies[function] = new(bodyReads, calls.ConvertAll(c => c.Name));
+            else
+                foreach (var call in calls)
                 {
-                    if (!isFunction)
-                        _loopReads.Add(read);
+                    var (callStart, callEnd) = nameColumn >= 0 && call.Start >= 0 && call.End > call.Start
+                        ? (nameColumn + call.Start, nameColumn + call.End)
+                        : (start, end);
+                    JudgeFunctionBody(call.Name, new(call.Name, sourceLine, callStart, callEnd));
                 }
-                else if (!isFunction)
-                    read.Defined = IsCheckDefined(name);
-                _readNames.Add(read);
+            calls.Clear();
+        }
+
+        // The callees of a function are first called with it
+        private void JudgeFunctionBody(string name, CalcpadCallSite call)
+        {
+            if (!_functionBodies.TryGetValue(name, out var body) || body.IsCalled)
+                return;
+
+            body.IsCalled = true;
+            foreach (var read in body.Reads)
+            {
+                read.Call = call with { Function = name };
+                if (_checkLoops.Count != 0)
+                    _loopReads.Add(read);
+                else
+                    read.Defined = IsCheckDefined(read.Name);
             }
-            names.Clear();
+            foreach (var callee in body.Callees)
+                JudgeFunctionBody(callee, call);
         }
 
         private void ResolveLoopReads()
@@ -130,6 +185,12 @@ namespace Calcpad.Core
                     RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
             }
             _loopErrors.Clear();
+        }
+
+        private void ClearReads()
+        {
+            _parser.ReadNames?.Clear();
+            _parser.FunctionCalls?.Clear();
         }
 
         private bool IsFunctionKnown(string name) => _parser.IsDefinedFunction(name) || _recursiveFunctions.Contains(name);
@@ -156,7 +217,7 @@ namespace Calcpad.Core
                     continue;
 
                 var ex = Exceptions.UndefinedVariableOrUnits(read.Name);
-                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
+                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End, read.Call, read.IsFunctionBody);
             }
             _readNames.Clear();
             _loopReads.Clear();

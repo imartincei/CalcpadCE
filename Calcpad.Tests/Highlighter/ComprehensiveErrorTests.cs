@@ -88,8 +88,9 @@ namespace Calcpad.Tests.Highlighter
 
             var shown = ErrorExpectations.WithRunErrors(lines, result.Diagnostics, runErrors);
             var problems = ErrorExpectations.Check(lines, shown);
+            // A body marker is untaken through the call it links to
             problems.AddRange(ErrorExpectations.Parse(lines)
-                .Where(e => !notRunLines.Contains(e.Line))
+                .Where(e => !notRunLines.Contains(e.Line) && !(e.LinkLine is { } link && notRunLines.Contains(link)))
                 .Select(e => $"Line {e.Line + 1}: {e.Code} is marked on a line the run executed"));
 
             Assert.True(problems.Count == 0,
@@ -141,6 +142,62 @@ namespace Calcpad.Tests.Highlighter
                     new ErrorExpectation(4, "CPD-3104", "]", 1),
                 ],
                 expectations);
+        }
+
+        [Fact]
+        public void ErrorExpectations_ParsesLinksAndEscapedDollars()
+        {
+            string[] lines =
+            [
+                @"'expect: CPD-3301[f(1)]->-2[qq], CPD-3302->+1, CPD-3303[m\$(1)]->+3[a\$]",
+                "x = f(1)",
+            ];
+
+            Assert.Equal(
+                [
+                    new ErrorExpectation(1, "CPD-3301", "f(1)", 0, -1, "qq"),
+                    new ErrorExpectation(1, "CPD-3302", null, 0, 2),
+                    new ErrorExpectation(1, "CPD-3303", "m$(1)", 0, 4, "a$"),
+                ],
+                ErrorExpectations.Parse(lines));
+        }
+
+        private static LinterDiagnostic Linked(int line, int column, int end, string message, params DiagnosticRelated[] related) => new()
+        {
+            Line = line, Column = column, EndColumn = end, Code = "CPD-3301",
+            Severity = LinterSeverity.Error, Message = message, Related = [.. related]
+        };
+
+        private static DiagnosticRelated To(int line, int column, int end, string message) =>
+            new() { Line = line, Column = column, EndColumn = end, Message = message };
+
+        [Fact]
+        public void ErrorExpectations_RequiresTheLinkAMarkerNames()
+        {
+            string[] lines = ["f(x) = x + qq", "'expect: CPD-3301[f(1)]", "a = f(1)"];
+            var call = Linked(2, 4, 8, "In the body of f on line 1.", To(0, 11, 13, "Error in the body of f"));
+            var body = Linked(0, 11, 13, "At the first call to f on line 3.", To(2, 4, 8, "Call to f"));
+
+            var problems = ErrorExpectations.Check(lines, [call, body]);
+
+            Assert.Contains(problems, p => p.StartsWith("Line 3: expected CPD-3301[f(1)] from"));
+            Assert.Contains(problems, p => p.StartsWith("Line 1: unexpected CPD-3301"));
+        }
+
+        [Fact]
+        public void ErrorExpectations_RejectsBrokenLinks()
+        {
+            string[] lines = ["f(x) = x + qq", "a = f(1)", "b = f(2)"];
+            var dangling = Linked(1, 4, 8, "In the body of f on line 1.", To(0, 7, 13, "Error in the body of f"));
+            var oneWay = Linked(0, 11, 13, "At the first call to f on line 3.", To(2, 4, 8, "Call to f"));
+            var unlinkedCall = Linked(2, 4, 8, "Undefined.");
+            var wrongLine = Linked(0, 11, 13, "At the first call to f on line 9.", To(1, 4, 8, "Call to f"));
+
+            var problems = ErrorExpectations.CheckLinks(lines, [dangling, oneWay, unlinkedCall, wrongLine]);
+
+            Assert.Contains(problems, p => p.StartsWith("Line 2: CPD-3301 [f(1)] links to line 1[x + qq], where no CPD-3301"));
+            Assert.Contains(problems, p => p.StartsWith("Line 1: CPD-3301 [qq] links to line 3[f(2)], which does not link back"));
+            Assert.Contains(problems, p => p.StartsWith("Line 1: CPD-3301 [qq] links to line 2[f(1)], but its message does not name that line"));
         }
     }
 }

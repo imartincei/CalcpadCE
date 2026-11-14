@@ -56,6 +56,9 @@ namespace Calcpad.Core
         public string Text { get; init; }
         public int SourceIndex { get; init; }
 
+        /// <summary>1-based line in the parsed code; 0 for a line MacroParser rejected.</summary>
+        public int OutputLine { get; init; }
+
         /// <summary>Macros expanded to produce this line, outermost first; null if none.</summary>
         public IReadOnlyList<string> ExpandedMacros { get; init; }
 

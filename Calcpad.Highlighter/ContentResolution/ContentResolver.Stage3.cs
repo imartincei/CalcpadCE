@@ -46,7 +46,8 @@ namespace Calcpad.Highlighter.ContentResolution
                     TotalContentLines = output.ContentCount,
                     SourceColumns = output.Origins is { } origins
                         ? Array.ConvertAll(origins, o => o.Line == output.Stage2Line ? o.Column : -1)
-                        : null
+                        : null,
+                    Origins = output.Origins
                 };
             }
 

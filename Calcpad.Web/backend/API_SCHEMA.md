@@ -144,10 +144,11 @@ Array<{
   severity: "Error" | "Warning"; // always "Error" from a run
   startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
   endColumn: number;
+  additionalRanges?: Array<{ sourceLine, outputLine, startColumn, endColumn }>; // later lines of a continued statement
 }>
 ```
 
-Columns are in the text Core ran, so on lines changed by macros or `#include` they may not line up with the source.
+Columns are on the source line. On a macro line, an error in an argument points at the argument and an error in the macro's body covers the call. Errors in `#include`d code cover the whole `#include` line. An error that runs onto later lines of a continued statement lists those parts in `additionalRanges`, and the editors underline from its start to the end of the last part.
 
 The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 
@@ -486,6 +487,7 @@ interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
   useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  isComplex?: boolean;      // Editor's complex mode; Core's check starts in it until a #settings changes it (default false)
   macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
@@ -496,6 +498,7 @@ interface LintResponse {
   errorCount: number;
   warningCount: number;
   diagnostics: LintDiagnostic[];
+  includeOnly: LintDiagnostic[];  // Errors for included files only; the run already shows them here
 }
 
 interface LintDiagnostic {
@@ -507,8 +510,29 @@ interface LintDiagnostic {
   severity: string;    // "error", "warning", or "information"
   severityId: number;  // 0=Error, 1=Warning, 2=Information
   source: string;      // Default: "Calcpad Linter"
+  related?: LintRelatedLocation[];  // Linked locations; null when none
+  includeOrigins?: LintIncludeOrigin[];  // Places in included files; null when none
+}
+
+interface LintRelatedLocation {
+  line: number;
+  column: number;
+  endColumn: number;
+  message: string;
+}
+
+interface LintIncludeOrigin {
+  filePath: string;    // Absolute path of the included file
+  line: number;        // Zero-based line in the included file
+  column: number;      // -1 for the whole line
+  endColumn: number;   // -1 for the whole line
+  message: string;     // The message without its "file line N: " prefix
 }
 ```
+
+An error in an included file is reported on its `#include` line, with the message prefixed by the file name and line. An error in the body of a macro from an included file is reported, prefixed the same way, on the call. `includeOrigins` gives its place in the included file, so an editor with that file open can mark it there too. `includeOnly` holds such macro body errors that the run already reported at the call; they are not shown in this file, only in the included one.
+
+An error in a macro or custom function body found at a call is reported on the call, with `related` pointing at the body. The first call that finds it also gets a diagnostic on the body text, with `related` pointing back at the call. A custom function body is judged at its first call: a name it reads must be defined by then.
 
 **Error Codes:**
 

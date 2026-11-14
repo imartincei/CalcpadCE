@@ -24,7 +24,7 @@ namespace Calcpad.Core
         // Column where the keyword line's trimmed text starts, or -1
         private int _keywordOffset = -1;
         // Where each physical line of a continued statement starts in the joined text
-        private readonly List<(int Start, int Length, int Line, int Column)> _segments = [];
+        private readonly List<(int Start, int Length, int Line, int Column, int OutputLine)> _segments = [];
         private bool _isJoined;
         private int _htmlLines;
         private int _decimals;
@@ -135,6 +135,7 @@ namespace Calcpad.Core
                                 _parser.Line = currentLineCache.SourceLine != 0
                                     ? currentLineCache.SourceLine
                                     : _currentLine + 1;
+                                _parser.StatementLine = 0;
                                 if (Trace is not null)
                                     TraceLine();
                                 _condition.SetCondition(-1);
@@ -178,7 +179,7 @@ namespace Calcpad.Core
                             textSpan = s.AsSpan();
                             if (_segments.Count > 0)
                                 _segments[^1] = _segments[^1] with { Length = Math.Min(_segments[^1].Length, start - _segments[^1].Start) };
-                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset));
+                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset, _currentLine + 1));
                             // The run maps joined columns back to each line; the check pass gets joined lines
                             _isJoined = !_isCheck;
                             lineOffset = _isJoined ? 0 : -1;
@@ -186,8 +187,9 @@ namespace Calcpad.Core
                         else
                         {
                             textSpan = lineSpan;
+                            _parser.StatementLine = _parser.Line;
                             _segments.Clear();
-                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset));
+                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset, _currentLine + 1));
                         }
 
                         if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
@@ -359,7 +361,7 @@ namespace Calcpad.Core
                         }
                         catch (MathParserException ex)
                         {
-                            _parser.ReadNames?.Clear();
+                            ClearReads();
                             var (start, end) = lineOffset < 0 ? (-1, -1) : ErrorColumns(lineOffset, s, ex.Position, ex.EndPosition);
                             AppendError(s.ToString(), ex, _currentLine, start, end);
                         }
@@ -718,7 +720,7 @@ namespace Calcpad.Core
 
                         TrackFunctionDefinition(false);
                         if (_isVal == -1)
-                            _parser.ReadNames?.Clear();
+                            ClearReads();
                         else if (_isCheck)
                         {
                             var (start, end) = ErrorColumns(token, -1);
@@ -764,7 +766,7 @@ namespace Calcpad.Core
                     catch (MathParserException ex)
                     {
                         _parser.ResetStack();
-                        _parser.ReadNames?.Clear();
+                        ClearReads();
                         string errText;
                         if (!_calculate && expression.Contains('?'))
                             errText = expression.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
@@ -783,12 +785,16 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        var (start, end) = ErrorColumns(token, ui is null ? ex.Position : -1, ex.EndPosition);
+                        var position = ex.Position;
+                        var endPosition = ex.EndPosition;
+                        if (position < 0 && ex.Name is not null)
+                            (position, endPosition) = FindName(token.Value, ex.Name);
+                        var (start, end) = ErrorColumns(token, ui is null ? position : -1, endPosition);
                         var isCascade = _isCheck && ex.Code == "CPD-3305" && _recursiveFunctions.Contains(ex.Name);
                         TrackFunctionDefinition(ex.Code is "CPD-5305" or "CPD-5306");
                         if (!isCascade && _isCheck && _checkLoops.Count != 0 && ex.Name is not null)
                             _loopErrors.Add((new(ex.Name, _currentLine, _parser.Line, start, end), ex));
-                        else if (!isCascade && RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end))
+                        else if (!isCascade && RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end, functions: ex.Functions))
                             ++_errorCount;
                         if (!_isCheck && (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences))
                             throw new MathParserException(Messages.Too_many_errors, "CPD-5904", CalcpadErrorKind.Values);
@@ -826,48 +832,63 @@ namespace Calcpad.Core
 
         /// <returns>False when this line already reported the same error, e.g. on an earlier loop pass.</returns>
         private bool RecordError(int line, string message, bool enabled, string code, CalcpadErrorKind kind, int sourceLine = 0,
-            int startColumn = -1, int endColumn = -1)
+            int startColumn = -1, int endColumn = -1, CalcpadCallSite callSite = null, bool isFunctionBody = false,
+            IReadOnlyList<CalcpadFunctionFrame> functions = null)
         {
             if (!_errorKeys.Add((line, code, message)))
                 return false;
             if (!enabled && !_isCheck) return true;
             if (_isVisible)
                 _errors.Enqueue(line);
+            var outputLine = line + 1;
+            List<CalcpadErrorRange> additionalRanges = null;
             if (sourceLine <= 0)
             {
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
                 if (_isJoined)
-                    (sourceLine, startColumn, endColumn) = MapJoinedColumns(startColumn, endColumn);
+                    (sourceLine, outputLine, startColumn, endColumn, additionalRanges) = MapJoinedColumns(startColumn, endColumn);
             }
             if (!_isCheck)
                 Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
-                OutputLine = line + 1,
+                OutputLine = outputLine,
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
                 Code = code,
                 Kind = kind,
                 StartColumn = startColumn,
-                EndColumn = endColumn
+                EndColumn = endColumn,
+                AdditionalRanges = additionalRanges,
+                CallSite = callSite,
+                IsFunctionBody = isFunctionBody,
+                Functions = functions
             });
             return true;
         }
 
-        // A span in a continued statement, cut to the line it starts on; the first line when unknown
-        private (int Line, int Start, int End) MapJoinedColumns(int start, int end)
+        // A span in a continued statement, split at its lines; the first line when unknown
+        private (int Line, int OutputLine, int Start, int End, List<CalcpadErrorRange> More) MapJoinedColumns(int start, int end)
         {
             if (start < 0)
-                return (_segments[0].Line, -1, -1);
+                return (_segments[0].Line, _segments[0].OutputLine, -1, -1, null);
 
             var i = _segments.Count - 1;
             while (i > 0 && _segments[i].Start > start)
                 --i;
-            var (segmentStart, length, line, column) = _segments[i];
+            var (segmentStart, length, line, column, outputLine) = _segments[i];
             var offset = Math.Min(start - segmentStart, length);
             var stop = Math.Min(Math.Max(end, start + 1) - segmentStart, length);
-            return (line, column + offset, column + Math.Max(stop, offset + 1));
+            List<CalcpadErrorRange> more = null;
+            for (var j = i + 1; j < _segments.Count && _segments[j].Start < end; ++j)
+            {
+                var next = _segments[j];
+                var count = Math.Min(end - next.Start, next.Length);
+                if (count > 0)
+                    (more ??= []).Add(new(next.Line, next.OutputLine, next.Column, next.Column + count));
+            }
+            return (line, outputLine, column + offset, column + Math.Max(stop, offset + 1), more);
         }
 
         // The failing word when the tokenizer found the position, otherwise the whole expression
@@ -901,6 +922,20 @@ namespace Calcpad.Core
             return (offset + a, offset + b);
 
             static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '.';
+        }
+
+        // The first whole-word occurrence of a name, for errors found while calculating
+        private static (int, int) FindName(string text, string name)
+        {
+            for (var i = text.IndexOf(name, StringComparison.Ordinal); i >= 0; i = text.IndexOf(name, i + 1, StringComparison.Ordinal))
+            {
+                var end = i + name.Length;
+                if ((i == 0 || !IsNameChar(text[i - 1])) && (end == text.Length || !IsNameChar(text[end])))
+                    return (i, end);
+            }
+            return (-1, -1);
+
+            static bool IsNameChar(char c) => char.IsLetterOrDigit(c) || c is '_' or ',' or '′' or '″' or '‴' or '⁗';
         }
 
         private (int Start, int End) KeywordColumns(int from, int to) =>
