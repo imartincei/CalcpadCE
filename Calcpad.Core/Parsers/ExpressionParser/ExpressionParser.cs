@@ -861,6 +861,25 @@ namespace Calcpad.Core
             return true;
         }
 
+        private void RecordWarning(string message, string code, int startColumn, int endColumn)
+        {
+            if (!_isCheck || !_errorKeys.Add((_currentLine, code, message)))
+                return;
+
+            _errorList.Add(new CalcpadError
+            {
+                SourceLine = _parser?.Line > 0 ? _parser.Line : _currentLine + 1,
+                OutputLine = _currentLine + 1,
+                Message = message,
+                Source = CalcpadErrorSource.Expression,
+                Code = code,
+                Kind = CalcpadErrorKind.Syntax,
+                Severity = CalcpadErrorSeverity.Warning,
+                StartColumn = startColumn,
+                EndColumn = endColumn
+            });
+        }
+
         // Function bodies resolve names when called, and loop bodies see later lines on the next pass,
         // so those reads are judged at the end of the document or of the outermost loop.
         /// <param name="nameColumn">Column of the parsed expression's start, to point at each name, or -1.</param>

@@ -343,7 +343,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     // #settings {json} - consume the whole JSON payload as a single token;
                     // quotes, braces and colons all belong to the JSON, not to Calcpad syntax.
                     _builder.Append(c);
-                    // #UI's block ends at the first '}', as UiValidator also assumes.
+                    // #UI's block ends at the first '}', as Core also assumes.
                     if (_state.UiJsonBlock && c == '}')
                     {
                         Append(TokenType.SettingsJson);

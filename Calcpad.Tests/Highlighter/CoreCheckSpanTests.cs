@@ -39,6 +39,37 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal(expected, Text(source, d));
         }
 
+        [Theory]
+        [InlineData("a = sin(1; 2)", "CPD-3308", "sin(1; 2)")]
+        [InlineData("a = atan2(1)", "CPD-3307", "atan2(1)")]
+        [InlineData("a = sin()", "CPD-3307", "sin()")]
+        [InlineData("a = max()", "CPD-3307", "max()")]
+        [InlineData("a = 1 + _\n  sin(1; 2)", "CPD-3308", "sin(1; 2)")]
+        [InlineData("a = max(1;; 2)", "CPD-3311", ";;")]
+        [InlineData("a = sin(; 1)", "CPD-3311", "(;")]
+        [InlineData("f(x) = x\na = f(1; )", "CPD-3311", "; )")]
+        [InlineData("g(x) = $Inline{a = 1; #if x}", "CPD-3405", "#")]
+        [InlineData("a = $Block{b = 2; c = #b}", "CPD-3405", "#")]
+        [InlineData("x = 1\nsin(x) = x", "CPD-3203", "sin")]
+        public void FormerStaticCodes_ComeOnlyFromCore(string source, string code, string expected)
+        {
+            var line = source.Split('\n').Length - 1;
+            var errors = Lint(source).Diagnostics.Where(d => d.Severity == LinterSeverity.Error).ToList();
+            var d = Assert.Single(errors);
+            Assert.Equal(code, d.Code);
+            Assert.Equal(line, d.Line);
+            Assert.Equal(expected, Text(source, d));
+        }
+
+        [Theory]
+        [InlineData("a = max(1)")]
+        [InlineData("v = [1; 2]\na = take(v)")]
+        [InlineData("a = round(1.5)")]
+        [InlineData("a = [1;; 2]")]
+        [InlineData("#noc\nsin(2*x) = 2*sin(x)*cos(x)")]
+        public void ValidCalls_GiveNoArgumentErrors(string source) =>
+            Assert.DoesNotContain(Lint(source).Diagnostics, d => d.Code is "CPD-3307" or "CPD-3308" or "CPD-3311" or "CPD-3203");
+
         [Fact]
         public void TwoUndefinedNamesOnALine_AreBothReported()
         {
@@ -92,6 +123,7 @@ namespace Calcpad.Tests.Highlighter
         {
             var d = Assert.Single(Lint(source, withTrace: true).Diagnostics, d => d.Code == code);
             Assert.Contains("'zzz'", d.Message);
+            Assert.Equal(LinterSeverity.Warning, d.Severity);
         }
 
         [Fact]

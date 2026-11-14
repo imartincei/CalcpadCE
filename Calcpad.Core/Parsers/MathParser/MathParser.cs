@@ -593,7 +593,8 @@ namespace Calcpad.Core
             _isCalculated = false;
             _functionDefinitionIndex = -1;
             var input = ResolveCallArguments(_input.GetInput(expression, allowAssignment, true));
-            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled, out var isFunctionDefinition);
+            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled,
+                IsCalculation && (IsEnabled || ReadNames is not null), out var isFunctionDefinition);
             _input.OrderOperators(input, isFunctionDefinition || _isSolver > 0 || IsPlotting, _assignmentIndex);
             if (isFunctionDefinition)
             {
@@ -890,7 +891,7 @@ namespace Calcpad.Core
                 return null;
 
             var input = ResolveCallArguments(_input.GetInput(expression, false));
-            new SyntaxAnalyser(_functions).Check(input, IsEnabled, out _);
+            new SyntaxAnalyser(_functions).Check(input, IsEnabled, IsEnabled, out _);
             _input.OrderOperators(input, true, 0);
             var rpn = Input.GetRpn(input);
             BindParameters(parameters, rpn);

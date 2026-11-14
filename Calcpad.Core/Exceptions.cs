@@ -221,6 +221,25 @@ namespace Calcpad.Core
         internal static MathParserException InvalidNumberOfArguments() =>
             new(Messages.Invalid_number_of_arguments, "CPD-3302", K.Syntax);
 
+        internal static MathParserException WrongArgumentCount(string name, int min, int max, int count)
+        {
+            var message = min == max
+                ? string.Format(Messages.Function_0_takes_1_arguments_got_2, name, min, count)
+                : count < min
+                    ? string.Format(Messages.Function_0_needs_at_least_1_arguments_got_2, name, min, count)
+                    : string.Format(Messages.Function_0_takes_at_most_1_arguments_got_2, name, max, count);
+            return new(message, count < min ? "CPD-3307" : "CPD-3308", K.Syntax);
+        }
+
+        internal static MathParserException EmptyArgument(int index, string name) =>
+            new(string.Format(Messages.Argument_0_of_1_is_empty, index, name), "CPD-3311", K.Syntax);
+
+        internal static MathParserException DirectiveInBlock() =>
+            new(Messages.Directives_are_not_allowed_inside_command_blocks, "CPD-3405", K.Syntax);
+
+        internal static MathParserException BuiltInFunctionRedefined(string name) =>
+            new(string.Format(Messages.Built_in_function_0_cannot_be_redefined, name), "CPD-3203", K.Syntax);
+
         internal static MathParserException ResultNotReal(string s) =>
             new(string.Format(Messages.The_result_is_not_a_real_number_0, s), "CPD-5417", K.Values);
 

@@ -291,7 +291,7 @@ namespace Calcpad.Tests.Highlighter
             Assert.Equal(4, tokens.Count(t => t.Type == TokenType.Const));
         }
 
-        /// <summary>#UI's keys are not #settings' keys, so SettingsValidator must skip them.</summary>
+        /// <summary>#UI's keys are not #settings' keys.</summary>
         [Fact]
         public void JsonBlock_IsNotValidatedAgainstSettingsKeys() =>
             Assert.DoesNotContain(Lint("#UI {\"type\": \"entry\"} L = 10m\nL").Diagnostics,

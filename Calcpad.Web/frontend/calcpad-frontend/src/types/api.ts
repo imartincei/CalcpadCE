@@ -318,6 +318,8 @@ export interface CalcpadError {
     source: CalcpadErrorSource;
     /** CPD-xxxx code, shared with the linter where both report the same problem. */
     code?: string;
+    /** Always 'Error' from a run; only the linter's check pass gives warnings. */
+    severity?: 'Error' | 'Warning';
     /** 0-based columns on the source line, end exclusive; -1 when the error covers the whole line. */
     startColumn?: number;
     endColumn?: number;

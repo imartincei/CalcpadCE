@@ -50,12 +50,8 @@ Calcpad.Highlighter/
 │           ├── NamingValidator.cs       - Variable names
 │           ├── UsageValidator.cs        - Undefined checks
 │           ├── SemanticValidator.cs     - Operators/commands
-│           ├── FunctionTypeValidator.cs - Parameter types
-│           ├── CommandBlockValidator.cs - $Inline/$Block/$While contents
 │           ├── FormatValidator.cs       - Format specifiers
 │           ├── HtmlCommentValidator.cs  - Metadata comment directives
-│           ├── SettingsValidator.cs     - #Settings / settings directives
-│           ├── UiValidator.cs           - #UI control directives
 │           └── CoreCheckValidator.cs    - Core's check pass (ExpressionParser.Check)
 ├── HtmlComment/
 │   ├── HtmlCommentParser.cs        - Metadata comment parsing

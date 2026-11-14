@@ -76,9 +76,16 @@ namespace Calcpad.Core
                     return KeywordResult.None;
                 }
                 jsonEnd = braceEnd + 1;
+                var json = s[cursor..jsonEnd].ToString();
+                if (_isCheck)
+                {
+                    var (from, to) = KeywordColumns(jsonStart, jsonEnd);
+                    foreach (var key in UiDto.UnknownKeys(json))
+                        RecordWarning(string.Format(Messages.Unrecognized_UI_property_0, key), "CPD-3415", from, to);
+                }
                 try
                 {
-                    properties = UiDto.Parse(s[cursor..jsonEnd].ToString()) ?? new UiDto();
+                    properties = UiDto.Parse(json) ?? new UiDto();
                 }
                 catch (JsonException)
                 {

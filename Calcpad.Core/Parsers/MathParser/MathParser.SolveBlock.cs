@@ -329,7 +329,17 @@ namespace Calcpad.Core
                 itemList.Add(new SolverItem() { Input = ts.Cut().ToString(), Offset = offset + start });
                 var itemArray = itemList.ToArray();
                 for (int i = 0; i < itemArray.Length; ++i)
+                {
+                    var hash = itemArray[i].Input.IndexOf('#');
+                    if (hash >= 0)
+                    {
+                        var ex = Exceptions.DirectiveInBlock();
+                        ex.Position = itemArray[i].Offset + hash;
+                        ex.EndPosition = ex.Position + 1;
+                        throw ex;
+                    }
                     ParseItem(ref itemArray[i], true);
+                }
                 return itemArray;
             }
 

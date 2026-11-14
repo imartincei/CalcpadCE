@@ -20,6 +20,24 @@ namespace Calcpad.Core
         /// <summary>Deserializes the payload. Throws <see cref="JsonException"/> on malformed JSON or a wrong value type.</summary>
         public static TSelf Parse(string json) => JsonSerializer.Deserialize<TSelf>(json, Options);
 
+        /// <summary>Top-level keys of a JSON object that the directive does not recognize.</summary>
+        public static List<string> UnknownKeys(string json)
+        {
+            var unknown = new List<string>();
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                    foreach (var prop in doc.RootElement.EnumerateObject())
+                        if (!KnownKeys.Contains(prop.Name))
+                            unknown.Add(prop.Name);
+            }
+            catch (JsonException)
+            {
+            }
+            return unknown;
+        }
+
         /// <summary>An entry for every supplied value that the directive rejects.</summary>
         public IReadOnlyList<DirectiveError<TKey>> Validate()
         {

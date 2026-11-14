@@ -12,6 +12,9 @@ namespace Calcpad.Core
 
         public CalcpadErrorKind Kind { get; init; }
 
+        /// <summary>Only the check pass reports warnings.</summary>
+        public CalcpadErrorSeverity Severity { get; init; }
+
         /// <summary>0-based columns in the parsed line text, end exclusive. -1 when the error covers the whole line.</summary>
         public int StartColumn { get; init; } = -1;
         public int EndColumn { get; init; } = -1;
@@ -28,6 +31,12 @@ namespace Calcpad.Core
         Names,
         /// <summary>Computed values: types, units, dimensions, indexes, solvers and files.</summary>
         Values
+    }
+
+    public enum CalcpadErrorSeverity
+    {
+        Error,
+        Warning
     }
 
     public enum CalcpadErrorSource

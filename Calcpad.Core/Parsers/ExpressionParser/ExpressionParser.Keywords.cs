@@ -810,6 +810,10 @@ namespace Calcpad.Core
                 SettingsError(string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
                 return;
             }
+            if (_isCheck)
+                foreach (var key in SettingsDto.UnknownKeys(json.ToString()))
+                    RecordWarning(string.Format(Messages.Unrecognized_setting_0, key), "CPD-3413", from, to);
+
             try
             {
                 var dto = SettingsDto.Parse(json.ToString());
