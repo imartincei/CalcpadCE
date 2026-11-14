@@ -33,7 +33,7 @@
               class="variable-item"
               :title="getMacroTooltip(macro)"
               @click="insertMacro(macro)"
-              @contextmenu.prevent.stop="openContextMenu($event, macro)"
+              @contextmenu.prevent.stop="openContextMenu($event, macro, 'macro')"
             >
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="macro.name" :query="searchTerm" />
@@ -65,7 +65,7 @@
               class="variable-item"
               :title="getVariableTooltip(variable)"
               @click="insertVariable(variable.name)"
-              @contextmenu.prevent.stop="openContextMenu($event, variable)"
+              @contextmenu.prevent.stop="openContextMenu($event, variable, 'variable')"
             >
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="variable.name" :query="searchTerm" />
@@ -97,7 +97,7 @@
               class="variable-item"
               :title="getFunctionTooltip(func)"
               @click="insertFunction(func)"
-              @contextmenu.prevent.stop="openContextMenu($event, func)"
+              @contextmenu.prevent.stop="openContextMenu($event, func, 'function')"
             >
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="func.name" :query="searchTerm" />
@@ -130,7 +130,7 @@
               class="variable-item"
               :title="getCustomUnitTooltip(unit)"
               @click="insertCustomUnit(unit)"
-              @contextmenu.prevent.stop="openContextMenu($event, unit)"
+              @contextmenu.prevent.stop="openContextMenu($event, unit, 'customUnit')"
             >
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="'.' + unit.name" :query="searchTerm" />
@@ -156,6 +156,10 @@
         class="context-menu"
         @click="onCopyDefinition"
       >{{ t('Copy Definition') }}</button>
+      <button
+        class="context-menu"
+        @click="onSaveCustomSnippet"
+      >{{ contextMenuSaved ? t('Edit Custom Snippet') : t('Save as Custom Snippet') }}</button>
     </div>
   </div>
 </template>
@@ -167,6 +171,8 @@ import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { writeClipboard } from '../services/clipboard'
 import type { VariablesData, VariableItem } from '../types'
+import { customSnippetFromDefinition } from '../../services/customizations'
+import type { CustomSnippet, DefinitionKind } from '../../services/customizations'
 
 const { t } = useI18n()
 
@@ -174,6 +180,7 @@ const { t } = useI18n()
 interface Props {
   variablesData?: VariablesData
   loading?: boolean
+  customSnippets?: CustomSnippet[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -183,12 +190,14 @@ const props = withDefaults(defineProps<Props>(), {
     functions: [],
     customUnits: []
   }),
-  loading: false
+  loading: false,
+  customSnippets: () => []
 })
 
 // Emits
 const emit = defineEmits<{
   insertText: [text: string]
+  saveCustomSnippet: [snippet: Omit<CustomSnippet, 'id'>]
 }>()
 
 // State
@@ -197,18 +206,32 @@ interface VariableContextMenu {
   y: number
   name: string
   definition: string
+  snippet: Omit<CustomSnippet, 'id'>
 }
 
 const contextMenu = ref<VariableContextMenu | null>(null)
 
-const openContextMenu = (e: MouseEvent, item: VariableItem) => {
+const openContextMenu = (e: MouseEvent, item: VariableItem, kind: DefinitionKind) => {
   const parts = [item.params ? `Parameters: ${item.params}` : '', item.definition ?? '']
   contextMenu.value = {
     x: e.clientX,
     y: e.clientY,
     name: item.name,
     definition: parts.filter(Boolean).join('\n'),
+    snippet: customSnippetFromDefinition(kind, item),
   }
+}
+
+const contextMenuSaved = computed(() => {
+  const insert = contextMenu.value?.snippet.insert
+  return !!insert && props.customSnippets.some(s => s.insert === insert)
+})
+
+const onSaveCustomSnippet = () => {
+  const m = contextMenu.value
+  if (!m) return
+  closeContextMenu()
+  emit('saveCustomSnippet', m.snippet)
 }
 
 const closeContextMenu = () => {

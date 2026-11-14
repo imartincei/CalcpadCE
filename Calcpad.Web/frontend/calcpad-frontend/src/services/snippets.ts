@@ -6,6 +6,9 @@ import type {
     InsertDataTree,
     SnippetsLoadedCallback,
 } from '../types/snippets';
+import type { UserCustomizations } from './customizations';
+import { DEFAULT_QUICK_TYPES, applySnippetCustomizations, buildQuickTypeMap } from './customizations';
+import { buildInsertSnippet, hasSnippetPlaceholders } from '../text/snippet-insert';
 
 /**
  * Manages loading, caching, and searching of CalcPad snippets/insert items.
@@ -20,6 +23,7 @@ export class CalcpadSnippetService {
     private _loadPromise: Promise<void> | null = null;
     private _retryInterval: ReturnType<typeof setInterval> | null = null;
     private _onSnippetsLoadedCallbacks: SnippetsLoadedCallback[] = [];
+    private _customizationsProvider: (() => UserCustomizations) | null = null;
     private static readonly RETRY_INTERVAL_MS = 3000;
 
     constructor(apiClient: CalcpadApiClient, logger?: ILogger) {
@@ -109,6 +113,11 @@ export class CalcpadSnippetService {
         }
     }
 
+    /** Supplies the user's custom quick types and snippets for the quick-type map. */
+    public setCustomizationsProvider(provider: () => UserCustomizations): void {
+        this._customizationsProvider = provider;
+    }
+
     public dispose(): void {
         this.stopRetryInterval();
     }
@@ -169,6 +178,10 @@ export class CalcpadSnippetService {
         return this._isLoaded;
     }
 
+    public getCustomizations(): UserCustomizations | null {
+        return this._customizationsProvider?.() ?? null;
+    }
+
     public getAllItems(): InsertItem[] {
         return [...this._allItems];
     }
@@ -196,18 +209,18 @@ export class CalcpadSnippetService {
         return [...itemMatches, ...categoryMatches];
     }
 
-    /**
-     * Build a quick type map from loaded snippets.
-     * Returns a map of "~shortcut" → "symbol" for all snippets with quickType set.
-     */
+    /** `~letters` → inserted text, from the `quickTypes` setting; `§` placeholders are kept for {@link quickTypeSnippet}. */
     public buildQuickTypeMap(): Map<string, string> {
-        const map = new Map<string, string>();
-        for (const item of this._allItems) {
-            if (item.quickType) {
-                map.set('~' + item.quickType, item.tag);
-            }
-        }
-        return map;
+        return buildQuickTypeMap(this._customizationsProvider?.().quickTypes ?? DEFAULT_QUICK_TYPES, true);
+    }
+
+    /** Snippet body for quick-type text with `§`, its tab stops named like the matching item's parameters. */
+    public quickTypeSnippet(text: string): string | null {
+        if (!text.includes('§')) return null;
+        const c = this.getCustomizations();
+        const items = c ? applySnippetCustomizations(this._allItems, c) : this._allItems;
+        const item = items.find(i => i.tag === text && hasSnippetPlaceholders(i));
+        return buildInsertSnippet({ ...(item ?? { description: '' }), tag: text });
     }
 
     public async reloadSnippets(): Promise<void> {

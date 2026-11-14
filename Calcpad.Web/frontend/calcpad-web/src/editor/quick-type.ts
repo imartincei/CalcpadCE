@@ -2,32 +2,28 @@ import * as monaco from 'monaco-editor';
 import { findQuickTypeReplacement } from 'calcpad-frontend/text/quick-type';
 import type { EditorBridge } from './bridge';
 
+interface SnippetController extends monaco.editor.IEditorContribution {
+    insert(template: string): void;
+}
+
 /**
- * Replace `~xxx` shortcuts with Unicode symbols (e.g. `~a ` → `α `).
- * Triggered when the user types a space character; the map is rebuilt whenever
- * snippets reload from the server.
+ * Replace `~xxx` shortcuts with Unicode symbols (e.g. `~a ` → `α `) when a space is typed.
+ * The map is read from the `quickTypes` setting at that moment, so edits apply at once.
  */
 export function attachQuickTyper(
     editor: monaco.editor.IStandaloneCodeEditor,
     bridge: EditorBridge,
 ): monaco.IDisposable {
-    let quickTypeMap = new Map<string, string>();
     let suppress = false;
-
-    function rebuild(): void {
-        quickTypeMap = bridge.snippets.buildQuickTypeMap();
-    }
-    if (bridge.snippets.isLoaded()) rebuild();
-    bridge.snippets.onSnippetsLoaded(rebuild);
 
     return editor.onDidChangeModelContent(e => {
         if (suppress) return;
         if (bridge.getExtraSetting('quickTyping') === 'false') return;
-        if (quickTypeMap.size === 0) return;
         if (e.changes.length !== 1) return;
 
         const change = e.changes[0];
         if (change.text !== ' ') return;
+        const quickTypeMap = bridge.snippets.buildQuickTypeMap();
 
         const model = editor.getModel();
         if (!model) return;
@@ -39,6 +35,7 @@ export function attachQuickTyper(
         const replacement = findQuickTypeReplacement(lineText, insertCol - 1, quickTypeMap);
         if (!replacement) return;
 
+        const snippet = bridge.snippets.quickTypeSnippet(replacement.replacement);
         suppress = true;
         try {
             editor.executeEdits('calcpad-quick-type', [{
@@ -46,11 +43,15 @@ export function attachQuickTyper(
                     lineNumber, replacement.startPos + 1,
                     lineNumber, insertCol + 1, // include the just-inserted space
                 ),
-                text: replacement.replacement,
+                text: snippet ? '' : replacement.replacement.replace(/§/g, ''),
                 forceMoveMarkers: true,
             }]);
         } finally {
             suppress = false;
+        }
+        // Placeholders become tab stops, like an accepted completion.
+        if (snippet) {
+            queueMicrotask(() => editor.getContribution<SnippetController>('snippetController2')?.insert(snippet));
         }
     });
 }

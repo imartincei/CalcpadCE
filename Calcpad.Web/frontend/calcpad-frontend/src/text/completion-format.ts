@@ -4,6 +4,8 @@ import type {
     VariableDefinition,
 } from '../types/api';
 import type { InsertItem } from '../types/snippets';
+import { applySnippetCustomizations } from '../services/customizations';
+import type { UserCustomizations } from '../services/customizations';
 import {
     buildInsertSnippet,
     formatInsertLabel,
@@ -28,10 +30,15 @@ export interface CompletionData {
     /** Markdown documentation. */
     documentation: string;
     sortText: string;
+    favorite?: boolean;
 }
 
+const SORT_FAVORITE = '00_';
 const SORT_USER = '0_';
 const SORT_BUILTIN = '1_';
+
+/** Shown after a starred item's label. */
+export const FAVORITE_COMPLETION_MARK = ' ★';
 
 /** Pulls a 0-indexed word start back over a preceding `#`, which the word pattern excludes. */
 export function completionRangeStart(lineText: string, wordStart: number): number {
@@ -168,16 +175,38 @@ export function isCompletableBuiltin(item: InsertItem): boolean {
     return !!item.keywordType && item.keywordType !== 'Unit';
 }
 
-export function formatBuiltinSnippetCompletion(item: InsertItem): CompletionData {
+/** Sorts starred snippets ahead of everything else. */
+export function builtinSortText(label: string, favorite: boolean): string {
+    return (favorite ? SORT_FAVORITE : SORT_BUILTIN) + label;
+}
+
+/** Completable built-ins plus custom snippets, each flagged when starred. */
+export function completableSnippets(
+    items: InsertItem[],
+    customizations: UserCustomizations | null,
+): { item: InsertItem; favorite: boolean }[] {
+    if (!customizations) return items.filter(isCompletableBuiltin).map(item => ({ item, favorite: false }));
+    const favorites = new Set(customizations.favoriteSnippets);
+    return applySnippetCustomizations(items, customizations)
+        .map(item => ({ item, favorite: favorites.has(item.key!) }))
+        .filter(({ item }) => !!item.customId || isCompletableBuiltin(item));
+}
+
+const CUSTOM_COMPLETION_KINDS: Partial<Record<string, CompletionKind>> = {
+    Function: 'function', Macro: 'macro', Variable: 'variable',
+};
+
+export function formatBuiltinSnippetCompletion(item: InsertItem, favorite = false): CompletionData {
     const asSnippet = hasSnippetPlaceholders(item);
     const label = formatInsertLabel(item);
     return {
         label,
-        kind: 'snippet',
+        kind: (item.customId && CUSTOM_COMPLETION_KINDS[item.keywordType ?? '']) || 'snippet',
         insertText: asSnippet ? buildInsertSnippet(item) : item.tag,
         isSnippet: asSnippet,
         detail: item.categoryPath || 'Built-in',
         documentation: item.description,
-        sortText: SORT_BUILTIN + label,
+        sortText: builtinSortText(label, favorite),
+        favorite,
     };
 }

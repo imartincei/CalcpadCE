@@ -8,7 +8,9 @@ import {
     formatMacroCompletion,
     formatFunctionCompletion,
     formatVariableCompletion,
-    isCompletableBuiltin,
+    completableSnippets,
+    builtinSortText,
+    FAVORITE_COMPLETION_MARK,
     parseDirectiveLine,
     type CompletionData,
     type CompletionKind,
@@ -33,6 +35,13 @@ function settingSnippetValue(s: MetadataSettingKey): string {
     if (s.type === 'string') return `"\${1:${s.def}}"`;
     return `\${1:${s.def}}`;
 }
+
+const CUSTOM_SNIPPET_KINDS: Partial<Record<string, vscode.CompletionItemKind>> = {
+    Function: vscode.CompletionItemKind.Function,
+    Macro: vscode.CompletionItemKind.Class,
+    Variable: vscode.CompletionItemKind.Variable,
+    Unit: vscode.CompletionItemKind.Unit,
+};
 
 const VSCODE_KIND_MAP: Record<CompletionKind, vscode.CompletionItemKind> = {
     macro: vscode.CompletionItemKind.Class,
@@ -126,15 +135,15 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
             this.outputChannel.appendLine('[COMPLETION ERROR] ' + error, 'verbose');
         }
 
-        // Keyword-defining built-ins only; units and UI-only snippets are excluded.
-        const allInsertItems = this.insertManager.getAllItems().filter(isCompletableBuiltin);
-        for (const insertItem of allInsertItems) {
-            // Filter by search term if provided
+        // Keyword-defining built-ins and starred custom snippets; starred items sort first.
+        const snippets = completableSnippets(this.insertManager.getAllItems(), this.insertManager.getCustomizations());
+        for (const { item: insertItem, favorite } of snippets) {
             if (!word || this.matchesSearchTerm(insertItem, word)) {
                 const completionItem = this.convertInsertItemToCompletionItem(insertItem);
                 if (completionItem) {
-                    // Sort built-ins after user-defined content
-                    completionItem.sortText = `1_${completionItem.label}`;
+                    const label = completionItem.label as string;
+                    completionItem.sortText = builtinSortText(label, favorite);
+                    if (favorite) completionItem.label = { label, detail: FAVORITE_COMPLETION_MARK };
                     completionItems.push(completionItem);
                 }
             }
@@ -167,8 +176,12 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         let kind = vscode.CompletionItemKind.Text;
         let insertText = item.tag;
         
+        const customKind = item.customId ? CUSTOM_SNIPPET_KINDS[item.keywordType ?? ''] : undefined;
+        if (customKind !== undefined) {
+            kind = customKind;
+            if (hasSnippetPlaceholders(item)) insertText = buildInsertSnippet(item);
         // Categorize based on tag content and category path
-        if (item.tag.includes('(') || item.categoryPath?.toLowerCase().includes('function')) {
+        } else if (item.tag.includes('(') || item.categoryPath?.toLowerCase().includes('function')) {
             kind = vscode.CompletionItemKind.Function;
             if (hasSnippetPlaceholders(item)) {
                 insertText = buildInsertSnippet(item);
@@ -197,8 +210,10 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         completionItem.detail = item.categoryPath || 'Built-in';
         completionItem.documentation = buildBuiltinDocMarkdown(item);
         
-        // Use snippet string for functions, plain text for others
-        if (kind === vscode.CompletionItemKind.Function && insertText.includes('${')) {
+        if (kind !== vscode.CompletionItemKind.Function && hasSnippetPlaceholders(item)) {
+            insertText = buildInsertSnippet(item);
+        }
+        if (hasSnippetPlaceholders(item) && insertText.includes('${')) {
             completionItem.insertText = new vscode.SnippetString(insertText);
         } else {
             completionItem.insertText = insertText;

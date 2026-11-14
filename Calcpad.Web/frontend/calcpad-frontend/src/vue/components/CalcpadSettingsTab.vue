@@ -10,18 +10,29 @@
     </div>
 
     <div class="settings-container">
+      <section v-show="favoritesVisible" class="settings-section favorites-section">
+        <h3 class="section-header" @click="toggle('favorites')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('favorites') }">&#x25BC;</span>
+          <span class="favorites-star">★</span> {{ t('Favorites') }}
+        </h3>
+        <div v-show="bodyVisible('favorites')" class="section-body">
+          <p v-if="favoriteSettings.length === 0" class="favorites-empty">{{ t('Star a setting to pin it here.') }}</p>
+          <div v-for="id in favoriteSettings" :id="favoriteSlotId(id)" :key="id"></div>
+        </div>
+      </section>
+
       <section v-show="sectionVisible('language')" class="settings-section">
         <h3 class="section-header" @click="toggle('language')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('language') }">&#x25BC;</span>
           {{ t('Language') }}
         </h3>
         <div v-show="bodyVisible('language')" class="section-body">
-          <div class="setting-group">
+          <SettingRow section="language" row="uiLanguage">
             <label for="uiLanguage">{{ t('Language:') }}</label>
             <select id="uiLanguage" v-model="localeSetting" @change="changeLocale">
               <option v-for="opt in LOCALE_OPTIONS" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
             </select>
-          </div>
+          </SettingRow>
         </div>
       </section>
       <section v-show="sectionVisible('math')" class="settings-section">
@@ -30,12 +41,7 @@
           <CalcpadSearchHighlight :text="t('Math Settings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
-          <div
-            v-for="spec in MATH_KEYS"
-            :key="spec.key"
-            v-show="rowVisible('math', spec.key)"
-            class="setting-group"
-          >
+          <SettingRow v-for="spec in MATH_KEYS" :key="spec.key" section="math" :row="spec.key">
             <label v-if="spec.type === 'boolean'">
               <input
                 type="checkbox"
@@ -78,7 +84,7 @@
                 @input="updateSettings"
               />
             </template>
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -88,20 +94,15 @@
           <CalcpadSearchHighlight text="Plot Settings" :query="query" />
         </h3>
         <div v-show="bodyVisible('plot')" class="section-body">
-          <div
-            v-for="spec in PLOT_KEYS_A"
-            :key="spec.key"
-            v-show="rowVisible('plot', spec.key)"
-            class="setting-group"
-          >
+          <SettingRow v-for="spec in PLOT_KEYS_A" :key="spec.key" section="plot" :row="spec.key">
             <label>
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
               <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
               <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('plot', 'screenScale')" class="setting-group">
+          <SettingRow section="plot" row="screenScale">
             <label for="screenScaleFactor">
               <CalcpadSearchHighlight text="Screen Scale Factor:" :query="query" />
             </label>
@@ -114,14 +115,9 @@
               step="0.1"
               @input="updateSettings"
             />
-          </div>
+          </SettingRow>
 
-          <div
-            v-for="spec in PLOT_KEYS_B"
-            :key="spec.key"
-            v-show="rowVisible('plot', spec.key)"
-            class="setting-group"
-          >
+          <SettingRow v-for="spec in PLOT_KEYS_B" :key="spec.key" section="plot" :row="spec.key">
             <label v-if="spec.type === 'boolean'">
               <input type="checkbox" v-model="settingModel(spec.key).value" @change="updateSettings" />
               <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />
@@ -148,9 +144,9 @@
                 @input="updateSettings"
               />
             </template>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('plot', 'lightDirection')" class="setting-group">
+          <SettingRow section="plot" row="lightDirection">
             <label for="lightDirection">
               <CalcpadSearchHighlight text="Light Direction:" :query="query" />
             </label>
@@ -168,14 +164,9 @@
               <option value="South">South</option>
               <option value="SouthEast">SouthEast</option>
             </select>
-          </div>
+          </SettingRow>
 
-          <div
-            v-for="spec in PLOT_KEYS_C"
-            :key="spec.key"
-            v-show="rowVisible('plot', spec.key)"
-            class="setting-group"
-          >
+          <SettingRow v-for="spec in PLOT_KEYS_C" :key="spec.key" section="plot" :row="spec.key">
             <label :for="spec.key">
               <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
               <span v-if="spec.detail" class="setting-info" :title="tt(spec.detail)">ⓘ</span>
@@ -190,7 +181,7 @@
               :title="settingErrors[spec.key] || undefined"
               @input="updateSettings"
             />
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -200,7 +191,7 @@
           <CalcpadSearchHighlight text="Units" :query="query" />
         </h3>
         <div v-show="bodyVisible('units')" class="section-body">
-          <div v-show="rowVisible('units', 'isUs')" class="setting-group">
+          <SettingRow section="units" row="isUs">
             <label for="nonMetricUnits">
               <CalcpadSearchHighlight text="Non-Metric Units:" :query="query" />
               <span class="setting-info" title="Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).">ⓘ</span>
@@ -213,7 +204,7 @@
               <option :value="false">UK (Imperial)</option>
               <option :value="true">US Customary</option>
             </select>
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -223,12 +214,7 @@
           <CalcpadSearchHighlight text="PDF Export" :query="query" />
         </h3>
         <div v-show="bodyVisible('pdf')" class="section-body">
-          <div
-            v-for="spec in pdfKeys"
-            :key="spec.key"
-            v-show="rowVisible('pdf', spec.key)"
-            class="setting-group"
-          >
+          <SettingRow v-for="spec in pdfKeys" :key="spec.key" section="pdf" :row="spec.key">
             <label :for="'pdf-' + spec.key">
               <CalcpadSearchHighlight :text="tt(spec.label)" :query="query" />:
               <span class="setting-info" :title="tt(spec.detail)">ⓘ</span>
@@ -260,13 +246,13 @@
               @input="updatePdfSettings"
             />
             <span v-if="pdfErrors[spec.key]" class="setting-error">{{ pdfErrors[spec.key] }}</span>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('pdf', 'reset')" class="settings-actions">
+          <SettingRow section="pdf" row="reset" row-class="settings-actions">
             <button @click="resetPdfSettings" class="reset-button">
               <CalcpadSearchHighlight text="Reset PDF Settings" :query="query" />
             </button>
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -276,7 +262,7 @@
           User
         </h3>
         <div v-show="bodyVisible('user')" class="section-body">
-          <div v-show="rowVisible('user', 'userName')" class="setting-group">
+          <SettingRow section="user" row="userName">
             <label for="userName">
               User Name:
               <span class="setting-info" title="Recorded in a file's info (Info tab) as its author, who last updated it, and who reviewed it.">ⓘ</span>
@@ -288,7 +274,7 @@
               placeholder="e.g. jsmith"
               @change="updateUserName"
             />
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -298,7 +284,7 @@
           <CalcpadSearchHighlight text="Editor" :query="query" />
         </h3>
         <div v-show="bodyVisible('editor')" class="section-body">
-          <div v-show="rowVisible('editor', 'quickTyping')" class="setting-group">
+          <SettingRow section="editor" row="quickTyping">
             <label>
               <input
                 v-model="enableQuickTyping"
@@ -308,9 +294,9 @@
               <CalcpadSearchHighlight text="Enable Quick Typing" :query="query" />
               <span class="setting-info" title="Type shortcuts like ~a → α, ~' → ′">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'commentFormat')" class="setting-group">
+          <SettingRow section="editor" row="commentFormat">
             <label for="commentFormat">
               <CalcpadSearchHighlight text="Comment Format:" :query="query" />
             </label>
@@ -323,9 +309,9 @@
               <option value="html">HTML</option>
               <option value="markdown">Markdown</option>
             </select>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'formattingHotkeys')" class="setting-group">
+          <SettingRow section="editor" row="formattingHotkeys">
             <label>
               <input
                 v-model="enableFormattingHotkeys"
@@ -335,9 +321,9 @@
               <CalcpadSearchHighlight text="Enable Formatting Hotkeys" :query="query" />
               <span class="setting-info" title="Ctrl+B for bold, Ctrl+I for italic, etc.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'previewCursorSync')" class="setting-group">
+          <SettingRow section="editor" row="previewCursorSync">
             <label>
               <input
                 v-model="enablePreviewCursorSync"
@@ -347,9 +333,9 @@
               <CalcpadSearchHighlight text="Sync Preview to Cursor Line" :query="query" />
               <span class="setting-info" title="Scroll the preview to follow the line the cursor is on in the editor.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'autoRun')" class="setting-group">
+          <SettingRow section="editor" row="autoRun">
             <label>
               <input
                 v-model="enableAutoRun"
@@ -359,9 +345,9 @@
               <CalcpadSearchHighlight text="Auto-Run Preview" :query="query" />
               <span class="setting-info" title="When off, the preview only re-renders when it is first opened or a manual run is triggered.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-if="!versionConfig.isWeb" v-show="rowVisible('editor', 'autoInputMode')" class="setting-group">
+          <SettingRow v-if="!versionConfig.isWeb" section="editor" row="autoInputMode">
             <label>
               <input
                 v-model="enableAutoInputMode"
@@ -371,9 +357,9 @@
               <CalcpadSearchHighlight text="Open #UI Documents in Input Mode" :query="query" />
               <span class="setting-info" title="A document declaring #UI controls opens as its input form the first time you open it.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'previewUiOverrides')" class="setting-group">
+          <SettingRow section="editor" row="previewUiOverrides">
             <label>
               <input
                 v-model="enablePreviewUiOverrides"
@@ -383,9 +369,9 @@
               <CalcpadSearchHighlight text="Apply #UI Values in Preview" :query="query" />
               <span class="setting-info" title="Preview normally shows the document's own values. Turn this on to render it with the values entered into the input form instead, for tracking down an error that only appears once a form is filled in.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'previewPdf')" class="setting-group">
+          <SettingRow section="editor" row="previewPdf">
             <label>
               <input
                 v-model="enablePreviewPdf"
@@ -395,9 +381,9 @@
               <CalcpadSearchHighlight text="Render Preview as PDF" :query="query" />
               <span class="setting-info" title="Preview and Report show the PDF export itself, with its exact pages, headers, and footers. Slower than the HTML preview.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'showFileMetadata')" class="setting-group">
+          <SettingRow section="editor" row="showFileMetadata">
             <label>
               <input
                 v-model="showFileMetadata"
@@ -407,9 +393,9 @@
               <CalcpadSearchHighlight text="Show File Metadata" :query="query" />
               <span class="setting-info" title="Show the file info and saved #UI values comments at the end of the file. They are hidden by default and edited in the Properties tab.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'showUiOverrideHints')" class="setting-group">
+          <SettingRow section="editor" row="showUiOverrideHints">
             <label>
               <input
                 v-model="showUiOverrideHints"
@@ -419,9 +405,9 @@
               <CalcpadSearchHighlight text="Show UI Override Hints" :query="query" />
               <span class="setting-info" title="Show saved #UI values above the lines they apply to: the value for a lone #UI control, a count for loops, macro calls and #include lines. Click one to edit it in the Properties tab.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'autoSyncUiValues')" class="setting-group">
+          <SettingRow section="editor" row="autoSyncUiValues">
             <label>
               <input
                 v-model="autoSyncUiValues"
@@ -431,9 +417,9 @@
               <CalcpadSearchHighlight text="Auto-Sync #UI Values" :query="query" />
               <span class="setting-info" title="For #UI lines in this file excluding loops, macros, and includes: a value entered in the input form is written into the #UI line, and editing the value on that line removes its saved override.">ⓘ</span>
             </label>
-          </div>
+          </SettingRow>
 
-          <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('editor', 'completionDelayMs')" class="setting-group">
+          <SettingRow v-if="versionConfig.isWebOrDesktop" section="editor" row="completionDelayMs">
             <label for="completionDelayMs">
               <CalcpadSearchHighlight text="Completion Delay (ms):" :query="query" />
               <span class="setting-info" title="How long to wait before showing code suggestions while typing. Zero shows them immediately.">ⓘ</span>
@@ -447,9 +433,9 @@
               required
               @change="updateCompletionDelayMs"
             />
-          </div>
+          </SettingRow>
 
-          <div v-if="versionConfig.isDesktop" v-show="rowVisible('editor', 'fontFamily')" class="setting-group">
+          <SettingRow v-if="versionConfig.isDesktop" section="editor" row="fontFamily">
             <label for="editorFontFamily">
               <CalcpadSearchHighlight text="Font Family:" :query="query" />
               <span class="setting-info" title="JuliaMono is the bundled default. Drop .woff2/.woff/.ttf/.otf files into the fonts folder to make them available here.">ⓘ</span>
@@ -475,8 +461,8 @@
                 :value="editorFontFamily"
               >{{ editorFontFamily }} (missing)</option>
             </select>
-          </div>
-          <div v-if="versionConfig.isDesktop" v-show="rowVisible('editor', 'fontsFolder')" class="setting-group">
+          </SettingRow>
+          <SettingRow v-if="versionConfig.isDesktop" section="editor" row="fontsFolder">
             <button
               class="diagnostics-button"
               title="Open the folder where custom fonts can be dropped. Reopen the Font Family picker to pick up new fonts."
@@ -484,9 +470,9 @@
             >
               <CalcpadSearchHighlight text="Open Fonts Folder" :query="query" />
             </button>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'previewTheme')" class="setting-group">
+          <SettingRow section="editor" row="previewTheme">
             <label for="previewTheme">
               <CalcpadSearchHighlight text="Preview Theme:" :query="query" />
             </label>
@@ -499,9 +485,9 @@
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'darkBackground')" class="setting-group">
+          <SettingRow section="editor" row="darkBackground">
             <label for="darkBackground">
               <CalcpadSearchHighlight text="Dark Mode Background:" :query="query" />
             </label>
@@ -520,9 +506,9 @@
                 Reset
               </button>
             </div>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'colorTheme')" class="setting-group">
+          <SettingRow section="editor" row="colorTheme">
             <label for="colorTheme">
               <CalcpadSearchHighlight text="Color Theme:" :query="query" />
             </label>
@@ -551,9 +537,9 @@
                 >{{ t.label }}</option>
               </optgroup>
             </select>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('editor', 'linterMinSeverity')" class="setting-group">
+          <SettingRow section="editor" row="linterMinSeverity">
             <label for="linterMinSeverity">
               <CalcpadSearchHighlight text="Linter Minimum Severity:" :query="query" />
             </label>
@@ -566,7 +552,7 @@
               <option value="warning">Warning</option>
               <option value="information">Information (all)</option>
             </select>
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -576,7 +562,45 @@
           <CalcpadSearchHighlight text="Formatting" :query="query" />
         </h3>
         <div v-show="bodyVisible('formatting')" class="section-body">
-          <slot name="formatting"></slot>
+          <SettingRow section="formatting" row="prettify">
+            <slot name="formatting"></slot>
+          </SettingRow>
+        </div>
+      </section>
+
+      <section v-show="sectionVisible('shortcuts')" class="settings-section">
+        <h3 class="section-header" @click="toggle('shortcuts')">
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('shortcuts') }">&#x25BC;</span>
+          <CalcpadSearchHighlight :text="t('Keyboard Shortcuts')" :query="query" />
+        </h3>
+        <div v-show="bodyVisible('shortcuts')" class="section-body">
+          <div
+            v-for="entry in shortcutEntries"
+            v-show="rowVisible('shortcuts', entry.id)"
+            :key="entry.id"
+            class="shortcut-row"
+          >
+            <div class="shortcut-line">
+              <CalcpadSearchHighlight class="shortcut-label" :text="entry.label" :query="query" />
+              <button
+                class="shortcut-key"
+                :class="{ modified: entry.modified, unassigned: !entry.hotkey }"
+                :title="t('Change shortcut')"
+                @click="recordingShortcut = recordingShortcut === entry.id ? null : entry.id"
+              >{{ entry.hotkey ? formatHotkey(normalizeHotkey(entry.hotkey) ?? entry.hotkey) : t('Unassigned') }}</button>
+            </div>
+            <HotkeyRecorder
+              v-if="recordingShortcut === entry.id"
+              :binding-id="entry.id"
+              :current="entry.hotkey"
+              :default-value="defaultKeybinding(entry.id)"
+              :keybindings="keybindings"
+              :extra-reserved="hostHotkeys"
+              :label-for="labelFor"
+              @save="saveShortcut(entry.id, $event)"
+              @cancel="recordingShortcut = null"
+            />
+          </div>
         </div>
       </section>
 
@@ -586,7 +610,7 @@
           <CalcpadSearchHighlight text="Server Settings" :query="query" />
         </h3>
         <div v-show="bodyVisible('server')" class="section-body">
-          <div v-show="rowVisible('server', 'url')" class="setting-group">
+          <SettingRow section="server" row="url">
             <label for="serverUrl">
               <CalcpadSearchHighlight text="Remote Server URL:" :query="query" />
             </label>
@@ -596,7 +620,7 @@
               type="text"
               @input="updateSettings"
             />
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -606,7 +630,7 @@
           <CalcpadSearchHighlight text="Diagnostics" :query="query" />
         </h3>
         <div v-show="bodyVisible('diagnostics')" class="section-body">
-          <div v-show="rowVisible('diagnostics', 'logsFolder')" class="setting-group">
+          <SettingRow section="diagnostics" row="logsFolder">
             <button
               class="diagnostics-button"
               title="Opens the folder containing server logs and the most recent crash dump."
@@ -614,9 +638,9 @@
             >
               <CalcpadSearchHighlight text="Open Logs Folder" :query="query" />
             </button>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('diagnostics', 'logLevel')" class="setting-group">
+          <SettingRow section="diagnostics" row="logLevel">
             <label for="logLevel">
               <CalcpadSearchHighlight text="Log Level:" :query="query" />
               <span class="setting-info" :title="logLevelDetail">&#9432;</span>
@@ -632,9 +656,9 @@
                 :value="opt.value"
               >{{ tt(opt.label) }}</option>
             </select>
-          </div>
+          </SettingRow>
 
-          <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('diagnostics', 'maxOutputLines')" class="setting-group">
+          <SettingRow v-if="versionConfig.isWebOrDesktop" section="diagnostics" row="maxOutputLines">
             <label for="maxOutputLines">
               <CalcpadSearchHighlight text="Max Output Lines (per channel):" :query="query" />
               <span class="setting-info" title="Lines retained in each Output channel before older lines are dropped. Lower values reduce memory use and improve responsiveness when logs are noisy.">ⓘ</span>
@@ -648,9 +672,9 @@
               step="100"
               @change="updateMaxOutputLines"
             />
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('diagnostics', 'maxPreviewSize')" class="setting-group">
+          <SettingRow section="diagnostics" row="maxPreviewSize">
             <label for="maxPreviewSize">
               <CalcpadSearchHighlight text="Max Preview Size (MB):" :query="query" />
               <span class="setting-info" title="A worksheet that renders to more HTML than this is not shown in the preview — showing it risks running the app out of memory. Exporting to PDF, HTML or DOCX is unaffected. Raise it only if you need very large documents on screen.">ⓘ</span>
@@ -664,9 +688,9 @@
               step="8"
               @change="updateMaxPreviewSize"
             />
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('diagnostics', 'maxPreviewConsoleMessages')" class="setting-group">
+          <SettingRow section="diagnostics" row="maxPreviewConsoleMessages">
             <label for="maxPreviewConsoleMessages">
               <CalcpadSearchHighlight text="Max Preview Console Messages:" :query="query" />
               <span class="setting-info" title="How many console lines one preview render may relay before the rest are dropped. A worksheet whose scripts log in a loop can otherwise flood the console channel. Raise it when debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless.">ⓘ</span>
@@ -680,7 +704,7 @@
               step="100"
               @change="updateMaxPreviewConsoleMessages"
             />
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -690,7 +714,7 @@
           <CalcpadSearchHighlight text="Configuration" :query="query" />
         </h3>
         <div v-show="bodyVisible('configuration')" class="section-body">
-          <div v-show="rowVisible('configuration', 'activeConfig')" class="setting-group">
+          <SettingRow section="configuration" row="activeConfig">
             <label for="activeConfig">
               <CalcpadSearchHighlight text="Active Config:" :query="query" />
             </label>
@@ -705,9 +729,9 @@
                 :value="name"
               >{{ name }}</option>
             </select>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('configuration', 'saveConfig')" class="setting-group">
+          <SettingRow section="configuration" row="saveConfig">
             <label for="configName">
               <CalcpadSearchHighlight text="Save current settings as:" :query="query" />
             </label>
@@ -727,16 +751,16 @@
               </button>
             </div>
             <span v-if="saveError" class="setting-error">{{ saveError }}</span>
-          </div>
+          </SettingRow>
 
-          <div v-show="rowVisible('configuration', 'actions')" class="settings-actions">
+          <SettingRow section="configuration" row="actions" row-class="settings-actions">
             <button @click="openSettingsFolder" class="reset-button">
               <CalcpadSearchHighlight text="Open Settings Folder" :query="query" />
             </button>
             <button @click="resetSettings" class="reset-button">
               <CalcpadSearchHighlight text="Reset to Default" :query="query" />
             </button>
-          </div>
+          </SettingRow>
         </div>
       </section>
 
@@ -752,11 +776,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, reactive, nextTick } from 'vue'
+import { ref, watch, computed, reactive, nextTick, provide, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CollapseAllButton from './CollapseAllButton.vue'
+import SettingRow from './SettingRow.vue'
+import HotkeyRecorder from './HotkeyRecorder.vue'
+import { SETTING_ROW_CONTEXT } from './setting-row-context'
+import { readCustomizations } from '../../services/customizations'
+import type { UserCustomizations } from '../../services/customizations'
+import { formatHotkey, normalizeHotkey } from '../../services/hotkeys'
+import type { HotkeyBinding } from '../../services/hotkeys'
+import { KEYBINDING_COMMANDS, SETTING_KEYBINDING_PREFIX, defaultKeybinding, keybindingCommand } from '../../services/keybindings'
+import { SETTING_TOGGLES } from '../../services/setting-actions'
 import type { WritableComputedRef } from 'vue'
 import type { PdfSettings, Settings, ThemeInfo, VersionConfig } from '../types'
 import { DEFAULT_PDF_SETTINGS, DEFAULT_VERSION_CONFIG } from '../types'
@@ -809,10 +842,12 @@ interface Props {
   initialCompletionDelayMs?: number
   initialAvailableFonts?: string[]
   initialUserName?: string
-  /** A setting to bring into view and focus, by its section and input id. */
-  focusRequest?: { section: string; id: string } | null
+  /** A setting to bring into view and focus, by its section and input id, or by its setting id. */
+  focusRequest?: { section: string; id: string; settingId?: string } | null
   appVersion?: string
   pdfSettings?: PdfSettings
+  customizations?: UserCustomizations
+  hostHotkeys?: HotkeyBinding[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -846,7 +881,9 @@ const props = withDefaults(defineProps<Props>(), {
   initialUserName: '',
   focusRequest: null,
   appVersion: '',
-  pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS })
+  pdfSettings: () => ({ ...DEFAULT_PDF_SETTINGS }),
+  customizations: () => readCustomizations(() => undefined),
+  hostHotkeys: () => []
 })
 
 // Emits
@@ -884,6 +921,7 @@ const emit = defineEmits<{
   focusHandled: []
   updatePdfSettings: [settings: PdfSettings]
   resetPdfSettings: []
+  updateCustomizations: [customizations: UserCustomizations]
 }>()
 
 // State
@@ -1073,6 +1111,10 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
     title: 'Formatting',
     rows: { prettify: 'prettify document auto indent style tab space spaces per level trim trailing whitespace' }
   },
+  shortcuts: {
+    title: 'Keyboard Shortcuts',
+    rows: Object.fromEntries(KEYBINDING_COMMANDS.map(c => [c.id, ('keyboard shortcut hotkey keybinding ' + c.label).toLowerCase()]))
+  },
   server: {
     title: 'Server Settings',
     rows: {
@@ -1118,10 +1160,11 @@ const isCollapsed = (id: string) => !!collapsed[id]
 const toggle = (id: string) => { collapsed[id] = !collapsed[id] }
 const bodyVisible = (id: string) => searchActive.value || !collapsed[id]
 
+const COLLAPSIBLE = ['favorites', ...Object.keys(SECTION_META)]
 const setAll = (value: boolean) => {
-  for (const id of Object.keys(SECTION_META)) collapsed[id] = value
+  for (const id of COLLAPSIBLE) collapsed[id] = value
 }
-const allCollapsed = computed(() => Object.keys(SECTION_META).every(id => collapsed[id]))
+const allCollapsed = computed(() => COLLAPSIBLE.every(id => collapsed[id]))
 
 const rowVisible = (id: string, key: string) => {
   if (!searchActive.value) return true
@@ -1142,6 +1185,84 @@ const sectionVisible = (id: string) => {
 const anyVisible = computed(() =>
   Object.keys(SECTION_META).some(id => sectionVisible(id))
 )
+
+// Favorites, hotkeys and shortcuts
+const favoriteSettings = computed(() => props.customizations.favoriteSettings)
+const keybindings = computed(() => props.customizations.keybindings)
+const recordingShortcut = ref<string | null>(null)
+
+const splitSettingId = (id: string): [string, string] => {
+  const dot = id.indexOf('.')
+  return [id.slice(0, dot), id.slice(dot + 1)]
+}
+
+const favoritesVisible = computed(() => {
+  if (!searchActive.value) return true
+  return favoriteSettings.value.some(id => rowVisible(...splitSettingId(id)))
+})
+
+const favoriteSlotId = (id: string) => 'calcpad-fav-slot-' + id.replace(/[^\w-]/g, '-')
+
+const updateCustomizations = (patch: Partial<UserCustomizations>) => {
+  emit('updateCustomizations', { ...props.customizations, ...patch })
+}
+
+// Rows carry their labels in markup only, so the label is read back from the rendered row.
+const domReady = ref(false)
+onMounted(() => { domReady.value = true })
+const settingLabel = (id: string): string => {
+  if (SETTING_TOGGLES[id]) return tt(SETTING_TOGGLES[id].label)
+  const row = domReady.value
+    ? rootEl.value?.querySelector(`[data-setting-id="${CSS.escape(id)}"] .setting-row-main`)
+    : null
+  const text = row?.querySelector('label, button')?.textContent ?? ''
+  const cleaned = text.replace(/ⓘ/g, '').replace(/\s+/g, ' ').trim().replace(/:$/, '')
+  return cleaned || splitSettingId(id)[1].replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, c => c.toUpperCase())
+}
+
+const labelFor = (bindingId: string): string => {
+  if (bindingId.startsWith(SETTING_KEYBINDING_PREFIX)) {
+    return t('Setting: {name}', { name: settingLabel(bindingId.slice(SETTING_KEYBINDING_PREFIX.length)) })
+  }
+  const command = keybindingCommand(bindingId)
+  return command ? tt(command.label) : bindingId
+}
+
+const shortcutEntries = computed(() => {
+  const commands = KEYBINDING_COMMANDS.map(c => ({
+    id: c.id,
+    label: tt(c.label),
+    hotkey: keybindings.value[c.id] ?? '',
+    modified: (keybindings.value[c.id] ?? '') !== defaultKeybinding(c.id),
+  }))
+  const settings = Object.entries(keybindings.value)
+    .filter(([id, hotkey]) => id.startsWith(SETTING_KEYBINDING_PREFIX) && hotkey)
+    .map(([id, hotkey]) => ({ id, label: labelFor(id), hotkey, modified: true }))
+  return [...commands, ...settings]
+})
+
+const saveShortcut = (id: string, hotkey: string) => {
+  const next = { ...keybindings.value }
+  if (!hotkey && id.startsWith(SETTING_KEYBINDING_PREFIX)) delete next[id]
+  else next[id] = hotkey
+  updateCustomizations({ keybindings: next })
+  recordingShortcut.value = null
+}
+
+provide(SETTING_ROW_CONTEXT, {
+  rowVisible,
+  isFavorite: id => favoriteSettings.value.includes(id),
+  toggleFavorite: id => {
+    const list = favoriteSettings.value
+    updateCustomizations({ favoriteSettings: list.includes(id) ? list.filter(x => x !== id) : [...list, id] })
+  },
+  favoriteSlotSelector: id => '#' + favoriteSlotId(id),
+  hotkeyFor: id => keybindings.value[SETTING_KEYBINDING_PREFIX + id] ?? '',
+  setHotkey: (id, hotkey) => saveShortcut(SETTING_KEYBINDING_PREFIX + id, hotkey),
+  keybindings: () => keybindings.value,
+  extraReserved: () => props.hostHotkeys,
+  labelFor,
+})
 
 // Methods
 // Per-field validation against the ranges Calcpad.Core enforces. Invalid fields
@@ -1517,7 +1638,10 @@ watch(
     searchQuery.value = ''
     collapsed[request.section] = false
     await nextTick()
-    const input = rootEl.value?.querySelector<HTMLElement>(`#${request.id}`)
+    const input = request.settingId
+      ? rootEl.value?.querySelector<HTMLElement>(
+        `[data-setting-id="${CSS.escape(request.settingId)}"]:not([data-favorite-copy]) .setting-row-main :is(input, select, textarea, button)`)
+      : rootEl.value?.querySelector<HTMLElement>(`#${request.id}`)
     input?.scrollIntoView({ block: 'center' })
     input?.focus()
     emit('focusHandled')
@@ -1569,6 +1693,20 @@ watch(
   overflow-y: auto;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/* Unwraps the Formatting slot so its inputs span the row like other settings. */
+.settings-container :deep([data-setting-id="formatting.prettify"] :is(.formatting-tab, .formatting-container)) {
+  display: contents;
+}
+
+.settings-container :deep([data-setting-id="formatting.prettify"] .formatting-container > *) {
+  grid-column: 1 / -1;
+}
+
+.settings-container :deep([data-setting-id="formatting.prettify"] .formatting-container > :first-child) {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .section-header {
@@ -1700,5 +1838,52 @@ watch(
   padding: 16px 4px;
   color: var(--vscode-descriptionForeground);
   text-align: center;
+}
+
+.favorites-star {
+  color: var(--vscode-editorWarning-foreground, #cca700);
+}
+
+.favorites-empty {
+  margin: 0 0 12px;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
+.shortcut-row {
+  margin-bottom: 6px;
+}
+
+.shortcut-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.shortcut-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.shortcut-key {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-family: monospace;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.shortcut-key.modified {
+  border-color: var(--vscode-focusBorder);
+}
+
+.shortcut-key.unassigned {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  font-family: inherit;
 }
 </style>

@@ -60,8 +60,11 @@
         v-else-if="pane.activeTab === 'insert'"
         :ref="el => { if (paneIndex === 0) insertTab = el as InstanceType<typeof CalcpadInsertTab> | null }"
         :insert-items="insertItems"
+        :customizations="customizations"
+        :search-shortcut="insertSearchShortcut"
         @insert-text="handleInsertText"
         @insert-image="handleInsertImage"
+        @update-customizations="handleUpdateCustomizations"
       />
       <CalcpadTocTab
         v-else-if="pane.activeTab === 'toc'"
@@ -103,6 +106,9 @@
         @focus-handled="settingFocus = null"
         :app-version="appVersion"
         :pdf-settings="pdfSettings"
+        :customizations="customizations"
+        :host-hotkeys="hostHotkeys"
+        @update-customizations="handleUpdateCustomizations"
         @update-settings="handleUpdateSettings"
         @update-pdf-settings="handleUpdatePdfSettings"
         @reset-pdf-settings="handleResetPdfSettings"
@@ -153,7 +159,9 @@
         v-else-if="pane.activeTab === 'variables'"
         :variables-data="variablesData"
         :loading="variablesLoading"
+        :custom-snippets="customizations.customSnippets"
         @insert-text="handleInsertText"
+        @save-custom-snippet="handleSaveCustomSnippet"
       />
       <CalcpadExportTab
         v-else-if="pane.activeTab === 'export'"
@@ -229,6 +237,10 @@ import type { ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
 import { coerceWriteMode, DEFAULT_COMPLETION_DELAY_MS } from '../../types/settings'
 import { DEFAULT_PDF_SETTINGS } from '../types'
+import { readCustomizations } from '../../services/customizations'
+import type { CustomSnippet, UserCustomizations } from '../../services/customizations'
+import { formatHotkey, hotkeyFromEvent, normalizeHotkey } from '../../services/hotkeys'
+import type { HotkeyBinding } from '../../services/hotkeys'
 
 const { t } = useI18n()
 import {
@@ -302,6 +314,23 @@ const pdfSettings = ref<PdfSettings>({ ...DEFAULT_PDF_SETTINGS })
 const prettifyIndentStyle = ref<'tab' | 'space'>('tab')
 const prettifyIndentSize = ref(4)
 const prettifyTrimTrailing = ref(true)
+
+const customizations = ref<UserCustomizations>(readCustomizations(() => undefined))
+const hostHotkeys = ref<HotkeyBinding[]>([])
+const insertSearchHotkey = computed(() => normalizeHotkey(customizations.value.keybindings.insertSearch ?? ''))
+const insertSearchShortcut = computed(() => insertSearchHotkey.value ? formatHotkey(insertSearchHotkey.value) : '')
+
+const handleUpdateCustomizations = (next: UserCustomizations) => {
+  customizations.value = next
+  postMessage({ type: 'updateCustomizations', customizations: next })
+}
+
+const handleSaveCustomSnippet = async (snippet: Omit<CustomSnippet, 'id'>) => {
+  if (tabUnavailable('insert')) return
+  switchTab('insert')
+  await nextTick()
+  insertTab.value?.openSnippetDraft(snippet)
+}
 
 const userName = ref('')
 const fileInfo = ref<FileInfo | null>(null)
@@ -478,10 +507,17 @@ const activateTab = (pane: Pane, tabId: string) => {
 }
 
 // A setting another tab links to, focused by the Settings tab in that pane once it shows.
-const settingFocus = ref<{ paneId: number; section: string; id: string } | null>(null)
+const settingFocus = ref<{ paneId: number; section: string; id: string; settingId?: string } | null>(null)
 
 const openSetting = (pane: Pane, section: string, id: string) => {
   settingFocus.value = { paneId: pane.id, section, id }
+  activateTab(pane, 'settings')
+}
+
+// A go-to hotkey: reuse a pane already on Settings, else the first pane.
+const openSettingById = (settingId: string) => {
+  const pane = panes.value.find(p => p.activeTab === 'settings') ?? panes.value[0]
+  settingFocus.value = { paneId: pane.id, section: settingId.split('.')[0], id: '', settingId }
   activateTab(pane, 'settings')
 }
 
@@ -499,7 +535,8 @@ const focusInsertSearch = async () => {
 }
 
 const handleInsertSearchShortcut = (event: KeyboardEvent) => {
-  if (event.key.toLowerCase() === 'i' && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+  if ((event.target as HTMLElement | null)?.closest?.('[data-hotkey-recorder]')) return
+  if (insertSearchHotkey.value && hotkeyFromEvent(event) === insertSearchHotkey.value) {
     event.preventDefault()
     event.stopPropagation()
     void focusInsertSearch()
@@ -866,6 +903,14 @@ const handleMessage = (event: MessageEvent) => {
       completionDelayMs.value = message.completionDelayMs
       if (Array.isArray(message.availableFonts)) availableFonts.value = message.availableFonts
       if (typeof message.userName === 'string') userName.value = message.userName
+      if (message.customizations) {
+        const raw = message.customizations as Record<string, unknown>
+        customizations.value = readCustomizations(key => raw[key] === undefined ? undefined : JSON.stringify(raw[key]))
+      }
+      if (Array.isArray(message.hostHotkeys)) hostHotkeys.value = message.hostHotkeys
+      break
+    case 'openSetting':
+      if (typeof message.id === 'string') openSettingById(message.id)
       break
     case 'documentMetadata':
       fileInfo.value = message.info ?? null
@@ -948,13 +993,16 @@ const handleMessage = (event: MessageEvent) => {
     case 'revealUiOverrides':
       revealUiOverrides(Array.isArray(message.keys) ? message.keys.map(String) : [])
       break
+    case 'openSnippetDraft':
+      if (message.snippet) void handleSaveCustomSnippet(message.snippet)
+      break
     case 'focusInsertSearch':
       void focusInsertSearch()
       break
   }
 }
 
-defineExpose({ switchTab, focusInsertSearch })
+defineExpose({ switchTab, focusInsertSearch, openSnippetDraft: handleSaveCustomSnippet })
 
 // Initialize
 onMounted(() => {

@@ -3,7 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, planUiOverridesToSource, toRangeEdits, selectionLineRange } from 'calcpad-frontend';
-import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
+import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit, HotkeyBinding, CustomSnippet } from 'calcpad-frontend';
+import { readCustomizations, customizationExtras, CUSTOMIZATION_KEYS, buildSettingToggle } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -14,6 +15,11 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     private _webviewReady = false;
     private _pendingInsertSearch = false;
+    private _pendingPanelMessage: Record<string, unknown> | null = null;
+    /** Keybindings were saved, reset or switched with a preset. */
+    public onKeybindingsChanged?: () => void;
+    /** Hotkeys VS Code and other extensions already bind, for the panel's conflict check. */
+    public getHostHotkeys?: () => HotkeyBinding[];
     private _outputChannel: VSCodeLogger;
     private _cachedPlots: ExtractedPlot[] = [];
     private _cachedHtml: string = '';
@@ -92,386 +98,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         this._outputChannel.appendLine('Webview HTML set', 'verbose');
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(async (data) => {
-            this._outputChannel.appendLine(`Received message: ${data.type}`, 'verbose');
-            switch (data.type) {
-                case 'insertText': {
-                    const insertEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-                    if (insertEditor) {
-                        const position = insertEditor.selection.active;
-                        // Markup snippets are written for Calcpad mode; an #html/#markdown
-                        // block takes the same content unwrapped and unquoted.
-                        const mode = this.getParseMode?.(insertEditor.document, position.line) ?? 'cpd';
-                        const text = mode === 'cpd' ? data.text : stripCpdSnippetWrapper(data.text);
-                        await insertEditor.edit(editBuilder => {
-                            editBuilder.insert(position, text);
-                        });
-                        await vscode.window.showTextDocument(insertEditor.document, insertEditor.viewColumn);
-                    }
-                    break;
-                }
-
-                case 'insertImage':
-                    vscode.commands.executeCommand('vscode-calcpad.insertImage');
-                    break;
-
-                case 'getSettings':
-                    await this._settingsManager.ready;
-                    webviewView.webview.postMessage(await this._buildSettingsResponse());
-                    break;
-
-                case 'updateSettings':
-                    this._settingsManager.updateSettings(data.settings);
-                    void this.onSettingsChanged?.();
-                    break;
-
-                case 'resetSettings':
-                    await this._settingsManager.resetSettings();
-                    webviewView.webview.postMessage({
-                        type: 'settingsReset',
-                        settings: this._settingsManager.getSettings(),
-                    });
-                    webviewView.webview.postMessage(await this._buildSettingsResponse());
-                    break;
-
-                case 'saveNamedConfig': {
-                    const result = await this._settingsManager.savePreset(data.name);
-                    if (!result.ok) {
-                        webviewView.webview.postMessage({
-                            type: 'saveNamedConfigError',
-                            message: result.message,
-                        });
-                    } else {
-                        webviewView.webview.postMessage(await this._buildSettingsResponse());
-                    }
-                    break;
-                }
-
-                case 'showAlert': {
-                    const text = String(data.message ?? '');
-                    if (data.kind === 'error') { void vscode.window.showErrorMessage(text); }
-                    else if (data.kind === 'warning') { void vscode.window.showWarningMessage(text); }
-                    else { void vscode.window.showInformationMessage(text); }
-                    break;
-                }
-
-                case 'switchConfig':
-                    await this._settingsManager.loadPreset(data.name);
-                    webviewView.webview.postMessage(await this._buildSettingsResponse());
-                    break;
-
-                case 'openSettingsFolder':
-                    await this._settingsManager.openSettingsFolder();
-                    break;
-
-                case 'updatePreviewTheme':
-                    this._settingsManager.setExtra('previewTheme', data.theme);
-                    void this.onPreviewThemeChanged?.();
-                    break;
-
-                case 'updateColorTheme':
-                    await vscode.workspace.getConfiguration('workbench').update('colorTheme', data.theme, vscode.ConfigurationTarget.Global);
-                    break;
-
-                case 'updateCommentFormat':
-                    this._settingsManager.setExtra('commentFormat', data.format);
-                    break;
-
-                case 'updateFormattingHotkeys':
-                    this._settingsManager.setExtra('formattingHotkeys', data.enabled);
-                    break;
-
-                case 'updateQuickTyping':
-                    this._settingsManager.setExtra('quickTyping', data.enabled);
-                    break;
-
-                case 'updatePreviewCursorSync':
-                    this._settingsManager.setExtra('previewCursorSync', data.enabled);
-                    break;
-
-                case 'updateAutoRun':
-                    this._settingsManager.setExtra('autoRun', data.enabled);
-                    this.onAutoRunChanged?.();
-                    break;
-
-                case 'updateAutoInputMode':
-                    this._settingsManager.setExtra('autoInputMode', data.enabled);
-                    break;
-
-                case 'updateShowFileMetadata':
-                    this._settingsManager.setExtra('showFileMetadata', !!data.enabled);
-                    this.onShowFileMetadataChanged?.();
-                    break;
-
-                case 'updateShowUiOverrideHints':
-                    this._settingsManager.setExtra('uiOverrideHints', !!data.enabled);
-                    this.onUiOverrideHintsChanged?.();
-                    break;
-
-                case 'updateAutoSyncUiValues':
-                    this._settingsManager.setExtra('autoSyncUiValues', !!data.enabled);
-                    break;
-
-                // Changes what an open preview renders, so it is re-run rather than
-                // left showing the values the previous setting asked for.
-                case 'updatePreviewUiOverrides':
-                    this._settingsManager.setExtra('previewUiOverrides', data.enabled);
-                    void this.onSettingsChanged?.();
-                    break;
-
-                case 'updatePreviewPdf':
-                    this._settingsManager.setExtra('previewPdf', !!data.enabled);
-                    void this.onSettingsChanged?.();
-                    break;
-
-                case 'updateDarkBackground':
-                    this._settingsManager.setExtra('darkBackground', data.color);
-                    break;
-
-                case 'updateLinterMinSeverity':
-                    this._settingsManager.setExtra('linterMinSeverity', data.severity);
-                    break;
-
-                case 'updateLogLevel':
-                    this._settingsManager.setExtra('logLevel', data.level);
-                    this.onLogLevelChanged?.(data.level);
-                    break;
-
-                case 'updateWriteMode':
-                    this._settingsManager.setExtra('writeMode', coerceWriteMode(data.mode));
-                    break;
-
-                case 'writeFilesNow':
-                    vscode.commands.executeCommand('vscode-calcpad.writeDataFiles');
-                    break;
-
-                // Decides whether an open preview is shown at all, so raising it has to
-                // re-render — a document blocked under the old value is showing the notice
-                // rather than a render, and nothing else would replace it.
-                case 'updateMaxPreviewSize':
-                    this._settingsManager.setExtra('maxPreviewSizeMB', data.value);
-                    void this.onSettingsChanged?.();
-                    break;
-
-                // Baked into the scripts a render injects, so it only takes effect on the
-                // next one.
-                case 'updateMaxPreviewConsoleMessages':
-                    this._settingsManager.setExtra('maxPreviewConsoleMessages', data.value);
-                    void this.onSettingsChanged?.();
-                    break;
-
-                case 'updatePdfSettings': {
-                    const current = this._settingsManager.getExtraObject<Record<string, unknown>>('pdfSettings', {});
-                    this._settingsManager.setExtra('pdfSettings', { ...current, ...data.settings });
-                    break;
-                }
-
-                case 'resetPdfSettings': {
-                    this._settingsManager.setExtra('pdfSettings', {});
-                    const resetPdfSettings = { ...DEFAULT_PDF_SETTINGS };
-                    webviewView.webview.postMessage({
-                        type: 'pdfSettingsReset',
-                        settings: resetPdfSettings,
-                    });
-                    break;
-                }
-
-                case 'openLogsFolder': {
-                    // Resolve the same logs directory the server manager uses.
-                    // Folder may not exist yet on a fresh install — create it so the
-                    // OS file explorer has something to open instead of erroring.
-                    const logsDir = path.join(this._context.extensionPath, 'bin', 'logs');
-                    try { fs.mkdirSync(logsDir, { recursive: true }); } catch { /* best-effort */ }
-                    try {
-                        await vscode.env.openExternal(vscode.Uri.file(logsDir));
-                        this._outputChannel.appendLine(`Opened logs folder: ${logsDir}`, 'verbose');
-                    } catch (err) {
-                        const msg = err instanceof Error ? err.message : String(err);
-                        this._outputChannel.appendLine(`Failed to open logs folder: ${msg}`, 'warning');
-                        vscode.window.showErrorMessage(`Could not open logs folder: ${msg}`);
-                    }
-                    break;
-                }
-
-                case 'getPdfSettings': {
-                    const stored = this._settingsManager.getExtraObject<Partial<typeof DEFAULT_PDF_SETTINGS>>('pdfSettings', {});
-                    const pdfSettings = { ...DEFAULT_PDF_SETTINGS, ...stored };
-                    webviewView.webview.postMessage({
-                        type: 'pdfSettingsResponse',
-                        settings: pdfSettings,
-                    });
-                    break;
-                }
-
-                // The Export tab names which rendering it wants; the PDF tab's Generate
-                // button sends none, and the commands default to the report.
-                case 'generatePdf':
-                    vscode.commands.executeCommand('vscode-calcpad.printToPdf', data.variant);
-                    break;
-
-                case 'saveSourceHtml':
-                    vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml', data.variant);
-                    break;
-
-                case 'saveDocx':
-                    vscode.commands.executeCommand('vscode-calcpad.saveDocx', data.variant);
-                    break;
-
-                case 'saveCompiled':
-                    vscode.commands.executeCommand('vscode-calcpad.saveAsCompiled');
-                    break;
-
-                case 'savePortable':
-                    vscode.commands.executeCommand('vscode-calcpad.exportPortable');
-                    break;
-
-                case 'getPlots':
-                    await this._handleGetPlots();
-                    break;
-
-                case 'savePlot':
-                    await this._handleSavePlot(data.index);
-                    break;
-
-                case 'savePlotsZip':
-                    await this._handleSavePlotsZip();
-                    break;
-
-                case 'getInsertData':
-                    this._webviewReady = true;
-                    if (this._pendingInsertSearch) this.focusInsertSearch();
-                    this._sendInitialData();
-                    break;
-
-                case 'getVariables':
-                    // Trigger a refresh of variables from the current document
-                    const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-                    if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
-                        vscode.commands.executeCommand('calcpad.refreshVariables');
-                    }
-                    break;
-
-                case 'getHeadings':
-                    {
-                        const headingsEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-                        if (headingsEditor && (headingsEditor.document.languageId === 'calcpad' || headingsEditor.document.languageId === 'plaintext')) {
-                            const text = headingsEditor.document.getText();
-                            const headings = parseHeadings(text);
-                            webviewView.webview.postMessage({
-                                type: 'updateHeadings',
-                                headings
-                            });
-                        } else {
-                            webviewView.webview.postMessage({
-                                type: 'updateHeadings',
-                                headings: []
-                            });
-                        }
-                    }
-                    break;
-
-                // While a worksheet is being filled in, the panel the user is working in is
-                // the input form, not the source editor, and a focused webview leaves
-                // `activeTextEditor` undefined. So the rendered views are scrolled too, and
-                // the cursor moves without pulling focus off the form.
-                case 'goToLine':
-                    {
-                        const goToEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
-                        if (typeof data.line !== 'number') break;
-                        if (goToEditor) {
-                            const lineIndex = Math.min(Math.max(0, data.line - 1), goToEditor.document.lineCount - 1);
-                            const lineEnd = goToEditor.document.lineAt(lineIndex).range.end;
-                            goToEditor.selection = new vscode.Selection(lineEnd, lineEnd);
-                            goToEditor.revealRange(goToEditor.document.lineAt(lineIndex).range, vscode.TextEditorRevealType.InCenter);
-                            if (!this._inputMode) {
-                                vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
-                            }
-                        }
-                        if (this._inputMode) {
-                            vscode.commands.executeCommand('vscode-calcpad.focusPreviewToLine', data.line);
-                        }
-                    }
-                    break;
-
-                case 'refreshDocument':
-                    this._outputChannel.appendLine('[Vue UI] Run preview requested', 'verbose');
-                    vscode.commands.executeCommand('calcpad.runPreview');
-                    break;
-
-                case 'prettifyDocument':
-                    this._outputChannel.appendLine('[Vue UI] Prettify document requested', 'verbose');
-                    vscode.commands.executeCommand('vscode-calcpad.prettifyDocument');
-                    break;
-
-                case 'getPrettifySettings': {
-                    webviewView.webview.postMessage({
-                        type: 'prettifySettingsResponse',
-                        indentStyle: this._settingsManager.getExtra('prettifyIndentStyle', 'tab'),
-                        indentSize: this._settingsManager.getExtraNumber('prettifyIndentSize', 4),
-                        trimTrailingWhitespace: this._settingsManager.getExtraBool('prettifyTrimTrailingWhitespace', true),
-                    });
-                    break;
-                }
-
-                case 'updatePrettifyIndentStyle':
-                    this._settingsManager.setExtra('prettifyIndentStyle', data.value);
-                    break;
-
-                case 'updatePrettifyIndentSize':
-                    this._settingsManager.setExtra('prettifyIndentSize', data.value);
-                    break;
-
-                case 'updatePrettifyTrim':
-                    this._settingsManager.setExtra('prettifyTrimTrailingWhitespace', data.value);
-                    break;
-
-                case 'getMetadataContext':
-                    this.updateMetadataContext(this._computeMetadataBlock(), this._metadataEditor());
-                    break;
-
-                case 'updateMetadata':
-                    await this._handleUpdateMetadata(data);
-                    break;
-
-                case 'getDocumentMetadata':
-                    this.refreshDocumentMetadata();
-                    break;
-
-                case 'updateFileInfo':
-                    await this._handleUpdateFileInfo(data.patch);
-                    break;
-
-                case 'updateUiOverrides':
-                    await this._handleUpdateUiOverrides(data.overrides);
-                    break;
-
-                case 'overrideUiDefaults':
-                    await this._overrideUiDefaults(data.keys);
-                    break;
-
-                case 'markFileReviewed':
-                    await this._markFileReviewed();
-                    break;
-
-                case 'updateUserName':
-                    this._settingsManager.setExtra('userName', String(data.value ?? '').trim());
-                    break;
-
-                case 'getUiControls':
-                    {
-                        // A failed render leaves the panel unresolved rather than empty:
-                        // "no controls" and "could not tell" must not read the same to a
-                        // purge button.
-                        const controls = await this.resolveUiControls?.();
-                        if (controls) this.updateUiControls(controls);
-                    }
-                    break;
-
-                case 'debug':
-                    this._outputChannel.appendLine(`[Vue Debug] ${data.message}`, 'verbose');
-                    break;
-            }
-        });
+        webviewView.webview.onDidReceiveMessage(data => this._onMessage(data));
 
         // Send initial data
         this._sendInitialData();
@@ -491,6 +118,403 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 tocTimer = setTimeout(() => this._sendHeadings(), 800);
             }
         });
+    }
+
+    /** Handles a panel message; also runs hotkey toggles while the panel isn't open. */
+    private async _onMessage(data: any): Promise<void> {
+        const webview = this._view?.webview ?? { postMessage: async (_message: unknown) => false };
+        this._outputChannel.appendLine(`Received message: ${data.type}`, 'verbose');
+        switch (data.type) {
+            case 'insertText': {
+                const insertEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                if (insertEditor) {
+                    const position = insertEditor.selection.active;
+                    // Markup snippets are written for Calcpad mode; an #html/#markdown
+                    // block takes the same content unwrapped and unquoted.
+                    const mode = this.getParseMode?.(insertEditor.document, position.line) ?? 'cpd';
+                    const text = mode === 'cpd' ? data.text : stripCpdSnippetWrapper(data.text);
+                    await insertEditor.edit(editBuilder => {
+                        editBuilder.insert(position, text);
+                    });
+                    await vscode.window.showTextDocument(insertEditor.document, insertEditor.viewColumn);
+                }
+                break;
+            }
+
+            case 'insertImage':
+                vscode.commands.executeCommand('vscode-calcpad.insertImage');
+                break;
+
+            case 'getSettings':
+                await this._settingsManager.ready;
+                webview.postMessage(await this._buildSettingsResponse());
+                break;
+
+            case 'updateSettings':
+                this._settingsManager.updateSettings(data.settings);
+                void this.onSettingsChanged?.();
+                break;
+
+            case 'resetSettings':
+                await this._settingsManager.resetSettings();
+                webview.postMessage({
+                    type: 'settingsReset',
+                    settings: this._settingsManager.getSettings(),
+                });
+                webview.postMessage(await this._buildSettingsResponse());
+                this.onKeybindingsChanged?.();
+                break;
+
+            case 'updateCustomizations': {
+                const source = (data.customizations ?? {}) as Record<string, unknown>;
+                const next = readCustomizations(key => source[key] === undefined ? undefined : JSON.stringify(source[key]));
+                const extras = customizationExtras(next);
+                for (const key of CUSTOMIZATION_KEYS) {
+                    if (this._settingsManager.getExtra(key) !== extras[key]) this._settingsManager.setExtra(key, extras[key]);
+                }
+                this.onKeybindingsChanged?.();
+                break;
+            }
+
+            case 'saveNamedConfig': {
+                const result = await this._settingsManager.savePreset(data.name);
+                if (!result.ok) {
+                    webview.postMessage({
+                        type: 'saveNamedConfigError',
+                        message: result.message,
+                    });
+                } else {
+                    webview.postMessage(await this._buildSettingsResponse());
+                }
+                break;
+            }
+
+            case 'showAlert': {
+                const text = String(data.message ?? '');
+                if (data.kind === 'error') { void vscode.window.showErrorMessage(text); }
+                else if (data.kind === 'warning') { void vscode.window.showWarningMessage(text); }
+                else { void vscode.window.showInformationMessage(text); }
+                break;
+            }
+
+            case 'switchConfig':
+                await this._settingsManager.loadPreset(data.name);
+                webview.postMessage(await this._buildSettingsResponse());
+                this.onKeybindingsChanged?.();
+                break;
+
+            case 'openSettingsFolder':
+                await this._settingsManager.openSettingsFolder();
+                break;
+
+            case 'updatePreviewTheme':
+                this._settingsManager.setExtra('previewTheme', data.theme);
+                void this.onPreviewThemeChanged?.();
+                break;
+
+            case 'updateColorTheme':
+                await vscode.workspace.getConfiguration('workbench').update('colorTheme', data.theme, vscode.ConfigurationTarget.Global);
+                break;
+
+            case 'updateCommentFormat':
+                this._settingsManager.setExtra('commentFormat', data.format);
+                break;
+
+            case 'updateFormattingHotkeys':
+                this._settingsManager.setExtra('formattingHotkeys', data.enabled);
+                break;
+
+            case 'updateQuickTyping':
+                this._settingsManager.setExtra('quickTyping', data.enabled);
+                break;
+
+            case 'updatePreviewCursorSync':
+                this._settingsManager.setExtra('previewCursorSync', data.enabled);
+                break;
+
+            case 'updateAutoRun':
+                this._settingsManager.setExtra('autoRun', data.enabled);
+                this.onAutoRunChanged?.();
+                break;
+
+            case 'updateAutoInputMode':
+                this._settingsManager.setExtra('autoInputMode', data.enabled);
+                break;
+
+            case 'updateShowFileMetadata':
+                this._settingsManager.setExtra('showFileMetadata', !!data.enabled);
+                this.onShowFileMetadataChanged?.();
+                break;
+
+            case 'updateShowUiOverrideHints':
+                this._settingsManager.setExtra('uiOverrideHints', !!data.enabled);
+                this.onUiOverrideHintsChanged?.();
+                break;
+
+            case 'updateAutoSyncUiValues':
+                this._settingsManager.setExtra('autoSyncUiValues', !!data.enabled);
+                break;
+
+            // Changes what an open preview renders, so it is re-run rather than
+            // left showing the values the previous setting asked for.
+            case 'updatePreviewUiOverrides':
+                this._settingsManager.setExtra('previewUiOverrides', data.enabled);
+                void this.onSettingsChanged?.();
+                break;
+
+            case 'updatePreviewPdf':
+                this._settingsManager.setExtra('previewPdf', !!data.enabled);
+                void this.onSettingsChanged?.();
+                break;
+
+            case 'updateDarkBackground':
+                this._settingsManager.setExtra('darkBackground', data.color);
+                break;
+
+            case 'updateLinterMinSeverity':
+                this._settingsManager.setExtra('linterMinSeverity', data.severity);
+                break;
+
+            case 'updateLogLevel':
+                this._settingsManager.setExtra('logLevel', data.level);
+                this.onLogLevelChanged?.(data.level);
+                break;
+
+            case 'updateWriteMode':
+                this._settingsManager.setExtra('writeMode', coerceWriteMode(data.mode));
+                break;
+
+            case 'writeFilesNow':
+                vscode.commands.executeCommand('vscode-calcpad.writeDataFiles');
+                break;
+
+            // Decides whether an open preview is shown at all, so raising it has to
+            // re-render — a document blocked under the old value is showing the notice
+            // rather than a render, and nothing else would replace it.
+            case 'updateMaxPreviewSize':
+                this._settingsManager.setExtra('maxPreviewSizeMB', data.value);
+                void this.onSettingsChanged?.();
+                break;
+
+            // Baked into the scripts a render injects, so it only takes effect on the
+            // next one.
+            case 'updateMaxPreviewConsoleMessages':
+                this._settingsManager.setExtra('maxPreviewConsoleMessages', data.value);
+                void this.onSettingsChanged?.();
+                break;
+
+            case 'updatePdfSettings': {
+                const current = this._settingsManager.getExtraObject<Record<string, unknown>>('pdfSettings', {});
+                this._settingsManager.setExtra('pdfSettings', { ...current, ...data.settings });
+                break;
+            }
+
+            case 'resetPdfSettings': {
+                this._settingsManager.setExtra('pdfSettings', {});
+                const resetPdfSettings = { ...DEFAULT_PDF_SETTINGS };
+                webview.postMessage({
+                    type: 'pdfSettingsReset',
+                    settings: resetPdfSettings,
+                });
+                break;
+            }
+
+            case 'openLogsFolder': {
+                // Resolve the same logs directory the server manager uses.
+                // Folder may not exist yet on a fresh install — create it so the
+                // OS file explorer has something to open instead of erroring.
+                const logsDir = path.join(this._context.extensionPath, 'bin', 'logs');
+                try { fs.mkdirSync(logsDir, { recursive: true }); } catch { /* best-effort */ }
+                try {
+                    await vscode.env.openExternal(vscode.Uri.file(logsDir));
+                    this._outputChannel.appendLine(`Opened logs folder: ${logsDir}`, 'verbose');
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    this._outputChannel.appendLine(`Failed to open logs folder: ${msg}`, 'warning');
+                    vscode.window.showErrorMessage(`Could not open logs folder: ${msg}`);
+                }
+                break;
+            }
+
+            case 'getPdfSettings': {
+                const stored = this._settingsManager.getExtraObject<Partial<typeof DEFAULT_PDF_SETTINGS>>('pdfSettings', {});
+                const pdfSettings = { ...DEFAULT_PDF_SETTINGS, ...stored };
+                webview.postMessage({
+                    type: 'pdfSettingsResponse',
+                    settings: pdfSettings,
+                });
+                break;
+            }
+
+            // The Export tab names which rendering it wants; the PDF tab's Generate
+            // button sends none, and the commands default to the report.
+            case 'generatePdf':
+                vscode.commands.executeCommand('vscode-calcpad.printToPdf', data.variant);
+                break;
+
+            case 'saveSourceHtml':
+                vscode.commands.executeCommand('vscode-calcpad.saveSourceHtml', data.variant);
+                break;
+
+            case 'saveDocx':
+                vscode.commands.executeCommand('vscode-calcpad.saveDocx', data.variant);
+                break;
+
+            case 'saveCompiled':
+                vscode.commands.executeCommand('vscode-calcpad.saveAsCompiled');
+                break;
+
+            case 'savePortable':
+                vscode.commands.executeCommand('vscode-calcpad.exportPortable');
+                break;
+
+            case 'getPlots':
+                await this._handleGetPlots();
+                break;
+
+            case 'savePlot':
+                await this._handleSavePlot(data.index);
+                break;
+
+            case 'savePlotsZip':
+                await this._handleSavePlotsZip();
+                break;
+
+            case 'getInsertData':
+                this._webviewReady = true;
+                if (this._pendingInsertSearch) this.focusInsertSearch();
+                this._flushPendingPanelMessage();
+                this._sendInitialData();
+                break;
+
+            case 'getVariables':
+                // Trigger a refresh of variables from the current document
+                const editor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
+                    vscode.commands.executeCommand('calcpad.refreshVariables');
+                }
+                break;
+
+            case 'getHeadings':
+                {
+                    const headingsEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                    if (headingsEditor && (headingsEditor.document.languageId === 'calcpad' || headingsEditor.document.languageId === 'plaintext')) {
+                        const text = headingsEditor.document.getText();
+                        const headings = parseHeadings(text);
+                        webview.postMessage({
+                            type: 'updateHeadings',
+                            headings
+                        });
+                    } else {
+                        webview.postMessage({
+                            type: 'updateHeadings',
+                            headings: []
+                        });
+                    }
+                }
+                break;
+
+            // While a worksheet is being filled in, the panel the user is working in is
+            // the input form, not the source editor, and a focused webview leaves
+            // `activeTextEditor` undefined. So the rendered views are scrolled too, and
+            // the cursor moves without pulling focus off the form.
+            case 'goToLine':
+                {
+                    const goToEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
+                    if (typeof data.line !== 'number') break;
+                    if (goToEditor) {
+                        const lineIndex = Math.min(Math.max(0, data.line - 1), goToEditor.document.lineCount - 1);
+                        const lineEnd = goToEditor.document.lineAt(lineIndex).range.end;
+                        goToEditor.selection = new vscode.Selection(lineEnd, lineEnd);
+                        goToEditor.revealRange(goToEditor.document.lineAt(lineIndex).range, vscode.TextEditorRevealType.InCenter);
+                        if (!this._inputMode) {
+                            vscode.window.showTextDocument(goToEditor.document, goToEditor.viewColumn);
+                        }
+                    }
+                    if (this._inputMode) {
+                        vscode.commands.executeCommand('vscode-calcpad.focusPreviewToLine', data.line);
+                    }
+                }
+                break;
+
+            case 'refreshDocument':
+                this._outputChannel.appendLine('[Vue UI] Run preview requested', 'verbose');
+                vscode.commands.executeCommand('calcpad.runPreview');
+                break;
+
+            case 'prettifyDocument':
+                this._outputChannel.appendLine('[Vue UI] Prettify document requested', 'verbose');
+                vscode.commands.executeCommand('vscode-calcpad.prettifyDocument');
+                break;
+
+            case 'getPrettifySettings': {
+                webview.postMessage({
+                    type: 'prettifySettingsResponse',
+                    indentStyle: this._settingsManager.getExtra('prettifyIndentStyle', 'tab'),
+                    indentSize: this._settingsManager.getExtraNumber('prettifyIndentSize', 4),
+                    trimTrailingWhitespace: this._settingsManager.getExtraBool('prettifyTrimTrailingWhitespace', true),
+                });
+                break;
+            }
+
+            case 'updatePrettifyIndentStyle':
+                this._settingsManager.setExtra('prettifyIndentStyle', data.value);
+                break;
+
+            case 'updatePrettifyIndentSize':
+                this._settingsManager.setExtra('prettifyIndentSize', data.value);
+                break;
+
+            case 'updatePrettifyTrim':
+                this._settingsManager.setExtra('prettifyTrimTrailingWhitespace', data.value);
+                break;
+
+            case 'getMetadataContext':
+                this.updateMetadataContext(this._computeMetadataBlock(), this._metadataEditor());
+                break;
+
+            case 'updateMetadata':
+                await this._handleUpdateMetadata(data);
+                break;
+
+            case 'getDocumentMetadata':
+                this.refreshDocumentMetadata();
+                break;
+
+            case 'updateFileInfo':
+                await this._handleUpdateFileInfo(data.patch);
+                break;
+
+            case 'updateUiOverrides':
+                await this._handleUpdateUiOverrides(data.overrides);
+                break;
+
+            case 'overrideUiDefaults':
+                await this._overrideUiDefaults(data.keys);
+                break;
+
+            case 'markFileReviewed':
+                await this._markFileReviewed();
+                break;
+
+            case 'updateUserName':
+                this._settingsManager.setExtra('userName', String(data.value ?? '').trim());
+                break;
+
+            case 'getUiControls':
+                {
+                    // A failed render leaves the panel unresolved rather than empty:
+                    // "no controls" and "could not tell" must not read the same to a
+                    // purge button.
+                    const controls = await this.resolveUiControls?.();
+                    if (controls) this.updateUiControls(controls);
+                }
+                break;
+
+            case 'debug':
+                this._outputChannel.appendLine(`[Vue Debug] ${data.message}`, 'verbose');
+                break;
+        }
     }
 
     private _getInstalledThemes(): Array<{ label: string; id: string; kind: 'dark' | 'light' }> {
@@ -564,7 +588,48 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             userName: sm.getExtra('userName', ''),
             activeConfig: sm.getActivePresetName(),
             availableConfigs: await sm.listPresets(),
+            customizations: readCustomizations(key => sm.getExtra(key)),
+            hostHotkeys: this.getHostHotkeys?.() ?? [],
         };
+    }
+
+    /** A setting hotkey: toggles a boolean setting, or opens the setting in the panel. */
+    public async runSettingHotkey(id: string): Promise<void> {
+        const sm = this._settingsManager;
+        const toggle = buildSettingToggle(id, {
+            getExtra: key => sm.getExtras()[key],
+            settings: sm.getSettings(),
+            pdfSettings: { ...DEFAULT_PDF_SETTINGS, ...sm.getExtraObject<Partial<typeof DEFAULT_PDF_SETTINGS>>('pdfSettings', {}) },
+        });
+        if (!toggle) {
+            await this._sendToPanel({ type: 'openSetting', id });
+            return;
+        }
+        await this._onMessage(toggle.message);
+        if (this._view) {
+            if (toggle.message.type === 'updatePdfSettings') await this._onMessage({ type: 'getPdfSettings' });
+            else void this._view.webview.postMessage(await this._buildSettingsResponse());
+        }
+        vscode.window.setStatusBarMessage(`CalcpadCE: ${toggle.label} ${toggle.enabled ? 'on' : 'off'}`, 3000);
+    }
+
+    /** Opens the Insert tab's snippet editor filled in with a draft. */
+    public async openSnippetDraft(snippet: Omit<CustomSnippet, 'id'>): Promise<void> {
+        await this._sendToPanel({ type: 'openSnippetDraft', snippet });
+    }
+
+    /** Shows the panel and posts a message once it is ready. */
+    private async _sendToPanel(message: Record<string, unknown>): Promise<void> {
+        this._pendingPanelMessage = message;
+        this._view?.show(false);
+        if (!this._view) await vscode.commands.executeCommand(`${CalcpadVueUIProvider.viewType}.focus`);
+        this._flushPendingPanelMessage();
+    }
+
+    private _flushPendingPanelMessage(): void {
+        if (!this._pendingPanelMessage || !this._webviewReady || !this._view) return;
+        void this._view.webview.postMessage(this._pendingPanelMessage);
+        this._pendingPanelMessage = null;
     }
 
     public setCachedHtml(html: string): void {

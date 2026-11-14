@@ -25,6 +25,9 @@ import { COMPILED_MIME } from '../cpdz';
 import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
 import { buildZip } from '../zip-writer';
 import type { ILogger } from '../../types/interfaces';
+import { CUSTOMIZATION_KEYS, customizationExtras, readCustomizations } from '../customizations';
+import type { UserCustomizations } from '../customizations';
+import { buildSettingToggle } from '../setting-actions';
 
 export interface ExportRequest {
     defaultName: string;
@@ -149,7 +152,38 @@ export abstract class BaseMessageBridge {
         this.snippetService = new CalcpadSnippetService(this.apiClient, log);
         this.definitionsService = new CalcpadDefinitionsService(this.apiClient);
         this.settings = getDefaultSettings();
+        this.snippetService.setCustomizationsProvider(() => this.getCustomizations());
         this.snippetService.loadSnippets();
+    }
+
+    getCustomizations(): UserCustomizations {
+        return readCustomizations(key => this.getExtraSetting(key));
+    }
+
+    private handleUpdateCustomizations(raw: unknown): void {
+        const source = (raw ?? {}) as Record<string, unknown>;
+        const next = readCustomizations(key => source[key] === undefined ? undefined : JSON.stringify(source[key]));
+        const extras = customizationExtras(next);
+        for (const key of CUSTOMIZATION_KEYS) {
+            if (this.getExtraSetting(key) !== extras[key]) this.setExtraSetting(key, extras[key]);
+        }
+    }
+
+    /** Toggles a boolean setting, or opens any other setting in the sidebar. */
+    async runSettingHotkey(id: string): Promise<void> {
+        const toggle = buildSettingToggle(id, {
+            getExtra: key => this.getExtraSetting(key),
+            settings: this.settings,
+            pdfSettings: resolveStoredPdfSettings(this.getStoredPdfOptions()),
+        });
+        if (!toggle) {
+            window.dispatchEvent(new CustomEvent('calcpad-show-sidebar'));
+            this.postToVue({ type: 'openSetting', id });
+            return;
+        }
+        this.handleMessage(toggle.message);
+        if (toggle.message.type === 'updatePdfSettings') this.handleGetPdfSettings();
+        else await this.handleGetSettings();
     }
 
     get api(): CalcpadApiClient { return this.apiClient; }
@@ -306,6 +340,12 @@ export abstract class BaseMessageBridge {
         switch (message.type) {
             case 'getInsertData':
                 this.handleGetInsertData();
+                break;
+            case 'updateCustomizations':
+                this.handleUpdateCustomizations(message.customizations);
+                break;
+            case 'runSettingHotkey':
+                void this.runSettingHotkey(String(message.id ?? ''));
                 break;
             case 'showAlert':
                 void this.showAlert(message.title ?? 'CalcpadCE', message.message ?? '', message.kind ?? 'info');
@@ -640,6 +680,9 @@ export abstract class BaseMessageBridge {
             completionDelayMs: Number(this.getExtraSetting('completionDelayMs') ?? DEFAULT_COMPLETION_DELAY_MS),
             userName: this.getExtraSetting('userName') ?? '',
             writeMode: this.writeMode(),
+            enableQuickTyping: this.getExtraSetting('quickTyping') !== 'false',
+            customizations: this.getCustomizations(),
+            hostHotkeys: [],
             ...extras,
         });
     }
