@@ -1,0 +1,20 @@
+' CPD-3104: unmatched closing square bracket
+'expect: CPD-3104[]]
+v = 1; 2]
+
+' One closing bracket too many
+'expect: CPD-3104[]]
+w = [1; 2]]
+
+' A parenthesis closed with a bracket
+'expect: CPD-3104[]]
+r = (1 + 2]
+
+' In a custom function body
+'expect: CPD-3104[]]
+f(x) = x^2]
+
+' On the last line of a vector continued over several lines
+'expect+1: CPD-3104[]]
+m = [1; 2 |
+3; 4]]

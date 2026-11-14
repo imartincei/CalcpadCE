@@ -38,7 +38,27 @@ The `.cpd` files are copied to the output directory by the csproj, so the fixtur
 `.cpd` sample files live in two folders and are picked up automatically by data-driven theories — adding a file adds a test case, no registration needed.
 
 - **`Calcpad.Tests/Highlighter/valid/`** — must produce **zero** Error-level diagnostics (`ComprehensiveValidTests`)
-- **`Calcpad.Tests/Highlighter/errors/`** — must produce the expected diagnostic codes (`ComprehensiveErrorTests`)
+- **`Calcpad.Tests/Highlighter/errors/`** — one file per code, which must report exactly the diagnostics its `'expect:` markers declare (`ComprehensiveErrorTests`). Files under `errors/includes/` are include targets only.
+
+Error sample markers (parsed by `ErrorExpectations.cs`):
+
+```calcpad
+'expect: CPD-3301[unknownVar]
+y = unknownVar*2
+'expect: CPD-3301, CPD-3305
+#include ../includes/broken_lib.cpd
+'expect+2: CPD-3301[undefinedW]
+r = 1 + _
+2 + _
+undefinedW
+```
+
+- A marker applies to the next line that isn't a marker; `'expect+N:` applies N lines below that one.
+- `[text]` is optional and must equal the underlined text.
+- Every Error or Warning must be expected; Information (CPD-3312, CPD-3313) is only checked when a marker names it.
+- Each static code needs at least two cases across the folder (`ErrorSamples_CoverEveryStaticCodeAtLeastTwice`).
+- `errors/untaken/` samples are also checked after a real debug run (`UntakenSample_KeepsItsErrorsAfterARun`). Each marker must still be shown by the lint or the run, and its line must not have run.
+- Pitfalls: a comment ending in ` _` continues onto the marker line, and Calcpad expands macros inside comments, so keep `name$` out of `[text]` spans and avoid apostrophes in comments.
 
 ```calcpad
 "Test: My Feature"
@@ -64,12 +84,13 @@ z = undefined_var  ' Should trigger CPD-3301
 
 - `Calcpad.Tests/Highlighter/HighlighterLinterFixture.cs` - Shared fixture (resolution + lint pipeline)
 - `Calcpad.Tests/Highlighter/ComprehensiveValidTests.cs` - Every `valid/*.cpd` must be error-free
-- `Calcpad.Tests/Highlighter/ComprehensiveErrorTests.cs` - Every `errors/*.cpd` must report its codes
+- `Calcpad.Tests/Highlighter/ComprehensiveErrorTests.cs` - Every `errors/**/*.cpd` must match its `'expect:` markers
+- `Calcpad.Tests/Highlighter/ErrorExpectations.cs` - Marker parser and checker
 - `Calcpad.Tests/Highlighter/SymbolResolverTests.cs` - Cursor → symbol → occurrences
 - `Calcpad.Tests/Highlighter/DefinitionClassificationTests.cs`, `MetadataReturnTypeTests.cs`, `ElementWiseFunctionTypeTests.cs` - Type inference
 - `Calcpad.Tests/Highlighter/HTMLCommentTests.cs`, `PdfMetadataHighlighterTests.cs`, `SettingsDirectiveHighlighterTests.cs`, `UiDirectiveHighlighterTests.cs` - Metadata comment directives
 - `Calcpad.Tests/Highlighter/valid/` - Feature samples, one concern per file
-- `Calcpad.Tests/Highlighter/errors/` - Error samples split by CPD code category
+- `Calcpad.Tests/Highlighter/errors/` - Error samples, one file per CPD code, grouped by category
 
 ## Comprehensive Test Structure
 
@@ -100,16 +121,17 @@ Calcpad.Tests/Highlighter/
 │   ├── advanced.cpd            Cross-feature integration: imported macros in loops, units in command blocks, nested macro calls
 │   ├── import.cpd              Module target for #include (exports constants, functions, units, macros)
 │   └── data.csv                CSV data for #read tests
-└── errors/
-    ├── include_errors.cpd          CPD-11xx (malformed include, missing filename)
-    ├── macro_errors.cpd            CPD-22xx (duplicate, no $, invalid name, nested, unmatched, dup param)
-    ├── complex_macro_errors.cpd    CPD-22xx in nested/parameterized macros
-    ├── balance_errors.cpd          CPD-31xx (unmatched parens, brackets, braces, control blocks)
-    ├── naming_errors.cpd           CPD-32xx (keyword conflict, unit shadow, constant conflict, no params)
-    ├── usage_errors.cpd            CPD-33xx (undefined var/func/macro/unit, wrong params, type mismatch)
-    ├── reassignment_errors.cpd     CPD-33xx from type changes across reassignment
-    ├── semantic_errors.cpd         CPD-34xx (invalid operator, unknown directive, # in command block, incomplete expr)
-    └── ui_errors.cpd               #UI directive diagnostics
+└── errors/                      One file per code, named <code>_<what>.cpd
+    ├── include/                CPD-11xx (malformed, missing, not found, circular, path roots)
+    ├── macro/                  CPD-22xx (#def names, parameters, nesting, placement)
+    ├── balance/                CPD-31xx (parens, brackets, braces, control blocks)
+    ├── naming/                 CPD-32xx (variable and function names)
+    ├── usage/                  CPD-33xx (undefined names, argument counts, keyword arguments)
+    ├── semantic/               CPD-34xx (syntax, commands, directives, #UI, #settings, metadata comments)
+    ├── format/                 CPD-36xx (format specifiers)
+    ├── core/                   CPD-51xx/52xx Core check-pass errors
+    ├── untaken/                Errors in #if/#else branches and loops that never run; also checked with a run attached
+    └── includes/               Include targets, reached by relative paths including ../ and sub/
 ```
 
 ## Testing via Linux Dev Server

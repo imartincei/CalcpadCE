@@ -1,0 +1,7 @@
+' CPD-1103: deprecated #include input values
+'expect: CPD-1103[#{2; 3}]
+#include ../includes/lib.cpd #{2; 3}
+
+' Nested relative include with one value. The included errors land here too.
+'expect: CPD-1103[#{7}], CPD-3301, CPD-3305, CPD-2201
+#include ../includes/sub/uses_broken.cpd #{7}

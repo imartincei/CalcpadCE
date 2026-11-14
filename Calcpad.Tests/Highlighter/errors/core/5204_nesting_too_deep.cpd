@@ -1,0 +1,48 @@
+' CPD-5204: blocks nested too deeply
+#if 1
+    #if 1
+        #if 1
+            #if 1
+                #if 1
+                    #if 1
+                        #if 1
+                            #if 1
+                                #if 1
+                                    #if 1
+                                        #if 1
+                                            #if 1
+                                                #if 1
+                                                    #if 1
+                                                        #if 1
+                                                            #if 1
+                                                                #if 1
+                                                                    #if 1
+                                                                        #if 1
+'expect: CPD-5204[#if 1]
+                                                                            #if 1
+'expect: CPD-5204[#if 1]
+                                                                                #if 1
+' The two levels that were rejected leave two #end if lines without an #if
+                                                                                #end if
+                                                                            #end if
+                                                                        #end if
+                                                                    #end if
+                                                                #end if
+                                                            #end if
+                                                        #end if
+                                                    #end if
+                                                #end if
+                                            #end if
+                                        #end if
+                                    #end if
+                                #end if
+                            #end if
+                        #end if
+                    #end if
+                #end if
+            #end if
+        #end if
+'expect: CPD-3105[#end if]
+    #end if
+'expect: CPD-3105[#end if]
+#end if

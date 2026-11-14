@@ -1,0 +1,10 @@
+' CPD-3416: uiOverrides metadata comment not at the end of the file (warning)
+'expect: CPD-3416
+'<!--{"uiOverrides": {"L:1": "8"}}-->
+x = 1
+' A second one, also misplaced
+'expect: CPD-3416, CPD-3417
+'<!--{"uiOverrides": {"L:1": "9"}}-->
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = x + undefinedName

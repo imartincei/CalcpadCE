@@ -1,0 +1,3 @@
+' Includes its parent folder by a relative path
+#include ../lib.cpd
+subValue = libSquare(2) + libLength

@@ -1,0 +1,6 @@
+' Library with errors on lines 3, 4 and 6
+brokenOk = 1
+brokenBad = brokenMissing + 1
+brokenCall = libSquareMissing(2)
+#def brokenDup$ = 1
+#def brokenDup$ = 2

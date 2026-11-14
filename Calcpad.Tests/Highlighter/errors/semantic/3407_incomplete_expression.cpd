@@ -1,0 +1,21 @@
+' CPD-3407: incomplete expression
+'expect: CPD-3407[+]
+incomplete = 5 +
+
+' A power with no exponent
+'expect: CPD-3407[^]
+p = 2^
+
+' An index with no value
+v = [1; 2]
+'expect: CPD-3407
+q = v.
+
+' In a custom function body
+'expect: CPD-3407[*]
+f(x) = x*
+
+' In a macro argument
+#def wrap$(e$) = $Block{t1 = e$; t1*2}
+'expect: CPD-3407[+]
+r = wrap$(1 +)

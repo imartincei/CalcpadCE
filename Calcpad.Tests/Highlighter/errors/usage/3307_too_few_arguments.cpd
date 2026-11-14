@@ -1,0 +1,19 @@
+' CPD-3307: built-in function called with too few arguments
+'expect: CPD-3307[root(16)]
+a = root(16)
+
+' No arguments
+'expect: CPD-3307[sin()]
+b = sin()
+
+' A variadic function needs at least one
+'expect: CPD-3307[max()]
+c = max()
+
+' if() in a custom function
+'expect: CPD-3307[if(x > 0; x)]
+f(x) = if(x > 0; x)
+
+' Inside $Block
+'expect: CPD-3307[atan2(1)]
+g(x) = $Block{t = atan2(1); t*x}

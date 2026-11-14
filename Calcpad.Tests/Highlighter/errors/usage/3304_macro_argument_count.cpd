@@ -1,0 +1,30 @@
+' CPD-3304: macro called with the wrong number of arguments
+#def one$(a$) = a$
+'expect: CPD-3304
+a = one$(1; 2)
+
+' Too few
+#def pair$(a$; b$) = a$ + b$
+'expect: CPD-3304
+b = pair$(1)
+
+' Only an optional argument given by name
+#def opt$(a$; b$ = 1) = a$ + b$
+'expect: CPD-3304
+c = opt$(b$ = 2)
+
+' A multi-line macro
+#def block$(x$; y$)
+blockSum = x$ + y$
+#end def
+'expect: CPD-3304
+block$(1)
+
+' A macro from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-3304
+d = libTwice$(1; 2) + libLength
+
+' A bad call inside an included file
+'expect: CPD-3304
+#include ../includes/bad_macro_call.cpd

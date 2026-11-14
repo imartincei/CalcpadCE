@@ -1,0 +1,13 @@
+' CPD-1105: circular #include
+' A file that includes itself
+'expect: CPD-1105
+#include ../includes/self_include.cpd
+
+' Two files that include each other
+'expect: CPD-1105
+#include ../includes/circular_a.cpd
+value = circularA + circularB
+
+' A cycle through a subfolder and back up with ../
+'expect: CPD-1105
+#include ../includes/circular_down.cpd

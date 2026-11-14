@@ -104,7 +104,7 @@ redef(a; b) = a + b
 redefUse = redef(2; 3)
 
 ' Optional parameters with defaults and keyword argument calls
-kwFunc(x; y = 2; z = 3kg) = x*y + z
+kwFunc(x; y = 2; z = 3kg) = x*y*kg + z
 kwAllDefaults = kwFunc(1)
 kwPositional = kwFunc(1; 5; 2kg)
 kwMixed = kwFunc(1; z = 4kg)

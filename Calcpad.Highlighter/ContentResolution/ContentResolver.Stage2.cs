@@ -86,7 +86,9 @@ namespace Calcpad.Highlighter.ContentResolution
                 {
                     text = "' Error: Include file not provided: " + output.FailedInclude;
                     lines[output.SourceIndex] = text;
-                    includeMap[output.SourceIndex] = new SourceInfo { Source = "include", SourceFile = output.FailedInclude };
+                    // A nested failed include keeps its file and line for messages
+                    if (includeMap[output.SourceIndex].Source != "include")
+                        includeMap[output.SourceIndex] = new SourceInfo { Source = "include", SourceFile = output.FailedInclude };
                 }
                 outputs.Add(new(text, output.SourceIndex, output.ExpandedMacros, output.ContentIndex, output.ContentCount, Locate(trace, output.SourceOffsets)));
             }

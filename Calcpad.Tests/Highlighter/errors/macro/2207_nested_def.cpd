@@ -1,0 +1,20 @@
+' CPD-2207: nested macro definition
+#def outer$
+'expect: CPD-2207
+#def inner$ = 1
+#end def
+
+' A nested multi-line definition
+#def outer2$(a$)
+outerValue = a$
+'expect: CPD-2207
+#def inner2$(b$)
+#end def
+#end def
+
+' An inline definition inside a macro with parameters
+#def outer3$(a$; b$)
+outerSum = a$ + b$
+'expect: CPD-2207
+#def inner3$(c$) = c$*2
+#end def

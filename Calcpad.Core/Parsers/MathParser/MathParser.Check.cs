@@ -42,6 +42,9 @@ namespace Calcpad.Core
 
         internal bool IsFunctionDefinition => _functionDefinitionIndex >= 0;
 
+        /// <summary>The function the last parsed expression defines, or null.</summary>
+        internal string DefinedFunction { get; private set; }
+
         internal bool IsDefinedFunction(string name) => _functions.IndexOf(name) >= 0;
 
         internal bool IsDefinedName(string name) =>

@@ -1,0 +1,23 @@
+' CPD-3310: undefined unit
+'expect: CPD-3310[badunit]
+a = 5badunit
+
+' Separated by a space
+'expect: CPD-3310[kgg]
+b = 5 kgg
+
+' A digit before a name reads as a unit
+'expect: CPD-3310[x]
+1x = 5
+
+' A target unit after the bar
+'expect: CPD-3310
+c = 5 m|ftt
+
+' Inside $Block
+'expect: CPD-3310[kgg]
+d = $Block{t = 2 kgg; t}
+
+' In a custom function body
+'expect: CPD-3310[mmm]
+f(x) = x*1 mmm

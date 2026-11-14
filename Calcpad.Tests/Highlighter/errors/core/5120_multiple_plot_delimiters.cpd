@@ -1,0 +1,11 @@
+' CPD-5120: more than one | in a plot command
+'expect: CPD-5120
+$Plot{x | x^2 | x^3 @ x = 0 : 1}
+
+' Inside a conditional block with custom functions
+f(x) = sin(x)
+g(x) = cos(x)
+#if f(1) > 0
+'expect: CPD-5120
+    $Plot{f(x) | g(x) | x @ x = 0 : 1}
+#end if

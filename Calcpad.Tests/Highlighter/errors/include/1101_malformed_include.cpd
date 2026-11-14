@@ -1,0 +1,8 @@
+' CPD-1101: malformed #include, an input field list without its closing brace
+'expect: CPD-1101, CPD-1103[#{1; 2]
+#include ../includes/constants.cpd #{1; 2
+
+' Through a nested relative include, and the library still loads
+'expect: CPD-1101, CPD-1103
+#include ../includes/sub/uses_lib.cpd #{4; 5; 6
+total = subValue + libSquare(gravity)
