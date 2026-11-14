@@ -175,6 +175,11 @@ export { buildZip } from './services/zip-writer';
 export type { ZipEntry } from './services/zip-writer';
 export { UiOverrideStore, readUiOverrides, writeUiOverrides, extractUiControls, classifyUiOverrides, selectionLineRange, rowInRange } from './services/ui-overrides';
 export { computeUiOverrideHints, shiftUiControls, uiOverrideHintTitle, UiOverrideHintTracker } from './services/ui-override-hints';
+export {
+    parseUiLine, applyUiValue, isSourceUiControl, effectiveUiOverrideKey, uiOverrideKeysFor,
+    planUiOverridesToSource, planUiValueToSource, uiControlsWithEditedValues,
+} from './services/ui-source-sync';
+export type { UiAssignment, UiLine, UiSourcePlan } from './services/ui-source-sync';
 export { UiPauseStore, hasPauseSteps } from './services/ui-pause';
 export { UiEditHistory } from './services/ui-history';
 export {

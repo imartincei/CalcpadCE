@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, toRangeEdits, selectionLineRange } from 'calcpad-frontend';
+import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, planUiOverridesToSource, toRangeEdits, selectionLineRange } from 'calcpad-frontend';
 import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -206,6 +206,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                 case 'updateShowUiOverrideHints':
                     this._settingsManager.setExtra('uiOverrideHints', !!data.enabled);
                     this.onUiOverrideHintsChanged?.();
+                    break;
+
+                case 'updateAutoSyncUiValues':
+                    this._settingsManager.setExtra('autoSyncUiValues', !!data.enabled);
                     break;
 
                 // Changes what an open preview renders, so it is re-run rather than
@@ -441,6 +445,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
                     await this._handleUpdateUiOverrides(data.overrides);
                     break;
 
+                case 'overrideUiDefaults':
+                    await this._overrideUiDefaults(data.keys);
+                    break;
+
                 case 'markFileReviewed':
                     await this._markFileReviewed();
                     break;
@@ -545,6 +553,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             enablePreviewPdf: sm.getExtraBool('previewPdf', false),
             showFileMetadata: sm.getExtraBool('showFileMetadata', false),
             showUiOverrideHints: sm.getExtraBool('uiOverrideHints', false),
+            autoSyncUiValues: sm.getExtraBool('autoSyncUiValues', false),
             darkBackground: sm.getExtra('darkBackground', '#1e1e1e'),
             linterMinSeverity: sm.getExtra('linterMinSeverity', 'information'),
             logLevel: coerceLogLevel(sm.getExtra('logLevel', 'warning')),
@@ -704,6 +713,23 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         const overrides = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, String(v)]));
         await this._applyFooterEdits(editor, planMetadataFooter(editor.document.getText().split(/\r?\n/), { uiOverrides: overrides }));
         this.onUiOverridesEdited?.(editor.document.uri.toString(), overrides);
+        this.refreshDocumentMetadata();
+    }
+
+    /** Moves saved values of plain `#UI` lines into the source; the controls are rendered afresh to match the text. */
+    private async _overrideUiDefaults(raw: unknown): Promise<void> {
+        const editor = this.getCompiledSource?.() ? undefined : this._calcpadSourceEditor();
+        if (!editor || !Array.isArray(raw)) return;
+        const document = editor.document;
+        const version = document.version;
+        const controls = await this.resolveUiControls?.();
+        const saved = readUiOverrides(document.getText());
+        if (!controls || !saved || document.version !== version) return;
+        this.updateUiControls(controls);
+        const plan = planUiOverridesToSource(document.getText().split(/\r?\n/), saved, controls, raw.map(String));
+        if (!plan.removed.length) return;
+        await this._applyFooterEdits(editor, plan.edits);
+        this.onUiOverridesEdited?.(document.uri.toString(), readUiOverrides(document.getText()) ?? {});
         this.refreshDocumentMetadata();
     }
 
