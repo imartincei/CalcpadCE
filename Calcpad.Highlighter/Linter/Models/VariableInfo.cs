@@ -83,7 +83,7 @@ namespace Calcpad.Highlighter.Linter.Models
         /// <summary>User-provided description from a metadata comment on the preceding line.</summary>
         public string Description { get; set; }
 
-        /// <summary>User-provided type hints per parameter (e.g., "vector", "scalar").</summary>
+        /// <summary>User-provided type hints per parameter (e.g., "vector", "value").</summary>
         public List<string> ParamTypes { get; set; }
 
         /// <summary>User-provided descriptions per parameter.</summary>

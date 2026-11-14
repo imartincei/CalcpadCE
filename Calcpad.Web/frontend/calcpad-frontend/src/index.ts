@@ -302,8 +302,7 @@ export type {
     PdfCommentValues,
 } from './text/metadata-comment';
 export {
-    FUNCTION_PARAM_TYPES,
-    MACRO_PARAM_TYPES,
+    PARAM_TYPES,
     LINT_CODES,
     findMetadataCommentBlock,
     computeMetadataBlock,

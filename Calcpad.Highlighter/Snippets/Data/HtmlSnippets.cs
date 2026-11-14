@@ -186,21 +186,21 @@ namespace Calcpad.Highlighter.Snippets.Data
             },
             new SnippetItem
             {
-                Insert = "'<!--{\"desc\": \"text\", \"paramTypes\": [\"Scalar\"], \"paramDesc\": [\"text\"]}-->",
+                Insert = "'<!--{\"desc\": \"text\", \"paramTypes\": [\"value\"], \"paramDesc\": [\"text\"]}-->",
                 Description = "Full metadata comment with description, parameter types, and parameter descriptions",
                 Label = "Full parameter metadata",
                 Category = "Metadata Properties"
             },
             new SnippetItem
             {
-                Insert = "'<!--{\"paramTypes\": [\"Scalar\"], \"paramDesc\": [\"text\"]}-->",
+                Insert = "'<!--{\"paramTypes\": [\"value\"], \"paramDesc\": [\"text\"]}-->",
                 Description = "Metadata comment with parameter types and descriptions",
                 Label = "Parameter types + descriptions",
                 Category = "Metadata Properties"
             },
             new SnippetItem
             {
-                Insert = "'<!--{\"paramTypes\": [\"Scalar\"]}-->",
+                Insert = "'<!--{\"paramTypes\": [\"value\"]}-->",
                 Description = "Metadata comment with parameter types only",
                 Label = "Parameter types only",
                 Category = "Metadata Properties"

@@ -42,7 +42,6 @@ const zh: Record<string, string> = {
     "Fields": "字段",
     "Function": "函数",
     "Macro": "宏",
-    "Macro (TokenType)": "宏（TokenType）",
     "Variable": "变量",
     "Custom Unit": "自定义单位",
     "Parameter descriptions": "参数说明",
