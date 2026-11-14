@@ -3718,6 +3718,10 @@ In <strong>Input</strong> and <strong>Report</strong>, a <strong>Print PDF</stro
 '&lt;p&gt;Span used: 'L'&lt;/p&gt;
 #end post
 </code></pre></div>
+<p>Both are still calculated when hidden, so a variable defined in <code>#post</code> can be used by a <code>#pre</code> later in the file.
+If the <code>#post</code> calculations slow down the form and variables are not needed in the Input form, turn off <strong>Calculate #post in Input Form</strong> in <a href="new-settings.html#math">Settings</a> or in the document using:</p>
+<div class="language-text highlight"><pre><span></span><code>#settings {"calculatePost": false}
+</code></pre></div>
 <p><strong>Preview</strong> is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.</p>
 <p>Turning on the <strong>Apply #UI Values in Preview</strong> setting will render the preview with the input values applied.
 This can make debugging issues from values input into the form easier.</p>

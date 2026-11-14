@@ -3349,6 +3349,11 @@ In VS Code, do not use VS Code's own settings editor.</p>
 <td>Ignore <code>#hide</code> so suppressed content is rendered anyway. For debugging.</td>
 </tr>
 <tr>
+<td><strong>Calculate #post in Input Form</strong></td>
+<td>on/off <em>(default on)</em></td>
+<td>On: <code>#post</code> blocks are still calculated, just hidden, while the input form is on screen, so a later <code>#pre</code> can use their variables. Off: they are skipped entirely in the Input form, which keeps typing responsive. Reports and Preview always calculate <code>#post</code>. See <a href="new-ui-mode.html#pre-and-post">UI Mode</a>.</td>
+</tr>
+<tr>
 <td><strong>Max Output Count</strong></td>
 <td>5–100</td>
 <td>Maximum number of rows/columns shown for large matrices and vectors.</td>
