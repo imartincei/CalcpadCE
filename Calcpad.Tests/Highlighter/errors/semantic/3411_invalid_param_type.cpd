@@ -1,0 +1,16 @@
+' CPD-3411: invalid paramTypes or returnType in a metadata comment (warning)
+'expect: CPD-3411
+'<!--{"desc": "x", "paramTypes": ["banana"]}-->
+f(x) = x
+
+'expect: CPD-3411
+'<!--{"returnType": "banana"}-->
+g(x) = x
+
+' A macro takes token type names, not value types
+'expect: CPD-3411
+'<!--{"paramTypes": ["Number"]}-->
+#def m$(a$) = a$
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = f(1) + g(2) + m$(3) + undefinedName

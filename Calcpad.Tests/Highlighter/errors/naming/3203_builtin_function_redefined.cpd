@@ -1,0 +1,16 @@
+' CPD-3203: function name conflicts with a built-in function
+'expect: CPD-3203[sin]
+sin(x) = x
+
+' Two parameters
+'expect: CPD-3203[max]
+max(a; b) = a
+
+' With an optional parameter and a $Block body
+'expect: CPD-3203[sqrt]
+sqrt(x; n = 2) = $Block{r = x^(1/n); r}
+
+' From a macro that builds the definition
+#def mkfun$(n$) = n$(x) = 2*x
+'expect: CPD-3203[cos]
+mkfun$(cos)

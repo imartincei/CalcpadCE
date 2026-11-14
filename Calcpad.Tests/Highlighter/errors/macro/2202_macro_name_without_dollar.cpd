@@ -1,0 +1,13 @@
+' CPD-2202: macro name must end with $
+'expect: CPD-2202[#def badMacro = 5]
+#def badMacro = 5
+
+' With parameters
+'expect: CPD-2202
+#def scale(x$) = 2*x$
+
+' A multi-line definition
+'expect: CPD-2202
+#def area(w$; h$)
+areaValue = w$*h$
+#end def

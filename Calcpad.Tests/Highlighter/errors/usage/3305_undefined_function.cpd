@@ -1,0 +1,28 @@
+' CPD-3305: undefined function
+'expect: CPD-3305[undefinedFunc]
+a = undefinedFunc(10)
+
+' Called before it is defined
+'expect: CPD-3305[later]
+b = later(2)
+later(x) = x
+
+' Inside a $Block function body continued with an underscore
+'expect+1: CPD-3305[helper]
+f(x) = $Block{t = x; _
+helper(t)}
+
+' Inside a command
+'expect: CPD-3305[missingTerm]
+c = $Sum{missingTerm(k) @ k = 1 : 3}
+
+' A function that has errors in its definition is never defined
+'expect: CPD-3101
+broken(x) = sqr(x*(x + 1)
+'expect: CPD-3305[broken]
+d = broken(2)
+
+' In a relative include
+'expect: CPD-3305, CPD-3301, CPD-2201
+#include ../includes/sub/uses_broken.cpd
+last = subOk

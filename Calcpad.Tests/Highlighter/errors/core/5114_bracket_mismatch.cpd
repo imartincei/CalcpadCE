@@ -1,0 +1,11 @@
+' CPD-5114: brackets closed in the wrong order
+'expect: CPD-5114[]]
+v = [1; (2]; 3)
+
+' In a custom function
+'expect: CPD-5114[]]
+f(x) = [x; (x + 1]; 2)
+
+' Inside $Block
+'expect: CPD-5114[)]
+g(x) = $Block{w = (x + [1); 2]; w}

@@ -1,0 +1,3 @@
+unclosedBefore = 1
+#def unclosedMacro$
+unclosedBody = 2

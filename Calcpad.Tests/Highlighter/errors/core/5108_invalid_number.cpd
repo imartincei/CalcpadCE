@@ -1,0 +1,16 @@
+' CPD-5108: cannot parse a number
+'expect: CPD-5108[1.2.3]
+r = 1.2.3
+
+' Two decimal points
+'expect: CPD-5108[3..4]
+s = 3..4
+
+' In a custom function body
+'expect: CPD-5108[2.5.1]
+f(x) = x*2.5.1
+
+' Inside $Block continued with an underscore
+'expect+1: CPD-5108[0.1.2]
+g(x) = $Block{a = x; _
+a + 0.1.2}

@@ -1,0 +1,14 @@
+' CPD-3419: deprecated stored input value (warning)
+'expect: CPD-3419[?{6}]
+L = ?{6}m
+
+' Several on one line
+'expect: CPD-3419[?{1}], CPD-3419[?{2}]
+a = ?{1} + ?{2}
+
+' In a relative include, reported on the #include line
+'expect: CPD-3419
+#include ../includes/deprecated_input.cpd
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = L + a + storedInput + undefinedName

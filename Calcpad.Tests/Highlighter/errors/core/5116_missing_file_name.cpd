@@ -1,0 +1,14 @@
+' CPD-5116: missing file name in #read or #write
+'expect: CPD-5116
+#read M from
+
+' #write without a file
+M = [1; 2]
+'expect: CPD-5116
+#write M to
+
+' Inside a loop
+#for i = 1 : 2
+'expect: CPD-5116
+    #append M to
+#loop

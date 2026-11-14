@@ -1,0 +1,70 @@
+' CPD-3301: undefined variable
+'expect: CPD-3301[unknownVar]
+y = unknownVar*2
+
+' Read on the line before its definition
+'expect: CPD-3301[beta]
+q = beta + 1
+beta = 2
+
+' Two undefined names on one line
+'expect: CPD-3301[alpha1], CPD-3301[alpha2]
+s = alpha1 + alpha2
+
+' On the last line of an expression continued with an underscore
+'expect+2: CPD-3301[undefinedW]
+r = 1 + _
+2 + _
+undefinedW
+
+' On the second line of a vector that continues after a semicolon
+'expect+1: CPD-3301[undefinedV]
+v = [1; 2;
+3; undefinedV]
+
+' In a $Block function body continued with an underscore
+'expect+2: CPD-3301[qq]
+f(x) = $Block{a = x; _
+b = a*2; _
+b + qq}
+fr = f(1)
+
+' In $Inline, $Sum and #if
+c = 3
+'expect: CPD-3301[zz]
+t = $Inline{a = c; b = a^2; a + b + zz}
+'expect: CPD-3301[undefinedS]
+u = $Sum{k*undefinedS @ k = 1 : 3}
+'expect: CPD-3301[undefinedC]
+#if c > undefinedC
+#end if
+
+' In a macro argument
+#def twice$(e$) = 2*(e$)
+'expect: CPD-3301[undefinedM]
+w = twice$(undefinedM)
+
+' In a multi-line macro body, reported on the whole call
+#def calc$(x$)
+calcY1 = x$*2
+calcY2 = calcY1 + nope
+#end def
+'expect: CPD-3301
+calc$(3)
+
+' Parameters that share a prefix replace parts of each other
+#def st$ = 'st'
+#def test2$(sta$; t$; stat$)
+st$t$
+#end def
+'expect: CPD-3301
+test2$(1; 2; 3)
+
+' In a relative include, reported on the #include line
+'expect: CPD-3301, CPD-3305, CPD-2201
+#include ../includes/broken_lib.cpd
+z = brokenOk
+
+' In a #round expression
+'expect: CPD-3301
+#round undefinedDecimals

@@ -1,0 +1,17 @@
+' CPD-5110: unexpected delimiter
+'expect: CPD-5110
+r = 1;2
+
+' A semicolon in parentheses
+'expect: CPD-5110
+s = (1; 2)
+
+' Extra part after a command range
+'expect: CPD-5110
+t = $Sum{k @ k = 1 : 3; 4}
+
+' Statements after a #while condition
+x = 1
+'expect: CPD-5110
+#while x < 3; x = x + 1
+#loop

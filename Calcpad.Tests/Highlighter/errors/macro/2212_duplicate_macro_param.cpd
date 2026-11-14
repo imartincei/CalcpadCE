@@ -1,0 +1,13 @@
+' CPD-2212: duplicate macro parameter
+'expect: CPD-2212
+#def dup$(x$; x$) = x$
+
+' A duplicate optional parameter
+'expect: CPD-2212
+#def dup2$(a$; b$; a$ = 2) = a$ + b$
+
+' A multi-line definition
+'expect: CPD-2212
+#def dup3$(len$; width$; len$)
+dupValue = len$*width$
+#end def

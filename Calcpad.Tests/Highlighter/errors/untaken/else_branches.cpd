@@ -1,0 +1,46 @@
+' Errors in #else if and #else branches that never run
+x = 1
+#if x < 0
+'expect: CPD-3301[undefinedIf]
+    a = undefinedIf
+#else if x > 5
+'expect: CPD-3301[undefinedElseIf]
+    b = undefinedElseIf
+#else if x > 3
+'expect: CPD-3305[noFunc]
+    c = noFunc(1)
+#else
+    d = 2
+#end if
+
+' The #else of a branch that runs
+#if x > 0
+    e1 = 1
+#else
+'expect: CPD-3308[cos(1; 2)]
+    e2 = cos(1; 2)
+'expect: CPD-3401[3 4]
+    e3 = 2 + 3 4
+#end if
+
+' A branch that runs, nested in one that does not
+#if x > 100
+    #if x > 0
+'expect: CPD-3301[undefinedNested]
+        f1 = undefinedNested
+    #else
+'expect: CPD-3310[mmm]
+        f2 = 5 mmm
+    #end if
+#end if
+
+' Names defined only after the branch
+#if x > 100
+'expect: CPD-3301[laterVar]
+    g1 = laterVar
+'expect: CPD-3305[laterFunc]
+    g2 = laterFunc(1)
+#end if
+laterVar = 3
+laterFunc(t) = t
+g3 = laterVar + laterFunc(2)

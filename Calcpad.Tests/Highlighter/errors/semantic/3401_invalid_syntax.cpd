@@ -1,0 +1,29 @@
+' CPD-3401: invalid operator or syntax
+'expect: CPD-3401[++]
+z = 5 ++ 3
+
+' Two values with no operator between them
+'expect: CPD-3401[3 4]
+a = 2 + 3 4
+
+' An operator with nothing on its left
+'expect: CPD-3401[= *]
+b = *5
+
+' A character that is not an operator
+'expect: CPD-3401[~]
+c = 3 ~ 2
+
+' Two names in a function parameter list
+'expect: CPD-3401[x y]
+f(x y) = 1
+
+' Inside $Block, on a line continued with an underscore
+'expect+1: CPD-3401[3 4]
+g(x) = $Block{t = x; _
+t + 3 4}
+
+' An index after an index
+v = [1; 2]
+'expect: CPD-3401[).2]
+d = v.(1).2

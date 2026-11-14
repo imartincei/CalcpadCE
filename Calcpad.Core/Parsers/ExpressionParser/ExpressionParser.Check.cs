@@ -21,6 +21,8 @@ namespace Calcpad.Core
         private readonly List<(ReadName Read, MathParserException Error)> _loopErrors = [];
         // Names only the run would define
         private readonly HashSet<string> _checkDefined = new(StringComparer.Ordinal);
+        // Recursive definitions; their calls report nothing more
+        private readonly HashSet<string> _recursiveFunctions = new(StringComparer.Ordinal);
         // The check pass doesn't run loops, so it tracks only their structure
         private readonly Stack<(int Id, int Line, int SourceLine)> _checkLoops = new();
 
@@ -49,6 +51,7 @@ namespace Calcpad.Core
             _loopReads.Clear();
             _checkDefined.Clear();
             _loopErrors.Clear();
+            _recursiveFunctions.Clear();
             if (_isCheck)
                 _parser.ReadNames = [];
         }
@@ -122,11 +125,23 @@ namespace Calcpad.Core
             // A later line of the loop may define it for the next pass
             foreach (var (read, ex) in _loopErrors)
             {
-                var defined = ex.Code == "CPD-3305" ? _parser.IsDefinedFunction(read.Name) : IsCheckDefined(read.Name);
+                var defined = ex.Code == "CPD-3305" ? IsFunctionKnown(read.Name) : IsCheckDefined(read.Name);
                 if (!defined)
                     RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
             }
             _loopErrors.Clear();
+        }
+
+        private bool IsFunctionKnown(string name) => _parser.IsDefinedFunction(name) || _recursiveFunctions.Contains(name);
+
+        private void TrackFunctionDefinition(bool isRecursive)
+        {
+            if (!_isCheck || _parser.DefinedFunction is not { } name)
+                return;
+            if (isRecursive)
+                _recursiveFunctions.Add(name);
+            else
+                _recursiveFunctions.Remove(name);
         }
 
         private bool IsCheckDefined(string name) => _checkDefined.Contains(name) || _parser.IsDefinedName(name);

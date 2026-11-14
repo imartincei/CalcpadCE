@@ -1,0 +1,17 @@
+' CPD-5203: #else if after #else
+a = 2
+#if a > 1
+#else
+'expect: CPD-5203[#else if a < 0]
+#else if a < 0
+#end if
+
+' Nested in another #if
+#if a > 0
+    #if a > 1
+    #else if a > 2
+    #else
+'expect: CPD-5203
+    #else if a > 3
+    #end if
+#end if

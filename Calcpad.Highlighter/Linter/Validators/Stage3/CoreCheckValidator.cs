@@ -9,7 +9,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
     /// Reports Core's check pass, minus errors the last run reported on the same line. Names and
-    /// Values errors on lines the run executed are left to it too, since it knows the order and values.
+    /// Values errors on lines the run executed without errors are left to it too, since it knows the order and values.
     /// </summary>
     public class CoreCheckValidator
     {
@@ -23,7 +23,8 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
 
                 if (error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run &&
                     (run.ReportedError(line, error.Code) ||
-                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values && run.GetExecution(line) == LineExecution.Executed))
+                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
+                     run.GetExecution(line) == LineExecution.Executed && !run.ReportedAnyError(line)))
                     continue;
 
                 result.AppendDiagnostic(ToDiagnostic(error, line, stage3, result));

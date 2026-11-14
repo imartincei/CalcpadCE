@@ -1,0 +1,8 @@
+' CPD-3418: uiOverrides sharing a comment with another key (warning)
+'expect: CPD-3301
+r = undefinedName
+' A second one with the pdf key, both misplaced
+'expect: CPD-3418, CPD-3416
+'<!--{"uiOverrides": {"L:2": "4"}, "pdf": {}}-->
+'expect: CPD-3418, CPD-3417
+'<!--{"uiOverrides": {"L:1": "8"}, "desc": "a"}-->
