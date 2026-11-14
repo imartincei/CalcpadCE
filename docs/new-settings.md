@@ -91,7 +91,7 @@ Pick the Monaco editor's font family from:
 - **Render Preview as PDF** *(default off)* — **Preview** and **Report** show the [PDF export](new-exports.md#pdf-export) itself in a built-in PDF viewer, with its exact pages, headers and footers, zoom (− / + / Fit, or Ctrl+Wheel) and a page counter. It follows **Auto-Run Preview**, but each render generates a PDF, so it is slower than the HTML preview. **Unwrapped** and the input form are unaffected.
 - **Show File Metadata** *(default off)* — show the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the end of the file. Edit it in the [Properties tab](new-calcpad-panel.md#properties).
 - **Show UI Override Hints** *(default off)* — show [saved input values](new-ui-mode.md#saving-what-was-entered) above the lines they apply to. Click one to edit it in the [Properties tab](new-calcpad-panel.md#properties).
-- **Auto-Sync #UI Values** *(default off)* — keep `#UI` line defaults and the input form in sync. See [Auto-syncing values with the source](new-ui-mode.md#auto-syncing-values-with-the-source).
+- **Auto-Sync #UI Values** *(default off)* — keep `#UI` line defaults and the input form in sync. See [Auto-syncing values with the CalcpadCE file](new-ui-mode.md#auto-syncing-values-with-the-calcpadce-file).
 
 ## Data output
 

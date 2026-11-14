@@ -57,7 +57,7 @@
         <button
           class="secondary"
           :disabled="dirty || !sourceKeys.length"
-          :title="t('Write #UI overrides into the source file as defaults and remove the override. Values in loops, macros, and includes are unaffected.')"
+          :title="t('Write #UI overrides into the CalcpadCE file as defaults and remove the override. Values in loops, macros, and includes are unaffected.')"
           @click="emit('override-defaults', sourceKeys)"
         >{{ sourceKeys.length ? t('Override Defaults ({n})', { n: sourceKeys.length }) : t('Override Defaults') }}</button>
         <button

@@ -125,7 +125,7 @@ const zh: Record<string, string> = {
     "Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes": "点击应用保存 {n} 项修改，点击重置撤销修改",
     "Override Defaults": "覆盖默认值",
     "Override Defaults ({n})": "覆盖默认值（{n}）",
-    "Write #UI overrides into the source file as defaults and remove the override. Values in loops, macros, and includes are unaffected.": "将 #UI 覆盖值作为默认值写入源文件，并移除覆盖。循环、宏和 #include 中的值不受影响。",
+    "Write #UI overrides into the CalcpadCE file as defaults and remove the override. Values in loops, macros, and includes are unaffected.": "将 #UI 覆盖值作为默认值写入 CalcpadCE 文件，并移除覆盖。循环、宏和 #include 中的值不受影响。",
     "Revert to defaults": "恢复默认值",
     "Reverts displayed #UI overrides back to their default values.": "将显示的 #UI 覆盖恢复为默认值。",
     "No saved #UI values. Values entered into the input form are saved here, at the end of the file.": "没有已保存的 #UI 值。输入表单中填写的内容会保存在文件末尾。",
