@@ -141,6 +141,7 @@ Array<{
   source: "Macro" | "Expression";
   code: string;         // CPD-xxxx, shared with /lint where both report the same problem
   kind: "Syntax" | "Structure" | "Names" | "Values";
+  severity: "Error" | "Warning"; // always "Error" from a run
   startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
   endColumn: number;
 }>

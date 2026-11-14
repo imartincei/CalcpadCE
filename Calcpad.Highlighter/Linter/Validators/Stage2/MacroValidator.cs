@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
 using Calcpad.Highlighter.Linter.Models;
@@ -12,6 +13,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
         public void Validate(Stage2Context stage2, LinterResult result)
         {
             var controlBlockStack = new Stack<(ControlBlockType type, int lineNumber)>();
+            var warnedIncludes = new HashSet<int>();
 
             for (int i = 0; i < stage2.Lines.Count; i++)
             {
@@ -26,16 +28,22 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
                 }
                 else if (blockType == ControlBlockType.EndIf || blockType == ControlBlockType.Loop)
                 {
-                    if (controlBlockStack.Count > 0 && CalcpadBuiltIns.MatchesEnder(controlBlockStack.Peek().type, blockType))
+                    // Entangled blocks close the nearest match and everything opened after it
+                    if (controlBlockStack.Any(b => CalcpadBuiltIns.MatchesEnder(b.type, blockType)))
                     {
-                        controlBlockStack.Pop();
+                        ControlBlockType popped;
+                        do popped = controlBlockStack.Pop().type;
+                        while (!CalcpadBuiltIns.MatchesEnder(popped, blockType));
                     }
                 }
 
                 if (blockType == ControlBlockType.Def)
                 {
                     // Check if inside control block
-                    if (controlBlockStack.Count > 0)
+                    // One warning per #include line, for all of its definitions
+                    if (controlBlockStack.Count > 0 &&
+                        (!stage2.IncludeMap.TryGetValue(i, out var source) || source.Source != "include" ||
+                         warnedIncludes.Add(stage2.Stage2ToStage1Map.GetValueOrDefault(i, i))))
                     {
                         var (outerBlockType, _) = controlBlockStack.Peek();
                         var keyword = CalcpadBuiltIns.GetKeywordString(outerBlockType);

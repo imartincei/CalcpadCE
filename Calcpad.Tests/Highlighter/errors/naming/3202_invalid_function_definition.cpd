@@ -1,0 +1,21 @@
+' CPD-3202: invalid token in a function definition
+'expect: CPD-3202[f(1) = 2]
+f(1) = 2
+
+' An expression as a parameter
+'expect: CPD-3202
+g(x + 1) = 2
+
+' A literal after a valid parameter
+'expect: CPD-3202
+h(x; 2) = x
+
+' A call that looks like a definition of an existing function
+k(x) = x^2
+'expect: CPD-3202
+k(2) = 3
+
+' Continued over two lines
+'expect: CPD-3202
+area(w; 3) = _
+w*3

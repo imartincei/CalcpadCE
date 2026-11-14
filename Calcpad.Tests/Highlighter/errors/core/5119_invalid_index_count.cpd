@@ -1,0 +1,12 @@
+' CPD-5119: wrong number of indexes
+M = [1; 2 | 3; 4]
+'expect: CPD-5119
+r = M.(1; 2; 3)
+
+' In a custom function
+'expect: CPD-5119
+f(i) = M.(i; 1; 1)
+
+' Inside $Sum
+'expect: CPD-5119
+s = $Sum{M.(k; 1; 2) @ k = 1 : 2}

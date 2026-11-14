@@ -1,0 +1,16 @@
+' CPD-3207: required parameter after an optional one in a function definition
+'expect: CPD-3207
+reqAfterOpt(x = 1; y) = x + y
+
+' After a required and an optional parameter
+'expect: CPD-3207
+g(x; y = 1; z) = x + y + z
+
+' A definition continued over two lines
+'expect: CPD-3207
+h(a = 2; b) = _
+a*b
+
+' A $Block body
+'expect: CPD-3207
+k(len = 1; width) = $Block{area = len*width; area}

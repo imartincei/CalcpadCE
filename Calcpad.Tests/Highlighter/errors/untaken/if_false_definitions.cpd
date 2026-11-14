@@ -1,0 +1,54 @@
+' Definition, command and directive errors in an #if branch that never runs
+x = 1
+#if x < 0
+'expect: CPD-3203[sin]
+    sin(t) = t
+'expect: CPD-3206[calc() = 1]
+    calc() = 1
+'expect: CPD-3207
+    g(t = 1; y) = t
+'expect: CPD-3202[f(1) = 2]
+    f(1) = 2
+'expect: CPD-5115
+    c1 = $Block{h(t) = t; h(2)}
+'expect: CPD-3402
+    c2 = $Bogus{t @ t = 1 : 2}
+'expect: CPD-3405[#]
+    c3 = $Inline{#hide; 2}
+'expect: CPD-3406
+    c4 = $Sum{k^2 k = 1 : 3}
+'expect: CPD-5113
+    $Plot{t @ t = : 1}
+'expect: CPD-5120
+    $Plot{t | t | t @ t = 0 : 1}
+    M = [1; 2|3; 4]
+'expect: CPD-5119
+    c5 = M.(1; 2; 3)
+'expect: CPD-5114[]]
+    c6 = [1; (2]; 3)
+#end if
+
+' Directives in a branch that never runs
+#if x > 100
+'expect: CPD-3403[#badDirective]
+    #badDirective
+'expect: CPD-3601
+    #format X9
+'expect: CPD-3413[{"decimals": "four"}]
+    #settings {"decimals": "four"}
+'expect: CPD-3415[{"type": "slider"}]
+    #UI {"type": "slider"} d1 = 1
+'expect: CPD-3201
+    #read 1M from ../includes/data.csv
+'expect: CPD-5116
+    #read M from
+#end if
+
+' Constants and outer-scope assignments
+#const k1 = 5
+#if x > 100
+'expect: CPD-3409[k1]
+    k1 = 6
+'expect: CPD-3410[zz]
+    zz ← 2
+#end if

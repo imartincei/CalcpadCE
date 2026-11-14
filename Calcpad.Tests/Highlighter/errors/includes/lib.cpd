@@ -1,0 +1,8 @@
+' Valid library for the error samples
+libSquare(x) = x^2
+libScale(x; k = 2) = k*x
+#def libTwice$(a$) = 2*(a$)
+#def libBlock$(a$)
+libTemp = a$ + 1
+#end def
+libLength = 3

@@ -586,4 +586,28 @@
   <data name="Invalid_for_loop_header" xml:space="preserve">
     <value>Невалиден ред "#for". Очаква се "#for брояч = начало : край".</value>
   </data>
+  <data name="Function_0_takes_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' приема {1} аргумент(а), подадени са {2}.</value>
+  </data>
+  <data name="Function_0_needs_at_least_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' изисква поне {1} аргумент(а), подадени са {2}.</value>
+  </data>
+  <data name="Function_0_takes_at_most_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' приема най-много {1} аргумент(а), подадени са {2}.</value>
+  </data>
+  <data name="Argument_0_of_1_is_empty" xml:space="preserve">
+    <value>Аргумент {0} на '{1}' е празен.</value>
+  </data>
+  <data name="Directives_are_not_allowed_inside_command_blocks" xml:space="preserve">
+    <value>Директиви '#' не са разрешени в командни блокове. Използвайте if(), $Repeat и др.</value>
+  </data>
+  <data name="Built_in_function_0_cannot_be_redefined" xml:space="preserve">
+    <value>'{0}' е вградена функция и не може да бъде предефинирана.</value>
+  </data>
+  <data name="Unrecognized_setting_0" xml:space="preserve">
+    <value>'{0}' не е разпозната настройка.</value>
+  </data>
+  <data name="Unrecognized_UI_property_0" xml:space="preserve">
+    <value>'{0}' не е разпознато свойство на #UI.</value>
+  </data>
 </root>

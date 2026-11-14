@@ -1,0 +1,17 @@
+' CPD-3106: unmatched closing curly brace
+'expect: CPD-3106[}]
+r = k}
+
+' In a custom function body
+'expect: CPD-3106[}]
+g(x) = x*2}
+
+' One brace too many after a command
+'expect: CPD-3106[}]
+s = $Inline{a = 1; a + 1}}
+
+' On the last line of a $Block continued with an underscore
+'expect+2: CPD-3106
+t = $Block{b = 2; _
+b*3}; _
+b}

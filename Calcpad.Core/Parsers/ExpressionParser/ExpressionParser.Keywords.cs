@@ -123,11 +123,21 @@ namespace Calcpad.Core
             for (int j = 0; j < ind.Count; ++j)
             {
                 var k = ind[j];
-                if (lower.StartsWith(KeywordNames[k]))
+                var name = KeywordNames[k];
+                // Whole word only, so #rounds is not #round
+                if (lower.StartsWith(name) && (s.Length <= name.Length + 1 || !IsKeywordLetter(s[name.Length + 1])))
                     return KeywordValues[k];
             }
             return Keyword.None;
         }
+
+        private static int KeywordEnd(ReadOnlySpan<char> s, int start)
+        {
+            var end = s[start..].IndexOfAny(' ', '\t');
+            return end < 0 ? s.Length : start + end;
+        }
+
+        private static bool IsKeywordLetter(char c) => char.IsLetter(c) || c == '_';
 
         /// <summary>
         /// The number of characters a keyword occupies in the source line, including the leading '#'.
@@ -169,9 +179,13 @@ namespace Calcpad.Core
 
                 if (_condition.IsSatisfied || !_calculate)
                 {
-                    var end = s.IndexOfAny(' ', '\t');
-                    if (end < 0)
-                        end = s.Length;
+                    var end = KeywordEnd(s, 0);
+                    if (s[..end].Equals("#end", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var next = s[end..].TrimStart();
+                        if (!next.IsEmpty)
+                            end = KeywordEnd(s, s.Length - next.Length);
+                    }
                     var (from, to) = KeywordColumns(0, end);
                     AppendError(s.ToString(), string.Format(Messages.Invalid_keyword_0, s[..end].ToString()), _currentLine, "CPD-3403", CalcpadErrorKind.Syntax, from, to);
                 }
@@ -325,25 +339,6 @@ namespace Calcpad.Core
                 _isVisible = value || _isCheck;
         }
 
-        // The check pass doesn't run loops, so it tracks only their structure
-        private readonly Stack<(int Id, int Line, int SourceLine)> _checkLoops = new();
-
-        private void CheckLoopStart()
-        {
-            if (_isCheck)
-                _checkLoops.Push((_condition.Id, _currentLine, _parser.Line));
-        }
-
-        private void CheckLoopEnd(ReadOnlySpan<char> s)
-        {
-            if (_checkLoops.Count == 0)
-                AppendError(s.ToString(), Messages.loop_without_a_corresponding_repeat, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            else if (_checkLoops.Pop().Id != _condition.Id)
-                AppendError(s.ToString(), Messages.Entangled_if__end_if__and_repeat__loop_blocks, _currentLine, "CPD-3105", CalcpadErrorKind.Structure);
-            if (_checkLoops.Count == 0)
-                ResolveLoopReads();
-        }
-
         private void SetParseMode(ReadOnlySpan<char> s, Keyword keyword, ParseMode mode)
         {
             FlushMarkdown();
@@ -430,8 +425,11 @@ namespace Calcpad.Core
                     try
                     {
                         _parser.Parse(expr);
-                        _parser.Calculate();
-                        Settings.Math.Decimals = (int)Math.Round(_parser.Real, MidpointRounding.AwayFromZero);
+                        if (_calculate)
+                        {
+                            _parser.Calculate();
+                            Settings.Math.Decimals = (int)Math.Round(_parser.Real, MidpointRounding.AwayFromZero);
+                        }
                     }
                     catch (MathParserException ex)
                     {
@@ -839,6 +837,10 @@ namespace Calcpad.Core
                 SettingsError(string.Format(Messages.Invalid_JSON_in_0, SettingsKeyword));
                 return;
             }
+            if (_isCheck)
+                foreach (var key in SettingsDto.UnknownKeys(json.ToString()))
+                    RecordWarning(string.Format(Messages.Unrecognized_setting_0, key), "CPD-3413", from, to);
+
             try
             {
                 var dto = SettingsDto.Parse(json.ToString());

@@ -23,33 +23,12 @@ namespace Calcpad.Core
         private int _lineOffset = -1;
         // Column where the keyword line's trimmed text starts, or -1
         private int _keywordOffset = -1;
+        // Where each physical line of a continued statement starts in the joined text
+        private readonly List<(int Start, int Length, int Line, int Column)> _segments = [];
+        private bool _isJoined;
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
-        private bool _isCheck;
-        // Check pass: names each line read, and names only the run would define
-        private sealed class ReadName(string name, int line, int sourceLine, int start, int end)
-        {
-            internal readonly string Name = name;
-            internal readonly int Line = line, SourceLine = sourceLine, Start = start, End = end;
-            // Whether the name had a definition when read; null until known
-            internal bool? Defined;
-            // For a function body: the first call, where it was judged
-            internal CalcpadCallSite Call;
-            internal bool IsFunctionBody;
-        }
-        // Check pass: what a function body reads and calls, judged at its first call
-        private sealed class FunctionBody(List<ReadName> reads, List<string> callees)
-        {
-            internal readonly List<ReadName> Reads = reads;
-            internal readonly List<string> Callees = callees;
-            internal bool IsCalled;
-        }
-        private readonly Dictionary<string, FunctionBody> _functionBodies = new(StringComparer.Ordinal);
-        private readonly List<ReadName> _readNames = [];
-        private readonly List<ReadName> _loopReads = [];
-        private readonly List<(ReadName Read, MathParserException Error)> _loopErrors = [];
-        private readonly HashSet<string> _checkDefined = new(StringComparer.Ordinal);
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
         private readonly Stack<int> _outputModeStack = new();
@@ -107,24 +86,6 @@ namespace Calcpad.Core
         public void Parse(string sourceCode, bool calculate = true, bool getXml = true) =>
             Parse(sourceCode.AsSpan(), calculate, getXml);
 
-        /// <summary>
-        /// Checks every line without calculating, including untaken branches and loop bodies, and never stops.
-        /// It reads and writes no files, and it changes <see cref="Settings"/> as #settings and #round lines do.
-        /// </summary>
-        public IReadOnlyList<CalcpadError> Check(string sourceCode)
-        {
-            _isCheck = true;
-            try
-            {
-                Parse(sourceCode.AsSpan(), false, false);
-            }
-            finally
-            {
-                _isCheck = false;
-            }
-            return _errorList;
-        }
-
         private void Parse(ReadOnlySpan<char> code, bool calculate, bool getXml)
         {
             var lines = new List<int> { 0 };
@@ -153,6 +114,7 @@ namespace Calcpad.Core
                         // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
                         ResetUiState();
                         _lineOffset = _keywordOffset = -1;
+                        _isJoined = false;
                         ref var currentLineCache = ref _lineCache[_currentLine];
                         var keyword = currentLineCache.Keyword;
                         if (keyword == Keyword.SkipLine)
@@ -203,25 +165,40 @@ namespace Calcpad.Core
                         var lineOffset = rawLine.Length - lineSpan.Length;
                         if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
                         {
-                            lineOffset = -1;
                             var c = textSpan[^1];
+                            var start = c == '_' ? textSpan.Length - 2 : textSpan.Length + 1;
                             if (c == '_')
                                 s = textSpan[0..^2].ToString() + lineSpan.ToString();
                             else
                                 s = $"{textSpan} {lineSpan}";
 
                             textSpan = s.AsSpan();
+                            if (_segments.Count > 0)
+                                _segments[^1] = _segments[^1] with { Length = Math.Min(_segments[^1].Length, start - _segments[^1].Start) };
+                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset));
+                            // The run maps joined columns back to each line; the check pass gets joined lines
+                            _isJoined = !_isCheck;
+                            lineOffset = _isJoined ? 0 : -1;
                         }
                         else
                         {
                             textSpan = lineSpan;
                             _parser.StatementLine = _parser.Line;
+                            _segments.Clear();
+                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset));
                         }
 
                         if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
                         {
-                            _lineCache[_currentLine] = new(null, Keyword.SkipLine);
-                            continue;
+                            if (_currentLine + 1 < lineCount)
+                            {
+                                _lineCache[_currentLine] = new(null, Keyword.SkipLine);
+                                continue;
+                            }
+                            // Nothing follows the last line, so it is parsed as is
+                            textSpan = textSpan.TrimEnd();
+                            if (textSpan.EndsWith(" _"))
+                                textSpan = textSpan[..^2].TrimEnd();
                         }
 
                         if (_parser.IsCanceled)
@@ -629,18 +606,8 @@ namespace Calcpad.Core
             _sb.Clear();
             _condition = new();
             _loops.Clear();
-            _checkLoops.Clear();
-            _readNames.Clear();
-            _loopReads.Clear();
-            _checkDefined.Clear();
             _skippedLoops.Clear();
-            _loopErrors.Clear();
-            _functionBodies.Clear();
-            if (_isCheck)
-            {
-                _parser.ReadNames = [];
-                _parser.FunctionCalls = [];
-            }
+            ResetCheckState();
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
@@ -746,6 +713,7 @@ namespace Calcpad.Core
                             tokens[i].CacheID = _parser.WriteEquationToCache(isOutput, cacheID);
                         }
 
+                        TrackFunctionDefinition(false);
                         if (_isVal == -1)
                             ClearReads();
                         else if (_isCheck)
@@ -817,9 +785,11 @@ namespace Calcpad.Core
                         if (position < 0 && ex.Name is not null)
                             (position, endPosition) = FindName(token.Value, ex.Name);
                         var (start, end) = ErrorColumns(token, ui is null ? position : -1, endPosition);
-                        if (_isCheck && _checkLoops.Count != 0 && ex.Name is not null)
+                        var isCascade = _isCheck && ex.Code == "CPD-3305" && _recursiveFunctions.Contains(ex.Name);
+                        TrackFunctionDefinition(ex.Code is "CPD-5305" or "CPD-5306");
+                        if (!isCascade && _isCheck && _checkLoops.Count != 0 && ex.Name is not null)
                             _loopErrors.Add((new(ex.Name, _currentLine, _parser.Line, start, end), ex));
-                        else if (RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end, functions: ex.Functions))
+                        else if (!isCascade && RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end, functions: ex.Functions))
                             ++_errorCount;
                         if (!_isCheck && (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences))
                             throw new MathParserException(Messages.Too_many_errors, "CPD-5904", CalcpadErrorKind.Values);
@@ -866,7 +836,13 @@ namespace Calcpad.Core
             if (_isVisible)
                 _errors.Enqueue(line);
             if (sourceLine <= 0)
+            {
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
+                if (_isJoined)
+                    (sourceLine, startColumn, endColumn) = MapJoinedColumns(startColumn, endColumn);
+            }
+            if (!_isCheck)
+                Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
@@ -884,107 +860,19 @@ namespace Calcpad.Core
             return true;
         }
 
-        // Function bodies resolve names when first called, and loop bodies see later lines on the next pass,
-        // so those reads are judged then, or at the end of the outermost loop or of the document.
-        /// <param name="nameColumn">Column of the parsed expression's start, to point at each name, or -1.</param>
-        private void TakeReadNames(int line, int sourceLine, int start = -1, int end = -1, bool isFunction = false, int nameColumn = -1)
+        // A span in a continued statement, cut to the line it starts on; the first line when unknown
+        private (int Line, int Start, int End) MapJoinedColumns(int start, int end)
         {
-            var calls = _parser?.FunctionCalls;
-            var function = isFunction ? _parser.DefinedFunctionName : null;
-            List<ReadName> bodyReads = function is null ? null : [];
-            if (_parser?.ReadNames is { Count: > 0 } names)
-            {
-                foreach (var (name, at) in names)
-                {
-                    var read = nameColumn >= 0 && at >= 0
-                        ? new ReadName(name, line, sourceLine, nameColumn + at, nameColumn + at + name.Length)
-                        : new ReadName(name, line, sourceLine, start, end);
-                    if (bodyReads is not null)
-                    {
-                        read.IsFunctionBody = true;
-                        bodyReads.Add(read);
-                    }
-                    else if (_checkLoops.Count != 0)
-                        _loopReads.Add(read);
-                    else
-                        read.Defined = IsCheckDefined(name);
-                    _readNames.Add(read);
-                }
-                names.Clear();
-            }
-            if (calls is not { Count: > 0 } && function is null)
-                return;
+            if (start < 0)
+                return (_segments[0].Line, -1, -1);
 
-            if (function is not null)
-                _functionBodies[function] = new(bodyReads, calls.ConvertAll(c => c.Name));
-            else
-                foreach (var call in calls)
-                {
-                    var (callStart, callEnd) = nameColumn >= 0 && call.Start >= 0 && call.End > call.Start
-                        ? (nameColumn + call.Start, nameColumn + call.End)
-                        : (start, end);
-                    JudgeFunctionBody(call.Name, new(call.Name, sourceLine, callStart, callEnd));
-                }
-            calls.Clear();
-        }
-
-        // The callees of a function are first called with it
-        private void JudgeFunctionBody(string name, CalcpadCallSite call)
-        {
-            if (!_functionBodies.TryGetValue(name, out var body) || body.IsCalled)
-                return;
-
-            body.IsCalled = true;
-            foreach (var read in body.Reads)
-            {
-                read.Call = call with { Function = name };
-                if (_checkLoops.Count != 0)
-                    _loopReads.Add(read);
-                else
-                    read.Defined = IsCheckDefined(read.Name);
-            }
-            foreach (var callee in body.Callees)
-                JudgeFunctionBody(callee, call);
-        }
-
-        private void ResolveLoopReads()
-        {
-            foreach (var read in _loopReads)
-                read.Defined = IsCheckDefined(read.Name);
-            _loopReads.Clear();
-
-            // A later line of the loop may define it for the next pass
-            foreach (var (read, ex) in _loopErrors)
-            {
-                var defined = ex.Code == "CPD-3305" ? _parser.IsDefinedFunction(read.Name) : IsCheckDefined(read.Name);
-                if (!defined)
-                    RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End);
-            }
-            _loopErrors.Clear();
-        }
-
-        private void ClearReads()
-        {
-            _parser.ReadNames?.Clear();
-            _parser.FunctionCalls?.Clear();
-        }
-
-        private bool IsCheckDefined(string name) => _checkDefined.Contains(name) || _parser.IsDefinedName(name);
-
-        // Names read before anything defines them, or that nothing defines at all
-        private void ReportUndefinedNames()
-        {
-            ResolveLoopReads();
-            foreach (var read in _readNames)
-            {
-                if (read.Defined ?? IsCheckDefined(read.Name))
-                    continue;
-
-                var ex = Exceptions.UndefinedVariableOrUnits(read.Name);
-                RecordError(read.Line, ex.Message, true, ex.Code, ex.Kind, read.SourceLine, read.Start, read.End, read.Call, read.IsFunctionBody);
-            }
-            _readNames.Clear();
-            _loopReads.Clear();
+            var i = _segments.Count - 1;
+            while (i > 0 && _segments[i].Start > start)
+                --i;
+            var (segmentStart, length, line, column) = _segments[i];
+            var offset = Math.Min(start - segmentStart, length);
+            var stop = Math.Min(Math.Max(end, start + 1) - segmentStart, length);
+            return (line, column + offset, column + Math.Max(stop, offset + 1));
         }
 
         // The failing word when the tokenizer found the position, otherwise the whole expression

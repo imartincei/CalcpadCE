@@ -8,14 +8,12 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Reports Core's check pass. Names and Values errors on lines the last run executed are
-    /// left to the run, which knows the order and values, and so are #settings and #UI errors.
+    /// Reports Core's check pass, minus errors the last run reported on the same line. Names and
+    /// Values errors on lines the run executed without errors are left to it too, since it knows the order and values.
     /// Errors in a macro or function body are kept, as the run cannot point into the body.
     /// </summary>
     public class CoreCheckValidator
     {
-        private static readonly HashSet<string> DirectiveCodes = ["CPD-3413", "CPD-3415"];
-
         public void Validate(Stage3Context stage3, IReadOnlyList<CalcpadError> errors, LinterResult result, Stage2Result stage2 = null)
         {
             foreach (var error in errors)
@@ -31,9 +29,10 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 var diagnostic = ToDiagnostic(error, line, stage3, result);
                 var inBody = callLine >= 0 || error.IsFunctionBody || diagnostic.Stage == LineStage.Stage3 &&
                     BodyDiagnostics.FindBodyText(stage3, stage2, line, diagnostic.Column, diagnostic.EndColumn).Line >= 0;
-                if (!inBody &&
-                    (error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values || DirectiveCodes.Contains(error.Code)) &&
-                    stage3.Runtime?.GetExecution(line) == LineExecution.Executed)
+                if (!inBody && error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run &&
+                    (run.ReportedError(line, error.Code) ||
+                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values &&
+                     run.GetExecution(line) == LineExecution.Executed && !run.ReportedAnyError(line)))
                     continue;
 
                 if (callLine >= 0 && diagnostic.Stage == LineStage.Stage3)
@@ -58,8 +57,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
             {
                 Code = body.Code,
                 Message = body.Message,
-                Severity = body.Severity,
-                Origin = body.Origin
+                Severity = body.Severity
             };
             var bodyDiagnostic = BodyDiagnostics.Link(callDiagnostic, callPosition, bodyPosition, call.Function,
                 $"At the first call to {call.Function} on line {{0}}.", true);
@@ -101,8 +99,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 EndColumn = end,
                 Code = error.Code,
                 Message = message,
-                Severity = LinterSeverity.Error,
-                Origin = DiagnosticOrigin.Check
+                Severity = error.Severity == CalcpadErrorSeverity.Warning ? LinterSeverity.Warning : LinterSeverity.Error
             };
         }
 

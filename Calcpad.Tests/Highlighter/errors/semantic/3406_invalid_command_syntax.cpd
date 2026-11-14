@@ -1,0 +1,29 @@
+' CPD-3406: invalid command syntax
+'expect: CPD-3406
+r = $Sum{k^2 k = 1 : 3}
+
+' A range without its colon
+'expect: CPD-3406
+s = $Sum{k^2 @ k = 1 3}
+
+' A solver range with only one bound
+'expect: CPD-3406
+t = $Root{x^2 - 2 @ x = 1}
+
+' The counter must be a single name
+'expect: CPD-3406
+u = $Sum{k^2 @ k + 1 = 1 : 3}
+
+' A plot range without its colon
+'expect: CPD-3406
+$Plot{x^2 @ x = 0 1}
+
+' A map needs a second variable
+'expect: CPD-3406
+$Map{x*y @ x = 0 : 1}
+
+' A command continued over three lines
+'expect: CPD-3406
+v = $Sum{k^2 @
+k = 1 :
+}

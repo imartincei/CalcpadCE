@@ -56,6 +56,10 @@ namespace Calcpad.Core
                     continue;
 
                 var starts = ArgumentStarts(tokens, i + 2, close);
+                for (var k = 0; k < starts.Count; ++k)
+                    if (starts[k] == close || tokens[starts[k]].Type == TokenTypes.Divisor)
+                        throw At(Exceptions.EmptyArgument(k + 1, t.Content), tokens[starts[k] - 1], tokens[starts[k]]);
+
                 var cf = _functions[t.Index];
                 var n = cf.ParameterCount;
                 var isKeyword = new bool[starts.Count];

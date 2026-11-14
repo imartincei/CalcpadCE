@@ -1,0 +1,40 @@
+' CPD-2209: macro definition inside a control block has no effect
+#if 1 > 0
+'expect: CPD-2209
+    #def inIf$ = 1
+#end if
+
+' Inside a loop
+#for i = 1 : 2
+'expect: CPD-2209
+    #def inFor$ = 1
+#loop
+
+' Inside an #else branch of an #if nested in a #repeat
+#repeat 2
+    #if 1 < 0
+    #else
+'expect: CPD-2209
+        #def deep$(a$) = a$
+    #end if
+#loop
+
+' A multi-line definition inside #while
+n = 1
+#while n < 2
+'expect: CPD-2209
+    #def whileBlock$
+    whileValue = 1
+    #end def
+    n = n + 1
+#loop
+
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = n + undefinedName
+
+' An #include with two definitions inside a control block warns once
+#if n > 100
+'expect: CPD-2209[#include ../includes/lib.cpd]
+#include ../includes/lib.cpd
+#end if

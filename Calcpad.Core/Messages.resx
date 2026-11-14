@@ -676,4 +676,28 @@
   <data name="Invalid_for_loop_header" xml:space="preserve">
     <value>Invalid "#for" header. Expected "#for counter = start : end".</value>
   </data>
+  <data name="Function_0_takes_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' takes {1} argument(s), got {2}.</value>
+  </data>
+  <data name="Function_0_needs_at_least_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' needs at least {1} argument(s), got {2}.</value>
+  </data>
+  <data name="Function_0_takes_at_most_1_arguments_got_2" xml:space="preserve">
+    <value>'{0}' takes at most {1} argument(s), got {2}.</value>
+  </data>
+  <data name="Argument_0_of_1_is_empty" xml:space="preserve">
+    <value>Argument {0} of '{1}' is empty.</value>
+  </data>
+  <data name="Directives_are_not_allowed_inside_command_blocks" xml:space="preserve">
+    <value>'#' directives are not allowed inside command blocks. Use if(), $Repeat, etc. instead.</value>
+  </data>
+  <data name="Built_in_function_0_cannot_be_redefined" xml:space="preserve">
+    <value>'{0}' is a built-in function and cannot be redefined.</value>
+  </data>
+  <data name="Unrecognized_setting_0" xml:space="preserve">
+    <value>'{0}' is not a recognized setting.</value>
+  </data>
+  <data name="Unrecognized_UI_property_0" xml:space="preserve">
+    <value>'{0}' is not a recognized #UI property.</value>
+  </data>
 </root>

@@ -1,0 +1,16 @@
+' CPD-3311: empty argument
+'expect: CPD-3311[; ;]
+a = max(1; ; 3)
+
+' A trailing empty argument
+f(x; y) = x + y
+'expect: CPD-3311[; )]
+b = f(1; )
+
+' An empty parameter in a definition
+'expect: CPD-3311[;)]
+g(x;) = 1
+
+' Only a separator
+'expect: CPD-3311
+h(;) = 1

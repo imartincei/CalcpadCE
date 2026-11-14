@@ -1,0 +1,15 @@
+' CPD-3316: duplicate keyword argument in a macro call
+#def kw$(a$; b$ = 1) = a$ + b$
+'expect: CPD-3316
+a = kw$(1; b$ = 3; b$ = 4)
+
+' Given by position and by name
+'expect: CPD-3316
+b = kw$(1; 2; b$ = 3)
+
+' A multi-line macro
+#def block$(x$; y$ = 2)
+blockValue = x$*y$
+#end def
+'expect: CPD-3316
+block$(1; y$ = 3; y$ = 4)

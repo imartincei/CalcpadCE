@@ -1,0 +1,13 @@
+' CPD-2204: macro name must start with a letter
+'expect: CPD-2204
+#def 123bad$ = 1
+
+' With parameters
+'expect: CPD-2204
+#def 2x$(a$) = a$
+
+' A multi-line definition
+'expect: CPD-2204
+#def 9block$(a$)
+blockValue = a$
+#end def

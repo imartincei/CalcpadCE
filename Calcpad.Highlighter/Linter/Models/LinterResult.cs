@@ -89,7 +89,8 @@ namespace Calcpad.Highlighter.Linter.Models
                     break;
 
                 case LineStage.Stage2:
-                    if (Stage2Context != null)
+                    if (Stage2Context != null &&
+                        !TryMapToIncludeLine(diagnostic, Stage2Context.IncludeMap, diagnostic.StageLine))
                     {
                         diagnostic.Line = SourceMapper.MapStage2ToOriginal(diagnostic.StageLine, Stage2Context, Stage1Context);
                     }
@@ -98,7 +99,8 @@ namespace Calcpad.Highlighter.Linter.Models
                 case LineStage.Stage3:
                     if (Stage2Context != null && Stage3Context != null)
                     {
-                        if (TryMapToIncludeLine(diagnostic))
+                        if (TryMapToIncludeLine(diagnostic, Stage3Context.IncludeMap,
+                                Stage3Context.Stage3ToStage2Map.GetValueOrDefault(diagnostic.StageLine, diagnostic.StageLine)))
                             break;
 
                         // Use full mapping with line continuation support
@@ -134,12 +136,11 @@ namespace Calcpad.Highlighter.Linter.Models
         }
 
         // The #include line has none of the included text, so all of it is marked
-        private bool TryMapToIncludeLine(LinterDiagnostic diagnostic)
+        private bool TryMapToIncludeLine(LinterDiagnostic diagnostic, Dictionary<int, ContentResolution.SourceInfo> includeMap, int stage2Line)
         {
-            if (!Stage3Context.IncludeMap.TryGetValue(diagnostic.StageLine, out var source) || source.Source != "include")
+            if (!includeMap.TryGetValue(diagnostic.StageLine, out var source) || source.Source != "include")
                 return false;
 
-            var stage2Line = Stage3Context.Stage3ToStage2Map.GetValueOrDefault(diagnostic.StageLine, diagnostic.StageLine);
             var stage1Line = Stage2Context.Stage2ToStage1Map.GetValueOrDefault(stage2Line, stage2Line);
             if (stage1Line < 0 || stage1Line >= Stage1Context.Lines.Count)
                 return false;

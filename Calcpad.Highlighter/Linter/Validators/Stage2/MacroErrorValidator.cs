@@ -46,8 +46,7 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage2
             EndColumn = end,
             Code = error.Code,
             Message = message,
-            Severity = LinterSeverity.Error,
-            Origin = DiagnosticOrigin.Check
+            Severity = LinterSeverity.Error
         };
 
         private static (int, int) WholeLine(string text) =>

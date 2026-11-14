@@ -1,0 +1,20 @@
+' CPD-1104: include file not found
+'expect: CPD-1104[#include missing.cpd]
+#include missing.cpd
+
+' A relative path that climbs out of the folder
+'expect: CPD-1104
+#include ../../missing_folder/lib.cpd
+
+' A path through a real folder that resolves to a missing file
+'expect: CPD-1104
+#include ../includes/sub/../not_there.cpd
+
+' A folder, not a file
+'expect: CPD-1104
+#include ../includes
+
+' The missing file is included by another file, so the error lands on this line
+'expect: CPD-1104
+#include ../includes/sub/includes_missing.cpd
+value = subBefore

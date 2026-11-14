@@ -1,0 +1,11 @@
+' CPD-3420: deprecated #input keyword (warning)
+'expect: CPD-3420[#input]
+#input
+
+' After some calculations
+x = 1
+'expect: CPD-3420[#input]
+#input
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = x + undefinedName

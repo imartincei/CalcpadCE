@@ -1,0 +1,10 @@
+' CPD-5305: a function that calls itself
+'expect: CPD-5305[f]
+f(x) = f(x - 1)
+
+' Calls to it report nothing more
+r = f(1)
+
+' Inside another expression
+'expect: CPD-5305[g]
+g(x) = 1 + 2*g(x/2)

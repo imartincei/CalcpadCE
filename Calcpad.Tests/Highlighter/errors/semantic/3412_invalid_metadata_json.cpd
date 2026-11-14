@@ -1,0 +1,18 @@
+' CPD-3412: invalid metadata-comment JSON (warning)
+'expect: CPD-3412
+'<!--{"desc": "x"-->
+f(x) = x
+
+' An unknown key
+'expect: CPD-3412
+'<!--{"bogusKey": 1}-->
+g(x) = x
+
+' An unknown diagnostic code in LintIgnore
+'expect: CPD-3412
+'<!--{"LintIgnore": ["CPD-9999"]}-->
+'expect: CPD-3412
+'<!--{"EndLintIgnore": ["XYZ"]}-->
+' A real error keeps this file in the error set
+'expect: CPD-3301
+r = f(1) + g(2) + undefinedName

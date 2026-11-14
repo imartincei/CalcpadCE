@@ -1,0 +1,15 @@
+' CPD-2205: malformed #def
+'expect: CPD-2205
+#def = 5
+
+' An empty name with parameters
+'expect: CPD-2205
+#def (a$) = a$
+
+' A bare #def at the end of a multi-line block
+#def wrapper$
+wrapperValue = 1
+#end def
+'expect: CPD-2205, CPD-2206
+#def
+

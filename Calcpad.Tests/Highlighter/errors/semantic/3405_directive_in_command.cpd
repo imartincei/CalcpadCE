@@ -1,0 +1,18 @@
+' CPD-3405: # directive inside a command block
+'expect: CPD-3405[#]
+r = $Inline{#hide; 2}
+
+' A control block inside $Inline
+'expect: CPD-3405[#]
+f(x) = $Inline{#if x > 0; r = 1; #end if; r}
+
+' Inside $Block continued with an underscore
+'expect+1: CPD-3405[#]
+g(x) = $Block{a = x; _
+#round 2; _
+a}
+
+' Inside $Repeat
+s = 0
+'expect: CPD-3405[#]
+$Repeat{s = s + k; #val @ k = 1 : 3}

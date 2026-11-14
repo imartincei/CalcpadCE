@@ -1,0 +1,17 @@
+' CPD-3313: redefinition of an existing function (information)
+f(x) = x
+'expect: CPD-3313[f]
+f(x) = 2*x
+
+' With a different parameter count
+g(x; y) = x + y
+'expect: CPD-3313[g]
+g(x) = x
+
+' A function from a relative include
+#include ../includes/lib.cpd
+'expect: CPD-3313[libSquare]
+libSquare(x) = x^3
+' A real error keeps this file in the error set
+'expect: CPD-3305
+a = libSquareMissing(2) + libLength

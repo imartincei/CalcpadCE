@@ -1,0 +1,16 @@
+' CPD-3410: outer-scope assignment to an undefined variable
+'expect: CPD-3410[kdf]
+kdf ← 8
+
+' Inside $Repeat
+'expect: CPD-3410[zz]
+$Repeat{zz ← k @ k = 1 : 2}
+
+' Inside $Block in a custom function
+'expect: CPD-3410[nope]
+f(x) = $Block{nope ← x; x}
+
+' Defined only after the function
+'expect: CPD-3410[c1]
+g(x) = $Inline{c1 ← x}
+#const c1 = 5

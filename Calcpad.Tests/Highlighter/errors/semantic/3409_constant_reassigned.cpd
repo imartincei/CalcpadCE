@@ -1,0 +1,24 @@
+' CPD-3409: reassignment of a constant
+#const c1 = 5
+'expect: CPD-3409[c1]
+c1 = 6
+
+' With the outer-scope arrow
+'expect: CPD-3409[c1]
+c1 ← 7
+
+' A built-in constant
+'expect: CPD-3409[π], CPD-3205[π]
+π = 3
+
+' In a function body with $Inline
+#const h1 = 6
+'expect+1: CPD-3409[h1]
+f(x) = $Inline{ _
+h1 ← x + 2}
+
+' Inside a loop
+#for i = 1 : 2
+'expect: CPD-3409[c1]
+    c1 = i
+#loop

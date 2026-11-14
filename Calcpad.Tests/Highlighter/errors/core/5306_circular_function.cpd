@@ -1,0 +1,11 @@
+' CPD-5306: a redefinition that makes a function call itself
+h(x) = x
+'expect: CPD-5306, CPD-3313
+h(x) = h(x) + 1
+
+' Through another function
+p(x) = 2*x
+q(x) = p(x) + 1
+'expect: CPD-5306, CPD-3313
+p(x) = q(x)
+r = q(1) + h(2)

@@ -123,6 +123,7 @@ namespace Calcpad.Core
                 var unitsLiteral = new TextSpan(expression);
                 var textSpan = new TextSpan(expression);
                 _parser._assignmentIndex = 0;
+                _parser.DefinedFunction = null;
                 Token t = null;
                 var n = GetTargetUnits(expression);
                 for (int i = 0; i <= n; ++i)
@@ -268,7 +269,7 @@ namespace Calcpad.Core
                                 var s = tokenLiteral.ToString();
                                 if (tt == TokenTypes.BracketLeft)
                                 {
-                                    t = MakeFunctionToken(s, _parser.IsCalculation && tokens.Count != 0);
+                                    t = MakeFunctionToken(s, _parser.IsCalculation && tokens.Count != 0 && !IsSelfReference(s, tokens));
                                     if (trackPositions)
                                         t.Start = tokenLiteral.Start;
                                     if (_isComplex &&
@@ -370,6 +371,16 @@ namespace Calcpad.Core
                                             throw Exceptions.ImproperAssignment();
 
                                         int count = tokens.Count;
+                                        if (count == 0)
+                                        {
+                                            var ex = Exceptions.AssignmentPreceded();
+                                            if (trackPositions)
+                                            {
+                                                ex.Position = i;
+                                                ex.EndPosition = i + 1;
+                                            }
+                                            throw ex;
+                                        }
                                         if (count == 1)
                                         {
                                             var token = tokens.Peek();
@@ -396,7 +407,10 @@ namespace Calcpad.Core
                                             }
                                         }
                                         else if (c == '=' && tokens.Peek().Type == TokenTypes.CustomFunction)
+                                        {
+                                            _parser.DefinedFunction = tokens.Peek().Content;
                                             _parameters = GetParameterNames(tokens);
+                                        }
 
                                         _parser._assignmentIndex = count;
                                     }
@@ -609,6 +623,10 @@ namespace Calcpad.Core
                 }
                 return n;
             }
+
+            // f(x) = f(x - 1) is reported as recursion, not as an undefined function
+            private bool IsSelfReference(string s, Queue<Token> tokens) =>
+                _parser._assignmentIndex > 0 && tokens.Peek() is { Type: TokenTypes.CustomFunction } first && first.Content == s;
 
             private Token MakeFunctionToken(string s, bool mustExist)
             {

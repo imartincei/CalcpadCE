@@ -1,0 +1,19 @@
+' CPD-2206: unmatched #def or #end def
+'expect: CPD-2206[#end def]
+#end def
+
+' One #end def too many after a closed block
+#def body$
+bodyValue = 1
+#end def
+'expect: CPD-2206
+#end def
+
+' An unclosed #def in an included file
+'expect: CPD-2206
+#include ../includes/unclosed_def.cpd
+
+' An unclosed #def at the end of the file
+'expect: CPD-2206
+#def unclosed$(a$)
+unclosedValue = a$

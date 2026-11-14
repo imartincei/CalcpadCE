@@ -110,7 +110,6 @@ namespace Calcpad.Highlighter.Linter.Helpers
                 Message = $"{message} {string.Format(bodyNote, callPosition.Line + 1)}",
                 Severity = call.Severity,
                 Source = call.Source,
-                Origin = call.Origin,
                 Related = [Related(callPosition, $"Call to {name}")]
             };
         }

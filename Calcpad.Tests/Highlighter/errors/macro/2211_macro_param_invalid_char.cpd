@@ -1,0 +1,13 @@
+' CPD-2211: invalid character in macro parameter
+'expect: CPD-2211
+#def m$(a-b$) = 1
+
+' The second parameter
+'expect: CPD-2211
+#def m2$(x$; y.z$) = x$
+
+' A multi-line definition
+'expect: CPD-2211
+#def m3$(w$; h@$)
+mValue = w$
+#end def

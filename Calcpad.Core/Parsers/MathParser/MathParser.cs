@@ -515,94 +515,12 @@ namespace Calcpad.Core
             _complexVariables = null;
         }
 
-        /// <summary>Check pass only: global names read by each parsed expression, less its own parameters and counters.</summary>
-        internal List<ReadName> ReadNames { get; set; }
-        private readonly List<ReadName> _pendingNames = [];
-
-        /// <summary>A name and its offset in the outermost parsed expression, or -1.</summary>
-        internal readonly record struct ReadName(string Name, int Start);
-
-        /// <summary>Check pass only: custom functions each parsed expression calls.</summary>
-        internal List<FunctionCall> FunctionCalls { get; set; }
-
-        /// <summary>A call from the function name to its closing bracket, as offsets in the outermost parsed expression, or -1.</summary>
-        internal readonly record struct FunctionCall(string Name, int Start, int End);
-
-        /// <summary>Where the expression being parsed starts in the outermost one.</summary>
-        internal int NameOffset { get; set; }
-        private readonly HashSet<string> _boundNames = new(StringComparer.Ordinal);
-        private int _parseDepth;
-        // lu() creates "ind" when it runs
-        private bool _hasLu;
-
-        internal void RecordReadName(string name, int start)
-        {
-            if (ReadNames is not null)
-                _pendingNames.Add(new(name, Offset(start)));
-        }
-
-        internal void UnrecordReadName(string name)
-        {
-            if (ReadNames is null)
-                return;
-            var i = _pendingNames.FindIndex(n => n.Name == name);
-            if (i >= 0)
-                _pendingNames.RemoveAt(i);
-        }
-
-        private void RecordFunctionCall(string name, int start, int end)
-        {
-            start = Offset(start);
-            end = start >= 0 && end > 0 ? Offset(end) : -1;
-            FunctionCalls.Add(new(name, start, end));
-        }
-
-        private int Offset(int start) => start >= 0 && NameOffset >= 0 ? NameOffset + start : -1;
-
-        internal void BindName(string name)
-        {
-            if (ReadNames is not null)
-                _boundNames.Add(name);
-        }
-
-        internal bool IsFunctionDefinition => _functionDefinitionIndex >= 0;
-
-        internal bool IsDefinedFunction(string name) => _functions.IndexOf(name) >= 0;
-
-        internal string DefinedFunctionName => IsFunctionDefinition ? _functions.LastName : null;
-
-        internal bool IsDefinedName(string name) =>
-            _input.DefinedVariables.Contains(name) ||
-            _hasLu && name == "ind" ||
-            _units.ContainsKey(name) ||
-            Unit.TryGet(name, IsUs, out _);
-
         public void Parse(ReadOnlySpan<char> expression, bool allowAssignment = true)
         {
             if (ReadNames is null)
-            {
                 ParseExpression(expression, allowAssignment);
-                return;
-            }
-            var isOuter = _parseDepth++ == 0;
-            _hasLu = _hasLu || System.Text.RegularExpressions.Regex.IsMatch(expression, @"(?<![\w.])lu\s*\(");
-            try
-            {
-                ParseExpression(expression, allowAssignment);
-                if (isOuter)
-                    foreach (var name in _pendingNames)
-                        if (!_boundNames.Contains(name.Name))
-                            ReadNames.Add(name);
-            }
-            finally
-            {
-                --_parseDepth;
-                if (isOuter)
-                {
-                    _pendingNames.Clear();
-                    _boundNames.Clear();
-                }
-            }
+            else
+                ParseRecordingNames(expression, allowAssignment);
         }
 
         private void ParseExpression(ReadOnlySpan<char> expression, bool allowAssignment)
@@ -611,12 +529,18 @@ namespace Calcpad.Core
             _isCalculated = false;
             _functionDefinitionIndex = -1;
             var input = ResolveCallArguments(_input.GetInput(expression, allowAssignment, true));
-            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled, out var isFunctionDefinition);
+            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled,
+                IsCalculation && (IsEnabled || ReadNames is not null), out var isFunctionDefinition);
             _input.OrderOperators(input, isFunctionDefinition || _isSolver > 0 || IsPlotting, _assignmentIndex);
             if (isFunctionDefinition)
             {
                 if (_isSolver > 0)
-                    throw Exceptions.FunctionDefinitionInSolver();
+                {
+                    var ex = Exceptions.FunctionDefinitionInSolver();
+                    ex.Position = expression.Length - expression.TrimStart().Length;
+                    ex.EndPosition = expression.TrimEnd().Length;
+                    throw ex;
+                }
 
                 _rpn = null;
                 AddFunction(input);
@@ -909,7 +833,7 @@ namespace Calcpad.Core
                 return null;
 
             var input = ResolveCallArguments(_input.GetInput(expression, false));
-            new SyntaxAnalyser(_functions).Check(input, IsEnabled, out _);
+            new SyntaxAnalyser(_functions).Check(input, IsEnabled, IsEnabled, out _);
             _input.OrderOperators(input, true, 0);
             var rpn = Input.GetRpn(input);
             BindParameters(parameters, rpn);

@@ -1,0 +1,13 @@
+' CPD-5115: function definition inside a solver or expression block
+'expect: CPD-5115
+r = $Block{f(x) = x; f(2)}
+
+' Inside $Inline in another function
+'expect: CPD-5115
+g(a) = $Inline{h(x) = x*a; h(2)}
+
+' A $Block continued with an underscore, reported on the definition
+'expect+1: CPD-5115[k(x) = x + a]
+s = $Block{a = 1; _
+k(x) = x + a; _
+k(1)}

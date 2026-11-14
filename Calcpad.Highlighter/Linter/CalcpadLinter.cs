@@ -18,23 +18,10 @@ namespace Calcpad.Highlighter.Linter
         private readonly MacroErrorValidator _macroErrorValidator = new();
         private readonly NamingValidator _namingValidator = new();
         private readonly UsageValidator _usageValidator = new();
-        private readonly FunctionTypeValidator _functionTypeValidator = new();
-        private readonly CommandBlockValidator _commandBlockValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
-        private readonly SettingsValidator _settingsValidator = new();
-        private readonly UiValidator _uiValidator = new();
         private readonly LegacyInputValidator _legacyInputValidator = new();
         private readonly DeprecatedInputKeywordValidator _deprecatedInputKeywordValidator = new();
         private readonly CoreCheckValidator _coreCheckValidator = new();
-
-        // Static checks that report, more precisely, what Core gives these codes on the same line
-        private static readonly Dictionary<string, string[]> CoveredCoreCodes = new()
-        {
-            ["CPD-3307"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
-            ["CPD-3308"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
-            ["CPD-3311"] = ["CPD-3302", "CPD-5110", "CPD-3401"],
-            ["CPD-3405"] = ["CPD-3401"],
-        };
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -73,7 +60,9 @@ namespace Calcpad.Highlighter.Linter
             // Run validators
             ValidateStage1(stage1Context, result);
             ValidateStage2(stage2Context, result);
-            _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
+            // A trace is only applied to the text it ran, so the run already reported these
+            if (staged.Runtime is null)
+                _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
             if (staged.CoreCheck is { } check)
                 _coreCheckValidator.Validate(stage3Context, check.Value, result, staged.Stage2);
@@ -96,22 +85,13 @@ namespace Calcpad.Highlighter.Linter
             return Task.Run(() => Lint(staged, ignoreRegions));
         }
 
-        // Static checks hide the Core codes they cover on their line; Core's own repeats share a span
+        // Errors from included or macro lines can land on the same source span
         private static void RemoveDuplicates(LinterResult result)
         {
-            var covered = new HashSet<(int, string)>();
-            var spans = new HashSet<(int, string, int, int)>();
-            var duplicates = new HashSet<LinterDiagnostic>();
-            foreach (var d in result.Diagnostics.OrderBy(d => d.Origin))
-            {
-                if (d.Origin == DiagnosticOrigin.Static)
-                {
-                    foreach (var code in CoveredCoreCodes.GetValueOrDefault(d.Code, []))
-                        covered.Add((d.Line, code));
-                }
-                else if (covered.Contains((d.Line, d.Code)) || !spans.Add((d.Line, d.Code, d.Column, d.EndColumn)))
-                    duplicates.Add(d);
-            }
+            var seen = new HashSet<(int, string, int, int, LinterSeverity)>();
+            var duplicates = result.Diagnostics
+                .Where(d => !seen.Add((d.Line, d.Code, d.Column, d.EndColumn, d.Severity)))
+                .ToHashSet();
             if (duplicates.Count > 0)
                 result.RemoveDiagnostics(duplicates.Contains);
         }
@@ -167,6 +147,8 @@ namespace Calcpad.Highlighter.Linter
                 context.SourceMap[kvp.Key] = stage1Result.SourceMap.GetValueOrDefault(kvp.Value, kvp.Value);
                 context.Stage2ToStage1Map[kvp.Key] = kvp.Value;
             }
+            if (stage2Result.IncludeMap != null)
+                context.IncludeMap = stage2Result.IncludeMap;
 
             // Convert macro definitions
             foreach (var macro in stage2Result.MacroDefinitions)
@@ -254,11 +236,7 @@ namespace Calcpad.Highlighter.Linter
         {
             _namingValidator.Validate(stage3, result, tokenProvider);
             _usageValidator.Validate(stage3, result, tokenProvider);
-            _functionTypeValidator.Validate(stage3, result, tokenProvider);
-            _commandBlockValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
-            _settingsValidator.Validate(stage3, result, tokenProvider);
-            _uiValidator.Validate(stage3, result, tokenProvider);
             _legacyInputValidator.Validate(stage3, result, tokenProvider);
             _deprecatedInputKeywordValidator.Validate(stage3, result, tokenProvider);
         }
