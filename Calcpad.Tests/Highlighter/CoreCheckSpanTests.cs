@@ -97,6 +97,17 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Theory]
+        [InlineData("a = 1)", "CPD-3102")]
+        [InlineData("#if 1\nz = 1", "CPD-3105")]
+        [InlineData("a = sin(1; 2)", "CPD-3308")]
+        [InlineData("#def m$(x$; x$) = x$\na = 1", "CPD-2212")]
+        public void ErrorsTheRunReports_AreNotRepeatedByTheCheck(string source, string code)
+        {
+            Assert.Single(Lint(source).Diagnostics, d => d.Code == code);
+            Assert.DoesNotContain(Lint(source, withTrace: true).Diagnostics, d => d.Code == code);
+        }
+
+        [Theory]
         [InlineData("#settings {\"decimals\": \"x\"}", "A #settings value has the wrong type.")]
         [InlineData("#settings {bad}", "Invalid JSON in #settings.")]
         public void SettingsErrors_PointAtTheJson(string source, string message)

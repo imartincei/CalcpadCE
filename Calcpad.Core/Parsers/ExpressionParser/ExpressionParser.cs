@@ -810,6 +810,8 @@ namespace Calcpad.Core
                 _errors.Enqueue(line);
             if (sourceLine <= 0)
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
+            if (!_isCheck)
+                Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,

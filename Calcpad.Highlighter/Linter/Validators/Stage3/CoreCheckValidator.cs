@@ -8,14 +8,11 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Highlighter.Linter.Validators.Stage3
 {
     /// <summary>
-    /// Reports Core's check pass. Names and Values errors on lines the last run executed are
-    /// left to the run, which knows the order and values, and so are #settings and #UI errors.
-    /// Warnings come only from the check, so they always stay.
+    /// Reports Core's check pass, minus errors the last run reported on the same line. Names and
+    /// Values errors on lines the run executed are left to it too, since it knows the order and values.
     /// </summary>
     public class CoreCheckValidator
     {
-        private static readonly HashSet<string> DirectiveCodes = ["CPD-3413", "CPD-3415"];
-
         public void Validate(Stage3Context stage3, IReadOnlyList<CalcpadError> errors, LinterResult result)
         {
             foreach (var error in errors)
@@ -24,9 +21,9 @@ namespace Calcpad.Highlighter.Linter.Validators.Stage3
                 if (line < 0 || line >= stage3.Lines.Count)
                     continue;
 
-                if (error.Severity == CalcpadErrorSeverity.Error &&
-                    (error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values || DirectiveCodes.Contains(error.Code)) &&
-                    stage3.Runtime?.GetExecution(line) == LineExecution.Executed)
+                if (error.Severity == CalcpadErrorSeverity.Error && stage3.Runtime is { } run &&
+                    (run.ReportedError(line, error.Code) ||
+                     error.Kind is CalcpadErrorKind.Names or CalcpadErrorKind.Values && run.GetExecution(line) == LineExecution.Executed))
                     continue;
 
                 result.AppendDiagnostic(ToDiagnostic(error, line, stage3, result));

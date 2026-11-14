@@ -59,6 +59,13 @@ namespace Calcpad.Core
 
         internal void MarkLine(int line, in TraceLineState state) => _lines[line] = state;
 
+        private readonly HashSet<(int Line, string Code)> _errors = [];
+
+        /// <summary>Whether the run reported an error with this code on the line.</summary>
+        public bool HasError(int line, string code) => _errors.Contains((line, code));
+
+        internal void MarkError(int line, string code) => _errors.Add((line, code));
+
         internal void Assign(string name, TraceValueKind kind, int line)
         {
             _assignments[(name, line)] = kind;

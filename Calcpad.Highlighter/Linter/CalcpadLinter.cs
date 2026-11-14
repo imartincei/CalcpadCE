@@ -60,7 +60,9 @@ namespace Calcpad.Highlighter.Linter
             // Run validators
             ValidateStage1(stage1Context, result);
             ValidateStage2(stage2Context, result);
-            _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
+            // A trace is only applied to the text it ran, so the run already reported these
+            if (staged.Runtime is null)
+                _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
             if (staged.CoreCheck is { } check)
                 _coreCheckValidator.Validate(stage3Context, check.Value, result);
