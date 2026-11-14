@@ -160,6 +160,17 @@ namespace Calcpad.Core
             if (s[0] == '#' && keyword == Keyword.None)
                 keyword = GetKeyword(s);
 
+            if (_postSkipDepth > 0)
+            {
+                if (keyword == Keyword.Post)
+                    ++_postSkipDepth;
+                else if (keyword == Keyword.End_Post)
+                    --_postSkipDepth;
+
+                keyword = Keyword.None;
+                return KeywordResult.Continue;
+            }
+
             var isModeKeyword = IsActiveModeKeyword(keyword);
             // Skipped lines must not cache their keyword, or a loop would replay it
             if (_modeSuppressed && !isModeKeyword)
@@ -206,6 +217,9 @@ namespace Calcpad.Core
                 case Keyword.Hide: SetVisibility(s, keyword, Settings.Math.ShowHiddenOutput && _isVisible); break;
                 case Keyword.Show: SetVisibility(s, keyword, true); break;
                 case Keyword.Pre: SetVisibility(s, keyword, !ForPrint); break;
+                case Keyword.Post when EnableUi && !Settings.CalculatePost && !_isCheck && IsDirectiveConditionMet(s, keyword):
+                    _postSkipDepth = 1;
+                    break;
                 case Keyword.Post: SetVisibility(s, keyword, !EnableUi); break;
                 case Keyword.End_Hide:
                 case Keyword.End_Show:

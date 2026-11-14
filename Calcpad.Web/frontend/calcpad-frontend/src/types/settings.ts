@@ -39,6 +39,7 @@ export interface CalcpadSettings {
         mode: 'auto' | 'local' | 'remote';
     };
     isUs: boolean;
+    calculatePost: boolean;
 }
 
 const COLOR_SCALE_OPTIONS: SettingOption[] = [
@@ -159,6 +160,7 @@ export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
     { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map (surface) plotting in pixels; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.', type: 'number', def: 0, min: 0 },
     { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods such as integration and root finding (1e-15 to 1e-2). Can be overridden per-document with a Precision = … line.', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
     { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG solver and eigensolver (1e-15 to 1e-2). Can be overridden per-document with a Tol = … line.', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
+    { key: 'calculatePost', label: 'Calculate #post in input form', detail: 'Calculate #post blocks while the input form is shown, hidden, so their variables stay available to later lines. Turn off to skip them entirely and keep the form responsive when the report is all at the end.', type: 'boolean', def: true },
 ];
 
 /** Looks up the definition for a `#settings` key. */
@@ -186,6 +188,7 @@ export const SETTINGS_PATH: Partial<Record<string, string>> = {
     isUs: 'isUs', vectorGraphics: 'plot.vectorGraphics', colorScale: 'plot.colorScale',
     smoothScale: 'plot.smoothScale', shadows: 'plot.shadows', adaptivePlot: 'plot.isAdaptive',
     plotWidth: 'plot.width', plotHeight: 'plot.height', plotStep: 'plot.step',
+    calculatePost: 'calculatePost',
 };
 
 // The handful of CalcpadSettings fields Core doesn't expose as a #settings key
@@ -408,6 +411,7 @@ export function buildApiSettings(settings: CalcpadSettings): unknown {
             colorScale: colorScaleToEnum(settings.plot.colorScale),
             lightDirection: lightDirectionToEnum(settings.plot.lightDirection)
         },
-        isUs: settings.isUs
+        isUs: settings.isUs,
+        calculatePost: settings.calculatePost
     };
 }

@@ -31,6 +31,8 @@ namespace Calcpad.Core
         private bool _calculate;
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
+        // Nesting depth of a #post block skipped by calculatePost: false
+        private int _postSkipDepth;
         private readonly Stack<int> _outputModeStack = new();
         private readonly Stack<MathParser.VariableSubstitutionOptions> _substitutionStack = new();
         private readonly Stack<SettingsDto> _settingsStack = new();
@@ -72,6 +74,8 @@ namespace Calcpad.Core
         }
 
         public void Cancel() => _parser?.Cancel();
+
+        private bool IsSuppressed => _modeSuppressed || _postSkipDepth > 0;
 
         private string HtmlId => LineAttributes(_currentLine, _parser.Line);
 
@@ -119,12 +123,12 @@ namespace Calcpad.Core
                         var keyword = currentLineCache.Keyword;
                         if (keyword == Keyword.SkipLine)
                             continue;
-                        if (keyword == Keyword.Continue && !_modeSuppressed)
+                        if (keyword == Keyword.Continue && !IsSuppressed)
                         {
                             ParseKeywordContinue();
                             continue;
                         }
-                        if (!_modeSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
+                        if (!IsSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
                         {
                             if (IsEnabled())
                             {
@@ -204,7 +208,7 @@ namespace Calcpad.Core
 
                         if (textSpan.IsEmpty)
                         {
-                            if (_modeSuppressed)
+                            if (IsSuppressed)
                                 continue;
 
                             if (IsNonCpdMode)
@@ -625,6 +629,7 @@ namespace Calcpad.Core
             _currentLine = -1;
             _isVisible = true;
             _visibilityStack.Clear();
+            _postSkipDepth = 0;
             _mdBuffer.Clear();
             _mdLines.Clear();
             ResetUiState();

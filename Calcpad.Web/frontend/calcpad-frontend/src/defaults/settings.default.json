@@ -32,7 +32,8 @@
             "url": "",
             "mode": "auto"
         },
-        "isUs": true
+        "isUs": true,
+        "calculatePost": true
     },
     "extras": {
         "previewTheme": "system",
