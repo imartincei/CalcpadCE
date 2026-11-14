@@ -156,6 +156,8 @@ const zh: Record<string, string> = {
     "Blues": "蓝色系",
     "Both": "页眉和页脚",
     "Bottom margin": "下边距",
+    "Calculate #post blocks while the input form is shown, hidden, so their variables stay available to later lines. Turn off to skip them entirely and keep the form responsive when the report is all at the end.": "显示输入表单时仍计算 #post 块（隐藏），使其变量可供后续行使用。关闭后将完全跳过这些块，在报告全部位于文件末尾时保持表单响应流畅。",
+    "Calculate #post in input form": "在输入表单中计算 #post",
     "Complex numbers": "复数",
     "Concentrates sample points where the curve bends sharply instead of spacing them evenly. Produces smoother plots of curved functions at a lower point count; disable for a fixed dense sampling.": "在曲线弯曲处集中采样点，而不是均匀分布。用更少的点得到更平滑的曲线；关闭则使用固定密采样。",
     "Date": "日期",

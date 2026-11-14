@@ -15,6 +15,7 @@ In VS Code, do not use VS Code's own settings editor.
 | **Format Equations** | on/off | *Professional* (on) renders equations in stacked math form; *Inline* (off) renders them on a single line. |
 | **Zero Small Matrix Elements** | on/off | Show very small matrix/vector values as `0` instead of using scientific notation. |
 | **Show Hidden Output** | on/off | Ignore `#hide` so suppressed content is rendered anyway. For debugging. |
+| **Calculate #post in Input Form** | on/off *(default on)* | On: `#post` blocks are still calculated, just hidden, while the input form is on screen, so a later `#pre` can use their variables. Off: they are skipped entirely in the Input form, which keeps typing responsive. Reports and Preview always calculate `#post`. See [UI Mode](new-ui-mode.md#pre-and-post). |
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
 | **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
 | **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |

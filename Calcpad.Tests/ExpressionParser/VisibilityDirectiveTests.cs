@@ -131,6 +131,57 @@ namespace Calcpad.Tests
             Assert.Contains("bbb2", html);
         }
 
+        private const string PostThenUse = "#post\nppp1 = 7\n#end post\n#pre\nqqq2 = ppp1 + 1\n#end pre";
+        private const string SkipPost = "#settings {\"calculatePost\": false}\n";
+
+        [Fact]
+        public void CalculatePost_Default_PostVariablesAvailableInForm()
+        {
+            var parser = new ExpressionParser { Settings = new Settings(), EnableUi = true };
+            parser.Parse(PostThenUse, true, false);
+            Assert.DoesNotContain("ppp1 = 7", parser.HtmlResult);
+            Assert.DoesNotContain("err", parser.HtmlResult);
+        }
+
+        [Fact]
+        public void CalculatePost_False_SkipsPostInForm()
+        {
+            var parser = new ExpressionParser { Settings = new Settings(), EnableUi = true };
+            parser.Parse(SkipPost + PostThenUse, true, false);
+            Assert.Contains("err", parser.HtmlResult);
+        }
+
+        [Fact]
+        public void CalculatePost_False_StillCalculatesInReport()
+        {
+            var parser = new ExpressionParser { Settings = new Settings(), ForPrint = true };
+            parser.Parse(SkipPost + "#post\nppp1 = 7\n#end post\nqqq2 = ppp1 + 1", true, false);
+            Assert.Contains("ppp1", parser.HtmlResult);
+            Assert.DoesNotContain("err", parser.HtmlResult);
+        }
+
+        [Fact]
+        public void CalculatePost_False_NestedBlocksResumeAfterMatchingEnd()
+        {
+            var html = Render(
+                SkipPost + "#post\n#post\naaa1 = 1\n#end post\n#hide\nbbb2 = 2\n#end hide\nccc3 = 3\n#end post\nddd4 = 4\n#hide\neee5 = 5\n#end hide\nfff6 = 6",
+                enableUi: true);
+            Assert.DoesNotContain("aaa1", html);
+            Assert.DoesNotContain("bbb2", html);
+            Assert.DoesNotContain("ccc3", html);
+            Assert.Contains("ddd4", html);
+            Assert.DoesNotContain("eee5", html);
+            Assert.Contains("fff6", html);
+        }
+
+        [Fact]
+        public void CalculatePost_False_ConditionNotMet_KeepsDefault()
+        {
+            var parser = new ExpressionParser { Settings = new Settings(), EnableUi = true };
+            parser.Parse(SkipPost + "x = 0\n#post x ≡ 1\nppp1 = 7\n#end post\nqqq2 = ppp1 + 1", true, false);
+            Assert.DoesNotContain("err", parser.HtmlResult);
+        }
+
         [Fact]
         public void HideCondition_BadExpression_RecordsErrorAndLeavesStateUnchanged()
         {

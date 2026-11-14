@@ -56,6 +56,13 @@ The two directives split a document into the part that is filled in and the part
 #end post
 ```
 
+Both are still calculated when hidden, so a variable defined in `#post` can be used by a `#pre` later in the file.
+If the `#post` calculations slow down the form and variables are not needed in the Input form, turn off **Calculate #post in Input Form** in [Settings](new-settings.md#math) or in the document using:
+
+```text
+#settings {"calculatePost": false}
+```
+
 **Preview** is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.
 
 Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
