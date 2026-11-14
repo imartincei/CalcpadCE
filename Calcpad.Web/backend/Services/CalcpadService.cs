@@ -91,7 +91,8 @@ namespace Calcpad.Server.Services
                 var macroParser = new MacroParser
                 {
                     Include = CreateIncludeDelegate(),
-                    SourceFilePath = sourceFilePath
+                    SourceFilePath = sourceFilePath,
+                    DefaultMacroCalls = coreSettings.MacroCalls
                 };
 
                 string outputText;

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.IO;
+using Calcpad.Core;
 using Calcpad.Highlighter.ContentResolution;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -69,21 +70,23 @@ namespace Calcpad.Server.Services
         }
 
         /// <param name="useTrace">Overlay the latest /convert trace for this content, if any.</param>
-        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath, bool useTrace = false)
+        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath, bool useTrace = false,
+            MacroCallMode macroCalls = MacroCallMode.Auto)
         {
             var fileKey = sourceFilePath ?? string.Empty;
-            var key = ContentKey.For(sourceFilePath, content);
+            var traceKey = ContentKey.For(sourceFilePath, content);
+            var key = $"{traceKey}|{(int)macroCalls}";
 
             if (_cache.TryGetValue(key, out CacheEntry? cached) && cached != null && IsIncludesFresh(cached))
-                return useTrace ? ApplyTrace(cached, sourceFilePath, key) : cached.Staged;
+                return useTrace ? ApplyTrace(cached, sourceFilePath, traceKey) : cached.Staged;
 
             // Concurrent callers for the same key share one resolution instead of racing.
             var lazy = _inFlight.GetOrAdd(key, _ => new Lazy<CacheEntry>(
-                () => Resolve(content, sourceFilePath, fileKey, key),
+                () => Resolve(content, sourceFilePath, macroCalls, fileKey, key),
                 LazyThreadSafetyMode.ExecutionAndPublication));
             try
             {
-                return useTrace ? ApplyTrace(lazy.Value, sourceFilePath, key) : lazy.Value.Staged;
+                return useTrace ? ApplyTrace(lazy.Value, sourceFilePath, traceKey) : lazy.Value.Staged;
             }
             finally
             {
@@ -109,13 +112,13 @@ namespace Calcpad.Server.Services
             return staged;
         }
 
-        private CacheEntry Resolve(string content, string? sourceFilePath, string fileKey, string key)
+        private CacheEntry Resolve(string content, string? sourceFilePath, MacroCallMode macroCalls, string fileKey, string key)
         {
             // New content for this file — drop its old entry now instead of waiting on the TTL.
             if (_activeKeyBySourceFile.TryGetValue(fileKey, out var oldKey) && oldKey != key)
                 _cache.Remove(oldKey);
 
-            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: sourceFilePath);
+            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath, macroCalls);
 
             var writeTimes = new ConcurrentDictionary<string, DateTime>();
             foreach (var (path, _) in staged.Stage2.IncludedFileHashes)

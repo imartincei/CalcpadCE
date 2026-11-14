@@ -33,6 +33,7 @@
             "mode": "auto"
         },
         "isUs": true,
+        "macroCalls": "auto",
         "calculatePost": true
     },
     "extras": {

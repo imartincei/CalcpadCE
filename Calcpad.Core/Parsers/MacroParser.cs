@@ -201,12 +201,16 @@ namespace Calcpad.Core
             Include,
             ProjectPath,
             LibraryPath,
+            Settings,
+            EndSettings,
         }
         private const string DefKeyword = "#def";
         private const string EndDefKeyword = "#end def";
         private const string IncludeKeyword = "#include";
         private const string ProjectPathKeyword = "#projectpath";
         private const string LibraryPathKeyword = "#librarypath";
+        private const string SettingsKeyword = "#settings";
+        private const string EndSettingsKeyword = "#end settings";
         private const string FieldsMarker = "#{";
         private readonly List<int> _lineNumbers = [];
         // Filesystem path comparison must match the host OS to avoid false-positive circular
@@ -217,6 +221,16 @@ namespace Calcpad.Core
         private PathRoots _pathRoots = new();
         public PathRoots PathRoots => _pathRoots;
         private readonly Dictionary<string, Macro> _macros = new(StringComparer.Ordinal);
+        private MacroCallMode _macroCalls;
+        /// <summary>Mode at the start of the document, before any <c>#settings</c>.</summary>
+        public MacroCallMode DefaultMacroCalls { get; set; }
+        private readonly Stack<MacroCallMode> _macroCallsStack = new();
+        private bool ParsesMacroCalls => _macroCalls switch
+        {
+            MacroCallMode.On => true,
+            MacroCallMode.Off => false,
+            _ => _macros.Count != 0
+        };
         public Func<string, Queue<string>, string> Include;
         public string SourceFilePath { get; set; }
         private readonly List<CalcpadError> _errorList = new();
@@ -269,6 +283,10 @@ namespace Calcpad.Core
                 return Keywords.ProjectPath;
             if (s.StartsWith(LibraryPathKeyword, StringComparison.OrdinalIgnoreCase))
                 return Keywords.LibraryPath;
+            if (s.StartsWith(SettingsKeyword, StringComparison.OrdinalIgnoreCase))
+                return Keywords.Settings;
+            if (s.StartsWith(EndSettingsKeyword, StringComparison.OrdinalIgnoreCase))
+                return Keywords.EndSettings;
 
             return Keywords.None;
         }
@@ -303,6 +321,8 @@ namespace Calcpad.Core
             {
                 sb = new StringBuilder(sourceCode.Length);
                 _macros.Clear();
+                _macroCalls = DefaultMacroCalls;
+                _macroCallsStack.Clear();
                 _lineNumbers.Clear();
                 _includeStack.Clear();
                 _parsedLineNumber = 0;
@@ -382,7 +402,7 @@ namespace Calcpad.Core
                         continue;
                     }
 
-                    if (_macros.Count != 0)
+                    if (ParsesMacroCalls)
                     {
                         try
                         {
@@ -463,6 +483,16 @@ namespace Calcpad.Core
                     case Keywords.LibraryPath:
                         ParsePathRoot(lineContent, sourceLine);
                         return true;
+                    // Left in the output for ExpressionParser
+                    case Keywords.Settings when macroDefCount == 0:
+                        _macroCallsStack.Push(_macroCalls);
+                        if (ReadMacroCalls(lineContent[SettingsKeyword.Length..]) is MacroCallMode mode)
+                            _macroCalls = mode;
+                        return false;
+                    case Keywords.EndSettings when macroDefCount == 0:
+                        if (_macroCallsStack.Count > 0)
+                            _macroCalls = _macroCallsStack.Pop();
+                        return false;
                     default:
                         return false;
                 }
@@ -861,6 +891,21 @@ namespace Calcpad.Core
                 lines.Add(line.ToString());
 
             return lines;
+        }
+
+        private static MacroCallMode? ReadMacroCalls(ReadOnlySpan<char> json)
+        {
+            json = json.Trim();
+            if (json.IndexOf("macroCalls", StringComparison.OrdinalIgnoreCase) < 0)
+                return null;
+            try
+            {
+                return SettingsDto.Parse(json.ToString())?.ParsedMacroCalls;
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                return null;
+            }
         }
 
         public static Queue<string> GetFields(ReadOnlySpan<char> s, char delimiter)
