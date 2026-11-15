@@ -50,6 +50,15 @@
       @mousedown.stop
       @click.stop
     >
+      <template v-for="kind in menuReferenceKinds" :key="kind">
+        <button class="context-menu" @click="onInsertReference(kind, false)">
+          {{ t(REFERENCE_LABELS[kind].relative) }}
+        </button>
+        <button class="context-menu" @click="onInsertReference(kind, true)">
+          {{ t(REFERENCE_LABELS[kind].absolute) }}
+        </button>
+      </template>
+      <div v-if="menuReferenceKinds.length" class="context-menu-separator" />
       <button class="context-menu" @click="onOpenContainingFolder">
         Open Containing Folder
       </button>
@@ -70,6 +79,10 @@ import type { OpenedFolder } from '../types'
 import FilesFolderSection from './FilesFolderSection.vue'
 import type { SectionContextMenuPayload } from './FilesFolderSection.vue'
 import { writeClipboard } from '../services/clipboard'
+import { INCLUDE_EXTENSIONS, DATA_EXTENSIONS } from '../../text/directives'
+import { IMAGE_EXTENSIONS } from '../../services/image-utils'
+
+type FileReferenceKind = 'include' | 'read' | 'image'
 
 const { t } = useI18n()
 
@@ -84,6 +97,7 @@ const emit = defineEmits<{
   'open-file': [path: string]
   'expand-folder': [path: string]
   'open-containing-folder': [path: string]
+  'insert-file-reference': [path: string, kind: FileReferenceKind, absolute: boolean]
   'close-folder': [slot: number]
   'refresh-folder': [slot: number]
 }>()
@@ -156,6 +170,37 @@ const contextMenu = ref<SectionContextMenuPayload | null>(null)
 
 const handleContextMenu = (payload: SectionContextMenuPayload) => {
   contextMenu.value = payload
+}
+
+const menuExtension = computed(() => {
+  const node = contextMenu.value?.node
+  if (!node || node.isDirectory) return ''
+  const dot = node.name.lastIndexOf('.')
+  return dot < 0 ? '' : node.name.substring(dot + 1).toLowerCase()
+})
+
+const REFERENCE_EXTENSIONS: Record<FileReferenceKind, readonly string[]> = {
+  include: INCLUDE_EXTENSIONS,
+  read: [...DATA_EXTENSIONS, 'txt'],
+  image: IMAGE_EXTENSIONS,
+}
+
+const REFERENCE_LABELS: Record<FileReferenceKind, { relative: string; absolute: string }> = {
+  include: { relative: 'Insert #include (Relative Path)', absolute: 'Insert #include (Absolute Path)' },
+  read: { relative: 'Insert #read (Relative Path)', absolute: 'Insert #read (Absolute Path)' },
+  image: { relative: 'Insert Image (Relative Path)', absolute: 'Insert Image (Absolute Path)' },
+}
+
+const menuReferenceKinds = computed(() =>
+  (Object.keys(REFERENCE_EXTENSIONS) as FileReferenceKind[])
+    .filter(kind => REFERENCE_EXTENSIONS[kind].includes(menuExtension.value))
+)
+
+const onInsertReference = (kind: FileReferenceKind, absolute: boolean) => {
+  const menu = contextMenu.value
+  if (!menu) return
+  emit('insert-file-reference', menu.node.path, kind, absolute)
+  closeContextMenu()
 }
 
 const closeContextMenu = () => {

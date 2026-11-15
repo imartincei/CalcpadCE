@@ -34,6 +34,7 @@ import type { ExportVariant } from 'calcpad-frontend/types/api';
 import {
     IMAGE_EXTENSIONS,
     bytesToBase64,
+    buildImageCommentLine,
     isCompiledPath,
     inlineImageSources,
     MAX_COMPILED_IMAGE_TOTAL_BYTES,
@@ -506,6 +507,9 @@ export class TauriMessageBridge extends BaseMessageBridge {
             case 'closeFolder':
                 this.handleCloseFolder(toFolderSlot(message.slot));
                 return true;
+            case 'insertFileReference':
+                this.handleInsertFileReference(message.path, message.kind, !!message.absolute);
+                return true;
         }
         return false;
     }
@@ -819,6 +823,25 @@ export class TauriMessageBridge extends BaseMessageBridge {
 
     // Reveals rather than opening the parent, so the file manager lands with the
     // item already selected.
+    private handleInsertFileReference(filePath: string, kind: 'include' | 'read' | 'image', absolute: boolean): void {
+        if (!filePath || typeof filePath !== 'string') return;
+        const ref = this.referenceForFilePath(filePath, absolute);
+        const line = kind === 'image' ? buildImageCommentLine(ref)
+            : kind === 'read' ? `#read M from ${ref}`
+            : `#include ${ref}`;
+        this._onInsertText?.(line);
+    }
+
+    /** Relative falls back to absolute for an untitled document or another drive. */
+    private referenceForFilePath(target: string, preferAbsolute: boolean): string {
+        const absolute = target.replace(/\\/g, '/');
+        const docPath = this.activeTabFilePath();
+        if (preferAbsolute || !docPath) return absolute;
+        const docDir = pathDirname(docPath);
+        const rootOf = (p: string) => p.replace(/\\/g, '/').split('/')[0].toLowerCase();
+        return rootOf(docDir) === rootOf(target) ? pathRelative(docDir, target) : absolute;
+    }
+
     private async handleOpenContainingFolder(itemPath: string): Promise<void> {
         if (!itemPath || typeof itemPath !== 'string') return;
         try {
