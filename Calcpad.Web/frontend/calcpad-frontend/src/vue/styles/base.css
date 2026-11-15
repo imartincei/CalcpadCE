@@ -420,6 +420,12 @@ select,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.calcpad-context-menu .context-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--vscode-menu-separatorBackground, var(--vscode-menu-border));
+}
+
 /* Common button styles */
 button {
   display: inline-flex;
