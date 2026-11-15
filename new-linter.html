@@ -1425,6 +1425,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#errors-inside-macros-and-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside macros and functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3109,6 +3120,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#errors-inside-macros-and-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside macros and functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3272,6 +3294,13 @@ Each diagnostic has a short, stable code (like <code>CPD-3301</code>) so you can
 <li><strong>As you type</strong>, the linter checks the document without running it, including <code>#include</code> and <code>#def</code> errors and code in branches and loops that don't run.</li>
 <li><strong>When the preview runs</strong> the document's calculation errors also appear in the Problems panel.</li>
 </ul>
+<h2 id="errors-inside-macros-and-functions">Errors inside macros and functions<a class="headerlink" href="#errors-inside-macros-and-functions" title="Permanent link">&para;</a></h2>
+<p>A macro body is checked with the arguments of each call.
+An error in the body is marked on the call, and the first call also marks the place in the <code>#def</code> where the error is.
+Each mark links to the other.</p>
+<p>A custom function body is checked at its first call: every variable the body uses must be defined by then.
+If one is not, the linter marks both the call and the variable in the function body.
+A function that is never called is checked at the end of the document.</p>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
 The tables below group them by the kind of problem.</p>
