@@ -2484,7 +2484,7 @@ async function bootstrap(): Promise<void> {
             groups: () => [...groups.values()],
             activeGroup: () => activeGroup,
             openFile: loadFile,
-        });
+        }, (locale, messages) => i18n.global.mergeLocaleMessage(locale, messages));
 
         // Files-tab clicks arrive via a custom event dispatched by the bridge.
         window.addEventListener('calcpad-open-file', (e: Event) => {

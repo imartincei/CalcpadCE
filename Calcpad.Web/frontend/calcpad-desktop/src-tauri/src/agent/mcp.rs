@@ -49,19 +49,19 @@ pub struct McpEndpoint {
 }
 
 impl McpEndpoint {
-    pub fn config_json(&self, key: &SessionKey) -> Value {
+    /// Everything a provider needs to connect its agent to this server.
+    pub fn descriptor(&self, key: &SessionKey) -> Value {
         json!({
-            "mcpServers": {
-                SERVER_NAME: {
-                    "type": "http",
-                    "url": self.url,
-                    "headers": {
-                        "Authorization": format!("Bearer {}", self.token),
-                        "X-Calcpad-Window": key.window,
-                        "X-Calcpad-Conversation": key.conversation,
-                    }
-                }
-            }
+            "name": SERVER_NAME,
+            "type": "http",
+            "url": self.url,
+            "headers": {
+                "Authorization": format!("Bearer {}", self.token),
+                "X-Calcpad-Window": key.window,
+                "X-Calcpad-Conversation": key.conversation,
+            },
+            "autoApprovedTools": auto_approved_tools(),
+            "approvalTool": APPROVAL_TOOL,
         })
     }
 }
@@ -166,13 +166,9 @@ const TOOLS: &[ToolSpec] = &[
 
 pub const APPROVAL_TOOL: &str = "approve_tool";
 
-/// Fully-qualified names of tools that need no permission prompt.
-pub fn auto_approved_tools() -> Vec<String> {
-    TOOLS
-        .iter()
-        .filter(|t| t.auto_approve)
-        .map(|t| format!("mcp__{SERVER_NAME}__{}", t.name))
-        .collect()
+/// Tools that need no permission prompt.
+pub fn auto_approved_tools() -> Vec<&'static str> {
+    TOOLS.iter().filter(|t| t.auto_approve).map(|t| t.name).collect()
 }
 
 fn tools() -> Vec<Tool> {
@@ -334,8 +330,8 @@ mod tests {
     #[test]
     fn approval_tool_is_never_auto_approved() {
         let names = auto_approved_tools();
-        assert!(names.contains(&"mcp__calcpad__get_document".to_string()));
-        assert!(!names.iter().any(|n| n.ends_with(APPROVAL_TOOL)));
+        assert!(names.contains(&"get_document"));
+        assert!(!names.contains(&APPROVAL_TOOL));
     }
 
     #[test]

@@ -1,12 +1,12 @@
 <template>
-  <aside class="agent-panel" :aria-label="t('Claude Code chat')">
+  <aside class="agent-panel" :aria-label="t('{name} chat', { name: providerName() })">
     <header class="agent-header">
       <div class="agent-brand">
         <span class="agent-logo" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
         </span>
         <div class="agent-brand-text">
-          <span class="agent-name">Claude Code</span>
+          <span class="agent-name">{{ providerName() }}</span>
           <span v-if="subtitle" class="agent-subtitle" :title="subtitle">{{ subtitle }}</span>
         </div>
       </div>
@@ -76,11 +76,11 @@
     </div>
 
     <form v-if="showSettings" class="agent-settings" @submit.prevent="applySettings">
-      <label class="agent-field">
-        <span class="agent-field-label">{{ t('Claude Code executable') }}</span>
-        <input v-model="draftSettings.executable" type="text" spellcheck="false" :placeholder="t('Found automatically')" />
+      <label v-for="field in agentChat.provider?.settings ?? []" :key="field.key" class="agent-field">
+        <span class="agent-field-label">{{ t(field.label) }}</span>
+        <input v-model="draftSettings.values[field.key]" type="text" spellcheck="false" :placeholder="field.placeholder ? t(field.placeholder) : ''" />
       </label>
-      <label class="agent-field">
+      <label v-if="modelOptions.length" class="agent-field">
         <span class="agent-field-label">{{ t('Model') }}</span>
         <select v-model="draftSettings.model" class="agent-select">
           <option v-for="option in modelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
@@ -105,7 +105,7 @@
         </template>
       </div>
       <div v-if="!conversation.changes.length" class="agent-empty">
-        <p>{{ t('Claude has not changed any worksheets in this conversation. Each worksheet is backed up before its first change.') }}</p>
+        <p>{{ t('{name} has not changed any worksheets in this conversation. Each worksheet is backed up before its first change.', { name: assistantName() }) }}</p>
       </div>
       <div
         v-for="change in changeRows"
@@ -186,7 +186,7 @@
         <span class="agent-empty-logo" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
         </span>
-        <p>{{ t('Ask Claude about your open worksheets. It can read them, check their errors, and propose edits for you to review.') }}</p>
+        <p>{{ t('Ask {name} about your open worksheets. It can read them, check their errors, and propose edits for you to review.', { name: assistantName() }) }}</p>
       </div>
 
       <template v-for="(item, index) in conversation.items" :key="conversation.id + ':' + index">
@@ -249,7 +249,7 @@
 
       <div v-if="conversation.status === 'starting' || (conversation.status === 'busy' && !isStreaming)" class="agent-thinking">
         <span class="agent-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        {{ conversation.status === 'starting' ? t('Starting Claude Code…') : t('Working…') }}
+        {{ conversation.status === 'starting' ? t('Starting {name}…', { name: providerName() }) : t('Working…') }}
       </div>
     </div>
 
@@ -259,7 +259,7 @@
           ref="input"
           v-model="draft"
           rows="1"
-          :placeholder="t('Message Claude…')"
+          :placeholder="t('Message {name}…', { name: assistantName() })"
           :title="t('Enter to send · Shift+Enter for a new line')"
           @input="autoSize"
           @keydown.enter.exact.prevent="submit"
@@ -286,7 +286,7 @@
         </button>
       </div>
       <div class="agent-composer-footer">
-        <label class="agent-model-picker" :title="t('Model')">
+        <label v-if="modelOptions.length" class="agent-model-picker" :title="t('Model')">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
           <span class="agent-picker-label">{{ currentModelLabel }}</span>
           <select :value="conversation.model" :aria-label="t('Model')" @change="onModelPicked">
@@ -294,11 +294,11 @@
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
         </label>
-        <label class="agent-model-picker agent-mode-picker" :class="'mode-' + conversation.permissionMode" :title="modeHint + ' (Shift+Tab)'">
+        <label class="agent-model-picker agent-mode-picker" :class="'edits-' + currentMode.edits" :title="modeHint + ' (Shift+Tab)'">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
           <span class="agent-picker-label">{{ t(currentMode.label) }}</span>
           <select :value="conversation.permissionMode" :aria-label="t('Permission mode')" @change="onModePicked">
-            <option v-for="mode in PERMISSION_MODES" :key="mode.value" :value="mode.value">{{ t(mode.label) }}</option>
+            <option v-for="mode in permissionModes()" :key="mode.value" :value="mode.value">{{ t(mode.label) }}</option>
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
         </label>
@@ -324,9 +324,12 @@ import {
   keepAllChanges,
   keepChange,
   lineStats,
-  MODEL_OPTIONS,
+  modeInfo,
+  modelOptions as providerModels,
   openChangeDiff,
-  PERMISSION_MODES,
+  permissionModes,
+  providerName,
+  assistantName,
   revertAllChanges,
   revertChange,
   setPermissionMode,
@@ -351,7 +354,7 @@ const drafts = reactive<Record<string, string>>({})
 const scroller = ref<HTMLElement | null>(null)
 const input = ref<HTMLTextAreaElement | null>(null)
 const showSettings = ref(false)
-const draftSettings = reactive({ executable: '', model: '' })
+const draftSettings = reactive({ values: {} as Record<string, string>, model: '' })
 
 const conversation = computed(() => activeConversation())
 const draft = computed({
@@ -366,8 +369,10 @@ const isStreaming = computed(() => {
 })
 /** Keeps a model typed in an older version selectable. */
 const modelOptions = computed(() => {
-  const extra = [conversation.value.model, draftSettings.model].filter(m => m && !MODEL_OPTIONS.some(o => o.value === m))
-  return [...MODEL_OPTIONS, ...[...new Set(extra)].map(m => ({ value: m, label: m }))]
+  const models = providerModels()
+  if (!models.length) return []
+  const extra = [conversation.value.model, draftSettings.model].filter(m => m && !models.some(o => o.value === m))
+  return [...models, ...[...new Set(extra)].map(m => ({ value: m, label: m }))]
 })
 const subtitle = computed(() => [conversation.value.resolvedModel, conversation.value.version && `v${conversation.value.version}`].filter(Boolean).join(' · '))
 
@@ -375,7 +380,7 @@ function modelLabel(option: { value: string; label: string }): string {
   return option.value === '' ? t('Default') : option.label
 }
 
-const currentMode = computed(() => PERMISSION_MODES.find(m => m.value === conversation.value.permissionMode) ?? PERMISSION_MODES[0])
+const currentMode = computed(() => modeInfo(conversation.value.permissionMode))
 const modeHint = computed(() => t(currentMode.value.hint))
 const currentModelLabel = computed(() => {
   const option = modelOptions.value.find(o => o.value === conversation.value.model)
@@ -452,11 +457,11 @@ function submit(): void {
 
 function toggleSettings(): void {
   showSettings.value = !showSettings.value
-  if (showSettings.value) Object.assign(draftSettings, agentChat.settings)
+  if (showSettings.value) Object.assign(draftSettings, { values: { ...agentChat.settings.values }, model: agentChat.settings.model })
 }
 
 function applySettings(): void {
-  void saveSettings({ ...draftSettings })
+  void saveSettings({ values: { ...draftSettings.values }, model: draftSettings.model })
   showSettings.value = false
 }
 
@@ -1328,11 +1333,10 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-link:hover {
   text-decoration: underline;
 }
-.agent-mode-picker.mode-auto,
-.agent-mode-picker.mode-acceptEdits {
+.agent-mode-picker.edits-auto {
   color: #d97757;
 }
-.agent-mode-picker.mode-plan {
+.agent-mode-picker.edits-blocked {
   color: var(--vscode-textLink-foreground, #3794ff);
 }
 

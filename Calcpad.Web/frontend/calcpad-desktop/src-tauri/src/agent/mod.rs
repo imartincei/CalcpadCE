@@ -1,14 +1,14 @@
-//! Coding-agent chat: an agent CLI child process per conversation tab, plus an MCP server
+//! Coding-agent chat: a provider extension process per conversation tab, plus an MCP server
 //! that exposes the live editor to it.
 
-mod claude_code;
+mod extension;
 pub mod history;
 mod mcp;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,7 @@ use tokio::sync::{oneshot, OnceCell};
 pub const EVENT_NAME: &str = "agent-event";
 const TOOL_REQUEST_EVENT: &str = "agent-tool-request";
 
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "kind", rename_all = "camelCase", rename_all_fields = "camelCase")]
 pub enum AgentEvent {
     SessionStarted {
@@ -62,18 +62,7 @@ pub enum AgentEvent {
     },
 }
 
-/// Modes the UI may select; bypassing permissions is deliberately not offered.
-pub const PERMISSION_MODES: &[&str] = &["default", "acceptEdits", "plan", "auto"];
-
-fn check_mode(mode: &str) -> Result<(), String> {
-    if PERMISSION_MODES.contains(&mode) {
-        Ok(())
-    } else {
-        Err(format!("Unsupported permission mode {mode}"))
-    }
-}
-
-/// One running agent conversation. Backends other than Claude Code (e.g. ACP) implement this.
+/// One running agent conversation.
 pub trait AgentBackend: Send + Sync {
     fn send_user(&self, text: &str) -> Result<(), String>;
     fn interrupt(&self) -> Result<(), String>;
@@ -86,11 +75,14 @@ pub trait AgentBackend: Send + Sync {
 #[derive(Debug, Default, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StartOptions {
-    pub executable: Option<String>,
+    pub provider: String,
     pub cwd: Option<String>,
     pub model: Option<String>,
     pub permission_mode: Option<String>,
     pub resume: Option<String>,
+    /// Values for the provider's manifest `settings`.
+    #[serde(default)]
+    pub settings: serde_json::Map<String, Value>,
 }
 
 /// A conversation tab in a window.
@@ -112,6 +104,7 @@ impl SessionKey {
 
 struct Session {
     generation: u64,
+    provider: Arc<extension::Provider>,
     backend: Box<dyn AgentBackend>,
 }
 
@@ -126,6 +119,7 @@ pub struct AgentState {
     pending: Mutex<HashMap<u64, Pending>>,
     next_id: AtomicU64,
     mcp: OnceCell<mcp::McpEndpoint>,
+    providers: OnceLock<Vec<Arc<extension::Provider>>>,
 }
 
 #[derive(Clone, Serialize)]
@@ -143,6 +137,10 @@ struct ToolRequest<'a> {
 }
 
 impl AgentState {
+    fn providers(&self, app: &AppHandle) -> &[Arc<extension::Provider>] {
+        self.providers.get_or_init(|| extension::discover(app))
+    }
+
     fn is_current(&self, key: &SessionKey, generation: u64) -> bool {
         self.sessions
             .lock()
@@ -247,9 +245,27 @@ impl mcp::ToolBridge for WindowBridge {
     }
 }
 
-fn plugin_dir(app: &AppHandle) -> Option<PathBuf> {
-    let dir = app.path().resource_dir().ok()?.join("agent-plugin");
-    dir.join(".claude-plugin").join("plugin.json").is_file().then_some(dir)
+fn resolve_cwd(requested: Option<&str>) -> PathBuf {
+    requested
+        .map(PathBuf::from)
+        .filter(|p| p.is_dir())
+        .or_else(|| std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).map(PathBuf::from))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
+fn session_label(key: &SessionKey) -> String {
+    let window: String = key
+        .window
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
+        .collect();
+    format!("{window}-{}", key.conversation)
+}
+
+/// Manifests of the installed agent providers.
+#[tauri::command]
+pub fn agent_providers(app: AppHandle, state: State<'_, AgentState>) -> Vec<Value> {
+    state.providers(&app).iter().map(|p| p.info.clone()).collect()
 }
 
 #[tauri::command]
@@ -260,10 +276,16 @@ pub async fn agent_start(
     options: StartOptions,
 ) -> Result<(), String> {
     let key = SessionKey::new(&window, conversation)?;
-    if let Some(mode) = options.permission_mode.as_deref() {
-        check_mode(mode)?;
-    }
     let state = app.state::<AgentState>();
+    let provider = state
+        .providers(&app)
+        .iter()
+        .find(|p| p.id == options.provider)
+        .cloned()
+        .ok_or_else(|| format!("The {} extension is not installed", options.provider))?;
+    if let Some(mode) = options.permission_mode.as_deref() {
+        provider.check_mode(mode)?;
+    }
     state.stop_where(|k| *k == key);
 
     let endpoint = state
@@ -272,17 +294,34 @@ pub async fn agent_start(
         .await?
         .clone();
     let generation = state.next_id.fetch_add(1, Ordering::Relaxed);
-    let launch = claude_code::Launch {
-        options,
-        mcp_config: endpoint.config_json(&key),
-        plugin_dir: plugin_dir(&app),
-        config_dir: app.path().app_data_dir().map_err(|e| e.to_string())?.join("agent"),
-    };
-    let backend = claude_code::spawn(&app, &key, generation, launch)?;
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?
+        .join("agent")
+        .join(&provider.id);
+    std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+    let start = serde_json::json!({
+        "type": "start",
+        "protocol": extension::PROTOCOL_VERSION,
+        "session": session_label(&key),
+        "dataDir": data_dir,
+        "extensionDir": provider.dir,
+        "options": {
+            "model": options.model,
+            "permissionMode": options.permission_mode,
+            "resume": options.resume,
+            "settings": options.settings,
+        },
+        "mcp": endpoint.descriptor(&key),
+    });
+    let cwd = resolve_cwd(options.cwd.as_deref());
+    let backend = extension::spawn(&app, &key, generation, &provider, start, &cwd)?;
     state.sessions.lock().expect("agent sessions mutex poisoned").insert(
         key,
         Session {
             generation,
+            provider,
             backend: Box::new(backend),
         },
     );
@@ -341,11 +380,13 @@ pub fn agent_set_permission_mode(
     conversation: String,
     mode: String,
 ) -> Result<(), String> {
-    check_mode(&mode)?;
     let key = SessionKey::new(&window, conversation)?;
     let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
     match sessions.get(&key) {
-        Some(session) => session.backend.set_permission_mode(&mode),
+        Some(session) => {
+            session.provider.check_mode(&mode)?;
+            session.backend.set_permission_mode(&mode)
+        }
         None => Ok(()),
     }
 }
@@ -386,19 +427,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn events_serialize_with_camel_case_fields() {
+    fn events_round_trip_with_camel_case_fields() {
         let event = AgentEvent::ToolResult {
             tool_use_id: "t1".into(),
             is_error: false,
             content: "ok".into(),
         };
+        let json = serde_json::json!({"kind":"toolResult","toolUseId":"t1","isError":false,"content":"ok"});
         assert_eq!(
             serde_json::to_value(EventPayload {
                 conversation: "c1".into(),
-                event
+                event: event.clone()
             })
             .unwrap(),
-            serde_json::json!({"conversation":"c1","event":{"kind":"toolResult","toolUseId":"t1","isError":false,"content":"ok"}})
+            serde_json::json!({"conversation":"c1","event":json})
         );
+        assert_eq!(serde_json::from_value::<AgentEvent>(json).unwrap(), event);
     }
 }

@@ -1749,6 +1749,7 @@ pub fn run() {
             show_app_menu,
             get_app_menu,
             create_export_path,
+            agent::agent_providers,
             agent::agent_start,
             agent::agent_send,
             agent::agent_interrupt,

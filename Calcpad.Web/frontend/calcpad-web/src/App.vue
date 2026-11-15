@@ -447,7 +447,7 @@
       </div><!-- /.document-panes -->
     </div><!-- /.work-area -->
 
-    <template v-if="isDesktop">
+    <template v-if="isDesktop && agentChat.provider">
       <div
         v-show="agentChat.panelOpen"
         class="resize-handle agent-resize-handle"
@@ -606,11 +606,11 @@
       ● {{ serverStatusLabel }}
     </span>
     <button
-      v-if="isDesktop"
+      v-if="isDesktop && agentChat.provider"
       class="status-agent"
       :class="{ active: agentChat.panelOpen }"
-      :title="t('Toggle Claude Code chat')"
-      :aria-label="t('Toggle Claude Code chat')"
+      :title="t('Toggle {name} chat', { name: agentChat.provider.name })"
+      :aria-label="t('Toggle {name} chat', { name: agentChat.provider.name })"
       :aria-pressed="agentChat.panelOpen"
       @click.stop="setPanelOpen(!agentChat.panelOpen)"
     >

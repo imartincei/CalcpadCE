@@ -13,26 +13,72 @@ export type ChatItem =
 
 export type AgentStatus = 'idle' | 'starting' | 'ready' | 'busy';
 
-export type PermissionMode = 'default' | 'acceptEdits' | 'plan' | 'auto';
+export type PermissionMode = string;
 
-/** Claude Code permission modes, in Shift+Tab cycling order. */
-export const PERMISSION_MODES: { value: PermissionMode; label: string; hint: string }[] = [
-    { value: 'default', label: 'Manual', hint: 'Ask before running commands or editing' },
-    { value: 'acceptEdits', label: 'Edit automatically', hint: 'Apply edits to open worksheets without review; no commands or file writes' },
-    { value: 'plan', label: 'Plan mode', hint: 'Explore and propose a plan without making changes' },
-    { value: 'auto', label: 'Auto mode', hint: 'Work without asking, changing only open worksheets; every change is backed up' },
-];
+export interface ModelOption {
+    value: string;
+    label: string;
+}
 
-/** Modes where Claude Code runs without Bash/Write, so only open worksheets can change. */
-export function isRestrictedMode(mode: PermissionMode): boolean {
-    return mode === 'acceptEdits' || mode === 'auto';
+/** How a mode treats propose_edit: diff review, applied with a backup, or refused. */
+export type EditPolicy = 'review' | 'auto' | 'blocked';
+
+export interface PermissionModeInfo {
+    value: PermissionMode;
+    label: string;
+    hint: string;
+    edits: EditPolicy;
+    /** Switching between modes with different profiles restarts the agent (the session resumes). */
+    profile?: string;
+}
+
+export interface SettingField {
+    key: string;
+    label: string;
+    placeholder?: string;
+}
+
+/** An agent provider's extension.json, as returned by agent_providers. */
+export interface ProviderInfo {
+    id: string;
+    name: string;
+    assistantName?: string;
+    models: ModelOption[];
+    /** Shift+Tab cycling order; the first is the default. */
+    permissionModes: PermissionModeInfo[];
+    settings: SettingField[];
+    i18n?: Record<string, Record<string, string>>;
+}
+
+export type MergeMessages = (locale: string, messages: Record<string, string>) => void;
+
+const FALLBACK_MODE: PermissionModeInfo = { value: 'default', label: 'Default', hint: '', edits: 'review' };
+
+export function permissionModes(): PermissionModeInfo[] {
+    return agentChat.provider?.permissionModes.length ? agentChat.provider.permissionModes : [FALLBACK_MODE];
+}
+
+export function modeInfo(mode: PermissionMode): PermissionModeInfo {
+    return permissionModes().find(m => m.value === mode) ?? permissionModes()[0];
+}
+
+export function modelOptions(): ModelOption[] {
+    return agentChat.provider?.models ?? [];
+}
+
+export function providerName(): string {
+    return agentChat.provider?.name ?? 'Agent';
+}
+
+export function assistantName(): string {
+    return agentChat.provider?.assistantName || providerName();
 }
 
 function toMode(value: unknown): PermissionMode {
-    return PERMISSION_MODES.some(m => m.value === value) ? value as PermissionMode : 'default';
+    return permissionModes().some(m => m.value === value) ? value as PermissionMode : permissionModes()[0].value;
 }
 
-/** Backup of a document taken before Claude first changed it in a conversation. */
+/** Backup of a document taken before the agent first changed it in a conversation. */
 export interface ChangeRecord {
     key: string;
     path: string | null;
@@ -43,12 +89,13 @@ export interface ChangeRecord {
 
 export interface Conversation {
     id: string;
+    provider: string;
     title: string;
     createdAt: number;
     updatedAt: number;
-    /** Claude Code session to resume when the process is restarted. */
+    /** Agent session to resume when the process is restarted. */
     sessionId: string | null;
-    /** Model alias picked for this conversation; empty is Claude Code's default. */
+    /** Model picked for this conversation; empty is the provider's default. */
     model: string;
     permissionMode: PermissionMode;
     /** Restart with the new mode's tool set once the current turn ends. */
@@ -68,7 +115,8 @@ export interface HistoryMeta {
 }
 
 export interface AgentSettings {
-    executable: string;
+    /** Values for the provider's settings fields. */
+    values: Record<string, string>;
     /** Model and permission mode for new conversations. */
     model: string;
     permissionMode: PermissionMode;
@@ -101,34 +149,36 @@ interface ToolRequest {
     args: Record<string, unknown>;
 }
 
-/** Claude Code aliases that always resolve to the latest model of each family. Empty = Claude Code's default. */
-export const MODEL_OPTIONS: { value: string; label: string }[] = [
-    { value: '', label: 'Default' },
-    { value: 'fable', label: 'Fable' },
-    { value: 'opus', label: 'Opus' },
-    { value: 'sonnet', label: 'Sonnet' },
-    { value: 'haiku', label: 'Haiku' },
-];
-
 const SETTINGS_KEY = 'calcpad.agent.settings';
 const PANEL_KEY = 'calcpad.agent.panelOpen';
 const TABS_KEY = 'calcpad.agent.tabs';
 const SAVE_DELAY_MS = 800;
 const TITLE_LENGTH = 60;
 
+function settingsKey(): string {
+    return agentChat.provider ? `${SETTINGS_KEY}.${agentChat.provider.id}` : SETTINGS_KEY;
+}
+
 function loadSettings(): AgentSettings {
     try {
-        const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}');
-        return { executable: String(raw.executable ?? ''), model: String(raw.model ?? ''), permissionMode: toMode(raw.permissionMode) };
+        const raw = JSON.parse(localStorage.getItem(settingsKey()) ?? '{}');
+        const values: Record<string, string> = {};
+        for (const [key, value] of Object.entries(raw.values ?? {})) values[key] = String(value);
+        return { values, model: String(raw.model ?? ''), permissionMode: toMode(raw.permissionMode) };
     } catch {
-        return { executable: '', model: '', permissionMode: 'default' };
+        return { values: {}, model: '', permissionMode: toMode(null) };
     }
+}
+
+function storeSettings(): void {
+    localStorage.setItem(settingsKey(), JSON.stringify(agentChat.settings));
 }
 
 function createConversation(settings: AgentSettings): Conversation {
     const now = Date.now();
     return {
         id: crypto.randomUUID(),
+        provider: agentChat.provider?.id ?? '',
         title: '',
         createdAt: now,
         updatedAt: now,
@@ -144,19 +194,21 @@ function createConversation(settings: AgentSettings): Conversation {
     };
 }
 
-const initialSettings = loadSettings();
-const initialConversation = createConversation(initialSettings);
-
 export const agentChat = reactive({
+    /** Null until providers load, or when no agent extension is installed. */
+    provider: null as ProviderInfo | null,
     panelOpen: localStorage.getItem(PANEL_KEY) === 'true',
-    settings: initialSettings,
-    conversations: [initialConversation] as Conversation[],
-    activeId: initialConversation.id,
+    settings: { values: {}, model: '', permissionMode: FALLBACK_MODE.value } as AgentSettings,
+    conversations: [] as Conversation[],
+    activeId: '',
     view: 'chat' as 'chat' | 'history' | 'changes',
     history: [] as HistoryMeta[],
     pendingEdit: null as PendingEdit | null,
     reviewChange: null as { conversationId: string; key: string; title: string; baseline: string; current: string } | null,
 });
+
+agentChat.conversations.push(createConversation(agentChat.settings));
+agentChat.activeId = agentChat.conversations[0].id;
 
 let editorContext: AgentEditorContext | null = null;
 let listening: Promise<void> | null = null;
@@ -201,6 +253,7 @@ function snapshot(conversation: Conversation): string {
     return JSON.stringify({
         version: 1,
         id: conversation.id,
+        provider: conversation.provider,
         title: conversation.title,
         createdAt: conversation.createdAt,
         updatedAt: conversation.updatedAt,
@@ -252,6 +305,7 @@ function revive(raw: Record<string, unknown>): Conversation | null {
     });
     return {
         id: raw.id,
+        provider: typeof raw.provider === 'string' ? raw.provider : agentChat.provider?.id ?? '',
         title: String(raw.title ?? ''),
         createdAt: Number(raw.createdAt ?? Date.now()),
         updatedAt: Number(raw.updatedAt ?? Date.now()),
@@ -322,7 +376,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             conversation.sessionId = event.sessionId;
             conversation.resolvedModel = event.model;
             conversation.version = event.version;
-            if (event.permissionMode) conversation.permissionMode = toMode(event.permissionMode === 'manual' ? 'default' : event.permissionMode);
+            if (permissionModes().some(m => m.value === event.permissionMode)) conversation.permissionMode = event.permissionMode!;
             break;
         case 'error':
             notice(conversation, event.message, true);
@@ -372,7 +426,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             dropQueuedEdits(conversation.id);
             if (event.code !== 0) {
                 const detail = event.output.trim().split('\n').slice(-6).join('\n');
-                notice(conversation, `Claude Code exited${event.code === null ? '' : ` with code ${event.code}`}.${detail ? '\n' + detail : ''}`, true);
+                notice(conversation, `${providerName()} exited${event.code === null ? '' : ` with code ${event.code}`}.${detail ? '\n' + detail : ''}`, true);
             }
             break;
     }
@@ -422,14 +476,15 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
         return;
     }
     if (tool === 'propose_edit') {
-        if (conversation.permissionMode === 'plan') {
-            await respond(id, { error: 'Plan mode is on, so worksheets cannot be edited. Present your plan instead.' });
+        const mode = modeInfo(conversation.permissionMode);
+        if (mode.edits === 'blocked') {
+            await respond(id, { error: `${mode.label} is on, so worksheets cannot be edited. Present your plan instead.` });
             return;
         }
         try {
             const edit = prepareEdit(editorContext, args);
             const title = edit.doc.tab.filePath ?? edit.doc.tab.title;
-            if (isRestrictedMode(conversation.permissionMode)) {
+            if (mode.edits === 'auto') {
                 recordChange(conversation, edit);
                 applyEdit(edit);
                 conversation.items.push({ kind: 'edit', requestId: id, title, summary: edit.summary, state: 'allowed', auto: true });
@@ -520,10 +575,34 @@ function ensureListening(): Promise<void> {
     return listening;
 }
 
-export function registerAgentEditor(context: AgentEditorContext): void {
+async function loadProvider(mergeMessages: MergeMessages): Promise<void> {
+    let providers: ProviderInfo[] = [];
+    try {
+        providers = await invoke<ProviderInfo[]>('agent_providers');
+    } catch {
+        // No agent support in this build.
+    }
+    const provider = providers[0];
+    if (!provider) return;
+    provider.models ??= [];
+    provider.settings ??= [];
+    for (const [locale, messages] of Object.entries(provider.i18n ?? {})) mergeMessages(locale, messages);
+    agentChat.provider = provider;
+    agentChat.settings = loadSettings();
+    for (const conversation of agentChat.conversations.filter(c => !c.items.length)) {
+        conversation.provider = provider.id;
+        conversation.model = agentChat.settings.model;
+        conversation.permissionMode = agentChat.settings.permissionMode;
+    }
+}
+
+export function registerAgentEditor(context: AgentEditorContext, mergeMessages: MergeMessages): void {
     editorContext = context;
-    void ensureListening();
-    restored ??= restoreTabs();
+    restored ??= loadProvider(mergeMessages).then(() => {
+        if (!agentChat.provider) return;
+        void ensureListening();
+        return restoreTabs();
+    });
 }
 
 // ---- Commands from the panel ----
@@ -538,7 +617,7 @@ function cwdForActiveDocument(): string | null {
 export async function sendMessage(text: string): Promise<void> {
     const conversation = activeConversation();
     const trimmed = text.trim();
-    if (!trimmed || conversation.status === 'starting' || conversation.status === 'busy') return;
+    if (!trimmed || !agentChat.provider || conversation.status === 'starting' || conversation.status === 'busy') return;
     conversation.items.push({ kind: 'user', text: trimmed });
     if (!conversation.title) conversation.title = trimmed.replace(/\s+/g, ' ').slice(0, TITLE_LENGTH);
     touch(conversation);
@@ -550,7 +629,8 @@ export async function sendMessage(text: string): Promise<void> {
             await invoke('agent_start', {
                 conversation: conversation.id,
                 options: {
-                    executable: agentChat.settings.executable || null,
+                    provider: conversation.provider || agentChat.provider.id,
+                    settings: agentChat.settings.values,
                     model: conversation.model || null,
                     permissionMode: conversation.permissionMode,
                     cwd: cwdForActiveDocument(),
@@ -658,7 +738,7 @@ export async function setModel(model: string): Promise<void> {
     const next = model.trim();
     const conversation = activeConversation();
     agentChat.settings = { ...agentChat.settings, model: next };
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(agentChat.settings));
+    storeSettings();
     if (next === conversation.model) return;
     conversation.model = next;
     touch(conversation);
@@ -673,23 +753,20 @@ export async function setModel(model: string): Promise<void> {
 async function restartForMode(conversation: Conversation): Promise<void> {
     conversation.restartPending = false;
     await stopProcess(conversation);
-    notice(conversation, `${PERMISSION_MODES.find(m => m.value === conversation.permissionMode)?.label ?? ''} applies from your next message.`);
+    notice(conversation, `${modeInfo(conversation.permissionMode).label} applies from your next message.`);
 }
 
-/**
- * Switches the active conversation's mode and makes it the default for new ones. Moving in or out
- * of a restricted mode changes Claude Code's tool set, which needs a restart (the session resumes).
- */
+/** Switches the active conversation's mode and makes it the default for new ones. */
 export async function setPermissionMode(mode: PermissionMode): Promise<void> {
     const conversation = activeConversation();
     agentChat.settings = { ...agentChat.settings, permissionMode: mode };
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(agentChat.settings));
+    storeSettings();
     const previous = conversation.permissionMode;
     if (mode === previous) return;
     conversation.permissionMode = mode;
     touch(conversation);
     if (conversation.status === 'idle') return;
-    if (isRestrictedMode(mode) !== isRestrictedMode(previous)) {
+    if ((modeInfo(mode).profile ?? '') !== (modeInfo(previous).profile ?? '')) {
         if (conversation.status === 'busy' || conversation.status === 'starting') conversation.restartPending = true;
         else await restartForMode(conversation);
         return;
@@ -702,12 +779,12 @@ export async function setPermissionMode(mode: PermissionMode): Promise<void> {
 }
 
 export function cyclePermissionMode(): void {
-    const modes = PERMISSION_MODES.map(m => m.value);
+    const modes = permissionModes().map(m => m.value);
     const current = modes.indexOf(activeConversation().permissionMode);
     void setPermissionMode(modes[(current + 1) % modes.length]);
 }
 
-// ---- Changes made by Claude (backups, diff, revert) ----
+// ---- Changes made by the agent (backups, diff, revert) ----
 
 function docKey(edit: PreparedEdit): string {
     return edit.doc.tab.filePath ?? `untitled:${edit.doc.tab.id}`;
@@ -808,14 +885,15 @@ export function showChanges(show: boolean): void {
     agentChat.view = show ? 'changes' : 'chat';
 }
 
-/** A new executable needs new processes; each conversation resumes on its next message. */
-export async function saveSettings(settings: Pick<AgentSettings, 'executable' | 'model'>): Promise<void> {
-    const executable = settings.executable.trim();
-    const executableChanged = executable !== agentChat.settings.executable;
-    agentChat.settings = { ...agentChat.settings, executable };
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(agentChat.settings));
+/** Changed provider settings need new processes; each conversation resumes on its next message. */
+export async function saveSettings(settings: Pick<AgentSettings, 'values' | 'model'>): Promise<void> {
+    const values: Record<string, string> = {};
+    for (const [key, value] of Object.entries(settings.values)) if (value.trim()) values[key] = value.trim();
+    const changed = JSON.stringify(values) !== JSON.stringify(agentChat.settings.values);
+    agentChat.settings = { ...agentChat.settings, values };
+    storeSettings();
     await setModel(settings.model);
-    if (executableChanged) await Promise.all(agentChat.conversations.map(stopProcess));
+    if (changed) await Promise.all(agentChat.conversations.map(stopProcess));
 }
 
 export function setPanelOpen(open: boolean): void {
