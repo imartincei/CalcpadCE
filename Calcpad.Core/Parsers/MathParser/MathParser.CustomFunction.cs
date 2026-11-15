@@ -11,6 +11,7 @@ namespace Calcpad.Core
             protected const int MaxCacheSize = 1000;
             internal event Action OnChange;
             internal string Name;
+            internal int SourceLine;
             internal Token[] Rpn;
             internal Unit Units;
             internal int ParameterCount { get; set; }

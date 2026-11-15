@@ -21,6 +21,143 @@ namespace Calcpad.Server.Services
         }
 
         /// <summary>
+        /// Maps Core's columns, which are in the parsed code, to the source line. Text from a macro
+        /// body covers the call; included lines cover the whole line.
+        /// </summary>
+        internal static List<CalcpadError> MapColumns(List<CalcpadError> errors, MacroTrace trace)
+        {
+            Dictionary<int, MacroTraceOutputLine>? outputs = null;
+            for (var i = 0; i < errors.Count; i++)
+            {
+                var e = errors[i];
+                if (e.Source != CalcpadErrorSource.Expression || e.StartColumn < 0 && e.AdditionalRanges is null)
+                    continue;
+
+                if (outputs is null)
+                {
+                    outputs = [];
+                    foreach (var output in trace.OutputLines)
+                        if (output.OutputLine > 0)
+                            outputs[output.OutputLine] = output;
+                }
+                var (start, end) = Map(e.OutputLine, e.StartColumn, e.EndColumn);
+                List<CalcpadErrorRange>? more = null;
+                foreach (var r in e.AdditionalRanges ?? [])
+                {
+                    var (rStart, rEnd) = Map(r.OutputLine, r.StartColumn, r.EndColumn);
+                    if (rStart >= 0)
+                        (more ??= []).Add(r with { StartColumn = rStart, EndColumn = rEnd });
+                }
+
+                errors[i] = new CalcpadError
+                {
+                    SourceLine = e.SourceLine,
+                    OutputLine = e.OutputLine,
+                    Message = e.Message,
+                    Source = e.Source,
+                    Code = e.Code,
+                    Kind = e.Kind,
+                    Severity = e.Severity,
+                    StartColumn = start,
+                    EndColumn = end,
+                    AdditionalRanges = more,
+                    CallSite = e.CallSite,
+                    IsFunctionBody = e.IsFunctionBody,
+                    Functions = e.Functions
+                };
+            }
+            return errors;
+
+            (int, int) Map(int outputLine, int start, int end)
+            {
+                if (start < 0 || !outputs!.TryGetValue(outputLine, out var output) || output.SourceIndex < 0)
+                    return (-1, -1);
+
+                var source = trace.SourceLines[output.SourceIndex];
+                if (source.File is not null)
+                    return (-1, -1);
+                if (output.SourceOffsets is not { } offsets)
+                    return output.Text == source.Text ? (start, end) : (-1, -1);
+
+                return MapMacroColumns(trace, output, source.Text, offsets, start, end);
+            }
+        }
+
+        // Arguments map to themselves; any body text widens to the macro call it came from
+        private static (int, int) MapMacroColumns(MacroTrace trace, MacroTraceOutputLine output, string line,
+            IReadOnlyList<int> offsets, int start, int end)
+        {
+            end = Math.Min(Math.Max(end, start + 1), offsets.Count);
+            int lo = int.MaxValue, hi = -1;
+            var hasBody = false;
+            for (var k = start; k < end; k++)
+            {
+                var c = Column(k);
+                if (c < 0)
+                    hasBody = true;
+                else
+                    (lo, hi) = (Math.Min(lo, c), Math.Max(hi, c + 1));
+            }
+            if (!hasBody)
+                return hi < 0 ? (-1, -1) : (lo, hi);
+
+            int before = -1, after = -1;
+            for (var k = start - 1; k >= 0 && before < 0; k--)
+                before = Column(k);
+            for (var k = end; k < offsets.Count && after < 0; k++)
+                after = Column(k);
+
+            int callStart = -1, callEnd = -1;
+            foreach (var (s, e) in MacroCalls(line, output.ExpandedMacros))
+            {
+                if (hi >= 0)
+                {
+                    // The smallest call holding the argument text
+                    if (s <= lo && hi <= e && (callStart < 0 || e - s < callEnd - callStart))
+                        (callStart, callEnd) = (s, e);
+                }
+                else if ((before < 0 || e > before) && (after < 0 || s <= after))
+                    (callStart, callEnd) = callStart < 0 ? (s, e) : (Math.Min(callStart, s), Math.Max(callEnd, e));
+            }
+            return callStart >= 0 ? (callStart, callEnd) : hi >= 0 ? (lo, hi) : (-1, -1);
+
+            int Column(int k) =>
+                k < offsets.Count && offsets[k] >= 0 && trace.TryLocate(offsets[k], out var index, out var column) &&
+                index == output.SourceIndex ? column : -1;
+        }
+
+        private static IEnumerable<(int Start, int End)> MacroCalls(string line, IReadOnlyList<string>? names)
+        {
+            foreach (var name in names?.Distinct() ?? [])
+            {
+                for (var at = line.IndexOf(name, StringComparison.Ordinal); at >= 0; at = line.IndexOf(name, at + 1, StringComparison.Ordinal))
+                {
+                    if (at > 0 && (char.IsLetterOrDigit(line[at - 1]) || line[at - 1] == '_'))
+                        continue;
+
+                    var stop = at + name.Length;
+                    if (stop < line.Length && line[stop] == '(')
+                    {
+                        var depth = 0;
+                        for (var j = stop; j < line.Length; j++)
+                        {
+                            if (line[j] == '(')
+                                depth++;
+                            else if (line[j] == ')' && --depth == 0)
+                            {
+                                stop = j + 1;
+                                break;
+                            }
+                        }
+                        if (depth > 0)
+                            stop = line.Length;
+                    }
+                    yield return (at, stop);
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates the Include delegate for MacroParser. Core only invokes this when the
         /// resolved path exists on disk, so a bare File.ReadAllText is sufficient and any I/O
         /// failure surfaces through the catch as a Calcpad error comment (URL-hosted includes
@@ -88,10 +225,14 @@ namespace Calcpad.Server.Services
                 var showErrorLines = !(hideErrorLines ?? enableUi);
 
                 // 2. Parse macros and includes (server reads referenced files from disk).
+                // Debug records where each expanded character came from, to map error columns back
+                var macroTrace = new MacroTrace();
                 var macroParser = new MacroParser
                 {
                     Include = CreateIncludeDelegate(),
                     SourceFilePath = sourceFilePath,
+                    Trace = macroTrace,
+                    Debug = true,
                     DefaultMacroCalls = coreSettings.MacroCalls
                 };
 
@@ -163,6 +304,8 @@ namespace Calcpad.Server.Services
                         htmlResult = ConvertCodeToHtml(outputText, errors);
                     }
                 }
+
+                errors = MapColumns(errors, macroTrace);
 
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);

@@ -12,6 +12,12 @@ namespace Calcpad.Core
         /// <summary>A name and its offset in the outermost parsed expression, or -1.</summary>
         internal readonly record struct ReadName(string Name, int Start);
 
+        /// <summary>Check pass only: custom functions each parsed expression calls.</summary>
+        internal List<FunctionCall> FunctionCalls { get; set; }
+
+        /// <summary>A call from the function name to its closing bracket, as offsets in the outermost parsed expression, or -1.</summary>
+        internal readonly record struct FunctionCall(string Name, int Start, int End);
+
         /// <summary>Where the expression being parsed starts in the outermost one.</summary>
         internal int NameOffset { get; set; }
         private readonly HashSet<string> _boundNames = new(StringComparer.Ordinal);
@@ -22,7 +28,7 @@ namespace Calcpad.Core
         internal void RecordReadName(string name, int start)
         {
             if (ReadNames is not null)
-                _pendingNames.Add(new(name, start >= 0 && NameOffset >= 0 ? NameOffset + start : -1));
+                _pendingNames.Add(new(name, Offset(start)));
         }
 
         internal void UnrecordReadName(string name)
@@ -34,6 +40,15 @@ namespace Calcpad.Core
                 _pendingNames.RemoveAt(i);
         }
 
+        private void RecordFunctionCall(string name, int start, int end)
+        {
+            start = Offset(start);
+            end = start >= 0 && end > 0 ? Offset(end) : -1;
+            FunctionCalls.Add(new(name, start, end));
+        }
+
+        private int Offset(int start) => start >= 0 && NameOffset >= 0 ? NameOffset + start : -1;
+
         internal void BindName(string name)
         {
             if (ReadNames is not null)
@@ -41,6 +56,8 @@ namespace Calcpad.Core
         }
 
         internal bool IsFunctionDefinition => _functionDefinitionIndex >= 0;
+
+        internal string DefinedFunctionName => IsFunctionDefinition ? _functions.LastName : null;
 
         /// <summary>The function the last parsed expression defines, or null.</summary>
         internal string DefinedFunction { get; private set; }

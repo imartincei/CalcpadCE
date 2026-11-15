@@ -25,6 +25,7 @@ export class CalcpadLintService {
         sourceFilePath?: string,
         key?: string,
         useTrace?: boolean,
+        isComplex?: boolean,
     ): Promise<LintResponse | null> {
         const reqId = ++this.requestId;
         const startTime = Date.now();
@@ -37,7 +38,7 @@ export class CalcpadLintService {
         }
 
         const truncated = truncateBase64Content(content);
-        const response = await this.apiClient.lint(truncated, sourceFilePath, { key, useTrace });
+        const response = await this.apiClient.lint(truncated, sourceFilePath, { key, useTrace, isComplex });
 
         if (response) {
             this.logger?.appendLine(
@@ -55,10 +56,10 @@ export class CalcpadLintService {
      * severityId: 0=Error, 1=Warning
      * Returns diagnostics at or above the minimum severity (lower number = higher severity).
      */
-    public static filterBySeverity(
-        diagnostics: LintDiagnostic[],
+    public static filterBySeverity<T extends Pick<LintDiagnostic, 'severityId'>>(
+        diagnostics: T[],
         minimumSeverity: 'error' | 'warning' | 'information'
-    ): LintDiagnostic[] {
+    ): T[] {
         switch (minimumSeverity) {
             case 'error':
                 return diagnostics.filter(d => d.severityId === 0);

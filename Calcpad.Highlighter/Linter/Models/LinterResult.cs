@@ -7,6 +7,9 @@ namespace Calcpad.Highlighter.Linter.Models
     public class LinterResult
     {
         public List<LinterDiagnostic> Diagnostics { get; set; } = new();
+
+        /// <summary>Errors in included files that this file's run already shows, kept for the files they are in.</summary>
+        public List<LinterDiagnostic> IncludeOnlyDiagnostics { get; set; } = new();
         private int _errorCount;
         private int _warningCount;
 
@@ -74,6 +77,8 @@ namespace Calcpad.Highlighter.Linter.Models
             foreach (var diagnostic in Diagnostics)
             {
                 MapDiagnosticToOriginal(diagnostic);
+                if (diagnostic.IncludeOrigins is { Count: 1 } origins)
+                    origins[0].Message = diagnostic.Message[diagnostic.IncludeMessageStart..];
             }
         }
 
@@ -90,7 +95,7 @@ namespace Calcpad.Highlighter.Linter.Models
 
                 case LineStage.Stage2:
                     if (Stage2Context != null &&
-                        !TryMapToIncludeLine(diagnostic, Stage2Context.IncludeMap, diagnostic.StageLine))
+                        !TryMapToIncludeLine(diagnostic, Stage2Context.IncludeMap, diagnostic.StageLine, true))
                     {
                         diagnostic.Line = SourceMapper.MapStage2ToOriginal(diagnostic.StageLine, Stage2Context, Stage1Context);
                     }
@@ -100,7 +105,8 @@ namespace Calcpad.Highlighter.Linter.Models
                     if (Stage2Context != null && Stage3Context != null)
                     {
                         if (TryMapToIncludeLine(diagnostic, Stage3Context.IncludeMap,
-                                Stage3Context.Stage3ToStage2Map.GetValueOrDefault(diagnostic.StageLine, diagnostic.StageLine)))
+                                Stage3Context.Stage3ToStage2Map.GetValueOrDefault(diagnostic.StageLine, diagnostic.StageLine),
+                                Stage3Context.MacroExpansions?.ContainsKey(diagnostic.StageLine) != true))
                             break;
 
                         // Use full mapping with line continuation support
@@ -136,7 +142,7 @@ namespace Calcpad.Highlighter.Linter.Models
         }
 
         // The #include line has none of the included text, so all of it is marked
-        private bool TryMapToIncludeLine(LinterDiagnostic diagnostic, Dictionary<int, ContentResolution.SourceInfo> includeMap, int stage2Line)
+        private bool TryMapToIncludeLine(LinterDiagnostic diagnostic, Dictionary<int, ContentResolution.SourceInfo> includeMap, int stage2Line, bool hasColumns)
         {
             if (!includeMap.TryGetValue(diagnostic.StageLine, out var source) || source.Source != "include")
                 return false;
@@ -145,12 +151,12 @@ namespace Calcpad.Highlighter.Linter.Models
             if (stage1Line < 0 || stage1Line >= Stage1Context.Lines.Count)
                 return false;
 
+            SourceMapper.MarkIncluded(diagnostic, source, hasColumns ? diagnostic.Column : -1, diagnostic.EndColumn);
             var text = Stage1Context.Lines[stage1Line];
             diagnostic.Line = SourceMapper.MapStage1ToOriginal(stage1Line, Stage1Context);
             diagnostic.Column = text.Length - text.TrimStart().Length;
             diagnostic.EndColumn = text.TrimEnd().Length;
             diagnostic.AdditionalRanges = null;
-            diagnostic.Message = $"{System.IO.Path.GetFileName(source.SourceFile)} line {source.OriginalLine + 1}: {diagnostic.Message}";
             return true;
         }
     }

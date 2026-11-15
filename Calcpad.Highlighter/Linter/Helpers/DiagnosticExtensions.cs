@@ -13,7 +13,9 @@ namespace Calcpad.Highlighter.Linter.Helpers
         /// <summary>Stage 2: After include/macro expansion</summary>
         Stage2,
         /// <summary>Stage 3: After full processing (default)</summary>
-        Stage3
+        Stage3,
+        /// <summary>Already mapped to the original source</summary>
+        Original
     }
 
     public static class DiagnosticExtensions

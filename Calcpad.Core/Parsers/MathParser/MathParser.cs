@@ -74,6 +74,8 @@ namespace Calcpad.Core
         internal bool HasInputFields;
         // If MathParser has input, the line is not cached in ExpressionParser
         internal int Line;
+        // First source line of a statement continued over several lines
+        internal int StatementLine;
         internal VariableSubstitutionOptions VariableSubstitution { get; set; }
         internal Unit Units { get; private set; }
         internal bool IsCanceled { get; private set; }
@@ -785,6 +787,7 @@ namespace Calcpad.Core
                             cf.Clear();
 
                         cf.Name = name;
+                        cf.SourceLine = StatementLine > 0 && StatementLine <= Line ? StatementLine : Line;
                         _functionDefinitionIndex = _functions.Add(name, cf);
                         return;
                     }

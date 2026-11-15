@@ -7,6 +7,7 @@ export type {
     LintRequest,
     LintResponse,
     LintDiagnostic,
+    LintRelatedLocation,
     HighlightRequest,
     HighlightResponse,
     HighlightToken,
@@ -25,6 +26,8 @@ export type {
     PrettifyRequest,
     PrettifyResponse,
     CalcpadError,
+    CalcpadErrorRange,
+    CalcpadFunctionFrame,
     CalcpadErrorSource,
     ConvertResult,
     UiConvertOptions,
@@ -104,6 +107,10 @@ export type { PdfBrowserStatus } from './api/pdf-browser';
 
 // --- Services ----------------------------------------------------------------
 export { CalcpadLintService } from './services/linter';
+export { IncludedLintStore, includePathKey } from './services/included-lint';
+export type { IncludedLintDiagnostic } from './services/included-lint';
+export { expandRunErrors } from './services/run-errors';
+export type { RunErrorMark, RunErrorLink } from './services/run-errors';
 export { CalcpadDefinitionsService } from './services/definitions';
 export { CalcpadSnippetService } from './services/snippets';
 export { setLogLevel, getLogLevel, shouldLog, DISPLAY_LOG_LEVEL, toDisplayLogLevel } from './services/log-level';

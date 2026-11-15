@@ -109,6 +109,8 @@ Nine validators run in stage order:
 
 Where Core can find a problem, only Core reports it: argument counts, empty arguments, `#` in command blocks, functions named like built-ins, and everything about `#UI` and `#settings`, including unknown keys (as warnings). The static validators cover only what Core can't see.
 
+After the validators, `BodyDiagnostics` moves a diagnostic on macro body text to the macro call and, for the first call that reaches that body line, adds one on the body text. `CoreCheckValidator` does the same for a custom function body error that Core found at the function's first call. Each diagnostic of a pair lists the other in `Related`.
+
 Every diagnostic code, its severity, and the `LintIgnore`/`EndLintIgnore` markers that `LintIgnoreRegionParser` reads are documented in [docs/new-linter.md](../docs/new-linter.md). Codes are defined in [Linter/Constants/ErrorCodes.cs](Linter/Constants/ErrorCodes.cs) — keep the two in sync when adding one.
 
 `HtmlCommentParser` groups comment tokens into HTML/metadata blocks and parses their JSON payloads; `HtmlCommentValidator` and the lint-ignore parser work from those blocks rather than from individual tokens.
