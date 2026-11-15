@@ -7,7 +7,7 @@ f(x) = x
 '<!--{"returnType": "banana"}-->
 g(x) = x
 
-' A macro takes token type names, not value types
+' Macros take the same types as functions
 'expect: CPD-3411
 '<!--{"paramTypes": ["Number"]}-->
 #def m$(a$) = a$
