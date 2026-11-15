@@ -101,5 +101,24 @@ Follow the pattern of `MathSettings` / `PlotSettings` with sensible defaults and
 3. **Load `reference/api-surface.md`** for existing patterns and Core integration
 4. **Create the wrapper** - Simple, documented, error-handled
 5. **Add settings if needed** - Configuration for advanced use
-6. **Verify behavior** - There is no test project for PyCalcpad; exercise it through the Python samples (`PyCalcpadEval.py`, `PyCalcpadConvert.py`, ...) or a scratch console call
+6. **Verify** - Run the checks below for what you changed
 7. **Document** - XML comments and examples
+
+## Verification
+
+Run only the checks for what you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+There is no test project for PyCalcpad.
+
+| Changed | Run (from repo root) |
+|---------|-----|
+| Any C# file | `dotnet build Calcpad.Api/PyCalcpad/PyCalcpad.csproj` |
+| `Calculator` / `Parser` behavior | The matching Python sample (`PyCalcpadEval.py`, `PyCalcpadParse.py`, `PyCalcpadConvert.py`, ...) or a scratch console call |
+| Settings mappers | A sample run with the setting changed from its default, confirming the output changes |
+
+### Full suite (user runs)
+
+`Calcpad.Cli` renders through PyCalcpad, so Compare Renderings covers it:
+```bash
+bash .github/scripts/compare-renderings.sh
+```

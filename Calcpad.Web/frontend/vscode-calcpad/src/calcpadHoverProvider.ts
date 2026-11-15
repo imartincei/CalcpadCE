@@ -3,6 +3,7 @@ import type { ILogger } from 'calcpad-frontend';
 import { CalcpadDefinitionsService } from './calcpadDefinitionsService';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { buildBuiltinDocMarkdown, extractFunctionName } from './calcpadBuiltinDocs';
+import { getVariableTypeAt } from 'calcpad-frontend';
 import type {
     MacroDefinition,
     FunctionDefinition,
@@ -56,16 +57,18 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
                 return new vscode.Hover(this.buildMacroHover(macro), wordRange);
             }
 
+            // As in Core, a name is a function only when "(" directly follows it.
             const func = definitions.functions.find(f => f.name === word);
-            if (func) {
+            const variable = definitions.variables.find(v => v.name === word);
+            const isCall = document.lineAt(position.line).text[wordRange.end.character] === '(';
+            if (func && (!variable || isCall)) {
                 this.outputChannel.appendLine('[Hover] Function: ' + word, 'verbose');
                 return new vscode.Hover(this.buildFunctionHover(func), wordRange);
             }
 
-            const variable = definitions.variables.find(v => v.name === word);
             if (variable) {
                 this.outputChannel.appendLine('[Hover] Variable: ' + word, 'verbose');
-                return new vscode.Hover(this.buildVariableHover(variable), wordRange);
+                return new vscode.Hover(this.buildVariableHover(variable, position.line), wordRange);
             }
 
             const unit = definitions.customUnits.find(u => u.name === word);
@@ -105,7 +108,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
             md.appendMarkdown(macro.description + '\n\n');
         }
 
-        this.appendParameterDocs(md, macro.parameters, macro.paramTypes, macro.paramDescriptions, macro.defaults);
+        this.appendParameterDocs(md, macro.parameters, macro.paramTypes, macro.paramDescriptions);
 
         return md;
     }
@@ -129,7 +132,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
             md.appendMarkdown(`Returns: *${func.returnType}*\n\n`);
         }
 
-        this.appendParameterDocs(md, func.parameters, func.paramTypes, func.paramDescriptions, func.defaults);
+        this.appendParameterDocs(md, func.parameters, func.paramTypes, func.paramDescriptions);
 
         if (func.expression) {
             md.appendMarkdown('**Expression:**\n');
@@ -139,7 +142,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         return md;
     }
 
-    private buildVariableHover(variable: VariableDefinition): vscode.MarkdownString {
+    private buildVariableHover(variable: VariableDefinition, line: number): vscode.MarkdownString {
         const md = new vscode.MarkdownString();
         md.isTrusted = true;
 
@@ -149,8 +152,9 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
             md.appendMarkdown(`Source: \`${variable.sourceFile}\`\n\n`);
         }
 
-        if (variable.type) {
-            md.appendMarkdown(`Type: *${variable.type}*\n\n`);
+        const type = getVariableTypeAt(variable, line);
+        if (type) {
+            md.appendMarkdown(`Type: *${type}*\n\n`);
         }
 
         if (variable.description) {
@@ -181,8 +185,7 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
         md: vscode.MarkdownString,
         params?: string[],
         paramTypes?: string[],
-        paramDescriptions?: string[],
-        defaults?: (string | null)[]
+        paramDescriptions?: string[]
     ): void {
         if (!params || params.length === 0) {
             return;
@@ -190,23 +193,16 @@ export class CalcpadHoverProvider implements vscode.HoverProvider {
 
         const hasTypes = paramTypes && paramTypes.length > 0;
         const hasDescs = paramDescriptions && paramDescriptions.length > 0;
-        const hasDefaults = defaults && defaults.length > 0;
 
-        if (hasTypes || hasDescs || hasDefaults) {
+        if (hasTypes || hasDescs) {
             md.appendMarkdown('**Parameters:**\n');
             for (let i = 0; i < params.length; i++) {
                 const name = params[i];
                 const type = hasTypes && i < paramTypes.length ? paramTypes[i] : undefined;
                 const desc = hasDescs && i < paramDescriptions.length ? paramDescriptions[i] : undefined;
-                const def = hasDefaults && i < defaults.length ? defaults[i] : undefined;
                 let line = `- \`${name}\``;
                 if (type) line += ` *(${type})*`;
                 if (desc) line += ` — ${desc}`;
-                if (def !== undefined && def !== null) {
-                    line += ` *(default: ${def})*`;
-                } else if (hasDefaults) {
-                    line += ` *(required)*`;
-                }
                 md.appendMarkdown(line + '\n');
             }
             md.appendMarkdown('\n');

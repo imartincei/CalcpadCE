@@ -1,49 +1,27 @@
-using System.Linq;
 using Calcpad.Highlighter.ContentResolution;
-using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
     /// Core unwraps a matrix·vector product to a vector (IValue.EvaluateOperator), so the type
-    /// tracker must infer 'matrix * vector' as a vector — otherwise downstream functions that
-    /// expect a vector (e.g. clsolve) raise a spurious CPD-3309.
+    /// tracker must infer 'matrix * vector' as a vector.
     /// </summary>
     public class MatrixVectorProductTypeTests
     {
-        private static LinterResult Lint(string content)
-        {
-            var staged = new ContentResolver().GetStagedContent(content);
-            var ignoreRegions = new LintIgnoreRegionParser().ExtractRegions(content);
-            return new CalcpadLinter().Lint(staged, ignoreRegions);
-        }
-
-        private static int TypeWarnings(LinterResult result) =>
-            result.Diagnostics.Count(d => d.Code == "CPD-3309");
+        private static CalcpadType TypeOf(string content, string name) =>
+            new ContentResolver().GetStagedContent(content).Stage3.TypeTracker.GetVariableInfo(name).Type;
 
         [Fact]
-        public void MatrixTimesVector_IntoVectorParam_NoTypeWarning()
+        public void MatrixTimesVector_IsVector()
         {
-            var src =
-                "X = [1; 2 | 3; 4]\n" +
-                "y = [5; 6]\n" +
-                "b = X*y\n" +
-                "A = copy(X*transp(X); symmetric(n_rows(X)); 1; 1)\n" +
-                "a = clsolve(A; b)\n";
-            Assert.Equal(0, TypeWarnings(Lint(src)));
+            Assert.Equal(CalcpadType.Vector, TypeOf("X = [1; 2 | 3; 4]\ny = [5; 6]\nb = X*y\n", "b"));
         }
 
         [Fact]
-        public void MatrixTimesMatrix_IntoVectorParam_StillWarns()
+        public void MatrixTimesMatrix_IsMatrix()
         {
-            // matrix * matrix is a matrix, so passing it where a vector is expected must warn.
-            var src =
-                "X = [1; 2 | 3; 4]\n" +
-                "A = [1; 2 | 3; 4]\n" +
-                "M = X*A\n" +
-                "r = clsolve(A; M)\n";
-            Assert.True(TypeWarnings(Lint(src)) > 0);
+            Assert.Equal(CalcpadType.Matrix, TypeOf("X = [1; 2 | 3; 4]\nA = [1; 2 | 3; 4]\nM = X*A\n", "M"));
         }
     }
 }

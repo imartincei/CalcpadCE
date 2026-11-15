@@ -5,10 +5,9 @@ using Calcpad.Highlighter.Linter.Models;
 namespace Calcpad.Tests.Highlighter
 {
     /// <summary>
-    /// Columns reported on a macro-expanded line index into the substituted macro body, which
-    /// shares no layout with the call site - they used to be applied verbatim to the original
-    /// line, underlining unrelated text or running past its end. Such diagnostics now cover the
-    /// whole call site line.
+    /// Columns reported on a macro-expanded line map back through the expansion: text from a call
+    /// argument keeps its range, an argument with body text covers its call, and text only from
+    /// the macro body covers the whole call site line.
     /// </summary>
     public class MacroDiagnosticRangeTests : IClassFixture<HighlighterLinterFixture>
     {
@@ -33,10 +32,10 @@ namespace Calcpad.Tests.Highlighter
             }
         }
 
-        private LinterDiagnostic LintUndefined(string source, string name)
+        private LinterDiagnostic LintUndefinedFunction(string source, string name)
         {
             var diagnostic = Lint(source).Diagnostics
-                .FirstOrDefault(d => d.Code == "CPD-3301" && d.Message.Contains(name));
+                .FirstOrDefault(d => d.Code == "CPD-3305" && d.Message.Contains(name));
             Assert.NotNull(diagnostic);
             return diagnostic;
         }
@@ -46,13 +45,13 @@ namespace Calcpad.Tests.Highlighter
         {
             var lines = new[]
             {
-                "#def area$(w$; h$) = w$*h$*zzzMissing",
+                "#def area$(w$; h$) = w$*h$*zzzMissing(1)",
                 "a = 1",
                 "b = 2",
                 "result = area$(a; b)"
             };
 
-            var diagnostic = LintUndefined(string.Join('\n', lines), "zzzMissing");
+            var diagnostic = LintUndefinedFunction(string.Join('\n', lines), "zzzMissing");
 
             Assert.Equal(3, diagnostic.Line);
             Assert.Equal(0, diagnostic.Column);
@@ -66,13 +65,13 @@ namespace Calcpad.Tests.Highlighter
             var lines = new[]
             {
                 "#def block$(x$)",
-                "\ty = x$ + zzzMissing",
+                "\ty = x$ + zzzMissing(1)",
                 "#end def",
                 "q = 3",
                 "block$(q)"
             };
 
-            var diagnostic = LintUndefined(string.Join('\n', lines), "zzzMissing");
+            var diagnostic = LintUndefinedFunction(string.Join('\n', lines), "zzzMissing");
 
             Assert.Equal(4, diagnostic.Line);
             Assert.Equal(0, diagnostic.Column);
@@ -84,13 +83,13 @@ namespace Calcpad.Tests.Highlighter
         {
             var lines = new[]
             {
-                "#def sum3$(a$; b$; c$) = a$ + b$ + c$ + zzzMissing",
+                "#def sum3$(a$; b$; c$) = a$ + b$ + c$ + zzzMissing(1)",
                 "p = 1",
                 "r = sum3$(p; _",
                 "    p; p)"
             };
 
-            var diagnostic = LintUndefined(string.Join('\n', lines), "zzzMissing");
+            var diagnostic = LintUndefinedFunction(string.Join('\n', lines), "zzzMissing");
 
             Assert.Equal(2, diagnostic.Line);
             Assert.Equal(0, diagnostic.Column);
@@ -104,11 +103,58 @@ namespace Calcpad.Tests.Highlighter
         }
 
         [Fact]
+        public void UndefinedNameInArgument_HighlightsArgument()
+        {
+            var lines = new[]
+            {
+                "#def area$(w$; h$) = w$*h$",
+                "result = area$(2; zzzMissing(1))"
+            };
+
+            var diagnostic = LintUndefinedFunction(string.Join('\n', lines), "zzzMissing");
+
+            Assert.Equal(1, diagnostic.Line);
+            Assert.Equal(18, diagnostic.Column);
+            Assert.Equal(28, diagnostic.EndColumn);
+        }
+
+        [Theory]
+        [InlineData("#def call$(x$) = f(x$)", "z = call$(1)", "call$(1)")]
+        [InlineData("#def call$(x$) = x$", "z = call$(f(1))", "f(1)")]
+        [InlineData("#def call$(x$) = x$", "z = call$(2 + f(1; 2; 3))", "f(1; 2; 3)")]
+        public void WrongArgumentCount_HighlightsArgumentOrCall(string def, string call, string highlighted)
+        {
+            var source = string.Join('\n', "f(a; b) = a + b", def, call);
+            var diagnostic = Assert.Single(Lint(source).Diagnostics, d => d.Code == "CPD-3302");
+            Assert.Equal(2, diagnostic.Line);
+            Assert.Equal(highlighted, call[diagnostic.Column..diagnostic.EndColumn]);
+        }
+
+        [Fact]
+        public void UndefinedNameInContinuedArgument_HighlightsArgument()
+        {
+            var lines = new[]
+            {
+                "#def sum3$(a$; b$; c$) = a$ + b$ + c$",
+                "p = 1",
+                "r = sum3$(p; _",
+                "    zzzMissing(1); p)"
+            };
+
+            var diagnostic = LintUndefinedFunction(string.Join('\n', lines), "zzzMissing");
+
+            Assert.Equal(3, diagnostic.Line);
+            Assert.Equal(4, diagnostic.Column);
+            Assert.Equal(14, diagnostic.EndColumn);
+            Assert.Null(diagnostic.AdditionalRanges);
+        }
+
+        [Fact]
         public void LineWithoutMacroExpansion_KeepsTokenRange()
         {
-            var source = "a = 1\nb = a + zzzMissing";
+            var source = "a = 1\nb = a + zzzMissing(1)";
 
-            var diagnostic = LintUndefined(source, "zzzMissing");
+            var diagnostic = LintUndefinedFunction(source, "zzzMissing");
 
             Assert.Equal(1, diagnostic.Line);
             Assert.Equal(8, diagnostic.Column);

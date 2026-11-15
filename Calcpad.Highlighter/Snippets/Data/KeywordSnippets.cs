@@ -589,7 +589,15 @@ namespace Calcpad.Highlighter.Snippets.Data
             new SnippetItem
             {
                 Insert = "#settings {\"decimals\": 4, \"substitute\": false}",
-                Description = "Override engine settings for subsequent lines via JSON. Use the Properties panel to see the available settings and edit them.",
+                Description = "Override engine settings for subsequent lines via JSON. Applies to the rest of the document, or up to a matching #end settings. Use the Properties panel to see the available settings and edit them.",
+                Example = "#settings {\"decimals\": 4}\nx = 6.12345\n#end settings\n'Previous settings restored\ny = 6.12345",
+                Category = "Settings/Overrides",
+                KeywordType = "Keyword"
+            },
+            new SnippetItem
+            {
+                Insert = "#end settings",
+                Description = "Restore the settings changed by the matching #settings",
                 Category = "Settings/Overrides",
                 KeywordType = "Keyword"
             },

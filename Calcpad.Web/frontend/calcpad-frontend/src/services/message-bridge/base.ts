@@ -16,10 +16,11 @@ import type { PdfSettings } from '../../types/pdf-settings';
 import { buildImageCommentLine, bytesToBase64 } from '../image-utils';
 import type { ImageStorageMode, PickedImage } from '../image-utils';
 import { extractPlotsFromHtml, type ExtractedPlot } from '../plot-extract';
-import { extractUiControls, readUiOverrides } from '../ui-overrides';
+import { extractUiControls, readUiOverrides, selectionLineRange } from '../ui-overrides';
 import { readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, stampFileInfoText, pdfDocumentTitle } from '../file-info';
 import { planMetadataFooter, toRangeEdits, type LineEdit } from '../metadata-footer';
-import type { UiControl } from '../ui-overrides';
+import { planUiOverridesToSource } from '../ui-source-sync';
+import type { LineRange, UiControl } from '../ui-overrides';
 import { COMPILED_MIME } from '../cpdz';
 import { DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT } from '../preview-limits';
 import { buildZip } from '../zip-writer';
@@ -123,7 +124,12 @@ export abstract class BaseMessageBridge {
     protected apiClient: CalcpadApiClient;
     protected snippetService: CalcpadSnippetService;
     protected definitionsService: CalcpadDefinitionsService;
-    protected settings: CalcpadSettings;
+    private _settings!: CalcpadSettings;
+    protected get settings(): CalcpadSettings { return this._settings; }
+    protected set settings(value: CalcpadSettings) {
+        this._settings = value;
+        this.apiClient.setMacroCalls(value.macroCalls);
+    }
     protected _onInsertText: ((text: string) => void) | null = null;
     protected _onGoToLine: ((line: number) => boolean) | null = null;
     protected quickPick: QuickPickFn | null = null;
@@ -239,15 +245,20 @@ export abstract class BaseMessageBridge {
      * the form itself was shown.
      */
     private async handleGetUiControls(): Promise<void> {
+        const controls = await this.resolveUiControls();
+        // A failed render leaves the panel unresolved rather than empty - "no controls"
+        // and "could not tell" must not read the same to a purge button.
+        if (!controls) return;
+        this._uiControlsSink?.(controls);
+        this.postToVue({ type: 'uiControls', controls });
+    }
+
+    /** The active document's controls, rendered afresh as a form; null when the render fails. */
+    async resolveUiControls(): Promise<UiControl[] | null> {
         const content = this.getActiveEditorContent();
         const { sourceFilePath } = await this.buildFileContext(content);
         const rendered = await this.renderForExport(content, buildApiSettings(this.settings), sourceFilePath, 'input');
-        // A failed render leaves the panel unresolved rather than empty - "no controls"
-        // and "could not tell" must not read the same to a purge button.
-        if (rendered == null) return;
-        const controls = extractUiControls(rendered);
-        this._uiControlsSink?.(controls);
-        this.postToVue({ type: 'uiControls', controls });
+        return rendered == null ? null : extractUiControls(rendered, content);
     }
 
     /** The `#UI` options an export of `variant` should render with. */
@@ -357,6 +368,13 @@ export abstract class BaseMessageBridge {
                 this.setExtraSetting('showFileMetadata', String(!!message.enabled));
                 this.postToVue({ type: 'showFileMetadataChanged', enabled: !!message.enabled });
                 break;
+            case 'updateShowUiOverrideHints':
+                this.setExtraSetting('uiOverrideHints', String(!!message.enabled));
+                this.postToVue({ type: 'showUiOverrideHintsChanged', enabled: !!message.enabled });
+                break;
+            case 'updateAutoSyncUiValues':
+                this.setExtraSetting('autoSyncUiValues', String(!!message.enabled));
+                break;
             case 'updateLinterMinSeverity':
                 this.setExtraSetting('linterMinSeverity', message.severity);
                 this.postToVue({ type: 'linterMinSeverityChanged', severity: message.severity });
@@ -443,6 +461,9 @@ export abstract class BaseMessageBridge {
                 break;
             case 'updateUiOverrides':
                 this.handleUpdateUiOverrides(message.overrides);
+                break;
+            case 'overrideUiDefaults':
+                void this.handleOverrideUiDefaults(message.keys);
                 break;
             case 'markFileReviewed':
                 void this.handleMarkFileReviewed();
@@ -607,6 +628,8 @@ export abstract class BaseMessageBridge {
             enablePreviewUiOverrides: this.previewAppliesUiOverrides(),
             enablePreviewPdf: this.getExtraSetting('previewPdf') === 'true',
             showFileMetadata: this.getExtraSetting('showFileMetadata') === 'true',
+            showUiOverrideHints: this.getExtraSetting('uiOverrideHints') === 'true',
+            autoSyncUiValues: this.getExtraSetting('autoSyncUiValues') === 'true',
             linterMinSeverity: this.getExtraSetting('linterMinSeverity') || 'information',
             logLevel: coerceLogLevel(this.getExtraSetting('logLevel')),
             maxOutputLines: Number(this.getExtraSetting('maxOutputLines')) || 1000,
@@ -643,6 +666,8 @@ export abstract class BaseMessageBridge {
             content,
             this.getVariablesOrigin(),
             sourceFilePath,
+            undefined,
+            this.getExtraSetting('autoRun') !== 'false',
         );
         this.postToVue({
             type: 'updateVariables',
@@ -656,7 +681,6 @@ export abstract class BaseMessageBridge {
                     description: m.description,
                     paramTypes: m.paramTypes,
                     paramDescriptions: m.paramDescriptions,
-                    defaults: m.defaults,
                 })),
                 variables: (response?.variables ?? []).map(v => ({
                     name: v.name,
@@ -678,7 +702,6 @@ export abstract class BaseMessageBridge {
                     description: f.description,
                     paramTypes: f.paramTypes,
                     paramDescriptions: f.paramDescriptions,
-                    defaults: f.defaults,
                 })),
                 customUnits: (response?.customUnits ?? []).map(u => ({
                     name: u.name,
@@ -1091,7 +1114,7 @@ export abstract class BaseMessageBridge {
             block = computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines));
             if (block) block.docKey = this.getMetadataDocKey();
         }
-        this.postToVue({ type: 'metadataContext', block });
+        this.postToVue({ type: 'metadataContext', block, selection: this.selectionLines(editor) });
         // Sent with the block so the panel's saved-values list follows the document the
         // cursor is actually in, rather than keeping the last one it asked about.
         this.refreshUiControls();
@@ -1201,7 +1224,12 @@ export abstract class BaseMessageBridge {
         const lines = model.getValue().split(/\r?\n/);
         const block = pos ? computeMetadataBlock(lines, pos.lineNumber - 1, buildSourceDefinitionResolver(lines)) : null;
         if (block) block.docKey = this.getMetadataDocKey();
-        this.postToVue({ type: 'metadataContext', block });
+        this.postToVue({ type: 'metadataContext', block, selection: this.selectionLines(editor) });
+    }
+
+    private selectionLines(editor: MonacoEditorLike | undefined): LineRange | null {
+        const sel = editor?.getSelection();
+        return sel ? selectionLineRange(sel.startLineNumber, sel.endLineNumber, sel.endColumn) : null;
     }
 
     /** Applies footer edits through the model, since a compiled worksheet's editor is read-only. */
@@ -1240,6 +1268,22 @@ export abstract class BaseMessageBridge {
         const overrides = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, String(v)]));
         this.applyFooterEdits(planMetadataFooter(model.getValue().split(/\r?\n/), { uiOverrides: overrides }));
         this._uiOverridesSink?.(overrides);
+        this.refreshDocumentMetadata();
+    }
+
+    /** Moves saved values of plain `#UI` lines into the source; the controls are rendered afresh to match the text. */
+    private async handleOverrideUiDefaults(raw: unknown): Promise<void> {
+        const model = this.getActiveMonacoEditor()?.getModel();
+        if (!model || !Array.isArray(raw)) return;
+        const content = model.getValue();
+        const controls = await this.resolveUiControls();
+        const saved = readUiOverrides(content);
+        if (!controls || !saved || model.getValue() !== content) return;
+        this._uiControlsSink?.(controls);
+        const plan = planUiOverridesToSource(content.split(/\r?\n/), saved, controls, raw.map(String));
+        if (!plan.removed.length) return;
+        this.applyFooterEdits(plan.edits);
+        this._uiOverridesSink?.(readUiOverrides(model.getValue()) ?? {});
         this.refreshDocumentMetadata();
     }
 
@@ -1294,6 +1338,7 @@ interface MonacoRangeLike {
 interface MonacoEditorLike {
     getModel(): MonacoModelLike | null;
     getPosition(): { lineNumber: number; column: number } | null;
+    getSelection(): MonacoRangeLike | null;
     revealLineInCenter(line: number): void;
     setPosition(pos: { lineNumber: number; column: number }, source?: string): void;
     executeEdits(source: string, edits: { range: MonacoRangeLike; text: string }[]): void;

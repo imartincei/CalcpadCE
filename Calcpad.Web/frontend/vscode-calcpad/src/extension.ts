@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as os from 'os';
-import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
-import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit } from 'calcpad-frontend';
+import { pdfResponseError, isBrowserNotFound, isBrowserLaunchFailed, installPdfBrowser, CalcpadApiClient, combineSignals, resolveEffectivePdfSettings, pdfSettingsFromDocument, parseConvertErrorHeader, parseConvertPauseHeader, findMetadataCommentBlock, serializeMetadataComment, computeMetadataBlock, buildSourceDefinitionResolver, extractBodyHtml, UiOverrideStore, UiPauseStore, UiEditHistory, hasPauseSteps, writeUiOverrides, extractUiControls, variantRender, inlineImageSources, createReferenceResolver, isCompiledPath, documentHasUiDirectives, COMPILED_EXTENSION, MAX_COMPILED_IMAGE_TOTAL_BYTES, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MAX_HTML_MIRROR_CHARS, MAX_INLINE_IMAGE_TOTAL_BYTES, previewSizeLimitChars, previewLimitNoticeHtml, formatSize, truncateForOutput, consoleRelayGuardScript, coerceLogLevel, setLogLevel, getLogLevel, ConnectionMonitor , getParseModeAt, toRangeEdits, readUiOverrides, planMetadataFooter, planUiValueToSource, uiOverrideKeysFor, uiControlsWithEditedValues, planFileInfoStamp, stampFileInfoText, onlyReviewChanged, pdfDocumentTitle, pdfViewerHtml, pdfPreviewErrorHtml } from 'calcpad-frontend';
+import type { PdfSettings as FrontendPdfSettings, ExportVariant, UiControl, UiOverrides, CalcpadError, LineEdit, SourceEdit } from 'calcpad-frontend';
 import { CalcpadServerLinter } from './calcpadServerLinter';
 import { CalcpadRunDiagnostics } from './calcpadRunDiagnostics';
 import { CalcpadSemanticTokensProvider, semanticTokensLegend } from './calcpadSemanticTokensProvider';
@@ -29,6 +29,7 @@ import { VSCodeLogger, VSCodeFileSystem } from './adapters';
 import { expandEnvVars } from './calcpadLocationResolver';
 import { installJuliaMonoCommand, maybePromptInstall } from './installFont';
 import { MetadataFooterView } from './metadataFooterView';
+import { UiOverrideHintsProvider, REVEAL_UI_OVERRIDES_COMMAND } from './uiOverrideHints';
 import { renderIntoShell, setShellLoading, getFrameAgentScript, frameStateFor, handleFrameStateMessage, lastRenderedHtml, copyPreviewSelection } from './previewFrame';
 
 // The wrapped ("regular") and unwrapped previews are independent panels that can
@@ -53,6 +54,7 @@ const uiHistory = new UiEditHistory();
 const uiPause = new UiPauseStore();
 // Controls each document's last input-form render produced, keyed like the store above.
 const uiControls = new Map<string, UiControl[]>();
+let uiOverrideHints: UiOverrideHintsProvider | undefined;
 // Document the input form is currently showing, so its values can be prompted
 // about and dropped when the form closes.
 let uiPanelDocKey: string | undefined = undefined;
@@ -201,6 +203,55 @@ async function saveUiValuesFor(document: vscode.TextDocument): Promise<number | 
     return Object.keys(overrides).length;
 }
 
+function autoSyncUiValues(document: vscode.TextDocument): boolean {
+    return CalcpadSettingsManager.getInstance().getExtraBool('autoSyncUiValues', false) && !isCompiledPath(document.fileName);
+}
+
+async function applyLineEdits(document: vscode.TextDocument, edits: LineEdit[]): Promise<boolean> {
+    if (!edits.length) return true;
+    const edit = new vscode.WorkspaceEdit();
+    edit.set(document.uri, metadataTextEdits(document, edits));
+    return vscode.workspace.applyEdit(edit);
+}
+
+/** With auto-sync on, writes a form value into its `#UI` line. False when it stays an override. */
+async function syncUiValueToSource(document: vscode.TextDocument, key: string, value: string): Promise<boolean> {
+    if (!autoSyncUiValues(document)) return false;
+    const docKey = document.uri.toString();
+    const controls = uiOverrideHints?.tracker.controlsFor(docKey) ?? uiControls.get(docKey);
+    const control = controls?.find(c => c.key === key);
+    if (!controls || !control) return false;
+    const text = document.getText();
+    const plan = planUiValueToSource(text.split(/\r?\n/), control, value, readUiOverrides(text) ?? {}, controls);
+    const entered = uiOverrideKeysFor(uiOverrides.toRecord(docKey) ?? {}, control, controls);
+    if (!plan || !entered || !await applyLineEdits(document, plan.edits)) return false;
+    uiOverrides.forget(docKey, [...plan.removed, ...entered], document.getText());
+    return true;
+}
+
+/** With auto-sync on, typing into a `#UI` line's value drops the overrides that shadowed it. */
+function clearEditedUiOverrides(document: vscode.TextDocument, before: UiControl[], edits: SourceEdit[]): void {
+    if (!autoSyncUiValues(document)) return;
+    const edited = uiControlsWithEditedValues(before, edits,
+        l => l >= 1 && l <= document.lineCount ? document.lineAt(l - 1).text : undefined);
+    if (!edited.length) return;
+    // Not from inside the change event.
+    setTimeout(async () => {
+        const docKey = document.uri.toString();
+        const saved = readUiOverrides(document.getText()) ?? {};
+        const entered = uiOverrides.toRecord(docKey) ?? {};
+        const savedKeys = new Set(edited.flatMap(c => uiOverrideKeysFor(saved, c, before) ?? []));
+        const enteredKeys = edited.flatMap(c => uiOverrideKeysFor(entered, c, before) ?? []);
+        if (!savedKeys.size && !enteredKeys.length) return;
+        if (savedKeys.size) {
+            const keep = Object.fromEntries(Object.entries(saved).filter(([k]) => !savedKeys.has(k)));
+            if (!await applyLineEdits(document, planMetadataFooter(document.getText().split(/\r?\n/), { uiOverrides: keep }))) return;
+        }
+        uiOverrides.forget(docKey, [...savedKeys, ...enteredKeys], document.getText());
+        vueUiProvider?.refreshDocumentMetadata();
+    }, 0);
+}
+
 // Version stamped into file info on save; set on activation.
 let extensionVersion = '';
 /** Injected by rollup.config.js from tools/version.mjs; absent when compiled by tsc alone. */
@@ -325,6 +376,14 @@ let extensionContext: vscode.ExtensionContext;
 let vueUiProvider: CalcpadVueUIProvider | undefined;
 // Set in activate(); the module-level export commands need it outside that scope.
 let sharedApiClient: CalcpadApiClient | undefined;
+// Set in activate(); reruns lint and definitions after a preview run.
+let refreshDocumentAnalysis: ((document: vscode.TextDocument) => void) | undefined;
+
+// Auto-run makes lint and definitions use the run's trace, so they wait for it.
+const useTrace = () => CalcpadSettingsManager.getInstance().getExtraBool('autoRun', true);
+const runFollows = (document: vscode.TextDocument) => useTrace()
+    && !!(wrappedPanel || unwrappedPanel || uiPanel || uiReportPanel)
+    && vscode.window.activeTextEditor?.document === document;
 
 const NO_SERVER_MESSAGE = 'No CalcpadCE server available — the bundled server did not start '
     + 'and no remote server URL is configured.';
@@ -385,15 +444,16 @@ const PREVIEW_BUSY_DELAY_MS = 400;
  */
 function updateMetadataContext(editor: vscode.TextEditor | undefined): void {
     let block = null;
-    if (editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext')) {
-        const lines = editor.document.getText().split(/\r?\n/);
-        const line = editor.selection.active.line;
-        const docKey = editor.document.uri.toString();
+    const calcpadEditor = editor && (editor.document.languageId === 'calcpad' || editor.document.languageId === 'plaintext') ? editor : undefined;
+    if (calcpadEditor) {
+        const lines = calcpadEditor.document.getText().split(/\r?\n/);
+        const line = calcpadEditor.selection.active.line;
+        const docKey = calcpadEditor.document.uri.toString();
         block = computeMetadataBlock(lines, line, buildSourceDefinitionResolver(lines));
         if (block) block.docKey = docKey;
     }
     vscode.commands.executeCommand('setContext', 'calcpad.inMetadataComment', block !== null && !block.isNew);
-    vueUiProvider?.updateMetadataContext(block);
+    vueUiProvider?.updateMetadataContext(block, calcpadEditor);
     // Sent with the block so the panel's saved-values list follows the document the
     // cursor is actually in, rather than keeping the last one it asked about.
     vueUiProvider?.updateUiControls(editor ? uiControls.get(editor.document.uri.toString()) ?? null : null);
@@ -922,7 +982,17 @@ function getLineLinkScript(scrollToLine?: number, includeLinks: boolean = true):
  * no `activeTextEditor` whose folder local images could be resolved against (a
  * compiled worksheet carries its images inline anyway).
  */
-async function updatePreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
+async function updatePreviewContent(...args: Parameters<typeof renderPreviewContent>): Promise<void> {
+    const [, content, sourceFileUri] = args;
+    try {
+        await renderPreviewContent(...args);
+    } finally {
+        const document = vscode.workspace.textDocuments.find(d => d.uri.toString() === sourceFileUri.toString());
+        if (useTrace() && document?.getText() === content) refreshDocumentAnalysis?.(document);
+    }
+}
+
+async function renderPreviewContent(panel: vscode.WebviewPanel, content: string, sourceFileUri: vscode.Uri, unwrapped: boolean = false, scrollToLine?: number, enableUi: boolean = false, forPrint: boolean = false, standalone: boolean = false) {
     const docKey = sourceFileUri.toString();
     // The plain preview shows the document as written, unless the setting asks it to
     // render the entered values too — a debugging view of the filled-in form.
@@ -1100,7 +1170,8 @@ async function updatePreviewContent(panel: vscode.WebviewPanel, content: string,
         // The controls this document really has, which is what tells the Properties tab
         // whether a saved #UI value still applies to anything.
         if (enableUi) {
-            uiControls.set(docKey, extractUiControls(apiResponse));
+            uiControls.set(docKey, extractUiControls(apiResponse, content));
+            uiOverrideHints?.tracker.setControls(docKey, uiControls.get(docKey)!);
             vueUiProvider?.updateUiControls(uiControls.get(docKey) ?? null);
         }
 
@@ -1743,12 +1814,19 @@ function handlePreviewMessage(message: any, kind: PreviewKind) {
         case 'uiValueChange': {
             const sourceEditor = previewSourceEditor;
             if (!sourceEditor || kind !== 'ui') break;
-            const docKey = sourceEditor.document.uri.toString();
-            if (!uiHistory.set(docKey, uiOverrides, docKey, String(message.varName), String(message.newValue))) break;
-            uiOverridesDirty.add(docKey);
-            // Refreshes the form (so the control keeps the entered value) and the
-            // report panel beside it (so the result updates).
-            void refreshPreviewPanels(sourceEditor.document);
+            const document = sourceEditor.document;
+            const docKey = document.uri.toString();
+            const varName = String(message.varName);
+            const newValue = String(message.newValue);
+            void (async () => {
+                if (!await syncUiValueToSource(document, varName, newValue)) {
+                    if (!uiHistory.set(docKey, uiOverrides, docKey, varName, newValue)) return;
+                    uiOverridesDirty.add(docKey);
+                }
+                // Refreshes the form (so the control keeps the entered value) and the
+                // report panel beside it (so the result updates).
+                void refreshPreviewPanels(document);
+            })();
             break;
         }
         case 'uiUndo':
@@ -1938,6 +2016,10 @@ export async function activate(context: vscode.ExtensionContext) {
         // Create shared API client (uses remote URL initially, switches to local when server starts)
         const apiClient = new CalcpadApiClient(settingsManager.getServerUrl(), serverDebugChannel);
         sharedApiClient = apiClient;
+        const syncMacroCalls = () => apiClient.setMacroCalls(settingsManager.getSettings().macroCalls);
+        syncMacroCalls();
+        void settingsManager.ready.then(syncMacroCalls);
+        context.subscriptions.push(settingsManager.onDidChangeSettings(syncMacroCalls));
 
         // Continuous liveness, surfaced as the coloured dot in the CalcpadCE view title. The
         // server manager pushes lifecycle transitions in; the poll is the backstop for what it
@@ -2202,11 +2284,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
     // Unified document processing function
     let isProcessingDocument = false;
+    // A request made mid-run is replayed after it rather than dropped.
+    let pendingDocument: vscode.TextDocument | undefined;
     async function processDocument(document: vscode.TextDocument) {
         if (document.languageId !== 'calcpad' && document.languageId !== 'plaintext') {
             return;
         }
-        if (isProcessingDocument) return;
+        if (isProcessingDocument) {
+            pendingDocument = document;
+            return;
+        }
 
         isProcessingDocument = true;
         try {
@@ -2214,15 +2301,19 @@ export async function activate(context: vscode.ExtensionContext) {
         } finally {
             isProcessingDocument = false;
         }
+        const next = pendingDocument;
+        pendingDocument = undefined;
+        if (next) await processDocument(next);
     }
+    refreshDocumentAnalysis = document => void processDocument(document);
 
     async function _doProcessDocument(document: vscode.TextDocument) {
         outputChannel.appendLine('[processDocument] Processing document: ' + document.uri.fsPath, 'verbose');
 
         // Run linting and definitions in parallel
         const [, definitions] = await Promise.all([
-            linter.lintDocument(document),
-            definitionsService.refreshDefinitions(document).catch((error: unknown) => {
+            linter.lintDocument(document, useTrace()),
+            definitionsService.refreshDefinitions(document, useTrace()).catch((error: unknown) => {
                 outputChannel.appendLine('Error fetching definitions: ' + error, 'warning');
                 return null;
             }),
@@ -2240,8 +2331,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: m.sourceFile,
                     description: m.description,
                     paramTypes: m.paramTypes,
-                    paramDescriptions: m.paramDescriptions,
-                    defaults: m.defaults
+                    paramDescriptions: m.paramDescriptions
                 })),
                 variables: definitions.variables.map(v => ({
                     name: v.name,
@@ -2262,8 +2352,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     sourceFile: f.sourceFile,
                     description: f.description,
                     paramTypes: f.paramTypes,
-                    paramDescriptions: f.paramDescriptions,
-                    defaults: f.defaults
+                    paramDescriptions: f.paramDescriptions
                 })),
                 customUnits: definitions.customUnits.map(u => ({
                     name: u.name,
@@ -2340,6 +2429,10 @@ export async function activate(context: vscode.ExtensionContext) {
     vueUiProvider.onLogLevelChanged = (level: string) => {
         applyLogLevel(level);
     };
+    vueUiProvider.onAutoRunChanged = () => {
+        const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
+        if (editor) refreshDocumentAnalysis?.(editor.document);
+    };
     // Rendered on demand rather than served from the cache: this is what the Properties
     // tab asks when it has no answer or wants a fresh one, and the cache is only as new
     // as the last time the input form itself was shown.
@@ -2347,9 +2440,11 @@ export async function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return null;
         try {
-            const { html } = await renderForExport(editor.document.getText(), editor.document.uri, 'input');
-            const controls = extractUiControls(html);
+            const text = editor.document.getText();
+            const { html } = await renderForExport(text, editor.document.uri, 'input');
+            const controls = extractUiControls(html, text);
             uiControls.set(editor.document.uri.toString(), controls);
+            uiOverrideHints?.tracker.setControls(editor.document.uri.toString(), controls);
             return controls;
         } catch (e) {
             outputChannel.appendLine('[UI controls] Render failed: ' + e, 'warning');
@@ -2376,6 +2471,31 @@ export async function activate(context: vscode.ExtensionContext) {
     const metadataFooterView = new MetadataFooterView(() => CalcpadSettingsManager.getInstance().getExtraBool('showFileMetadata', false));
     vueUiProvider.onShowFileMetadataChanged = () => metadataFooterView.refresh();
     context.subscriptions.push(metadataFooterView);
+
+    uiOverrideHints = new UiOverrideHintsProvider(
+        () => CalcpadSettingsManager.getInstance().getExtraBool('uiOverrideHints', false),
+        async (document) => {
+            try {
+                const text = document.getText();
+                const { html } = await renderForExport(text, document.uri, 'input');
+                return extractUiControls(html, text);
+            } catch (e) {
+                outputChannel.appendLine('[UI override hints] Render failed: ' + e, 'warning');
+                return null;
+            }
+        },
+        clearEditedUiOverrides);
+    vueUiProvider.onUiOverrideHintsChanged = () => uiOverrideHints?.refresh();
+    context.subscriptions.push(uiOverrideHints, vscode.commands.registerCommand(REVEAL_UI_OVERRIDES_COMMAND,
+        async (uri: vscode.Uri, line: number, keys: string[]) => {
+            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri.toString());
+            if (editor) {
+                const pos = new vscode.Position(line - 1, 0);
+                editor.selection = new vscode.Selection(pos, pos);
+            }
+            await vscode.commands.executeCommand('calcpadVueUI.focus');
+            vueUiProvider?.revealUiOverrides(keys);
+        }));
     const vueUiProviderDisposable = vscode.window.registerWebviewViewProvider(
         CalcpadVueUIProvider.viewType,
         vueUiProvider
@@ -2780,7 +2900,8 @@ export async function activate(context: vscode.ExtensionContext) {
             }
             lintTimeout = setTimeout(() => {
                 invalidateUiControls(event.document);
-                processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+                if (!runFollows(event.document))
+                    processDocument(event.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
                 vueUiProvider?.refreshDocumentMetadata();
             }, 500);
             // Only schedule preview update when auto-run is on. Otherwise the
@@ -2831,7 +2952,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 schedulePreviewUpdate();
             }
             // Update Variables tab
-            processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+            if (!runFollows(editor.document))
+                processDocument(editor.document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
             // Last, and after the cancel path above returns: a switch the user backed out of
             // must not open anything.
             await maybeAutoEnterInputMode(editor.document);

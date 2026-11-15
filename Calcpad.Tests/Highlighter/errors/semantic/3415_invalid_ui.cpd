@@ -1,0 +1,62 @@
+' CPD-3415: invalid #UI format
+' JSON without its closing brace
+'expect: CPD-3415[{"type": "entry" a = 1]
+#UI {"type": "entry" a = 1
+
+' Not JSON
+'expect: CPD-3415[{not json}]
+#UI {not json} b = 1
+
+' An unknown property is a warning
+'expect: CPD-3415[{"colour": "red"}]
+#UI {"colour": "red"} d = 1
+
+' An unknown control type
+'expect: CPD-3415[{"type": "slider"}]
+#UI {"type": "slider"} e = 1
+
+' A dropdown without its option arrays
+'expect: CPD-3415[{"type": "dropdown"}]
+#UI {"type": "dropdown"} f = 1
+
+' A radio with only one of the two arrays
+'expect: CPD-3415
+#UI {"type": "radio", "keys": ["Steel", "Concrete"]} g = 1
+
+' Option arrays of different lengths
+'expect: CPD-3415
+#UI {"type": "dropdown", "keys": ["Low", "Med", "High"], "values": ["1", "2"]} h = 1
+
+' Only numbers are supported
+'expect: CPD-3415[{"mode": "string"}]
+#UI {"mode": "string"} i = 1
+
+' A string variable is also an undefined macro
+'expect: CPD-3415, CPD-3303
+#UI j$ = 1
+
+' A negative grid size
+'expect: CPD-3415
+#UI {"type": "datagrid", "rows": -1, "columns": 2} k = [1; 2]
+
+' More headers than columns
+'expect: CPD-3415
+#UI {"type": "datagrid", "rows": 1, "columns": 2, "columnHeaders": ["a", "b", "c"]} m = [1; 2]
+
+' A value of the wrong type
+'expect: CPD-3415[{"rows": "two"}]
+#UI {"rows": "two"} n = 1
+
+' No assignment
+'expect: CPD-3415[#UI {"type": "entry"}]
+#UI {"type": "entry"}
+
+' Nothing after the keyword
+'expect: CPD-3415
+#UI
+
+' Inside a conditional block
+#if n > 0
+'expect: CPD-3415[{"type": "slider"}]
+    #UI {"type": "slider"} o = 2
+#end if

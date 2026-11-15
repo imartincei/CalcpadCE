@@ -50,6 +50,10 @@ rounded4 = 3.14159265
 #format F2
 formatted = 123.456789
 #format default
+' Scoped settings
+#settings {"decimals": 4}
+scoped = 3.14159265
+#end settings
 ' Trig unit switches
 #deg
 degResult = sin(90)

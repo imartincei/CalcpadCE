@@ -1,5 +1,5 @@
 <template>
-  <div class="ui-overrides-section">
+  <div ref="root" class="ui-overrides-section">
     <p v-if="!hasDocument" class="note">{{ t('No document is open.') }}</p>
     <p v-else-if="!rows.length && !dirty" class="note">{{ t('No saved #UI values. Values entered into the input form are saved here, at the end of the file.') }}</p>
 
@@ -11,7 +11,24 @@
         no longer match a #UI control.
       </p>
 
-      <div v-for="(row, i) in classified" v-show="rowMatches(row)" :key="'uo' + row.key" class="list-row">
+      <label class="selection-filter" :title="t('Includes values from #include lines and macro calls in the selection.')">
+        <input type="checkbox" v-model="selectedLinesOnly" />
+        <span>{{ t('Selected lines only') }}</span>
+        <span v-if="selectedLinesOnly && selection" class="selection-lines">({{ selectionLabel }})</span>
+      </label>
+      <p v-if="selectedLinesOnly && !selection" class="note">{{ t('Place the cursor on a line to see its values.') }}</p>
+      <p v-else-if="selectedLinesOnly && uiControlsResolved && !classified.some(rowMatches)" class="note">
+        {{ t('No values for the selected lines.') }}
+      </p>
+
+      <div
+        v-for="(row, i) in classified"
+        v-show="rowMatches(row)"
+        :key="'uo' + row.key"
+        class="list-row"
+        :class="{ flash: flashKeys.has(row.key) }"
+        :data-key="row.key"
+      >
         <button
           class="key-button"
           :disabled="row.line === null"
@@ -23,6 +40,9 @@
         <button class="icon" :title="t('Remove')" @click="rows.splice(i, 1)">✕</button>
       </div>
 
+      <p v-if="changeCount" class="pending">
+        {{ t('Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes', { n: changeCount }, changeCount) }}
+      </p>
       <div class="actions">
         <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
         <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
@@ -33,16 +53,31 @@
           @click="purgeUnused"
         >{{ t('Purge unused') }}</button>
       </div>
+      <div class="actions">
+        <button
+          class="secondary"
+          :disabled="dirty || !sourceKeys.length"
+          :title="t('Write #UI overrides into the CalcpadCE file as defaults and remove the override. Values in loops, macros, and includes are unaffected.')"
+          @click="emit('override-defaults', sourceKeys)"
+        >{{ sourceKeys.length ? t('Override Defaults ({n})', { n: sourceKeys.length }) : t('Override Defaults') }}</button>
+        <button
+          class="secondary"
+          :disabled="!shownRows.length"
+          :title="t('Reverts displayed #UI overrides back to their default values.')"
+          @click="revertToDefaults"
+        >{{ t('Revert to defaults') }}</button>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
-import { classifyUiOverrides } from '../../services/ui-overrides'
-import type { UiControl, UiOverrideRow, UiOverrides } from '../../services/ui-overrides'
+import { classifyUiOverrides, rowInRange } from '../../services/ui-overrides'
+import { effectiveUiOverrideKey } from '../../services/ui-source-sync'
+import type { LineRange, UiControl, UiOverrideRow, UiOverrides } from '../../services/ui-overrides'
 import { getUiOverridesDraft, setUiOverridesDraft, clearUiOverridesDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { UiOverrideDraftRow } from '../metadata-drafts'
 
@@ -54,6 +89,10 @@ interface Props {
   docKey?: string
   /** Controls of the last input-form render, or null until the host resolves them. */
   uiControls?: UiControl[] | null
+  /** Editor lines the cursor or selection covers. */
+  selection?: LineRange | null
+  /** Saved values an editor hint asked to show. */
+  reveal?: { keys: string[]; seq: number } | null
   /** Whether the section is showing, since resolving controls renders the document. */
   visible?: boolean
   query?: string
@@ -66,6 +105,8 @@ const props = withDefaults(defineProps<Props>(), {
   hasDocument: false,
   docKey: '',
   uiControls: null,
+  selection: null,
+  reveal: null,
   visible: true,
   query: '',
   filter: '',
@@ -75,6 +116,7 @@ const emit = defineEmits<{
   'update': [overrides: UiOverrides]
   'go-to-line': [line: number]
   'refresh-ui-controls': []
+  'override-defaults': [keys: string[]]
   'draft-dirty': [payload: { docKey: string; dirty: boolean }]
 }>()
 
@@ -84,6 +126,13 @@ const sameRows = (a: UiOverrideDraftRow[], b: UiOverrideDraftRow[]) => JSON.stri
 
 const rows = ref<UiOverrideDraftRow[]>(getUiOverridesDraft(props.docKey) ?? savedRows(props.overrides))
 const dirty = computed(() => !sameRows(rows.value, savedRows(props.overrides)))
+
+// Values added, edited or removed since the last save.
+const changeCount = computed(() => {
+  const draft = new Map(rows.value.map(r => [r.key, r.value]))
+  const changed = [...draft].filter(([key, value]) => props.overrides[key] !== value).length
+  return changed + Object.keys(props.overrides).filter(key => !draft.has(key)).length
+})
 let boundDocKey = props.docKey
 
 function reportDirty(docKey: string, value: boolean) {
@@ -131,8 +180,84 @@ watch(() => props.visible && rows.value.length > 0 && !uiControlsResolved.value,
   if (need) emit('refresh-ui-controls')
 }, { immediate: true })
 
-const rowMatches = (row: UiOverrideRow) =>
+const SELECTED_LINES_KEY = 'calcpad.properties.uiOverridesSelectedLinesOnly'
+const selectedLinesOnly = ref(false)
+try {
+  selectedLinesOnly.value = localStorage.getItem(SELECTED_LINES_KEY) === 'true'
+} catch {
+  // ignore unavailable storage
+}
+watch(selectedLinesOnly, value => {
+  try {
+    localStorage.setItem(SELECTED_LINES_KEY, String(value))
+  } catch {
+    // ignore unavailable storage
+  }
+})
+
+const selectionLabel = computed(() => {
+  const s = props.selection
+  if (!s) return ''
+  return s.start === s.end ? `line ${s.start}` : `lines ${s.start}–${s.end}`
+})
+
+const matchesSearch = (row: UiOverrideRow) =>
   !props.filter || row.key.toLowerCase().includes(props.filter) || row.value.toLowerCase().includes(props.filter)
+
+const rowMatches = (row: UiOverrideRow) =>
+  matchesSearch(row) && (!selectedLinesOnly.value || (!!props.selection && rowInRange(row, props.selection)))
+
+const root = ref<HTMLElement | null>(null)
+const flashKeys = ref(new Set<string>())
+// Rows can arrive after the reveal, since the document's values are fetched as the tab opens.
+let pendingScroll = false
+let flashTimer: ReturnType<typeof setTimeout> | null = null
+
+function scrollToFlashed() {
+  if (!pendingScroll) return
+  const el = Array.from(root.value?.querySelectorAll<HTMLElement>('.list-row') ?? [])
+    .find(r => flashKeys.value.has(r.dataset.key ?? '') && r.offsetParent !== null)
+  if (!el) return
+  pendingScroll = false
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  el.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' })
+}
+
+watch(() => props.reveal?.seq, seq => {
+  if (seq === undefined || !props.reveal) return
+  flashKeys.value = new Set(props.reveal.keys)
+  pendingScroll = true
+  if (flashTimer) clearTimeout(flashTimer)
+  flashTimer = setTimeout(() => {
+    flashKeys.value = new Set()
+    pendingScroll = false
+  }, 2500)
+  // After the tab scrolls to the section header.
+  setTimeout(scrollToFlashed, 100)
+}, { immediate: true })
+
+watch(classified, () => { if (pendingScroll) void nextTick(scrollToFlashed) })
+
+onBeforeUnmount(() => { if (flashTimer) clearTimeout(flashTimer) })
+
+const shownRows = computed(() => classified.value.filter(rowMatches))
+
+// Rows that are the only value a plain #UI line of this file renders with.
+const sourceKeys = computed(() => {
+  const controls = props.uiControls ?? []
+  const overrides = Object.fromEntries(rows.value.map(r => [r.key, r.value]))
+  return shownRows.value
+    .filter(row => {
+      const users = controls.filter(c => effectiveUiOverrideKey(overrides, c.key) === row.key)
+      return users.length === 1 && !!users[0].inSource
+    })
+    .map(row => row.key)
+})
+
+function revertToDefaults() {
+  const shown = new Set(shownRows.value.map(r => r.key))
+  rows.value = rows.value.filter(r => !shown.has(r.key))
+}
 
 function purgeUnused() {
   const stale = new Set(unusedRows.value.map(r => r.key))
@@ -168,6 +293,31 @@ function reset() {
   line-height: 1.5;
 }
 
+.pending {
+  margin: 8px 0 0 0;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  font-style: italic;
+}
+
+.selection-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px 0;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  user-select: none;
+}
+
+.selection-filter input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.selection-lines {
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
 .list-row {
   display: flex;
   align-items: center;
@@ -184,6 +334,22 @@ function reset() {
   padding: 4px 6px;
   font-family: var(--vscode-font-family);
   border-radius: 2px;
+}
+
+.list-row.flash {
+  animation: uo-flash 2.5s ease-out;
+}
+
+@keyframes uo-flash {
+  0%, 40% { background: var(--vscode-editor-findMatchHighlightBackground, rgba(234, 92, 0, 0.33)); }
+  100% { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-row.flash {
+    animation: none;
+    background: var(--vscode-editor-findMatchHighlightBackground, rgba(234, 92, 0, 0.33));
+  }
 }
 
 .key-button {

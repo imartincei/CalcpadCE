@@ -1,0 +1,12 @@
+' CPD-3417: duplicate uiOverrides metadata comment (warning)
+'expect: CPD-3301
+r = undefinedName
+' The first one is also not at the end
+'expect: CPD-3416
+'<!--{"uiOverrides": {"L:1": "8"}}-->
+'expect: CPD-3416, CPD-3417
+'<!--{"uiOverrides": {"L:2": "4"}}-->
+' The last one, directly above the fileInfo footer
+'expect: CPD-3417
+'<!--{"uiOverrides": {"L:1": "9"}}-->
+'<!--{"fileInfo": {"version": "1"}}-->

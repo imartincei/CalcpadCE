@@ -54,6 +54,7 @@ export function createCalcpadI18n(setting: LocaleSetting = readLocaleSetting()):
         fallbackLocale: 'en',
         messages: { en, zh },
         missingWarn: false,
+        fallbackFormat: true,
         fallbackWarn: false,
     })
     if (typeof document !== 'undefined') {

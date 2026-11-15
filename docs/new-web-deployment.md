@@ -98,8 +98,10 @@ The analysis endpoints (`/highlight`, `/lint`, `/definitions`, `/symbol-at-posit
 Calculation errors come back alongside it in an `X-Calcpad-Errors` response header, URL-encoded JSON of:
 
 ```typescript
-Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression", code }>
+Array<{ sourceLine, outputLine, message, source: "Macro" | "Expression", code, kind, startColumn, endColumn }>
 ```
+
+`startColumn` and `endColumn` mark the error on its source line, or are -1 when it covers the whole line.
 
 `code` is the error's `CPD-xxxx` code (see [Linter and Diagnostics](new-linter.md)).
 The editors show these errors in their Problems panels.

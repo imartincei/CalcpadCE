@@ -2,6 +2,8 @@ using System.Linq;
 using Calcpad.Highlighter.ContentResolution;
 using Calcpad.Highlighter.Linter;
 using Calcpad.Highlighter.Linter.Models;
+using Calcpad.Highlighter.Tokenizer;
+using Calcpad.Highlighter.Tokenizer.Models;
 
 namespace Calcpad.Tests.Highlighter
 {
@@ -30,6 +32,31 @@ namespace Calcpad.Tests.Highlighter
         public void CommandScopeVariableCollidingWithUnit_NoSyntaxError(string src)
         {
             Assert.Equal(0, Count(Lint(src), "CPD-3406"));
+        }
+
+        private static TokenType[] TypesOf(string content, string text) =>
+            new CalcpadTokenizer().Tokenize(content).Tokens.Where(t => t.Text == text).Select(t => t.Type).ToArray();
+
+        [Theory]
+        [InlineData("$Block{a = vector(5); $Repeat{a.i = i^2 @ i = 1 : 5}; a}", "a")]
+        [InlineData("$Block{m = matrix(5; 5); $Repeat{$Repeat{m.(i; j) = i*j @ i = 1 : 5} @ j = 1 : 5}; m}", "m")]
+        [InlineData("x = $Inline{s = 2; t = s^2; t}", "s")]
+        [InlineData("x = $Inline{s = 2; t = s^2; t}", "t")]
+        [InlineData("$While{g < 5; g = g + 1}", "g")]
+        public void BlockAssignment_IsLocalVariable(string src, string name)
+        {
+            var types = TypesOf(src, name);
+            Assert.NotEmpty(types);
+            Assert.All(types, t => Assert.Equal(TokenType.LocalVariable, t));
+        }
+
+        [Theory]
+        [InlineData("$Block{a == 5; a}")]
+        [InlineData("$Block{f(a = 5); a}")]
+        [InlineData("$Sum{a = 5 @ i = 1 : 2}")]
+        public void NonAssignment_LeavesUnit(string src)
+        {
+            Assert.Contains(TokenType.Units, TypesOf(src, "a"));
         }
 
         [Fact]

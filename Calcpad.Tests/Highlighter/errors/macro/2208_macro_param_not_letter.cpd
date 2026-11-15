@@ -1,0 +1,13 @@
+' CPD-2208: macro parameter must start with a letter
+'expect: CPD-2208
+#def bad$(1a$) = 1
+
+' The second parameter
+'expect: CPD-2208
+#def bad2$(a$; 2b$) = a$
+
+' A multi-line definition
+'expect: CPD-2208
+#def bad3$(9x$)
+badValue = 1
+#end def

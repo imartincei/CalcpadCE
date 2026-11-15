@@ -17,12 +17,6 @@ namespace Calcpad.Highlighter.ContentResolution
         public string Source { get; set; } // "local" | "include"
         public string SourceFile { get; set; }
 
-        /// <summary>
-        /// Parameters that are used in comments (directly or transitively through nested macro calls).
-        /// These parameters should have their call-site arguments tokenized as Comment.
-        /// </summary>
-        public HashSet<string> CommentParameters { get; set; } = new(StringComparer.Ordinal);
-
         /// <summary>User-provided description from a metadata comment on the preceding line.</summary>
         public string Description { get; set; }
 
@@ -179,7 +173,15 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>Total number of lines in the expanded result for this call site</summary>
         public int TotalContentLines { get; set; }
+
+        /// <summary>Column in the call site line of each character, or -1 for macro body text.</summary>
+        public IReadOnlyList<int> SourceColumns { get; set; }
     }
+
+    /// <summary>A line a macro call expanded to.</summary>
+    /// <param name="Columns">Column on the original line of each character, or -1 when it is not from that line.</param>
+    /// <param name="CallLine">Original line of the call the text ran at.</param>
+    public sealed record CallSiteExpansion(string Text, int[] Columns, int CallLine);
 
     public class SourceInfo
     {
@@ -282,30 +284,16 @@ namespace Calcpad.Highlighter.ContentResolution
         public PathRoots PathRoots { get; set; }
 
         /// <summary>
-        /// Maps macro name (case-insensitive) to its comment parameters — those used in comments,
-        /// directly or transitively. Computed after all macros are collected, with transitive
-        /// closure for nested macro calls.
-        /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
         /// Maps macro name to ordered list of parameter names.
         /// Used for matching call-site argument positions to parameter names.
         /// </summary>
-        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
-        /// Maps macro name to inline body text (everything after = in #def for inline macros,
-        /// or joined content lines for multiline macros).
-        /// Used for argument type resolution via substitution + tokenization.
+        /// User-defined macro info for linting, from the first definition of each macro.
+        /// Key: macro name, Value: MacroInfo with param counts.
         /// </summary>
-        public Dictionary<string, string> MacroBodies { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        /// User-defined macro info for linting, built by the tokenizer during Macro mode.
-        /// Key: macro name (case-insensitive), Value: MacroInfo with param counts.
-        /// </summary>
-        public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; } = new(System.StringComparer.Ordinal);
 
         /// <summary>
         /// SHA256 hex digest of each `#include`d file's content, keyed by its resolved absolute
@@ -313,7 +301,20 @@ namespace Calcpad.Highlighter.ContentResolution
         /// by re-hashing just these files, without rerunning include resolution/macro expansion.
         /// </summary>
         public Dictionary<string, string> IncludedFileHashes { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Stage 2 lines MacroParser rejected; Core shows them as errors and skips them.</summary>
+        public HashSet<int> MacroErrorLines { get; set; } = [];
+
+        /// <summary>MacroParser's errors, on Stage 2 lines.</summary>
+        public List<MacroError> MacroErrors { get; set; } = [];
+
+        /// <summary>False when MacroParser stopped early and passed the rest through unexpanded.</summary>
+        public bool IsMacroParserComplete { get; set; } = true;
     }
+
+    /// <param name="StartColumn">Column in the Stage 2 line, or -1 for the whole line.</param>
+    /// <param name="IsIncluded">The line was read from an included file.</param>
+    public readonly record struct MacroError(int Line, string Code, string Message, int StartColumn, int EndColumn, bool IsIncluded);
 
     public class Stage3Result
     {
@@ -325,6 +326,13 @@ namespace Calcpad.Highlighter.ContentResolution
         public List<FunctionDefinition> FunctionsWithParams { get; set; }
         public Dictionary<string, MacroInfo> UserDefinedMacros { get; set; }
         public HashSet<string> DefinedVariables { get; set; }
+
+        /// <summary>
+        /// Case-sensitive variable name → first original source line (0-based) that defines it.
+        /// Included and macro-generated definitions map to their #include or call line.
+        /// </summary>
+        public Dictionary<string, int> VariableFirstLines { get; set; } = new(System.StringComparer.Ordinal);
+
         public List<VariableDefinition> VariablesWithDefinitions { get; set; }
         public List<CustomUnitDefinition> CustomUnits { get; set; }
 
@@ -382,19 +390,12 @@ namespace Calcpad.Highlighter.ContentResolution
         /// call sites from expansion tracking — mapped to original source lines with include file
         /// info. Used for go-to-definition and find-all-occurrences.
         /// </summary>
-        public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<SymbolLocation>> MacroIndex { get; set; } = new(System.StringComparer.Ordinal);
 
-        /// <summary>
-        /// Maps macro name to its comment parameters (parameters used in comments, directly or transitively).
-        /// Key: macro name (case-insensitive), Value: set of parameter names that are comment parameters.
-        /// </summary>
-        public Dictionary<string, HashSet<string>> MacroCommentParameters { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        /// <summary>Expanded lines carrying text from each root-document line, keyed by original line.</summary>
+        public Dictionary<int, List<CallSiteExpansion>> CallSiteExpansions { get; set; } = new();
 
-        /// <summary>
-        /// Maps macro name to ordered list of parameter names.
-        /// Used for matching call-site argument positions to parameter names.
-        /// </summary>
-        public Dictionary<string, List<string>> MacroParameterOrder { get; set; } = new(System.StringComparer.OrdinalIgnoreCase);
+        internal Stage3Result ShallowCopy() => (Stage3Result)MemberwiseClone();
     }
 
     public class StagedResolvedContent
@@ -402,5 +403,11 @@ namespace Calcpad.Highlighter.ContentResolution
         public Stage1Result Stage1 { get; set; }
         public Stage2Result Stage2 { get; set; }
         public Stage3Result Stage3 { get; set; }
+
+        /// <summary>What Core executed for this content; null when no trace matched.</summary>
+        public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>Core's check pass over the Stage 3 lines, run once on first use.</summary>
+        public Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> CoreCheck { get; set; }
     }
 }

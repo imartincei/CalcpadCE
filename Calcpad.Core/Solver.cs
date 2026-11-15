@@ -97,9 +97,6 @@ namespace Calcpad.Core
             else if (result is Matrix matrix)
                 value = matrix[0, 0];
 
-            if (double.IsNaN(value.Re) || double.IsInfinity(value.Re))
-                throw Exceptions.FunctionNotDefined(x.ToString(CultureInfo.InvariantCulture));
-
             Units = value.Units;
             return result;
         }
@@ -471,12 +468,8 @@ namespace Calcpad.Core
             GetBounds(start, end, out var n1, out var n2);
             IValue result = RealValue.NaN;
             for (int i = n1; i <= n2; ++i)
-            {
                 result = Fi(i);
-                if (result is IScalarValue scalar &&
-                    double.IsInfinity(scalar.Re))
-                    break;
-            }
+
             return result;
         }
 
@@ -544,9 +537,10 @@ namespace Calcpad.Core
             var number = new Complex(0.0);
             for (int i = n1; i <= n2; ++i)
             {
-                number = Fc(i);
-                if (IsInfinity(number))
-                    break;
+                Variable.SetNumber(i);
+                var result = (IScalarValue)Function();
+                Units = result.Units;
+                number = result.Complex;
             }
             return number;
         }

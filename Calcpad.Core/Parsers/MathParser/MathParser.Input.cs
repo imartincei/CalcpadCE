@@ -87,12 +87,34 @@ namespace Calcpad.Core
                 TokenTypes.Error,
             };
 
-            internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment)
+            private HashSet<string> _parameters;
+
+            internal Queue<Token> GetInput(ReadOnlySpan<char> expression, bool allowAssignment, bool trackPositions = false)
+            {
+                var at = -1;
+                var parameters = _parameters;
+                try
+                {
+                    return ReadInput(expression, allowAssignment, trackPositions, ref at);
+                }
+                catch (MathParserException ex) when (trackPositions && at >= 0 && ex.Position < 0)
+                {
+                    ex.Position = at;
+                    throw;
+                }
+                finally
+                {
+                    _parameters = parameters;
+                }
+            }
+
+            private Queue<Token> ReadInput(ReadOnlySpan<char> expression, bool allowAssignment, bool trackPositions, ref int at)
             {
                 var tokens = new Queue<Token>(expression.Length);
                 var pt = TokenTypes.None;
                 var st = SolverBlock.SolverTypes.None;
                 var isSolver = false;
+                int solverStart = -1, solverOpen = -1;
                 var isInput = false;
                 var isSubscript = false;
                 var bracketCounter = 0;
@@ -101,11 +123,13 @@ namespace Calcpad.Core
                 var unitsLiteral = new TextSpan(expression);
                 var textSpan = new TextSpan(expression);
                 _parser._assignmentIndex = 0;
+                _parser.DefinedFunction = null;
                 Token t = null;
                 var n = GetTargetUnits(expression);
                 for (int i = 0; i <= n; ++i)
                 {
                     var c = (i == n) ? ' ' : expression[i];
+                    at = isSolver ? -1 : i;
                     var tt = GetCharType(c); // Get the type from a predefined array
                     if (pt == TokenTypes.Unit || pt == TokenTypes.Variable)
                     {
@@ -124,7 +148,15 @@ namespace Calcpad.Core
                         continue;
 
                     if (tt == TokenTypes.Error)
-                        throw Exceptions.InvalidSymbol(c);
+                    {
+                        var symbolError = c == '}' ? Exceptions.MissingLeftSolverBracket() : Exceptions.InvalidSymbol(c);
+                        if (trackPositions)
+                        {
+                            symbolError.Position = i;
+                            symbolError.EndPosition = i + 1;
+                        }
+                        throw symbolError;
+                    }
 
                     if (tt == TokenTypes.Constant &&
                         unitsLiteral.IsEmpty ||
@@ -216,6 +248,8 @@ namespace Calcpad.Core
                                 else
                                 {
                                     t = MakeRealValueToken(tokenLiteral.ToString());
+                                    if (trackPositions)
+                                        t.Start = tokenLiteral.Start;
                                     tokens.Enqueue(t);
                                     tokenLiteral.Reset(i);
                                     if (!unitsLiteral.IsEmpty)
@@ -233,7 +267,9 @@ namespace Calcpad.Core
                                 var s = tokenLiteral.ToString();
                                 if (tt == TokenTypes.BracketLeft)
                                 {
-                                    t = MakeFunctionToken(s, _parser.IsCalculation && tokens.Count != 0);
+                                    t = MakeFunctionToken(s, _parser.IsCalculation && tokens.Count != 0 && !IsSelfReference(s, tokens));
+                                    if (trackPositions)
+                                        t.Start = tokenLiteral.Start;
                                     if (_isComplex &&
                                            (t.Type == TokenTypes.VectorFunction ||
                                             t.Type == TokenTypes.VectorFunction2 ||
@@ -261,10 +297,12 @@ namespace Calcpad.Core
                                         if (!tokenLiteral.IsEmpty)
                                             t = MakeUnitToken(s, true);
                                     }
-                                    else if (Validator.UnitChars.Contains(s[0]))
-                                        t = MakeUnitToken(s, true);
                                     else
-                                        t = new VariableToken(s, null);
+                                    {
+                                        t = Validator.UnitChars.Contains(s[0]) ? MakeUnitToken(s, true) : new VariableToken(s, null);
+                                        if (trackPositions)
+                                            t.Start = tokenLiteral.Start;
+                                    }
                                 }
                                 tokens.Enqueue(t);
                                 if (t.Type == TokenTypes.Array)
@@ -331,22 +369,47 @@ namespace Calcpad.Core
                                             throw Exceptions.ImproperAssignment();
 
                                         int count = tokens.Count;
+                                        if (count == 0)
+                                        {
+                                            var ex = Exceptions.AssignmentPreceded();
+                                            if (trackPositions)
+                                            {
+                                                ex.Position = i;
+                                                ex.EndPosition = i + 1;
+                                            }
+                                            throw ex;
+                                        }
                                         if (count == 1)
                                         {
                                             var token = tokens.Peek();
                                             if (token is VariableToken vt)
                                             {
-                                                if (c == '←')
-                                                    GetVariable(vt, true);
-                                                else
-                                                    CreateVariable(vt);
+                                                try
+                                                {
+                                                    if (c == '←')
+                                                        GetVariable(vt, true);
+                                                    else
+                                                        CreateVariable(vt);
 
-                                                if (vt.Variable.IsReadOnly)
-                                                    throw Exceptions.CannotModifyConstant(vt.Content);
-
+                                                    if (vt.Variable.IsReadOnly)
+                                                        throw Exceptions.CannotModifyConstant(vt.Content);
+                                                }
+                                                catch (MathParserException ex) when (trackPositions && ex.Position < 0)
+                                                {
+                                                    var name = expression[..i];
+                                                    ex.Position = name.Length - name.TrimStart().Length;
+                                                    ex.EndPosition = name.TrimEnd().Length;
+                                                    throw;
+                                                }
                                                 vt.Variable.IsReadOnly = _parser.IsConst;
                                             }
                                         }
+                                        else if (c == '=' && tokens.Peek().Type == TokenTypes.CustomFunction)
+                                        {
+                                            _parser.DefinedFunction = tokens.Peek().Content;
+                                            _parameters = GetParameterNames(tokens);
+                                        }
+
                                         _parser._assignmentIndex = count;
                                     }
                                 }
@@ -354,6 +417,8 @@ namespace Calcpad.Core
                                     throw Exceptions.ComplexVectorsAndMatricesNotSupported();
 
                                 t = new Token(c.ToString(), tt);
+                                if (trackPositions)
+                                    t.Start = i;
                             }
                             tokens.Enqueue(t);
                         }
@@ -361,24 +426,44 @@ namespace Calcpad.Core
                     if (pt != TokenTypes.Input || tt != TokenTypes.None)
                         pt = tt;
                 }
+                at = -1;
                 GetVariables(tokens);
                 if (!isSolver)
                     return tokens;
 
-                if (st == SolverBlock.SolverTypes.None)
-                    throw Exceptions.MissingLeftSolverBracket();
-
-                throw Exceptions.MissingRightSolverBracket();
+                var solverError = st == SolverBlock.SolverTypes.None
+                    ? Exceptions.MissingLeftSolverBracket()
+                    : Exceptions.MissingRightSolverBracket();
+                // From '$' to its '{', or to the end of the name when there is none
+                if (trackPositions && solverStart >= 0)
+                {
+                    var end = solverOpen >= 0 ? solverOpen + 1 : solverStart + 1;
+                    while (solverOpen < 0 && end < n && char.IsLetter(expression[end]))
+                        ++end;
+                    solverError.Position = solverStart;
+                    solverError.EndPosition = end;
+                }
+                throw solverError;
 
                 bool InputSolver(char c, TokenTypes tt, ref TextSpan ts, TextSpan tokenLiteral, int i)
                 {
                     if (tt == TokenTypes.Solver && !isSolver)
                     {
                         if (!tokenLiteral.IsEmpty)
-                            throw Exceptions.InvalidMacro(tokenLiteral.ToString());
+                        {
+                            var macroError = Exceptions.InvalidMacro(tokenLiteral.ToString());
+                            if (trackPositions)
+                            {
+                                macroError.Position = tokenLiteral.Start;
+                                macroError.EndPosition = i + 1;
+                            }
+                            throw macroError;
+                        }
 
                         ts.Reset(i);
                         isSolver = true;
+                        solverStart = i;
+                        solverOpen = -1;
                     }
                     if (isSolver)
                     {
@@ -392,6 +477,7 @@ namespace Calcpad.Core
                                     if (st == SolverBlock.SolverTypes.Error)
                                         throw Exceptions.InvalidSolver(s.ToString());
 
+                                    solverOpen = i;
                                     ts.Reset(i + 1);
                                 }
                                 else
@@ -403,10 +489,23 @@ namespace Calcpad.Core
                                 --bracketCounter;
                                 if (bracketCounter == 0)
                                 {
-                                    t = new Token(string.Empty, TokenTypes.Solver)
+                                    int index;
+                                    var nameOffset = _parser.NameOffset;
+                                    _parser.NameOffset = trackPositions && nameOffset >= 0 ? nameOffset + solverOpen + 1 : -1;
+                                    try
                                     {
-                                        Index = AddSolver(ts.ToString(), st)
-                                    };
+                                        index = AddSolver(ts.ToString(), st);
+                                    }
+                                    catch (MathParserException ex)
+                                    {
+                                        ex.Shift(trackPositions ? solverOpen + 1 : -1);
+                                        throw;
+                                    }
+                                    finally
+                                    {
+                                        _parser.NameOffset = nameOffset;
+                                    }
+                                    t = new Token(string.Empty, TokenTypes.Solver) { Index = index };
                                     tokens.Enqueue(t);
                                     st = SolverBlock.SolverTypes.None;
                                     isSolver = false;
@@ -522,6 +621,10 @@ namespace Calcpad.Core
                 }
                 return n;
             }
+
+            // f(x) = f(x - 1) is reported as recursion, not as an undefined function
+            private bool IsSelfReference(string s, Queue<Token> tokens) =>
+                _parser._assignmentIndex > 0 && tokens.Peek() is { Type: TokenTypes.CustomFunction } first && first.Content == s;
 
             private Token MakeFunctionToken(string s, bool mustExist)
             {
@@ -661,21 +764,58 @@ namespace Calcpad.Core
                 foreach (var variables in _localVariables)
                     if (variables.TryGetValue(s, out var v))
                     {
+                        if (ReferenceEquals(variables, _variables))
+                            _parser.RecordReadName(s, vt.Start);
                         vt.Variable = v;
                         return;
                     }
                 if (mustExist)
                     throw Exceptions.VariableNotExist(vt.Content);
 
+                _parser.RecordReadName(s, vt.Start);
                 var topLocalVariables = _localVariables.Peek();
                 var newVar = new Variable();
                 topLocalVariables.Add(s, newVar);
                 vt.Variable = newVar;
             }
 
+            // Names in the signature: depth 1, after ( or ;
+            private static HashSet<string> GetParameterNames(Queue<Token> tokens)
+            {
+                var names = new HashSet<string>(StringComparer.Ordinal);
+                int depth = 0, squareDepth = 0;
+                var pt = TokenTypes.None;
+                foreach (var t in tokens)
+                {
+                    switch (t.Type)
+                    {
+                        case TokenTypes.BracketLeft: ++depth; break;
+                        case TokenTypes.BracketRight: --depth; break;
+                        case TokenTypes.SquareBracketLeft: ++squareDepth; break;
+                        case TokenTypes.SquareBracketRight: --squareDepth; break;
+                        case TokenTypes.Variable when depth == 1 && squareDepth == 0 &&
+                            (pt == TokenTypes.BracketLeft || pt == TokenTypes.Divisor):
+                            names.Add(t.Content);
+                            break;
+                    }
+                    pt = t.Type;
+                }
+                return names;
+            }
+
             private VariableToken MakeVectorOrMatrixToken(string s)
             {
                 foreach (var variables in _localVariables)
+                {
+                    // Parameters hide globals of the same name
+                    if (_parameters is not null &&
+                        ReferenceEquals(variables, _variables) &&
+                        _parameters.Contains(s))
+                        return new VariableToken(s, null)
+                        {
+                            Type = TokenTypes.Array
+                        };
+
                     if (variables.TryGetValue(s, out var v))
                     {
                         ref var value = ref v.ValueByRef();
@@ -696,6 +836,7 @@ namespace Calcpad.Core
                             };
                         return null;
                     }
+                }
                 return null;
             }
 

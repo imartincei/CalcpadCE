@@ -36,7 +36,8 @@ namespace Calcpad.Core
             private int _count;
             private string _keyword;
             private int _keywordLength;
-            private readonly Item[] _conditions = new Item[20];
+            private const int MaxDepth = 19;
+            private readonly Item[] _conditions = new Item[MaxDepth + 1];
             private Types Type => _conditions[Id].Type;
             internal int Id { get; private set; }
             internal bool IsUnchecked { get; private set; }
@@ -116,6 +117,9 @@ namespace Calcpad.Core
                     if (type == Types.ElseIf)
                         throw Exceptions.ElseIfAfterElse();
                 }
+                if ((type == Types.If || type == Types.While) && Id == MaxDepth)
+                    throw Exceptions.NestingTooDeep(MaxDepth);
+
                 switch (type)
                 {
                     case Types.If:

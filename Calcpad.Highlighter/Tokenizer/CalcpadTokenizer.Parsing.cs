@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Calcpad.Highlighter.Linter.Constants;
 using Calcpad.Highlighter.Linter.Helpers;
@@ -155,10 +156,7 @@ namespace Calcpad.Highlighter.Tokenizer
                         {
                             _state.CurrentMacroCall = macroName;
                             _state.CurrentMacroArgIndex = 0;
-
-                            // Resolve argument tokens by substituting into the macro body
-                            // _state.TokenStartColumn is at the '(' position
-                            ResolveMacroCallArgTokens(macroName, _state.TokenStartColumn);
+                            ResolveMacroCallArgTokens(_state.TokenStartColumn);
                         }
                     }
                 }
@@ -167,7 +165,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 if (!_state.IsFunctionDefinition &&
                     (t == TokenType.Variable || t == TokenType.Function) &&
                     _builder.Length > 0 &&
-                    _functionsWithDefaults.Contains(_builder.ToString()))
+                    HasDefaults(_builder.ToString()))
                     _state.FunctionCallMask |= callBit;
             }
             else if (c == ')')
@@ -224,13 +222,15 @@ namespace Calcpad.Highlighter.Tokenizer
         }
 
         /// <summary>
-        /// Registers the scope variables a command block declares after its body, e.g. the s in
-        /// $Integral{cos(s^2) @ s = 0 : t}. The body is tokenized before the @ declaration is
-        /// reached, so without this a name that is also a unit (s, t, min, ...) resolves to Units.
+        /// Registers the scope variables a command block declares, e.g. the s in
+        /// $Integral{cos(s^2) @ s = 0 : t} and the a in $Block{a = 5; 2*a}. Otherwise a name that
+        /// is also a unit (s, t, a, m, ...) resolves to Units.
         /// </summary>
         private void CollectCommandScopeVariables(ReadOnlySpan<char> text, int bracePosition)
         {
+            var hasLocals = HasLocalAssignments(text, bracePosition);
             var depth = 0;
+            var nesting = 0;
             for (int i = bracePosition; i < text.Length; i++)
             {
                 var c = text[i];
@@ -238,12 +238,21 @@ namespace Calcpad.Highlighter.Tokenizer
                     return;
 
                 if (c == '{')
-                    ++depth;
+                {
+                    if (++depth == 1 && hasLocals)
+                        CollectLocalAssignment(text, i + 1);
+                }
                 else if (c == '}')
                 {
                     if (--depth == 0)
                         return;
                 }
+                else if (c is '(' or '[')
+                    ++nesting;
+                else if (c is ')' or ']')
+                    --nesting;
+                else if (c == ';' && depth == 1 && nesting == 0 && hasLocals)
+                    CollectLocalAssignment(text, i + 1);
                 else if (c == '@' || c == '&')
                 {
                     var j = i + 1;
@@ -260,6 +269,38 @@ namespace Calcpad.Highlighter.Tokenizer
                     i = j - 1;
                 }
             }
+        }
+
+        // Core gives these commands their own scope, where "name = ..." makes a local
+        private static readonly HashSet<string> LocalScopeCommands =
+            new(["$block", "$inline", "$while", "$repeat"], StringComparer.OrdinalIgnoreCase);
+
+        private static bool HasLocalAssignments(ReadOnlySpan<char> text, int bracePosition)
+        {
+            var start = bracePosition;
+            while (start > 0 && CalcpadCharacterHelpers.IsIdentifierChar(text[start - 1]))
+                --start;
+
+            return start > 0 && text[start - 1] == '$' &&
+                   LocalScopeCommands.Contains(text[(start - 1)..bracePosition].ToString());
+        }
+
+        private void CollectLocalAssignment(ReadOnlySpan<char> text, int i)
+        {
+            while (i < text.Length && char.IsWhiteSpace(text[i]))
+                ++i;
+
+            var start = i;
+            while (i < text.Length && CalcpadCharacterHelpers.IsIdentifierChar(text[i]))
+                ++i;
+
+            var end = i;
+            while (i < text.Length && char.IsWhiteSpace(text[i]))
+                ++i;
+
+            if (end > start && i < text.Length && text[i] == '=' &&
+                (i + 1 >= text.Length || text[i + 1] != '='))
+                _localVariables.Add(text[start..end].ToString());
         }
 
         private void ParseOperator(char c)
@@ -346,6 +387,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 Append(TokenType.Const);
                 _builder.Append(c);
                 _state.CurrentType = TokenType.Units;
+                _state.IsUnitsAfterNumber = true;
             }
             else
             {
@@ -360,7 +402,10 @@ namespace Calcpad.Highlighter.Tokenizer
             _state.TokenStartColumn += _builder.Length;
             _builder.Append(c);
             if (char.IsLetter(c) || CalcpadCharacterHelpers.IsUnitStart(c))
+            {
                 _state.CurrentType = TokenType.Units;
+                _state.IsUnitsAfterNumber = true;
+            }
         }
 
         private void ParseLineBreak(int underscorePosition)

@@ -56,6 +56,13 @@ The two directives split a document into the part that is filled in and the part
 #end post
 ```
 
+Both are still calculated when hidden, so a variable defined in `#post` can be used by a `#pre` later in the file.
+If the `#post` calculations slow down the form and variables are not needed in the Input form, turn off **Calculate #post in Input Form** in [Settings](new-settings.md#math) or in the document using:
+
+```text
+#settings {"calculatePost": false}
+```
+
 **Preview** is the suggested mode to write your CalcpadCE file in: it shows everything at once, and it ignores input values so you see the default values of the document.
 
 Turning on the **Apply #UI Values in Preview** setting will render the preview with the input values applied.
@@ -220,6 +227,11 @@ The cells stay numeric, hovering the cell shows the unit that will be applied in
 So `U = matrix(2; 2)*5m` fills the grid with `5` and writes `[5m; 5m | 5m; 5m]`, and a literal default such as `M = [1m; 2m]` behaves the same way.
 
 It is also recommended to put units in column or row headers.
+Headers accept inline HTML, as in a regular HTML table:
+
+```text
+#UI {"type": "datagrid", "columnHeaders": ["F<sub>x</sub>, kN", "M<sub>y</sub>, kN·m"]} L = [0; 0]
+```
 
 `forceUnits: false` puts the units in the cells instead, so `5m` can be typed into one, and `allowExpression: true` accepts any expression in the cell.
 Note that this is still subject to the limitations of the calculation engine, putting a vector or matrix into a cell will throw an error.
@@ -352,6 +364,28 @@ If a document's values do end up scrambled, the metadata comment is plain text: 
 Editing the comment takes effect on the next render, and what it says replaces what is currently entered — including values typed into the form but not yet saved.
 
 The [Properties tab](new-calcpad-panel.md#properties) does this without hand-editing: its **Saved #UI values** list shows every entry, lets you edit one in place or jump to its control, flags entries that no longer match a control still in the document, and has a **Purge unused** button to drop them.
+Click **Selected lines only** to list just the values for the lines under the cursor or selection.
+An `#include` line, macro call, or loop lists the overrides for every UI element it produces.
+
+### Seeing saved values in the editor
+
+Turn on **Show UI Override Hints** in [Settings](new-settings.md#editor-features) to show saved values above the lines they apply to.
+This is the value itself on a `#UI` line with one control, or the count for a loop, macro call or `#include` line.
+Click a hint to open those values in the Properties tab.
+
+### Moving saved values into the CalcpadCE file
+
+The **Saved #UI values** list in the [Properties tab](new-calcpad-panel.md#properties) has two buttons that act on the values listed:
+
+- **Override Defaults** writes each UI override into its `#UI` line and removes the override. Values in loops, macros and `#include` files are unaffected. If filtering by selected lines, only the selected lines have their defaults updated.
+- **Revert to defaults** removes #UI overrides so the Input form is reverted to default values. If filtering by selected lines, only the selected lines are reverted.
+
+### Auto-syncing values with the CalcpadCE file
+
+Turn on **Auto-Sync #UI Values** in [Settings](new-settings.md#editor-features) to keep `#UI` lines in this file (excluding overrides in loops, macros, and `#include` lines) in sync with the Input form:
+
+- A value entered in the Input form is written into its `#UI` line as the default instead of being saved as an override.
+- Editing the default value on a `#UI` line removes its saved override.
 
 ## Exporting
 
@@ -445,7 +479,7 @@ The step is not saved with the values, so the form starts again from the first s
 
 ## Diagnostics
 
-`#UI` problems are reported under `CPD-3415` by the linter and also appear at the offending line by the calculation engine when you run the document:
+`#UI` problems are reported under `CPD-3415`.
 
 | Message | Cause |
 | ------- | ----- |

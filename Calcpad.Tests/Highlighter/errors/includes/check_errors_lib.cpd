@@ -1,0 +1,4 @@
+' Library with Core check errors only, on lines 3 and 4
+checkOk = 1
+checkBad = checkMissing + 1
+checkCall = sin(1; 2)

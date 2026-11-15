@@ -14,13 +14,12 @@ namespace Calcpad.Highlighter.Linter.Models
         public Dictionary<int, SourceInfo> IncludeMap { get; set; } = new();
         public HashSet<string> DefinedVariables { get; set; } = new();
         public Dictionary<string, FunctionInfo> DefinedFunctions { get; set; } = new(StringComparer.Ordinal);
-        public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.OrdinalIgnoreCase); // name -> macro info
+        public Dictionary<string, MacroInfo> DefinedMacros { get; set; } = new(StringComparer.Ordinal); // name -> macro info
         public HashSet<string> CustomUnits { get; set; } = new();
 
         /// <summary>
-        /// Stage3 lines produced by macro expansion, keyed by Stage3 line index.
-        /// Columns on these lines refer to the expanded text, which has no correspondence
-        /// to the original call site, so diagnostics on them are widened to the whole line.
+        /// Stage3 lines produced by macro expansion, keyed by Stage3 line index. Diagnostics on
+        /// them map through the call site columns, or cover the whole line where there are none.
         /// </summary>
         public Dictionary<int, MacroExpansionInfo> MacroExpansions { get; set; } = new();
 
@@ -28,6 +27,13 @@ namespace Calcpad.Highlighter.Linter.Models
         /// Type tracker with full type information for all definitions
         /// </summary>
         public TypeTracker TypeTracker { get; set; } = new();
+
+        /// <summary>Runtime facts from Core; null when no trace matched the content.</summary>
+        public RuntimeOverlay Runtime { get; set; }
+
+        /// <summary>True when a matching Core run never reached the line, e.g. an untaken #if branch.</summary>
+        public bool IsNotExecuted(int stage3Line) =>
+            Runtime?.GetExecution(stage3Line) == LineExecution.NotExecuted;
 
         /// <summary>
         /// Functions that use command blocks ($Inline, $Block, $While).

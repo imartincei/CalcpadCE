@@ -212,6 +212,81 @@
             var expected = 2d / (1d + Math.Sqrt(5d));
             Assert.Equal(expected, result, Tol);
         }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_UndefinedResult_ReturnsUndefined()
+        {
+            var calc = new TestCalc(new());
+            calc.Run("$Repeat{y = 0/0 @ k = 1 : 1}");
+            Assert.Equal(" Undefined ", calc.ToString());
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_UndefinedFirstIteration_Continues()
+        {
+            var calc = new TestCalc(new());
+            var result = calc.Run("$Repeat{y = if(k ≡ 1; 0/0; 2*k) @ k = 1 : 3}");
+            Assert.Equal(6d, result, Tol);
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_UndefinedFirstVectorElement_Continues()
+        {
+            var calc = new TestCalc(new());
+            calc.Run("v = $Repeat{v = [0/0; k] @ k = 1 : 3}");
+            var result = calc.Run("v.2");
+            Assert.Equal(3d, result, Tol);
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_UndefinedInCustomFunction_ReturnsUndefined()
+        {
+            var calc = new TestCalc(new());
+            calc.Run("f(x) = $Repeat{y = if(x < 0; 0/0; x*k) @ k = 1 : 2}");
+            Assert.Equal(4d, calc.Run("f(2)"), Tol);
+            calc.Run("f(-1)");
+            Assert.Equal(" Undefined ", calc.ToString());
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_InfiniteFirstIteration_Continues()
+        {
+            var calc = new TestCalc(new());
+            var result = calc.Run("$Repeat{y = 1/(k - 1) @ k = 1 : 3}");
+            Assert.Equal(0.5, result, Tol);
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_InfiniteResult_ReturnsInfinity()
+        {
+            var calc = new TestCalc(new());
+            var result = calc.Run("$Repeat{y = 1/(k - 1) @ k = 1 : 1}");
+            Assert.True(double.IsPositiveInfinity(result));
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_InfiniteFirstIteration_Complex()
+        {
+            var calc = new TestCalc(new() { IsComplex = true });
+            var result = calc.Run("$Repeat{y = 1/(k - 1) @ k = 1 : 3}");
+            Assert.Equal(0.5, result, Tol);
+        }
+
+        [Fact]
+        [Trait("Category", "Repeat")]
+        public void Repeat_UndefinedFirstIteration_Complex()
+        {
+            var calc = new TestCalc(new() { IsComplex = true });
+            var result = calc.Run("$Repeat{y = if(k ≡ 1; 0/0; 2*k) @ k = 1 : 3}");
+            Assert.Equal(6d, result, Tol);
+        }
         #endregion
     }
 }

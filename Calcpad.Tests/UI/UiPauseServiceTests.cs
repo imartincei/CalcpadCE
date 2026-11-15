@@ -9,7 +9,7 @@ public class UiPauseServiceTests
     [Fact]
     public void SteppedForm_StopsAndReportsPosition()
     {
-        var (html, _, _, pause) = new CalcpadService().Convert(Source, enableUi: true, stepPauses: true, pauseAfter: "1");
+        var (html, _, _, _, pause) = new CalcpadService().Convert(Source, enableUi: true, stepPauses: true, pauseAfter: "1");
 
         Assert.Contains("bbb2", html);
         Assert.DoesNotContain("ccc3", html);
@@ -22,7 +22,7 @@ public class UiPauseServiceTests
     [InlineData(true, false)]  // Input-form export
     public void UnsteppedRenders_RunPastEveryPause(bool enableUi, bool stepPauses)
     {
-        var (html, _, _, pause) = new CalcpadService().Convert(Source, enableUi: enableUi, stepPauses: stepPauses);
+        var (html, _, _, _, pause) = new CalcpadService().Convert(Source, enableUi: enableUi, stepPauses: stepPauses);
 
         Assert.Contains("ccc3", html);
         Assert.DoesNotContain("Paused:", html);

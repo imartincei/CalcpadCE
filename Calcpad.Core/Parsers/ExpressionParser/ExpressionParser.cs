@@ -16,16 +16,26 @@ namespace Calcpad.Core
         private const int MaxErrorOccurrences = 1000;
         private int _errorCount;
         private int _errorOccurrences;
-        private readonly HashSet<(int Line, string Message)> _errorKeys = [];
+        private readonly HashSet<(int Line, string Code, string Message)> _errorKeys = [];
         private int _isVal;
         private int _currentLine;
+        // Column of the parsed text in the current line, or -1 when unknown
+        private int _lineOffset = -1;
+        // Column where the keyword line's trimmed text starts, or -1
+        private int _keywordOffset = -1;
+        // Where each physical line of a continued statement starts in the joined text
+        private readonly List<(int Start, int Length, int Line, int Column)> _segments = [];
+        private bool _isJoined;
         private int _htmlLines;
         private int _decimals;
         private bool _calculate;
         private bool _isVisible;
         private readonly Stack<bool> _visibilityStack = new();
+        // Nesting depth of a #post block skipped by calculatePost: false
+        private int _postSkipDepth;
         private readonly Stack<int> _outputModeStack = new();
         private readonly Stack<MathParser.VariableSubstitutionOptions> _substitutionStack = new();
+        private readonly Stack<SettingsDto> _settingsStack = new();
         private bool _isMarkdownOn;
         private MathParser _parser;
         private readonly StringBuilder _sb = new(10000);
@@ -54,7 +64,6 @@ namespace Calcpad.Core
         public IReadOnlyList<CalcpadError> Errors => _errorList;
         public bool Debug { get; set; }
         public bool ForPrint { get; set; }
-        public bool ShowWarnings { get; set; } = true;
         public bool ShowErrorLines { get; set; } = true;
         public readonly List<string> OpenXmlExpressions = new(100);
 
@@ -65,6 +74,8 @@ namespace Calcpad.Core
         }
 
         public void Cancel() => _parser?.Cancel();
+
+        private bool IsSuppressed => _modeSuppressed || _postSkipDepth > 0;
 
         private string HtmlId => LineAttributes(_currentLine, _parser.Line);
 
@@ -99,134 +110,200 @@ namespace Calcpad.Core
             {
                 while (++_currentLine < lineCount)
                 {
-                    // #UI metadata is scoped to the line that declared it. Clearing here
-                    // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
-                    ResetUiState();
-                    ref var currentLineCache = ref _lineCache[_currentLine];
-                    var keyword = currentLineCache.Keyword;
-                    if (keyword == Keyword.SkipLine)
-                        continue;
-                    if (keyword == Keyword.Continue && !_modeSuppressed)
+                    if (_isCheck)
+                        TakeReadNames(_currentLine - 1, _parser.Line);
+                    try
                     {
-                        ParseKeywordContinue();
-                        continue;
-                    }
-                    if (!_modeSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
-                    {
-                        if (IsEnabled())
-                        {
-                            _parser.Line = currentLineCache.SourceLine != 0
-                                ? currentLineCache.SourceLine
-                                : _currentLine + 1;
-                            _condition.SetCondition(-1);
-                            _parser.IsCalculation = _isVal != -1;
-                            ParseLine(currentLineCache.Tokens, Keyword.None);
-                        }
-                        continue;
-                    }
-                    var i1 = lines[_currentLine];
-                    var i2 = lines[_currentLine + 1];
-                    var lineSpan = code[i1..i2];
-                    var eolIndex = lineSpan.IndexOf('\v');
-                    if (eolIndex > -1)
-                    {
-                        _parser.Line = int.Parse(lineSpan[(eolIndex + 1)..]);
-                        lineSpan = lineSpan[..eolIndex];
-                    }
-                    else
-                        _parser.Line = _currentLine + 1;
-
-                    var rawLine = lineSpan.TrimEnd();
-                    lineSpan = lineSpan.Trim();
-                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
-                    {
-                        var c = textSpan[^1];
-                        if (c == '_')
-                            s = textSpan[0..^2].ToString() + lineSpan.ToString();
-                        else
-                            s = $"{textSpan} {lineSpan}";
-
-                        textSpan = s.AsSpan();
-                    }
-                    else
-                        textSpan = lineSpan;
-
-                    if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
-                    {
-                        _lineCache[_currentLine] = new(null, Keyword.SkipLine);
-                        continue;
-                    }
-
-                    if (_parser.IsCanceled)
-                        break;
-
-                    if (textSpan.IsEmpty)
-                    {
-                        if (_modeSuppressed)
+                        // #UI metadata is scoped to the line that declared it. Clearing here
+                        // covers the paths that skip ParseLine, e.g. an unsatisfied condition.
+                        ResetUiState();
+                        _lineOffset = _keywordOffset = -1;
+                        _isJoined = false;
+                        ref var currentLineCache = ref _lineCache[_currentLine];
+                        var keyword = currentLineCache.Keyword;
+                        if (keyword == Keyword.SkipLine)
                             continue;
+                        if (keyword == Keyword.Continue && !IsSuppressed)
+                        {
+                            ParseKeywordContinue();
+                            continue;
+                        }
+                        if (!IsSuppressed && currentLineCache.IsCached && keyword == Keyword.None)
+                        {
+                            if (IsEnabled())
+                            {
+                                _parser.Line = currentLineCache.SourceLine != 0
+                                    ? currentLineCache.SourceLine
+                                    : _currentLine + 1;
+                                if (Trace is not null)
+                                    TraceLine();
+                                _condition.SetCondition(-1);
+                                _parser.IsCalculation = _isVal != -1;
+                                ParseLine(currentLineCache.Tokens, Keyword.None);
+                            }
+                            continue;
+                        }
+                        var i1 = lines[_currentLine];
+                        var i2 = lines[_currentLine + 1];
+                        var lineSpan = code[i1..i2];
+                        var eolIndex = lineSpan.IndexOf('\v');
+                        if (eolIndex > -1)
+                        {
+                            _parser.Line = int.Parse(lineSpan[(eolIndex + 1)..]);
+                            lineSpan = lineSpan[..eolIndex];
+                        }
+                        else
+                            _parser.Line = _currentLine + 1;
+
+                        if (MacroParser.TryParseErrorLine(lineSpan, out var macroCode, out var macroLine, out var macroMessage))
+                        {
+                            textSpan = [];
+                            if (!_isCheck)
+                                AppendMacroError(macroLine, macroMessage, macroCode);
+                            continue;
+                        }
+
+                        var rawLine = lineSpan.TrimEnd();
+                        lineSpan = lineSpan.Trim();
+                        var lineOffset = rawLine.Length - lineSpan.Length;
+                        if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
+                        {
+                            var c = textSpan[^1];
+                            var start = c == '_' ? textSpan.Length - 2 : textSpan.Length + 1;
+                            if (c == '_')
+                                s = textSpan[0..^2].ToString() + lineSpan.ToString();
+                            else
+                                s = $"{textSpan} {lineSpan}";
+
+                            textSpan = s.AsSpan();
+                            if (_segments.Count > 0)
+                                _segments[^1] = _segments[^1] with { Length = Math.Min(_segments[^1].Length, start - _segments[^1].Start) };
+                            _segments.Add((start, lineSpan.Length, _parser.Line, lineOffset));
+                            // The run maps joined columns back to each line; the check pass gets joined lines
+                            _isJoined = !_isCheck;
+                            lineOffset = _isJoined ? 0 : -1;
+                        }
+                        else
+                        {
+                            textSpan = lineSpan;
+                            _segments.Clear();
+                            _segments.Add((0, lineSpan.Length, _parser.Line, lineOffset));
+                        }
+
+                        if (!IsNonCpdMode && HasLineExtension(textSpan.TrimEnd()))
+                        {
+                            if (_currentLine + 1 < lineCount)
+                            {
+                                _lineCache[_currentLine] = new(null, Keyword.SkipLine);
+                                continue;
+                            }
+                            // Nothing follows the last line, so it is parsed as is
+                            textSpan = textSpan.TrimEnd();
+                            if (textSpan.EndsWith(" _"))
+                                textSpan = textSpan[..^2].TrimEnd();
+                        }
+
+                        if (_parser.IsCanceled)
+                            break;
+
+                        if (textSpan.IsEmpty)
+                        {
+                            if (IsSuppressed)
+                                continue;
+
+                            if (IsNonCpdMode)
+                            {
+                                if (IsEnabled() && !_isCheck)
+                                    ParseNonCpdModeLine(ReadOnlySpan<char>.Empty);
+
+                                continue;
+                            }
+                            if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
+                                _sb.AppendLine($"<p{HtmlId}>&nbsp;</p>");
+
+                            continue;
+                        }
+                        var lineCache = _currentLine;
+                        _parser.IsConst = false;
+                        if (Trace is not null)
+                            TraceExpression(null);
+                        _keywordOffset = lineOffset;
+                        var result = ParseKeyword(textSpan, ref keyword);
+                        if (keyword != currentLineCache.Keyword)
+                            _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
+
+                        if (Trace is not null)
+                        {
+                            _parser.SyncTrace();
+                            if (IsEnabled())
+                                TraceLine();
+                        }
+
+                        if (result == KeywordResult.Continue)
+                            continue;
+                        else if (result == KeywordResult.Break)
+                            break;
 
                         if (IsNonCpdMode)
                         {
-                            if (IsEnabled())
-                                ParseNonCpdModeLine(ReadOnlySpan<char>.Empty);
+                            if (IsEnabled() && !_isCheck)
+                                ParseNonCpdModeLine(rawLine);
 
                             continue;
                         }
-                        if (_isVisible && _isVal != 1 && _htmlLines < MaxHtmlLines && IsEnabled())
-                            _sb.AppendLine($"<p{HtmlId}>&nbsp;</p>");
-
-                        continue;
-                    }
-                    var lineCache = _currentLine;
-                    _parser.IsConst = false;
-                    var result = ParseKeyword(textSpan, ref keyword);
-                    if (keyword != currentLineCache.Keyword)
-                        _lineCache[lineCache] = new(currentLineCache.Tokens, keyword, _parser.Line);
-
-                    if (result == KeywordResult.Continue)
-                        continue;
-                    else if (result == KeywordResult.Break)
-                        break;
-
-                    if (IsNonCpdMode)
-                    {
-                        if (IsEnabled())
-                            ParseNonCpdModeLine(rawLine);
-
-                        continue;
-                    }
-                    _parser.IsCalculation = _isVal != -1;
-                    if ((textSpan[0] != '$' || !ParsePlot(textSpan)) &&
-                        ParseCondition(textSpan, keyword))
-                    {
-                        List<Token> tokens;
-                        if (_lineCache[_currentLine].IsCached)
-                            tokens = _lineCache[_currentLine].Tokens;
-                        else
+                        _parser.IsCalculation = _isVal != -1;
+                        if ((textSpan[0] != '$' || !ParsePlot(textSpan, lineOffset)) &&
+                            ParseCondition(textSpan, keyword))
                         {
-                            var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
-                                keyword == Keyword.Const ? KeywordLength(Keyword.Const) : _condition.KeywordLength;
-                            tokens = GetTokens(textSpan[skipChars..]);
-                            if (_isMarkdownOn)
-                                ParseMarkdown(tokens);
+                            List<Token> tokens;
+                            if (_lineCache[_currentLine].IsCached)
+                                tokens = _lineCache[_currentLine].Tokens;
+                            else
+                            {
+                                var skipChars = keyword == Keyword.Ui ? _uiSkipChars :
+                                    keyword == Keyword.Const ? KeywordLength(Keyword.Const) : _condition.KeywordLength;
+                                if (lineOffset >= 0)
+                                    _lineOffset = lineOffset + skipChars;
+                                tokens = GetTokens(textSpan[skipChars..]);
+                                if (!_isCheck)
+                                {
+                                    if (_isMarkdownOn)
+                                        ParseMarkdown(tokens);
 
-                            ExpandImageSources(tokens);
-                            _lineCache[_currentLine] = new(tokens, keyword, _parser.Line);
+                                    ExpandImageSources(tokens);
+                                }
+                                _lineCache[_currentLine] = new(tokens, keyword, _parser.Line);
+                            }
+                            _parser.HasInputFields = false;
+                            ParseLine(tokens, keyword);
+                            // Lines with input fields are not cached, so new values are re-read
+                            if (_parser.HasInputFields)
+                                _lineCache[_currentLine] = new(null, keyword);
                         }
-                        _parser.HasInputFields = false;
-                        ParseLine(tokens, keyword);
-                        // Lines with input fields are not cached, so new values are re-read
-                        if (_parser.HasInputFields)
-                            _lineCache[_currentLine] = new(null, keyword);
+                    }
+                    catch (Exception ex) when (_isCheck)
+                    {
+                        _parser.ResetStack();
+                        if (ex is MathParserException mpe)
+                            AppendError(textSpan.ToString(), mpe, _currentLine);
+                        else
+                            RecordError(_currentLine, string.Format(Messages.Unexpected_error_0_Please_check_the_expression_consistency, ex.Message), true, "CPD-5900", CalcpadErrorKind.Values);
                     }
                 }
                 FlushMarkdown();
+                if (_isCheck)
+                {
+                    TakeReadNames(_currentLine - 1, _parser.Line);
+                    ReportUndefinedNames();
+                }
                 if (_currentLine == lineCount)
                 {
                     if (_condition.OpenIf is { } opening)
                         ReportUnclosed(Messages.if_block_not_closed_Missing_end_if, opening);
                     if (_loops.Count != 0)
                         ReportUnclosed(Messages.Iteration_block_not_closed_Missing_loop, (_loops.Peek().StartLine, _loops.Peek().SourceLine));
+                    else if (_checkLoops.Count != 0)
+                        ReportUnclosed(Messages.Iteration_block_not_closed_Missing_loop, (_checkLoops.Peek().Line, _checkLoops.Peek().SourceLine));
                 }
             }
             catch (MathParserException ex)
@@ -238,24 +315,19 @@ namespace Calcpad.Core
                 var msg = string.Format(Messages.Unexpected_error_0_Please_check_the_expression_consistency, ex.Message);
                 if (_isVisible)
                     _sb.Append(ErrHtml(msg, _currentLine));
-                RecordError(_currentLine, msg, Debug, "CPD-5900");
+                RecordError(_currentLine, msg, Debug, "CPD-5900", CalcpadErrorKind.Values);
             }
             finally
             {
                 FlushMarkdown();
-                FinalizeOutput();
+                FinalizeOutput(lineCount);
             }
 
             void ReportUnclosed(string message, (int Line, int SourceLine) opening)
             {
                 _sb.Append(ErrHtml(message, opening.Line));
-                RecordError(opening.Line, message, Debug, "CPD-3105", opening.SourceLine);
+                RecordError(opening.Line, message, Debug, "CPD-3105", CalcpadErrorKind.Structure, opening.SourceLine);
             }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            bool IsEnabled() => _condition.IsSatisfied &&
-                (_loops.Count == 0 || !_loops.Peek().IsBroken) ||
-                !_calculate;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool HasLineExtension(ReadOnlySpan<char> s) => s.EndsWith(" _") || s.Length > 0 && CheckIsLineExtension(s[^1]) && !Validator.IsComment(s);
@@ -263,7 +335,7 @@ namespace Calcpad.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             bool CheckIsLineExtension(char c) => c < 128 && IsLineExtension[c];
 
-            bool ParsePlot(ReadOnlySpan<char> s)
+            bool ParsePlot(ReadOnlySpan<char> s, int lineOffset)
             {
                 if (s.StartsWith("$plot", StringComparison.OrdinalIgnoreCase) ||
                     s.StartsWith("$map", StringComparison.OrdinalIgnoreCase))
@@ -280,11 +352,16 @@ namespace Calcpad.Core
                         {
                             _parser.IsPlotting = true;
                             var s1 = plotParser.Parse(s, _calculate);
+                            _parser.ReadNames?.RemoveAll(n => plotParser.Variables.Contains(n.Name));
+                            if (_isCheck)
+                                TakeReadNames(_currentLine, _parser.Line, nameColumn: lineOffset);
                             _sb.Append(InsertAttribute(s1, HtmlId));
                         }
                         catch (MathParserException ex)
                         {
-                            AppendError(s.ToString(), ex, _currentLine);
+                            _parser.ReadNames?.Clear();
+                            var (start, end) = lineOffset < 0 ? (-1, -1) : ErrorColumns(lineOffset, s, ex.Position, ex.EndPosition);
+                            AppendError(s.ToString(), ex, _currentLine, start, end);
                         }
                         finally
                         {
@@ -368,6 +445,10 @@ namespace Calcpad.Core
             bool ParseCondition(ReadOnlySpan<char> s, Keyword keyword)
             {
                 _condition.SetCondition(keyword - Keyword.If, _currentLine, _parser.Line);
+                // Unclosed skipped loops inside a closed #if block
+                while (_skippedLoops.Count > 0 && _skippedLoops.Peek() > _condition.Id)
+                    _skippedLoops.Pop();
+
                 if (IsEnabled())
                 {
                     if (_condition.KeywordLength == s.Length)
@@ -397,7 +478,7 @@ namespace Calcpad.Core
             void ParseLine(List<Token> tokens, Keyword keyword)
             {
                 var kwdLength = _condition.KeywordLength;
-                var isOutput = _isVisible &&
+                var isOutput = _isVisible && !_isCheck &&
                     (!_calculate || kwdLength == 0) &&
                     _htmlLines < MaxHtmlLines;
 
@@ -405,7 +486,7 @@ namespace Calcpad.Core
                 {
                     ++_htmlLines;
                     if (_htmlLines == MaxHtmlLines)
-                        AppendError(string.Concat(tokens), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine, "CPD-5906");
+                        AppendError(string.Concat(tokens), string.Format(Messages.The_output_is_longer_than_0_lines_The_rest_will_be_skipped, MaxHtmlLines), _currentLine, "CPD-5906", CalcpadErrorKind.Values);
                     else
                     {
                         bool isIndent = keyword == Keyword.Else_If || keyword == Keyword.End_If;
@@ -519,18 +600,20 @@ namespace Calcpad.Core
             _firstErrIndexByLine = new();
             _errorList = new();
             Settings.Math.FormatString = null;
-            _parser = new MathParser(Settings.Math)
-            {
-                ShowWarnings = ShowWarnings
-            };
+            _parser = new MathParser(Settings.Math);
+            Trace = Debug ? new() : null;
+            _parser.Trace = Trace;
             _decimals = Settings.Math.Decimals;
             _lineCache = new LineInfo[lineCount];
             _sb.Clear();
             _condition = new();
             _loops.Clear();
+            _skippedLoops.Clear();
+            ResetCheckState();
             _isVal = 0;
             _outputModeStack.Clear();
             _substitutionStack.Clear();
+            _settingsStack.Clear();
             _isMarkdownOn = false;
             _parseMode = ParseMode.Cpd;
             _modeSuppressed = false;
@@ -546,18 +629,22 @@ namespace Calcpad.Core
             _currentLine = -1;
             _isVisible = true;
             _visibilityStack.Clear();
+            _postSkipDepth = 0;
             _mdBuffer.Clear();
             _mdLines.Clear();
             ResetUiState();
         }
 
-        private void FinalizeOutput()
+        private void FinalizeOutput(int lineCount)
         {
             if (NextPauseKey is not null)
                 _sb.Append(Messages.Paused_Click_Next_to_continue);
 
             if (Debug && _errors.Count != 0)
                 AppendErrors();
+
+            if (Trace is not null)
+                Trace.IsComplete = _currentLine == lineCount && _calculate;
 
             HtmlResult = _sb.ToString();
 
@@ -609,6 +696,8 @@ namespace Calcpad.Core
                     // What was actually parsed: a control's entered value replaces the right
                     // hand side, and an error has to name that rather than the source.
                     var expression = token.Value;
+                    if (Trace is not null)
+                        TraceExpression(expression);
                     try
                     {
                         ui = TakeUiControl(token.Value);
@@ -621,11 +710,28 @@ namespace Calcpad.Core
                             if (isLoop)
                                 tokens[i].CacheID = _parser.WriteEquationToCache(isOutput);
                         }
-                        else
-                            _parser.ReadEquationFromCache(cacheID);
+                        else if (!_parser.ReadEquationFromCache(cacheID))
+                        {
+                            _parser.Parse(token.Value);
+                            tokens[i].CacheID = _parser.WriteEquationToCache(isOutput, cacheID);
+                        }
+
+                        TrackFunctionDefinition(false);
+                        if (_isVal == -1)
+                            _parser.ReadNames?.Clear();
+                        else if (_isCheck)
+                        {
+                            var (start, end) = ErrorColumns(token, -1);
+                            var nameColumn = ui is null && _lineOffset >= 0 && token.Start >= 0 ? _lineOffset + token.Start : -1;
+                            TakeReadNames(_currentLine, _parser.Line, start, end, _parser.IsFunctionDefinition, nameColumn);
+                        }
 
                         if (_calculate && _isVal > -1)
+                        {
                             _parser.Calculate(isOutput, cacheID);
+                            if (Trace is not null)
+                                _parser.SyncTrace();
+                        }
                         else
                             _parser.DefineCustomUnits();
 
@@ -658,6 +764,7 @@ namespace Calcpad.Core
                     catch (MathParserException ex)
                     {
                         _parser.ResetStack();
+                        _parser.ReadNames?.Clear();
                         string errText;
                         if (!_calculate && expression.Contains('?'))
                             errText = expression.Replace("?", "<input type=\"text\" size=\"2\" name=\"Var\">");
@@ -676,10 +783,15 @@ namespace Calcpad.Core
                             else
                                 _sb.Append($"<span class=\"err\"{Id(_currentLine)}>{errText}</span>");
                         }
-                        if (RecordError(_currentLine, ex, Debug))
+                        var (start, end) = ErrorColumns(token, ui is null ? ex.Position : -1, ex.EndPosition);
+                        var isCascade = _isCheck && ex.Code == "CPD-3305" && _recursiveFunctions.Contains(ex.Name);
+                        TrackFunctionDefinition(ex.Code is "CPD-5305" or "CPD-5306");
+                        if (!isCascade && _isCheck && _checkLoops.Count != 0 && ex.Name is not null)
+                            _loopErrors.Add((new(ex.Name, _currentLine, _parser.Line, start, end), ex));
+                        else if (!isCascade && RecordError(_currentLine, ex.Message, Debug, ex.Code, ex.Kind, 0, start, end))
                             ++_errorCount;
-                        if (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences)
-                            throw new MathParserException(Messages.Too_many_errors, "CPD-5904");
+                        if (!_isCheck && (_errorCount == MaxErrors || ++_errorOccurrences == MaxErrorOccurrences))
+                            throw new MathParserException(Messages.Too_many_errors, "CPD-5904", CalcpadErrorKind.Values);
                     }
                 }
                 else if (isOutput)
@@ -687,29 +799,48 @@ namespace Calcpad.Core
             }
         }
 
-        void AppendError(string lineContent, MathParserException ex, int line) =>
-            AppendError(lineContent, ex.Message, line, ex.Code);
+        void AppendError(string lineContent, MathParserException ex, int line, int startColumn = -1, int endColumn = -1) =>
+            AppendError(lineContent, ex.Message, line, ex.Code, ex.Kind, startColumn, endColumn);
 
-        void AppendError(string lineContent, string text, int line, string code)
+        void AppendError(string lineContent, string text, int line, string code, CalcpadErrorKind kind, int startColumn = -1, int endColumn = -1)
         {
             string s = lineContent.Replace("<", "&lt;").Replace(">", "&gt;");
             if (_isVisible)
                 _sb.Append(ErrHtml(FormatError(s, text, line), line));
-            RecordError(line, text, Debug, code);
+            RecordError(line, text, Debug, code, kind, 0, startColumn, endColumn);
+        }
+
+        // MacroParser.Errors already lists it, so it only goes to the HTML and the summary
+        private void AppendMacroError(string lineContent, string message, string code)
+        {
+            if (!_isVisible)
+                return;
+
+            _sb.Append(ErrHtml(FormatError(HttpUtility.HtmlEncode(lineContent), message, _currentLine), _currentLine));
+            if (Debug && _errorKeys.Add((_currentLine, code, message)))
+                _errors.Enqueue(_currentLine);
         }
 
         private bool RecordError(int line, MathParserException ex, bool enabled) =>
-            RecordError(line, ex.Message, enabled, ex.Code);
+            RecordError(line, ex.Message, enabled, ex.Code, ex.Kind);
 
-        // False when this line already reported the same error, e.g. on an earlier loop pass
-        private bool RecordError(int line, string message, bool enabled, string code, int sourceLine = 0)
+        /// <returns>False when this line already reported the same error, e.g. on an earlier loop pass.</returns>
+        private bool RecordError(int line, string message, bool enabled, string code, CalcpadErrorKind kind, int sourceLine = 0,
+            int startColumn = -1, int endColumn = -1)
         {
-            if (!_errorKeys.Add((line, message))) return false;
-            if (!enabled) return true;
+            if (!_errorKeys.Add((line, code, message)))
+                return false;
+            if (!enabled && !_isCheck) return true;
             if (_isVisible)
                 _errors.Enqueue(line);
             if (sourceLine <= 0)
+            {
                 sourceLine = _parser?.Line > 0 ? _parser.Line : line + 1;
+                if (_isJoined)
+                    (sourceLine, startColumn, endColumn) = MapJoinedColumns(startColumn, endColumn);
+            }
+            if (!_isCheck)
+                Trace?.MarkError(sourceLine, code);
             _errorList.Add(new CalcpadError
             {
                 SourceLine = sourceLine,
@@ -717,9 +848,63 @@ namespace Calcpad.Core
                 Message = message,
                 Source = CalcpadErrorSource.Expression,
                 Code = code,
+                Kind = kind,
+                StartColumn = startColumn,
+                EndColumn = endColumn
             });
             return true;
         }
+
+        // A span in a continued statement, cut to the line it starts on; the first line when unknown
+        private (int Line, int Start, int End) MapJoinedColumns(int start, int end)
+        {
+            if (start < 0)
+                return (_segments[0].Line, -1, -1);
+
+            var i = _segments.Count - 1;
+            while (i > 0 && _segments[i].Start > start)
+                --i;
+            var (segmentStart, length, line, column) = _segments[i];
+            var offset = Math.Min(start - segmentStart, length);
+            var stop = Math.Min(Math.Max(end, start + 1) - segmentStart, length);
+            return (line, column + offset, column + Math.Max(stop, offset + 1));
+        }
+
+        // The failing word when the tokenizer found the position, otherwise the whole expression
+        private (int Start, int End) ErrorColumns(Token token, int position, int endPosition = -1) =>
+            _lineOffset < 0 || token.Start < 0
+                ? (-1, -1)
+                : ErrorColumns(_lineOffset + token.Start, token.Value, position, endPosition);
+
+        private static (int Start, int End) ErrorColumns(int offset, ReadOnlySpan<char> value, int position, int endPosition)
+        {
+            if (position >= 0 && endPosition > position && endPosition <= value.Length)
+                return (offset + position, offset + endPosition);
+            if (position < 0 || position > value.Length)
+            {
+                var trimmed = value.TrimStart();
+                return (offset + value.Length - trimmed.Length, offset + value.TrimEnd().Length);
+            }
+            int a = Math.Min(position, value.Length - 1), b = a + 1;
+            if (!IsWordChar(value[a]) && a > 0 && IsWordChar(value[a - 1]))
+                b = a--;
+            if (IsWordChar(value[a]))
+            {
+                while (a > 0 && IsWordChar(value[a - 1])) --a;
+                while (b < value.Length && IsWordChar(value[b])) ++b;
+                // A unit written after its number, as in 5m
+                var name = a;
+                while (name < b && !char.IsLetter(value[name])) ++name;
+                if (name < b)
+                    a = name;
+            }
+            return (offset + a, offset + b);
+
+            static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '.';
+        }
+
+        private (int Start, int End) KeywordColumns(int from, int to) =>
+            _keywordOffset < 0 || to <= from ? (-1, -1) : (_keywordOffset + from, _keywordOffset + to);
 
         private static string LineHtml(int line) => $"[<a href=\"#0\" data-text=\"{line + 1}\">{line + 1}</a>]";
         private string FormatError(string expr, string msg, int line) =>

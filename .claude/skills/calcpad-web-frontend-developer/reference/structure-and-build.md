@@ -150,6 +150,9 @@ npm run dev                       # tauri dev (hot-reload Vue + rebuild Rust on 
 ./build-desktop.sh                # Full bundle (stage + tauri build → src-tauri/target/release/bundle/)
 ```
 
+To reproduce the Linux desktop CI job locally (build, GTK tests on X11/Wayland, deb/rpm/Arch packages, notices check), run `tools/desktop-linux-ci/run.sh` from the repo root.
+It runs in an Ubuntu 22.04 container and needs only Docker, Node.js, git and rsync on the host.
+
 ### VS Code Extension
 ```bash
 cd Calcpad.Web/frontend/vscode-calcpad

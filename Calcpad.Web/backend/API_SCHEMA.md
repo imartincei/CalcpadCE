@@ -140,8 +140,14 @@ Array<{
   message: string;
   source: "Macro" | "Expression";
   code: string;         // CPD-xxxx, shared with /lint where both report the same problem
+  kind: "Syntax" | "Structure" | "Names" | "Values";
+  severity: "Error" | "Warning"; // always "Error" from a run
+  startColumn: number;  // 0-based, end exclusive; -1 covers the whole line
+  endColumn: number;
 }>
 ```
+
+Columns are in the text Core ran, so on lines changed by macros or `#include` they may not line up with the source.
 
 The web, desktop and VS Code editors show these errors in their Problems panels, beside the `/lint` diagnostics.
 
@@ -157,9 +163,11 @@ When `stepPauses` is in effect, an `X-Calcpad-Pause` header reports where the fo
 
 Both headers are listed in the CORS policy's exposed headers, so a browser client can read them.
 
+A render with line anchors (`includeLineAnchors`, on by default for anything but print) also records what the calculation executed. `/lint` and `/definitions` requests with `useTrace: true` for the same `content` and `sourceFilePath` then use it: variable types come from the run, and lines the run never reached (an untaken `#if` branch) skip type checks. Without `useTrace`, after a render with no line anchors, or for any other content, they use static inference. The editors set `useTrace` when auto-run is on and lint once each run finishes.
+
 Every local `<img src>` comes back with its `{project}`/`{library}`/`{user}` token and any environment variable already expanded to an absolute forward-slash path, resolved against the roots declared anywhere in the `#include` chain. A source with no token is returned as authored, so a relative one still needs joining against `sourceFilePath`'s folder — the only path work left to a client that has to read the file off disk (to base64-inline it for a sandboxed preview, say). An undeclared root is reported as a normal render error and the source is left as written.
 
-Metadata footer comments (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) are stripped from the returned HTML.
+The metadata footer (`CalcpadCE Metadata`, `uiOverrides`, `fileInfo`) at the end of the source is removed before rendering, in every parse mode.
 
 ---
 
@@ -386,6 +394,7 @@ interface HighlightRequest {
   content: string;          // The Calcpad source code to tokenize
   includeText?: boolean;    // Whether to include token text in response (default: false)
   sourceFilePath?: string;  // Full path of source file on client (for resolving relative #include)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -476,6 +485,8 @@ Lint Calcpad source code and return diagnostics (errors, warnings, and informati
 interface LintRequest {
   content: string;          // The Calcpad source code to lint
   sourceFilePath?: string;  // Full path of source file on client
+  useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -536,7 +547,6 @@ interface LintDiagnostic {
 | CPD-3201 | Naming | Invalid variable name (must start with a letter) |
 | CPD-3202 | Naming | Invalid function name |
 | CPD-3203 | Naming | Function name conflicts with a built-in function |
-| CPD-3204 | Naming | Variable name conflicts with a keyword |
 | CPD-3205 | Naming | Variable name conflicts with a built-in constant |
 | CPD-3206 | Naming | Function must have at least one parameter |
 | CPD-3207 | Naming | Required parameter after optional parameter in function definition |
@@ -546,10 +556,8 @@ interface LintDiagnostic {
 | CPD-3303 | Usage | Undefined macro |
 | CPD-3304 | Usage | Macro called with the wrong number of parameters |
 | CPD-3305 | Usage | Undefined function |
-| CPD-3306 | Usage | Invalid element access |
 | CPD-3307 | Usage | Too few parameters |
 | CPD-3308 | Usage | Too many parameters |
-| CPD-3309 | Usage | Parameter type mismatch |
 | CPD-3310 | Usage | Undefined unit |
 | CPD-3311 | Usage | Empty parameter in a function call |
 | CPD-3312 | Usage | Unused variable |
@@ -602,10 +610,13 @@ interface LintDiagnostic {
 | CPD-5117 | Syntax | Invalid data type |
 | CPD-5118 | Syntax | Missing matrix index |
 | CPD-5119 | Syntax | Invalid number of indexes |
+| CPD-5121 | Syntax | Invalid `#for` header |
+| CPD-5122 | Syntax | Assignment must follow a variable or function name |
 | CPD-5120 | Syntax | More than one delimiter in a plot command |
 | CPD-5201 | Blocks | Condition cannot be empty |
 | CPD-5202 | Blocks | Duplicate #else |
 | CPD-5203 | Blocks | #else if after #else |
+| CPD-5204 | Blocks | Blocks nested too deeply |
 | CPD-5301 | Names | Cannot evaluate as a function |
 | CPD-5302 | Names | Cannot evaluate as a function or operator |
 | CPD-5303 | Names | Cannot redefine existing units |
@@ -740,6 +751,8 @@ Get detailed definitions (macros, functions, variables, custom units) from Calcp
 interface DefinitionsRequest {
   content: string;          // The Calcpad source code to analyze
   sourceFilePath?: string;  // Full path of source file on client
+  useTrace?: boolean;       // Use the last /convert trace for this exact content (default false)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -793,13 +806,19 @@ interface FunctionDefinitionDto {
 
 interface VariableDefinitionDto {
   name: string;
-  expression?: string;
-  type: string;
+  expression?: string;           // Right-hand side of the first definition; the first executed one when a trace matches
+  type: string;                  // "Various" when a matching trace saw the type change
   typeId: number;
-  lineNumber: number;
+  typeChanges: VariableTypeChangeDto[] | null;  // Set only alongside "Various": where each new type starts
+  lineNumber: number;            // Zero-based; the first executed definition when a trace matches
   source: string;
   sourceFile?: string;
   description?: string;
+}
+
+interface VariableTypeChangeDto {
+  line: number;                  // Zero-based line of the assignment
+  type: string;                  // Value, Vector or Matrix
 }
 
 interface CustomUnitDefinitionDto {
@@ -925,6 +944,7 @@ interface SymbolAtPositionRequest {
   line: number;             // Zero-based line of the cursor in the original source
   column: number;           // Zero-based column of the cursor
   sourceFilePath?: string;  // Full path of source file on client (resolves #include)
+  macroCalls?: number;      // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -1051,6 +1071,7 @@ Rewrite a worksheet into the self-contained form a compiled `.cpdz` needs: macro
 interface PortableBundleRequest {
   content: string;
   sourceFilePath?: string;   // relative #include and #read paths resolve against its folder
+  macroCalls?: number;       // App-level macro call mode: 0=auto, 1=on, 2=off (default 0)
 }
 ```
 
@@ -1229,6 +1250,7 @@ GET /api/calcpad/snippets?category=Functions/Trigonometric
 | `CALCPAD_HANG_THRESHOLD_SECONDS` | `60` | Seconds without a completed request before the hang watchdog writes a report |
 | `CALCPAD_HANG_DUMP` | *(unset)* | `1` also spawns `createdump` when a hang is detected |
 | `CALCPAD_CONTENT_CACHE_SIZE_LIMIT` | `50000` | Flattened source lines budgeted across the resolved-content cache shared by lint/highlight/definitions |
+| `CALCPAD_TRACE_CACHE_SIZE_LIMIT` | `20000` | Executed lines budgeted across stored run traces, kept per path and content; least recently used go first |
 | `BROWSER_PATH` | *(auto-detect)* | Chromium-family executable for PDF export. Also `BrowserPath` in `appsettings.json` |
 | `ALLOW_CHROMIUM_DOWNLOAD` | `false` | Lets the render path download Chromium on its own. Also `AllowChromiumDownload` in `appsettings.json` |
 

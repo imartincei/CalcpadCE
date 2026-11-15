@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
+using Calcpad.Core;
 using Calcpad.Highlighter.ContentResolution;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -23,6 +22,7 @@ namespace Calcpad.Server.Services
         private const int RevalidateIntervalMs = 500;
 
         private readonly IMemoryCache _cache;
+        private readonly RuntimeTraceCache _traces;
         private readonly ConcurrentDictionary<string, string> _activeKeyBySourceFile = new();
 
         /// <summary>
@@ -46,13 +46,19 @@ namespace Calcpad.Server.Services
             public required StagedResolvedContent Staged { get; init; }
             public required ConcurrentDictionary<string, DateTime> IncludeWriteTimes { get; init; }
             public long LastValidatedTicks;
+
+            /// <summary><see cref="Staged"/> with the runtime trace applied.</summary>
+            public TracedContent? WithTrace;
         }
+
+        private sealed record TracedContent(long Version, StagedResolvedContent Staged);
 
         private readonly MemoryCacheEntryOptions _baseOptions;
 
-        public ContentResolutionCache(IMemoryCache cache)
+        public ContentResolutionCache(IMemoryCache cache, RuntimeTraceCache traces)
         {
             _cache = cache;
+            _traces = traces;
             _sizeLimit = ResolveSizeLimit();
             var expirationSeconds = int.TryParse(
                 Environment.GetEnvironmentVariable("CALCPAD_CONTENT_CACHE_EXPIRATION_SECONDS"), out var seconds)
@@ -63,21 +69,24 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath)
+        /// <param name="useTrace">Overlay the latest /convert trace for this content, if any.</param>
+        public StagedResolvedContent GetOrResolve(string content, string? sourceFilePath, bool useTrace = false,
+            MacroCallMode macroCalls = MacroCallMode.Auto)
         {
             var fileKey = sourceFilePath ?? string.Empty;
-            var key = $"{fileKey}|{Sha256Hex(content)}";
+            var traceKey = ContentKey.For(sourceFilePath, content);
+            var key = $"{traceKey}|{(int)macroCalls}";
 
             if (_cache.TryGetValue(key, out CacheEntry? cached) && cached != null && IsIncludesFresh(cached))
-                return cached.Staged;
+                return useTrace ? ApplyTrace(cached, sourceFilePath, traceKey) : cached.Staged;
 
             // Concurrent callers for the same key share one resolution instead of racing.
             var lazy = _inFlight.GetOrAdd(key, _ => new Lazy<CacheEntry>(
-                () => Resolve(content, sourceFilePath, fileKey, key),
+                () => Resolve(content, sourceFilePath, macroCalls, fileKey, key),
                 LazyThreadSafetyMode.ExecutionAndPublication));
             try
             {
-                return lazy.Value.Staged;
+                return useTrace ? ApplyTrace(lazy.Value, sourceFilePath, traceKey) : lazy.Value.Staged;
             }
             finally
             {
@@ -85,13 +94,31 @@ namespace Calcpad.Server.Services
             }
         }
 
-        private CacheEntry Resolve(string content, string? sourceFilePath, string fileKey, string key)
+        /// <summary>
+        /// Overlays the latest /convert trace for this exact content. A trace recorded before an
+        /// include last changed describes stale include content, so it is ignored.
+        /// </summary>
+        private StagedResolvedContent ApplyTrace(CacheEntry entry, string? sourceFilePath, string key)
+        {
+            var trace = _traces.Get(key);
+            if (trace is null || entry.IncludeWriteTimes.Values.Any(t => t > trace.StoredUtc))
+                return entry.Staged;
+
+            if (entry.WithTrace is { } applied && applied.Version == trace.Version)
+                return applied.Staged;
+
+            var staged = ContentResolver.ApplyRuntimeTrace(entry.Staged, trace.Trace);
+            entry.WithTrace = new(trace.Version, staged);
+            return staged;
+        }
+
+        private CacheEntry Resolve(string content, string? sourceFilePath, MacroCallMode macroCalls, string fileKey, string key)
         {
             // New content for this file — drop its old entry now instead of waiting on the TTL.
             if (_activeKeyBySourceFile.TryGetValue(fileKey, out var oldKey) && oldKey != key)
                 _cache.Remove(oldKey);
 
-            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath: sourceFilePath);
+            var staged = new ContentResolver().GetStagedContent(content, sourceFilePath, macroCalls);
 
             var writeTimes = new ConcurrentDictionary<string, DateTime>();
             foreach (var (path, _) in staged.Stage2.IncludedFileHashes)
@@ -142,7 +169,7 @@ namespace Calcpad.Server.Services
                     if (entry.IncludeWriteTimes.TryGetValue(path, out var known) && known == writeTime)
                         continue;
 
-                    if (Sha256Hex(File.ReadAllText(path)) != expectedHash) return false;
+                    if (ContentKey.Sha256Hex(File.ReadAllText(path)) != expectedHash) return false;
                     entry.IncludeWriteTimes[path] = writeTime;
                 }
                 catch
@@ -167,8 +194,5 @@ namespace Calcpad.Server.Services
                 return default;
             }
         }
-
-        private static string Sha256Hex(string text) =>
-            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
     }
 }

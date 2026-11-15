@@ -8,6 +8,10 @@
 export interface LintRequest {
     content: string;
     sourceFilePath?: string;
+    /** Use the last debug run of this exact content. Static when false. */
+    useTrace?: boolean;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface LintResponse {
@@ -51,6 +55,8 @@ export interface HighlightRequest {
     content: string;
     includeText?: boolean;
     sourceFilePath?: string;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface HighlightResponse {
@@ -182,6 +188,10 @@ export enum CalcpadTokenType {
 export interface DefinitionsRequest {
     content: string;
     sourceFilePath?: string;
+    /** Use the last debug run of this exact content. Static when false. */
+    useTrace?: boolean;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface DefinitionsResponse {
@@ -214,7 +224,6 @@ export interface MacroDefinition {
     description?: string;
     paramTypes?: string[];
     paramDescriptions?: string[];
-    defaults?: (string | null)[];
 }
 
 export interface FunctionDefinition {
@@ -232,7 +241,6 @@ export interface FunctionDefinition {
     description?: string;
     paramTypes?: string[];
     paramDescriptions?: string[];
-    defaults?: (string | null)[];
 }
 
 export interface VariableDefinition {
@@ -240,10 +248,17 @@ export interface VariableDefinition {
     expression?: string;
     type: string;
     typeId: number;
+    /** Where each new type starts, when a run changed the type. */
+    typeChanges?: VariableTypeChange[] | null;
     lineNumber: number;  // Zero-based line number
     source: string;
     sourceFile?: string;
     description?: string;
+}
+
+export interface VariableTypeChange {
+    line: number;  // Zero-based line number
+    type: string;
 }
 
 export interface CustomUnitDefinition {
@@ -275,6 +290,8 @@ export interface SymbolAtPositionRequest {
     line: number;       // 0-based, in original source
     column: number;     // 0-based
     sourceFilePath?: string;
+    /** Core `MacroCallMode` index: 0=auto, 1=on, 2=off. */
+    macroCalls?: number;
 }
 
 export interface SymbolAtPositionResponse {
@@ -309,6 +326,11 @@ export interface CalcpadError {
     source: CalcpadErrorSource;
     /** CPD-xxxx code, shared with the linter where both report the same problem. */
     code?: string;
+    /** Always 'Error' from a run; only the linter's check pass gives warnings. */
+    severity?: 'Error' | 'Warning';
+    /** 0-based columns on the source line, end exclusive; -1 when the error covers the whole line. */
+    startColumn?: number;
+    endColumn?: number;
 }
 
 export interface ConvertResult {

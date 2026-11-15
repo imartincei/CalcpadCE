@@ -123,6 +123,16 @@
       ]
     },
     {
+      "comment": "Open documents are polled for edits made by other programs.",
+      "identifier": "fs:allow-stat",
+      "allow": [
+        { "path": "$APPDATA/**" },
+        { "path": "$APPCONFIG/**" },
+        { "path": "$APPLOG/**" },
+        { "path": "$HOME/**" }
+      ]
+    },
+    {
       "identifier": "fs:allow-remove",
       "allow": [
         { "path": "$APPDATA/**" },

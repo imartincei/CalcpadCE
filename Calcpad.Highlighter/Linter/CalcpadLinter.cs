@@ -15,18 +15,13 @@ namespace Calcpad.Highlighter.Linter
     {
         private readonly IncludeValidator _includeValidator = new();
         private readonly MacroValidator _macroValidator = new();
-        private readonly BalanceValidator _balanceValidator = new();
+        private readonly MacroErrorValidator _macroErrorValidator = new();
         private readonly NamingValidator _namingValidator = new();
         private readonly UsageValidator _usageValidator = new();
-        private readonly SemanticValidator _semanticValidator = new();
-        private readonly FunctionTypeValidator _functionTypeValidator = new();
-        private readonly CommandBlockValidator _commandBlockValidator = new();
-        private readonly FormatValidator _formatValidator = new();
         private readonly HtmlCommentValidator _htmlCommentValidator = new();
-        private readonly SettingsValidator _settingsValidator = new();
-        private readonly UiValidator _uiValidator = new();
         private readonly LegacyInputValidator _legacyInputValidator = new();
         private readonly DeprecatedInputKeywordValidator _deprecatedInputKeywordValidator = new();
+        private readonly CoreCheckValidator _coreCheckValidator = new();
 
         /// <summary>
         /// Lint code using pre-processed staged content from ContentResolver.
@@ -50,6 +45,7 @@ namespace Calcpad.Highlighter.Linter
             var stage1Context = ConvertToStage1Context(staged.Stage1);
             var stage2Context = ConvertToStage2Context(staged.Stage2, staged.Stage1);
             var stage3Context = ConvertToStage3Context(staged.Stage3, staged.Stage2);
+            stage3Context.Runtime = staged.Runtime;
 
             // Set stage contexts on result for automatic line continuation mapping
             result.SetStageContexts(stage1Context, stage2Context, stage3Context);
@@ -57,22 +53,23 @@ namespace Calcpad.Highlighter.Linter
             // Create tokenizer for stage 3 content
             var tokenProvider = new TokenizedLineProvider();
 
-            // Pass macro comment parameters from Stage2 so that macro call arguments
-            // are correctly tokenized as Comment vs expression
-            tokenProvider.SetMacroCommentParameters(
-                staged.Stage2.MacroCommentParameters,
-                staged.Stage2.MacroParameterOrder,
-                staged.Stage2.MacroBodies);
+            tokenProvider.SetMacroParameters(staged.Stage2.MacroParameterOrder);
 
             tokenProvider.Tokenize(stage3Context.Lines);
 
             // Run validators
             ValidateStage1(stage1Context, result);
             ValidateStage2(stage2Context, result);
+            // A trace is only applied to the text it ran, so the run already reported these
+            if (staged.Runtime is null)
+                _macroErrorValidator.Validate(staged.Stage2, stage1Context, result);
             ValidateStage3(stage3Context, result, tokenProvider);
+            if (staged.CoreCheck is { } check)
+                _coreCheckValidator.Validate(stage3Context, check.Value, result);
 
             // Map all diagnostics from stage lines to original lines
             result.MapDiagnosticsToOriginal();
+            RemoveDuplicates(result);
 
             // Suppress diagnostics covered by LintIgnore regions
             if (ignoreRegions is { Count: > 0 })
@@ -85,6 +82,17 @@ namespace Calcpad.Highlighter.Linter
             IReadOnlyList<LintIgnoreRegion> ignoreRegions = null)
         {
             return Task.Run(() => Lint(staged, ignoreRegions));
+        }
+
+        // Errors from included or macro lines can land on the same source span
+        private static void RemoveDuplicates(LinterResult result)
+        {
+            var seen = new HashSet<(int, string, int, int, LinterSeverity)>();
+            var duplicates = result.Diagnostics
+                .Where(d => !seen.Add((d.Line, d.Code, d.Column, d.EndColumn, d.Severity)))
+                .ToHashSet();
+            if (duplicates.Count > 0)
+                result.RemoveDiagnostics(duplicates.Contains);
         }
 
         private static void ApplyIgnoreRegions(
@@ -138,6 +146,8 @@ namespace Calcpad.Highlighter.Linter
                 context.SourceMap[kvp.Key] = stage1Result.SourceMap.GetValueOrDefault(kvp.Value, kvp.Value);
                 context.Stage2ToStage1Map[kvp.Key] = kvp.Value;
             }
+            if (stage2Result.IncludeMap != null)
+                context.IncludeMap = stage2Result.IncludeMap;
 
             // Convert macro definitions
             foreach (var macro in stage2Result.MacroDefinitions)
@@ -223,16 +233,9 @@ namespace Calcpad.Highlighter.Linter
 
         private void ValidateStage3(Stage3Context stage3, LinterResult result, TokenizedLineProvider tokenProvider)
         {
-            _balanceValidator.Validate(stage3, result, tokenProvider);
             _namingValidator.Validate(stage3, result, tokenProvider);
             _usageValidator.Validate(stage3, result, tokenProvider);
-            _semanticValidator.Validate(stage3, result, tokenProvider);
-            _functionTypeValidator.Validate(stage3, result, tokenProvider);
-            _commandBlockValidator.Validate(stage3, result, tokenProvider);
-            _formatValidator.Validate(stage3, result, tokenProvider);
             _htmlCommentValidator.Validate(stage3, result, tokenProvider);
-            _settingsValidator.Validate(stage3, result, tokenProvider);
-            _uiValidator.Validate(stage3, result, tokenProvider);
             _legacyInputValidator.Validate(stage3, result, tokenProvider);
             _deprecatedInputKeywordValidator.Validate(stage3, result, tokenProvider);
         }

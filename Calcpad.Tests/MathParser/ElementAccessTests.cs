@@ -86,5 +86,71 @@ namespace Calcpad.Tests
         [InlineData("v.1", false)]
         public void ValidatorRejectsDottedNames(string name, bool expected) =>
             Assert.Equal(expected, Validator.IsVariable(name));
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void MatrixParameterNamedLikeGlobalVector()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(3d, calc.Run(["m = [1; 2; 3]", "f(m) = m.(2; 1)", "f([1; 2 | 3; 4])"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void VectorParameterNamedLikeGlobalMatrix()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(20d, calc.Run(["v = [1; 2 | 3; 4]", "f(v) = v.2", "f([10; 20; 30])"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void MatrixParameterAssignedInInlineNamedLikeGlobalVector()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(6d, calc.Run([
+                "m = [1; 2; 3]",
+                "mset(i; j; m; val) = $Inline{m.(i; j) = val}",
+                "A = [1; 2 | 3; 4]",
+                "mset(2; 1; A; 6)",
+                "A.(2; 1)"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void VectorParameterAssignedInInlineNamedLikeGlobalMatrix()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(9d, calc.Run([
+                "v = [1; 2 | 3; 4]",
+                "set(i; v; val) = $Inline{v.i = val}",
+                "w = [1; 2; 3]",
+                "set(2; w; 9)",
+                "w.2"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void GlobalVectorInFunctionBodyKeepsItsShape()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(21d, calc.Run(["v = [10; 20]", "f(x) = x + v.2", "f(1)"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void GlobalDefinedAfterFunctionIsSeen()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(3d, calc.Run(["f(x) = x + a.2", "a = [1; 2]", "f(1)"]));
+        }
+
+        [Fact]
+        [Trait("Category", "ElementAccess")]
+        public void ParameterNamesDoNotCarryToNextLine()
+        {
+            var calc = new TestCalc(new());
+            Assert.Equal(2d, calc.Run(["f(m) = m.(1; 1)", "m = [1; 2; 3]", "m.2"]));
+        }
     }
 }

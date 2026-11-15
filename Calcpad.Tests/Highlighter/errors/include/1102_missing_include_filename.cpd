@@ -1,0 +1,11 @@
+' CPD-1102: #include without a file name
+'expect: CPD-1102
+#include
+
+' Only whitespace after the keyword
+'expect: CPD-1102
+    #include    
+
+' Only an input field list
+'expect: CPD-1102, CPD-1103
+#include #{1; 2}

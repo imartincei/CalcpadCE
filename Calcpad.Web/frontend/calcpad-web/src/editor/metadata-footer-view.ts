@@ -17,7 +17,12 @@ export class MetadataFooterView implements monaco.IDisposable {
     ) {
         this.disposables.push(
             editor.onDidChangeModel(() => this.update()),
-            editor.onDidChangeModelContent(() => this.update()),
+            editor.onDidChangeModelContent(e => {
+                // Lines re-inserted over a hidden area come back visible, though Monaco still thinks it's applied.
+                const span = this.hidden;
+                this.update(e.isFlush || !!span && e.changes.some(c =>
+                    c.range.startLineNumber <= span.end + 1 && c.range.endLineNumber >= span.start + 1));
+            }),
             editor.onDidChangeCursorSelection(() => this.keepSelectionOut()),
         );
         window.addEventListener('message', this.onMessage);
@@ -33,7 +38,7 @@ export class MetadataFooterView implements monaco.IDisposable {
         if (event.source === null && event.data?.type === 'showFileMetadataChanged') this.update();
     };
 
-    private update(): void {
+    private update(force = false): void {
         const model = this.editor.getModel();
         const span = model && !this.isShown()
             ? findMetadataHiddenSpan(i => model.getLineContent(i + 1), model.getLineCount())
@@ -41,11 +46,13 @@ export class MetadataFooterView implements monaco.IDisposable {
         // Hiding every line would leave Monaco nothing to show.
         this.hidden = span && span.start > 0 ? span : null;
         const applied = `${model?.id}:${this.hidden?.start ?? ''}:${this.hidden?.end ?? ''}`;
-        if (applied === this.applied) return;
+        if (applied === this.applied && !force) return;
         this.applied = applied;
         const range = this.hidden && new monaco.Range(this.hidden.start + 1, 1, this.hidden.end + 1, 1);
-        (this.editor as unknown as { setHiddenAreas(ranges: monaco.IRange[], source?: unknown): void })
-            .setHiddenAreas(range ? [range] : [], HIDDEN_SOURCE);
+        const editor = this.editor as unknown as { setHiddenAreas(ranges: monaco.IRange[], source?: unknown): void };
+        // Monaco skips a range equal to the one it has, so clear it first.
+        if (force && range) editor.setHiddenAreas([], HIDDEN_SOURCE);
+        editor.setHiddenAreas(range ? [range] : [], HIDDEN_SOURCE);
         this.keepSelectionOut();
     }
 

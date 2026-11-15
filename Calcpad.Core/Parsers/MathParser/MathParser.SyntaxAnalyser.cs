@@ -1,4 +1,5 @@
-﻿using System.Collections.Frozen;
+﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 
 namespace Calcpad.Core
@@ -19,6 +20,9 @@ namespace Calcpad.Core
                     CountOfDivisors = countOfDivisors;
                 }
             }
+
+            // An open bracket; Call is the function it belongs to, if any
+            private readonly record struct Enclosure(Token Call, int CountOfDivisors, int Min, int Max);
 
             private static readonly FrozenDictionary<TokenTypes, int> OrderIndex =
             new Dictionary<TokenTypes, int>()
@@ -86,11 +90,14 @@ namespace Calcpad.Core
                 _functions = functions;
             }
 
-            internal void Check(Queue<Token> input, bool isCalculating, out bool isFunctionDefinition)
+            internal void Check(Queue<Token> input, bool isCalculating, bool rejectBuiltInDefinition, out bool isFunctionDefinition)
             {
                 isFunctionDefinition = false;
                 if (input.Count == 0)
                     return;
+
+                if (rejectBuiltInDefinition)
+                    CheckBuiltInDefinition(input);
 
                 var countOfBrackets = 0;
                 var countOfOperators = 0;
@@ -101,10 +108,20 @@ namespace Calcpad.Core
                 var optionalFunctionStack = new Stack<MultiFunctionStackItem>();
                 var vectorStack = new Stack<MultiFunctionStackItem>();
                 var indexStack = new Stack<MultiFunctionStackItem>();
+                var openBrackets = new Stack<Token>();
+                var enclosures = new Stack<Enclosure>();
                 var pt = new Token(string.Empty, TokenTypes.None);
                 var firstToken = input.Peek();
+                var position = 0;
                 foreach (var t in input)
                 {
+                    if (++position == 3 && firstToken.Type == TokenTypes.CustomFunction &&
+                        pt.Type == TokenTypes.BracketLeft && t.Type == TokenTypes.BracketRight)
+                        throw Exceptions.MissingFunctionParameter();
+
+                    if (IsEmptySlot(pt.Type, t.Type) && enclosures.TryPeek(out var slot) && slot.Call is not null)
+                        throw Span(Exceptions.EmptyArgument(countOfDivisors - slot.CountOfDivisors + 1, slot.Call.Content), pt, t);
+
                     switch (t.Type)
                     {
                         case TokenTypes.Function2:
@@ -139,7 +156,7 @@ namespace Calcpad.Core
                             if (t.Index < 0)
                             {
                                 if (isFunctionDefinition && t.Content == firstToken.Content)
-                                    throw Exceptions.RecursionNotAllowed(t.Content);
+                                    throw AtName(Exceptions.RecursionNotAllowed(t.Content), t);
 
                                 if (t is FunctionToken)
                                     multiFunctionStack.Push(new MultiFunctionStackItem(t, countOfBrackets, countOfDivisors));
@@ -157,11 +174,31 @@ namespace Calcpad.Core
                                     isFunctionInIndex = true;
                             }
                             ++countOfBrackets;
+                            openBrackets.Push(t);
+                            if (OrderIndex[pt.Type] == functionOrder)
+                            {
+                                var (min, max) = Arity(pt);
+                                enclosures.Push(new Enclosure(pt, countOfDivisors, min, max));
+                            }
+                            else
+                                enclosures.Push(new Enclosure(null, countOfDivisors, 0, int.MaxValue));
                             break;
                         case TokenTypes.BracketRight:
+                            // A [ opened after the matching ( is still open
+                            if (countOfBrackets > 0 && vectorStack.TryPeek(out var openVector) && openVector.CountOfBrackets == countOfBrackets)
+                                throw At(Exceptions.BracketMismatch(), t);
+
                             --countOfBrackets;
                             if (countOfBrackets < 0)
-                                throw Exceptions.MissingLeftBracket();
+                                throw At(Exceptions.MissingLeftBracket(), t);
+
+                            openBrackets.TryPop(out _);
+                            if (enclosures.TryPop(out var call) && call.Call is not null)
+                            {
+                                var count = pt.Type == TokenTypes.BracketLeft ? 0 : countOfDivisors - call.CountOfDivisors + 1;
+                                if (count < call.Min || count > call.Max)
+                                    throw Span(Exceptions.WrongArgumentCount(call.Call.Content, call.Min, call.Max, count), call.Call, t);
+                            }
 
                             if (multiFunctionStack.TryPeek(out var mfStackItem) &&
                                 countOfBrackets == mfStackItem.CountOfBrackets)
@@ -170,7 +207,7 @@ namespace Calcpad.Core
                                 if (mfStackItem.Token is FunctionToken ft)
                                     ft.ParameterCount = countOfDivisors - mfStackItem.CountOfDivisors + 1;
                                 else
-                                    throw Exceptions.InvalidFunction(mfStackItem.Token.Content);
+                                    throw AtName(Exceptions.InvalidFunction(mfStackItem.Token.Content), mfStackItem.Token);
 
                                 countOfDivisors = mfStackItem.CountOfDivisors;
                             }
@@ -211,14 +248,15 @@ namespace Calcpad.Core
                             break;
                         case TokenTypes.SquareBracketLeft:
                             vectorStack.Push(new MultiFunctionStackItem(t, countOfBrackets, countOfDivisors));
+                            enclosures.Push(new Enclosure(null, countOfDivisors, 0, int.MaxValue));
                             break;
                         case TokenTypes.SquareBracketRight:
-
+                            enclosures.TryPop(out _);
                             if (!vectorStack.TryPop(out var vecstItem))
-                                throw Exceptions.MissingVectorOpeningBracket();
+                                throw At(Exceptions.MissingVectorOpeningBracket(), t);
 
                             if (countOfBrackets != vecstItem.CountOfBrackets)
-                                throw Exceptions.BracketMismatch();
+                                throw At(Exceptions.BracketMismatch(), t);
 
                             countOfDivisors = vecstItem.CountOfDivisors;
                             break;
@@ -286,6 +324,11 @@ namespace Calcpad.Core
                     }
                     pt = t;
                 }
+                if (pt.Type == TokenTypes.BracketLeft)
+                    throw At(Exceptions.MissingRightBracket(), pt);
+                if (pt.Type == TokenTypes.SquareBracketLeft)
+                    throw At(Exceptions.MissingVectorClosingBracket(), pt);
+
                 if (pt.Type != TokenTypes.None &&
                     pt.Type != TokenTypes.Constant &&
                     pt.Type != TokenTypes.Variable &&
@@ -299,25 +342,97 @@ namespace Calcpad.Core
                     pt.Type != TokenTypes.Solver &&
                     pt.Type != TokenTypes.Error &&
                     pt.Content != "!")
-                    throw Exceptions.IncompleteExpression();
+                    throw At(Exceptions.IncompleteExpression(), pt);
 
                 if (firstToken.Type == TokenTypes.CustomFunction &&
                     firstToken.Index < 0 &&
                     !isFunctionDefinition &&
                     isCalculating)
-                    throw Exceptions.InvalidFunction(firstToken.Content);
+                    throw AtName(Exceptions.InvalidFunction(firstToken.Content), firstToken);
 
                 if (countOfBrackets > 0)
-                    throw Exceptions.MissingRightBracket();
+                    throw At(Exceptions.MissingRightBracket(), openBrackets.Count > 0 ? openBrackets.Peek() : null);
 
                 if (vectorStack.Count > 0)
-                    throw Exceptions.MissingVectorClosingBracket();
+                    throw At(Exceptions.MissingVectorClosingBracket(), vectorStack.Peek().Token);
 
                 if (countOfDivisors > 0)
                     throw Exceptions.UnexpectedDelimiter();
 
                 if (countOfDivisors < 0)
                     throw Exceptions.InvalidNumberOfArguments();
+            }
+
+            private static (int Min, int Max) Arity(Token function) =>
+                function.Type switch
+                {
+                    TokenTypes.Function or TokenTypes.VectorFunction or TokenTypes.MatrixFunction => (1, 1),
+                    TokenTypes.Function2 or TokenTypes.VectorFunction2 or TokenTypes.MatrixFunction2 => (2, 2),
+                    TokenTypes.MatrixIterativeFunction => (MatrixCalculator.IsLastParameterOptional((int)function.Index) ? 1 : 2, 2),
+                    TokenTypes.Function3 or TokenTypes.VectorFunction3 or TokenTypes.MatrixFunction3 => (3, 3),
+                    TokenTypes.MatrixFunction4 => (4, 4),
+                    TokenTypes.MatrixFunction5 => (5, 5),
+                    TokenTypes.MultiFunction or TokenTypes.Interpolation or
+                    TokenTypes.VectorMultiFunction or TokenTypes.MatrixMultiFunction => (1, int.MaxValue),
+                    _ => (0, int.MaxValue)
+                };
+
+            private static bool IsEmptySlot(TokenTypes previous, TokenTypes current) =>
+                previous == TokenTypes.Divisor && current is TokenTypes.Divisor or TokenTypes.BracketRight ||
+                previous == TokenTypes.BracketLeft && current == TokenTypes.Divisor;
+
+            // A built-in function's name, brackets and '=' read as a definition
+            private static void CheckBuiltInDefinition(Queue<Token> input)
+            {
+                var name = input.Peek();
+                if (OrderIndex[name.Type] != functionOrder || name.Type == TokenTypes.CustomFunction)
+                    return;
+
+                var depth = 0;
+                var isClosed = false;
+                foreach (var t in input)
+                {
+                    if (isClosed)
+                    {
+                        if (t.Type == TokenTypes.Operator && IsAssignment(t.Content))
+                            throw AtName(Exceptions.BuiltInFunctionRedefined(name.Content), name);
+                        return;
+                    }
+                    if (t.Type == TokenTypes.BracketLeft)
+                        ++depth;
+                    else if (t.Type == TokenTypes.BracketRight && --depth == 0)
+                        isClosed = true;
+                }
+            }
+
+            private static MathParserException Span(MathParserException ex, Token first, Token last)
+            {
+                if (first.Start >= 0 && last.Start >= 0)
+                {
+                    ex.Position = first.Start;
+                    ex.EndPosition = last.Start + SourceLength(last);
+                }
+                return ex;
+            }
+
+            private static MathParserException At(MathParserException ex, Token bracket)
+            {
+                if (bracket?.Start >= 0)
+                {
+                    ex.Position = bracket.Start;
+                    ex.EndPosition = bracket.Start + 1;
+                }
+                return ex;
+            }
+
+            internal static MathParserException AtName(MathParserException ex, Token name)
+            {
+                if (name.Start >= 0)
+                {
+                    ex.Position = name.Start;
+                    ex.EndPosition = name.Start + name.Content.Length;
+                }
+                return ex;
             }
 
             private static void CheckOrder(Token pt, Token ct)
@@ -335,8 +450,21 @@ namespace Calcpad.Core
 
                 var correctOrder = CorrectOrder[OrderIndex[ptt], OrderIndex[ctt]];
                 if (!correctOrder)
-                    throw Exceptions.InvalidSyntax(pt.Content, ct.Content);
+                {
+                    var ex = Exceptions.InvalidSyntax(pt.Content, ct.Content);
+                    var start = pt.Start >= 0 ? pt.Start : ct.Start;
+                    if (start >= 0)
+                    {
+                        ex.Position = start;
+                        ex.EndPosition = ct.Start >= 0 ? ct.Start + SourceLength(ct) : start + SourceLength(pt);
+                    }
+                    throw ex;
+                }
             }
+
+            // Units are stored as <i>name</i>
+            private static int SourceLength(Token t) =>
+                Math.Max(1, t.Content.StartsWith("<i>") ? t.Content.Length - 7 : t.Content.Length);
         }
     }
 }

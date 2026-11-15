@@ -22,6 +22,7 @@ import type {
 } from '../types/api';
 import type { SnippetsResponse } from '../types/snippets';
 import { pdfResponseError } from './pdf-browser';
+import { macroCallsToEnum } from '../types/settings';
 
 /** Request header carrying the server's per-launch token. Must match the backend's constant. */
 export const API_TOKEN_HEADER = 'X-Calcpad-Token';
@@ -68,6 +69,7 @@ export class CalcpadApiClient {
     // Set once the wait below has run out, so a host with no server at all fails the next
     // request straight away instead of parking every keystroke's lint for the full timeout.
     private baseUrlUnavailable = false;
+    private macroCalls = 0;
 
     constructor(baseUrl: string, logger?: ILogger) {
         this.baseUrl = baseUrl;
@@ -86,6 +88,11 @@ export class CalcpadApiClient {
 
     public getBaseUrl(): string {
         return this.baseUrl;
+    }
+
+    /** App-level macro call mode, sent with every request that expands macros. */
+    public setMacroCalls(mode: string | undefined): void {
+        this.macroCalls = macroCallsToEnum(mode);
     }
 
     /**
@@ -163,19 +170,19 @@ export class CalcpadApiClient {
         })();
     }
 
-    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<LintResponse | null> {
-        const request: LintRequest = { content, sourceFilePath };
+    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean }): Promise<LintResponse | null> {
+        const request: LintRequest = { content, sourceFilePath, useTrace: opts?.useTrace, macroCalls: this.macroCalls };
         return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint', opts?.key);
     }
 
     public async highlight(content: string, includeText: boolean = false, sourceFilePath?: string, opts?: { key?: string }): Promise<HighlightToken[] | null> {
-        const request: HighlightRequest = { content, includeText, sourceFilePath };
+        const request: HighlightRequest = { content, includeText, sourceFilePath, macroCalls: this.macroCalls };
         const response = await this.post<HighlightResponse>('/api/calcpad/highlight', request, 'Highlight', opts?.key);
         return response?.tokens ?? null;
     }
 
-    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string }): Promise<DefinitionsResponse | null> {
-        const request: DefinitionsRequest = { content, sourceFilePath };
+    public async definitions(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean }): Promise<DefinitionsResponse | null> {
+        const request: DefinitionsRequest = { content, sourceFilePath, useTrace: opts?.useTrace, macroCalls: this.macroCalls };
         return this.post<DefinitionsResponse>('/api/calcpad/definitions', request, 'Definitions', opts?.key);
     }
 
@@ -192,7 +199,7 @@ export class CalcpadApiClient {
         sourceFilePath?: string,
         opts?: { key?: string },
     ): Promise<SymbolAtPositionResponse | null> {
-        const request: SymbolAtPositionRequest = { content, line, column, sourceFilePath };
+        const request: SymbolAtPositionRequest = { content, line, column, sourceFilePath, macroCalls: this.macroCalls };
         return this.post<SymbolAtPositionResponse>('/api/calcpad/symbol-at-position', request, 'SymbolAtPosition', opts?.key);
     }
 
@@ -234,7 +241,7 @@ export class CalcpadApiClient {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: this.jsonHeaders(),
-                    body: JSON.stringify({ content, sourceFilePath }),
+                    body: JSON.stringify({ content, sourceFilePath, macroCalls: this.macroCalls }),
                     signal: AbortSignal.timeout(30000),
                 });
                 const body = await response.json().catch(() => null);

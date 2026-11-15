@@ -322,7 +322,6 @@ circle.Series4 {fill:#f0d000;}
    (
    <var>x</var>
    )
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
  </p>
  <p>Values</p>
@@ -403,7 +402,6 @@ circle.Series4 {fill:#f0d000;}
     30
    </span>
    + 1
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
   - variable transformation
  </p>
@@ -442,7 +440,6 @@ circle.Series4 {fill:#f0d000;}
    <var>f</var>
    <sub>7</sub>
    )
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
  </p>
  <p>
@@ -480,7 +477,6 @@ circle.Series4 {fill:#f0d000;}
    <var>f</var>
    <sub>7</sub>
    )
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
  </p>
  <p>

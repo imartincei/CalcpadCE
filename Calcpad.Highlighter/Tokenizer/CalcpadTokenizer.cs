@@ -60,6 +60,7 @@ namespace Calcpad.Highlighter.Tokenizer
             public TokenType CurrentType;
             public TokenType PreviousType;
             public bool AllowUnaryMinus;
+            public bool IsUnitsAfterNumber;         // Core always reads a name after a number as units
 
             // Local variable tracking
             public bool IsFunctionDefinition;       // True when parsing f(x;y) = ... before the =
@@ -119,8 +120,6 @@ namespace Calcpad.Highlighter.Tokenizer
 
             if (_mode == TokenizerMode.Lint)
                 InitLintState();
-            if (_mode == TokenizerMode.Macro)
-                InitMacroCollectionState();
 
             int lineNum = 0;
             var parseModes = new ParseModeTracker();
@@ -133,7 +132,7 @@ namespace Calcpad.Highlighter.Tokenizer
                 if (parseModes.Mode != ParseMode.Cpd)
                 {
                     _result.LineModes[lineNum] = parseModes.Mode;
-                    if (_mode != TokenizerMode.Macro && !inMacroBody && !ParseModeTracker.IsDirective(trimmed, parseModes.Mode))
+                    if (!inMacroBody && !ParseModeTracker.IsDirective(trimmed, parseModes.Mode))
                     {
                         _result.RawLines.Add(lineNum);
                         AddRawLineMacroTokens(lineMemory.Span, lineNum++);
@@ -188,6 +187,7 @@ namespace Calcpad.Highlighter.Tokenizer
             _inHtmlComment = false;
             _explicitLineBreak = false;
             _continueLine = false;
+            _argTokensLine = -1;
             TokenizeLineInternal(line.AsMemory(), lineNumber);
             return _result;
         }
@@ -343,7 +343,7 @@ namespace Calcpad.Highlighter.Tokenizer
                     // #settings {json} - consume the whole JSON payload as a single token;
                     // quotes, braces and colons all belong to the JSON, not to Calcpad syntax.
                     _builder.Append(c);
-                    // #UI's block ends at the first '}', as UiValidator also assumes.
+                    // #UI's block ends at the first '}', as Core also assumes.
                     if (_state.UiJsonBlock && c == '}')
                     {
                         Append(TokenType.SettingsJson);
@@ -487,10 +487,6 @@ namespace Calcpad.Highlighter.Tokenizer
             if (_mode == TokenizerMode.Lint)
                 FinalizeLineLint();
 
-            // In Macro mode, finalize any pending macro definition at end of line
-            if (_mode == TokenizerMode.Macro)
-                FinalizeLineMacroCollection();
-
             // For multiline macro definitions: if we saw #def macro$(...) but no = on this line,
             // enter macro definition mode for subsequent lines
             if (_state.HasMacro && !_inMacroDefinition && _macroParameters.Count > 0)
@@ -619,6 +615,7 @@ namespace Calcpad.Highlighter.Tokenizer
 
             // Resolve types based on context (no error detection - that's the linter's job)
             type = ResolveType(type, text);
+            _state.IsUnitsAfterNumber = false;
 
             // Check for macro parameters in comment content when inside a macro definition
             if (_inMacroDefinition && _macroParameters.Count > 0 &&
@@ -665,6 +662,9 @@ namespace Calcpad.Highlighter.Tokenizer
             {
                 _beforeFirstCodeToken = false;
             }
+            // Text between expressions ends one, so the next identifier starts a new one
+            else if (type == TokenType.Comment && _state.TextComment == '\0')
+                _beforeFirstCodeToken = true;
 
             // Track potential definitions
             TrackDefinitions(type, text);

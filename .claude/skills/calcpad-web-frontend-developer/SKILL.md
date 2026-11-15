@@ -79,6 +79,17 @@ public async newMethod(content: string): Promise<NewResponse | null> {
 
 For Monaco editor features and VS Code commands, see the recipes in `reference/web-editor.md` and `reference/vscode-extension.md`.
 
+### Localization (i18n)
+Never hard-code translated strings inline (e.g. `uiText('English', '中文')` or ad-hoc `locale === 'zh' ? … : …`). All UI text goes through the shared messages in `calcpad-frontend/src/i18n/`:
+- Keys are the English source text; `messages/en.ts` stays empty. Add the Chinese translation to `messages/zh.ts`.
+- Use `{name}` placeholders for interpolation and `'{n} item | {n} items'` for plurals; `fallbackFormat` formats the English key when no entry exists.
+- In Vue components, use `t()` from `useI18n()`.
+- In non-Vue code (Monaco providers, editor commands), have the host pass in the shared i18n `t` (see `registerUiOverrideHints` in `calcpad-web/src/main.ts`) instead of importing a locale helper.
+- Native Tauri menu labels live in `i18n/menu.ts`.
+
+### Animations and Motion
+Respect `prefers-reduced-motion`. When adding a CSS animation or transition, add a `@media (prefers-reduced-motion: reduce)` override that disables it, keeping any static visual cue (e.g. a highlight without the fade). For JS motion such as `scrollIntoView({ behavior: 'smooth' })`, check `matchMedia('(prefers-reduced-motion: reduce)')` and use `'auto'` instead. `base.css` already disables transitions globally under reduced motion, but not animations.
+
 ## Workflow
 
 1. **Understand the feature** - Which frontend(s) does it affect?
@@ -87,4 +98,37 @@ For Monaco editor features and VS Code commands, see the recipes in `reference/w
 4. **Follow existing patterns** - Match code style and architecture
 5. **Implement** - Start with types, then service/client, then UI
 6. **Build shared lib first** - If you changed calcpad-frontend, rebuild it before testing consumers
-7. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README)
+7. **Verify** - Run the checks below for what you changed
+8. **Test** - Run `npm run dev` for the web editor, or launch the VS Code extension. To drive the desktop app (native dialogs, menus, server failures) without taking over the user's screen, use `tools/desktop-test/` (Windows; see its README). On Linux, `tools/desktop-test/linux-tests.sh` runs the GTK regression tests, and `tools/desktop-linux-ci/run.sh` runs the whole Linux desktop CI job in a container (see Full suite)
+
+## Verification
+
+Run only the checks for the sub-projects and files you changed, never the full suite. When done, give the user the full-suite command below to run themselves.
+
+| Changed | Run (from that sub-project's folder unless noted) |
+|---------|-----|
+| `calcpad-frontend/src/` | `npx tsc --noEmit -p .`, then `npm run build` so consumers see the change |
+| `calcpad-frontend/scripts/` | `npx tsc -p tsconfig.scripts.json` |
+| `calcpad-web/src/` | `npx vue-tsc --noEmit -p .` |
+| `calcpad-web` Vite/node config | `npx tsc -p tsconfig.node.json` |
+| `calcpad-web/src/editor/language.ts` | `node --test tools/monaco-language.test.mjs` (repo root) |
+| `calcpad-web/src/editor/navigation-history.ts` | `node --test tools/navigation-history.test.mjs` (repo root) |
+| Theme colors or UI tokens | `npm run check:contrast` (in `calcpad-web`) |
+| `vscode-calcpad/src/` | `npx tsc --noEmit -p .` (build `calcpad-frontend` first if it changed) |
+| `vscode-calcpad/CalcpadVuePanel/` | `npx vue-tsc --noEmit -p tsconfig.vue.json` |
+
+### Desktop (Rust)
+
+After changing anything in `calcpad-desktop/src-tauri/`, run from that folder:
+```bash
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+### Full suite (user runs)
+
+VS Code task **Check: All** (every TypeScript, Rust and .NET check), or **Run All Verifications** to add the .NET tests and Compare Renderings.
+
+For desktop changes, `tools/desktop-linux-ci/run.sh` (repo root) runs `build-desktop-linux.yml` locally in an Ubuntu 22.04 container.
+It covers the build, the X11, scaled and Wayland GTK tests, the deb/rpm/Arch packages and the notices check.
+`--skip-tests` and `--only=<steps>` run part of it; see `tools/desktop-linux-ci/README.md`.

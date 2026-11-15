@@ -77,6 +77,65 @@ namespace Calcpad.Tests
         }
 
         [Fact]
+        public void EndSettings_RestoresPriorValues()
+        {
+            var html = Render("#settings {\"decimals\": 4}\nx = 6.12345\n#end settings\ny = 8.7654");
+            Assert.Contains("6.1235", html);
+            Assert.Contains("8.77", html);
+            Assert.DoesNotContain("8.7654", html);
+        }
+
+        [Fact]
+        public void EndSettings_Nested_PopsOneLevel()
+        {
+            var html = Render("#settings {\"decimals\": 4}\n#settings {\"decimals\": 1}\nx = 6.12345\n#end settings\ny = 8.7654321\n#end settings\nz = 3.14159");
+            Assert.Contains("6.1", html);
+            Assert.DoesNotContain("6.12", html);
+            Assert.Contains("8.7654", html);
+            Assert.DoesNotContain("8.76543", html);
+            Assert.Contains("3.14", html);
+            Assert.DoesNotContain("3.141", html);
+        }
+
+        [Fact]
+        public void EndSettings_LeavesUntouchedKeys()
+        {
+            // #round isn't a #settings key, so #end settings must not undo it.
+            var html = Render("#round 4\n#settings {\"returnAngleUnits\": false}\n#end settings\nx = 6.12345");
+            Assert.Contains("6.1235", html);
+        }
+
+        [Fact]
+        public void EndSettings_RestoresSettingsVariable()
+        {
+            const string plot = "\n$Plot{ x^2 @ x = 0 : 2 }";
+            var variableOnly = PlotWidthStyle("PlotWidth = 800" + plot);
+            var restored = PlotWidthStyle("PlotWidth = 800\n#settings {\"plotWidth\": 400}\n#end settings" + plot);
+            Assert.Equal(variableOnly, restored);
+        }
+
+        [Fact]
+        public void EndSettings_RestoresReturnAngleUnits()
+        {
+            Assert.Contains("°", Render("#settings {\"returnAngleUnits\": false}\n#end settings\nx = atan(1)"));
+        }
+
+        [Fact]
+        public void EndSettings_WithoutOpener_IsNoOp()
+        {
+            var html = Render("#end settings\nx = 6.12345");
+            Assert.Contains("6.12", html);
+            Assert.DoesNotContain("Invalid", html);
+        }
+
+        [Fact]
+        public void EndSettings_AfterInvalidSettings_DoesNotPopOuter()
+        {
+            var html = Render("#settings {\"decimals\": 4}\n#settings {not valid}\n#end settings\nx = 6.12345");
+            Assert.Contains("6.1235", html);
+        }
+
+        [Fact]
         public void SettingsDirective_MalformedJson_ReportsError()
         {
             var parser = new ExpressionParser { Settings = new Settings(), Debug = true };

@@ -46,10 +46,13 @@
             :has-document="hasDocument"
             :doc-key="docKey"
             :ui-controls="uiControls"
+            :selection="selection"
+            :reveal="uiOverridesReveal"
             :visible="bodyVisible('uiOverrides')"
             :query="query"
             :filter="uiOverridesFilter"
             @update="emit('update-ui-overrides', $event)"
+            @override-defaults="emit('override-ui-defaults', $event)"
             @go-to-line="emit('go-to-line', $event)"
             @refresh-ui-controls="emit('refresh-ui-controls')"
             @draft-dirty="onUiOverridesDirty"
@@ -61,7 +64,7 @@
         <h3 class="section-header" @click="toggle('fields')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('fields') }">&#x25BC;</span>
           <CalcpadSearchHighlight :text="t('Fields')" :query="query" />
-          <span v-if="dirty" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
+          <span v-if="fieldChanges" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('fields')" class="section-body">
           <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
@@ -230,6 +233,16 @@
                 </select>
               </div>
             </div>
+
+            <p v-if="fieldChanges" class="pending">{{ pendingText(fieldChanges) }}</p>
+            <div class="actions line-actions">
+              <button
+                :disabled="!fieldChanges || hasUiErrors"
+                :title="hasUiErrors ? 'Fix the highlighted fields before applying' : `Apply the Fields to line ${boundBlock.line + 1}`"
+                @click="onApply('fields')"
+              >{{ t('Apply') }}</button>
+              <button class="secondary" :disabled="!fieldChanges" @click="resetSection('fields')">{{ t('Reset') }}</button>
+            </div>
           </template>
         </div>
       </section>
@@ -238,7 +251,7 @@
         <h3 class="section-header" @click="toggle('settings')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('settings') }">&#x25BC;</span>
           <CalcpadSearchHighlight text="Settings" :query="query" />
-          <span v-if="dirty" class="dirty-mark" title="Unsaved changes - Apply or Reset">*</span>
+          <span v-if="settingChanges" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('settings')" class="section-body">
           <p v-if="sourceUnavailable" class="note">{{ sourceUnavailableNote }}</p>
@@ -369,17 +382,22 @@
                 </select>
               </div>
             </div>
+
+            <p v-if="settingChanges" class="pending">{{ pendingText(settingChanges) }}</p>
+            <div class="actions line-actions">
+              <button
+                :disabled="!settingChanges || hasSettingErrors || hasPdfErrors"
+                :title="hasSettingErrors || hasPdfErrors ? 'Fix the highlighted fields before applying' : `Apply the Settings to line ${boundBlock.line + 1}`"
+                @click="onApply('settings')"
+              >{{ t('Apply') }}</button>
+              <button class="secondary" :disabled="!settingChanges" @click="resetSection('settings')">{{ t('Reset') }}</button>
+            </div>
           </template>
         </div>
       </section>
 
       <div v-if="searchActive && !anyVisible" class="no-results">
         No properties found for "{{ searchQuery.trim() }}"
-      </div>
-
-      <div v-if="boundBlock && !sourceUnavailable && ((sectionVisible('fields') && bodyVisible('fields')) || (sectionVisible('settings') && bodyVisible('settings')))" class="actions line-actions">
-        <button :disabled="hasErrors" :title="hasErrors ? 'Fix the highlighted fields before applying' : `Apply the Fields and Settings to line ${boundBlock.line + 1}`" @click="onApply">Apply</button>
-        <button class="secondary" @click="clearDraft">Reset</button>
       </div>
     </div>
   </div>
@@ -403,7 +421,7 @@ import { FILE_INFO_KEY, UI_OVERRIDES_KEY } from '../../services/metadata-footer'
 import type { UiDirectiveData } from '../../text/ui-directive'
 import { getMetadataDraft, setMetadataDraft, clearMetadataDraft, metadataDraftDiscarded } from '../metadata-drafts'
 import type { MetadataDraft } from '../metadata-drafts'
-import type { UiControl, UiOverrides } from '../../services/ui-overrides'
+import type { LineRange, UiControl, UiOverrides } from '../../services/ui-overrides'
 import type { FileInfo } from '../../services/file-info'
 import CollapseAllButton from './CollapseAllButton.vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
@@ -417,6 +435,10 @@ interface Props {
   block?: MetadataCommentBlock | null
   /** Controls of the last input-form render, or null until the host resolves them. */
   uiControls?: UiControl[] | null
+  /** Editor lines the cursor or selection covers. */
+  selection?: LineRange | null
+  /** Saved values an editor hint asked to show. */
+  uiOverridesReveal?: { keys: string[]; seq: number } | null
   fileInfo?: FileInfo | null
   savedUiOverrides?: UiOverrides
   hasDocument?: boolean
@@ -430,6 +452,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   block: null,
   uiControls: null,
+  selection: null,
+  uiOverridesReveal: null,
   fileInfo: null,
   savedUiOverrides: () => ({}),
   hasDocument: false,
@@ -449,6 +473,7 @@ const emit = defineEmits<{
   'open-settings': []
   'file-info-draft-dirty': [payload: { docKey: string; dirty: boolean }]
   'update-ui-overrides': [overrides: UiOverrides]
+  'override-ui-defaults': [keys: string[]]
   'ui-overrides-draft-dirty': [payload: { docKey: string; dirty: boolean }]
 }>()
 
@@ -580,6 +605,12 @@ function reveal(target: RevealTarget) {
     ?.querySelector(`[data-anchor="${target.anchor}"]`)
     ?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
 }
+
+watch(() => props.uiOverridesReveal?.seq, seq => {
+  if (seq === undefined) return
+  searchQuery.value = ''
+  reveal({ section: 'uiOverrides', anchor: 'uiOverrides' })
+}, { immediate: true })
 
 /** The block the form is editing - not the one under the cursor while edits are held. */
 const boundBlock = ref<MetadataCommentBlock | null>(null)
@@ -801,7 +832,6 @@ const pdf = catalogHelpers(PDF_SETTING_KEYS)
 
 const hasSettingErrors = computed(() => model.settings.some(r => !!setting.error(r)))
 const hasPdfErrors = computed(() => model.pdf.some(r => !!pdf.error(r)))
-const hasErrors = computed(() => hasSettingErrors.value || hasPdfErrors.value || hasUiErrors.value)
 
 /** Everything the user can change; compared as text to tell edited from untouched. */
 function snapshot(): string {
@@ -809,7 +839,43 @@ function snapshot(): string {
 }
 
 const baseline = ref('')
-const dirty = computed(() => snapshot() !== baseline.value)
+
+type Model = typeof model
+type Section = 'fields' | 'settings'
+const SECTION_KEYS: Record<Section, (keyof Model)[]> = {
+  fields: ['desc', 'paramTypes', 'paramDesc', 'returnType', 'ui'],
+  settings: ['settings', 'pdf', 'startLintMode', 'startLintCodes', 'endLintMode', 'endLintCodes'],
+}
+
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
+const baseModel = computed<Model | null>(() => baseline.value ? JSON.parse(baseline.value).model : null)
+
+// Keys added, edited or removed between two key/value lists.
+function rowChanges(rows: SettingRow[], saved: SettingRow[]): number {
+  const draft = new Map(rows.map(r => [r.key, r.value]))
+  const before = new Map(saved.map(r => [r.key, r.value]))
+  return [...draft].filter(([k, v]) => before.get(k) !== v).length + [...before.keys()].filter(k => !draft.has(k)).length
+}
+
+const fieldChanges = computed(() => {
+  const b = baseModel.value
+  if (!b) return 0
+  const top = (['desc', 'paramTypes', 'paramDesc', 'returnType'] as const).filter(k => !same(model[k], b[k])).length
+  return top + (Object.keys(model.ui) as (keyof Model['ui'])[]).filter(k => !same(model.ui[k], b.ui[k])).length
+})
+
+const settingChanges = computed(() => {
+  const b = baseModel.value
+  if (!b) return 0
+  return rowChanges(model.settings, b.settings) + rowChanges(model.pdf, b.pdf)
+    + (same([model.startLintMode, model.startLintCodes], [b.startLintMode, b.startLintCodes]) ? 0 : 1)
+    + (same([model.endLintMode, model.endLintCodes], [b.endLintMode, b.endLintCodes]) ? 0 : 1)
+})
+
+const dirty = computed(() => fieldChanges.value + settingChanges.value > 0)
+
+const pendingText = (n: number) =>
+  t('Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes', { n }, n)
 
 const KIND_LABELS: Record<string, string> = {
   variable: 'Variable',
@@ -874,13 +940,6 @@ function clearDraft() {
   const key = boundBlock.value?.docKey
   if (key) clearMetadataDraft(key)
   bind(props.block)
-}
-
-/** Apply keeps the form as-is: it already holds what was written. */
-function acceptDraft() {
-  const key = boundBlock.value?.docKey
-  if (key) clearMetadataDraft(key)
-  baseline.value = snapshot()
 }
 
 // The host drops a document's draft when its file closes.
@@ -952,65 +1011,79 @@ function lintFieldValue(mode: LintMode, codes: string[]): string[] | undefined {
   return codes.slice()
 }
 
-function onApply() {
-  if (hasSettingErrors.value || hasPdfErrors.value || hasUiErrors.value) return
-  const data: MetadataCommentData = { ...model.extra }
+function onApply(section: Section) {
+  const b = baseModel.value
+  if (!b || (section === 'fields' ? hasUiErrors.value : hasSettingErrors.value || hasPdfErrors.value)) return
+  // This section's edits over the other section's saved values.
+  const src: Model = { ...b, extra: model.extra }
+  for (const k of SECTION_KEYS[section]) (src as Record<string, unknown>)[k] = JSON.parse(JSON.stringify(model[k]))
+  const data: MetadataCommentData = { ...src.extra }
 
-  if (model.desc.trim()) data.desc = model.desc.trim()
+  if (src.desc.trim()) data.desc = src.desc.trim()
 
-  const types = model.paramTypes.filter(t => t !== '')
+  const types = src.paramTypes.filter(t => t !== '')
   if (types.length) data.paramTypes = types
 
-  const descs = model.paramDesc.filter(d => d.trim() !== '')
+  const descs = src.paramDesc.filter(d => d.trim() !== '')
   if (descs.length) data.paramDesc = descs
 
-  if (model.returnType) data.returnType = model.returnType
+  if (src.returnType) data.returnType = src.returnType
 
-  const settings: SettingsValues = setting.collect(model.settings)
+  const settings: SettingsValues = setting.collect(src.settings)
 
-  const pdfValues = pdf.collect(model.pdf)
+  const pdfValues = pdf.collect(src.pdf)
   // cleanMetadata drops an empty object, so clearing every row removes the key.
   if (Object.keys(pdfValues).length) data.pdf = pdfValues as PdfCommentValues
 
-  const lintIgnore = lintFieldValue(model.startLintMode, model.startLintCodes)
+  const lintIgnore = lintFieldValue(src.startLintMode, src.startLintCodes)
   if (lintIgnore !== undefined) data.LintIgnore = lintIgnore
 
-  const endLintIgnore = lintFieldValue(model.endLintMode, model.endLintCodes)
+  const endLintIgnore = lintFieldValue(src.endLintMode, src.endLintCodes)
   if (endLintIgnore !== undefined) data.EndLintIgnore = endLintIgnore
 
   let ui: UiDirectiveData | undefined
   if (showUi.value) {
     ui = {}
-    if (model.ui.type) ui.type = model.ui.type
-    if (model.ui.mode) ui.mode = model.ui.mode
-    if (model.ui.style.trim()) ui.style = model.ui.style.trim()
-    if (model.ui.reportStyle.trim()) ui.reportStyle = model.ui.reportStyle.trim()
-    if (model.ui.forceUnits !== '') ui.forceUnits = model.ui.forceUnits
-    if (model.ui.allowExpression !== '') ui.allowExpression = model.ui.allowExpression
+    if (src.ui.type) ui.type = src.ui.type
+    if (src.ui.mode) ui.mode = src.ui.mode
+    if (src.ui.style.trim()) ui.style = src.ui.style.trim()
+    if (src.ui.reportStyle.trim()) ui.reportStyle = src.ui.reportStyle.trim()
+    if (src.ui.forceUnits !== '') ui.forceUnits = src.ui.forceUnits
+    if (src.ui.allowExpression !== '') ui.allowExpression = src.ui.allowExpression
     // The directive takes these on a grid only, and the fields above are hidden for the other
     // types - an undeclared type is auto-detected, so whatever it carries is left alone.
-    if (!['entry', 'dropdown', 'radio', 'checkbox'].includes(model.ui.type)) {
-      if (model.ui.rows !== '') ui.rows = Number(model.ui.rows)
-      if (model.ui.columns !== '') ui.columns = Number(model.ui.columns)
-      const columnHeaders = model.ui.columnHeaders.filter(h => h.trim() !== '')
+    if (!['entry', 'dropdown', 'radio', 'checkbox'].includes(src.ui.type)) {
+      if (src.ui.rows !== '') ui.rows = Number(src.ui.rows)
+      if (src.ui.columns !== '') ui.columns = Number(src.ui.columns)
+      const columnHeaders = src.ui.columnHeaders.filter(h => h.trim() !== '')
       if (columnHeaders.length) ui.columnHeaders = columnHeaders
-      const rowHeaders = model.ui.rowHeaders.filter(h => h.trim() !== '')
+      const rowHeaders = src.ui.rowHeaders.filter(h => h.trim() !== '')
       if (rowHeaders.length) ui.rowHeaders = rowHeaders
-      const width = model.ui.width.trim()
+      const width = src.ui.width.trim()
       // A plain number stays a number; a percentage goes through as a string.
       if (width) ui.width = /^\d+(\.\d+)?$/.test(width) ? Number(width) : width
-      if (model.ui.rowHeaderWidth !== '') ui.rowHeaderWidth = Number(model.ui.rowHeaderWidth)
-      const columnWidths = model.ui.columnWidths.filter(w => w !== '').map(Number)
+      if (src.ui.rowHeaderWidth !== '') ui.rowHeaderWidth = Number(src.ui.rowHeaderWidth)
+      const columnWidths = src.ui.columnWidths.filter(w => w !== '').map(Number)
       if (columnWidths.length) ui.columnWidths = columnWidths
     }
-    if (model.ui.keys.length) {
-      ui.keys = model.ui.keys.slice()
-      ui.values = model.ui.values.slice()
+    if (src.ui.keys.length) {
+      ui.keys = src.ui.keys.slice()
+      ui.values = src.ui.values.slice()
     }
   }
 
   emit('apply', { data, settings, ui, block: boundBlock.value! })
-  acceptDraft()
+  baseline.value = JSON.stringify({ model: src, added: [...added] })
+  const key = boundBlock.value?.docKey
+  if (key && !dirty.value) clearMetadataDraft(key)
+}
+
+/** Reverts one section; once nothing is pending the form follows the cursor again. */
+function resetSection(section: Section) {
+  const b = baseModel.value
+  if (!b) return
+  for (const k of SECTION_KEYS[section]) (model as Record<string, unknown>)[k] = JSON.parse(JSON.stringify(b[k]))
+  if (!dirty.value) clearDraft()
 }
 
 // Identity of the target the form is bound to. Cursor jitter within the same
@@ -1615,5 +1688,11 @@ watch(
   display: flex;
   gap: 8px;
   margin-top: 8px;
+}
+
+.pending {
+  margin: 8px 0 0 0;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  font-style: italic;
 }
 </style>

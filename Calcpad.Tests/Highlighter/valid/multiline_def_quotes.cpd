@@ -1,6 +1,6 @@
 "Test: Multiple definitions on one line separated by inline comments"
-'A code region after a closing quote is its own definition, e.g.
-'name(x) = expr' text 'name_2(x) = expr should define both names.
+'A code region after a closing quote is its own definition, so two definitions
+'separated by an inline comment on one line should define both names.
 
 k(m) = m
 k_2(m) = m^2

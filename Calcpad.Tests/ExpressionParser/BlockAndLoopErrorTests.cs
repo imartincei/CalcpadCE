@@ -65,4 +65,69 @@ public class BlockAndLoopErrorTests
         Assert.Equal(2, errors.Length);
         Assert.StartsWith("2: ", errors[1]);
     }
+
+    [Fact]
+    public void DeepNesting_IsReportedOnce()
+    {
+        var code = string.Concat(Enumerable.Repeat("#if 1\n", 20)) + "x = 1";
+        var parser = new ExpressionParser { Debug = true };
+        parser.Parse(code, true, false);
+        Assert.Equal((20, "CPD-5204"), (parser.Errors[0].SourceLine, parser.Errors[0].Code));
+    }
+
+    [Theory]
+    [InlineData("#for i 1 : 3\n#loop")]
+    [InlineData("#for 2i = 1 : 3\n#loop")]
+    public void MalformedForHeader_IsReported(string code)
+    {
+        var parser = new ExpressionParser { Debug = true };
+        parser.Parse(code, true, false);
+        Assert.Equal("CPD-5121", parser.Errors[0].Code);
+    }
+
+    [Fact]
+    public void MalformedForHeader_InUntakenBranch_DoesNotStopTheRun()
+    {
+        Assert.Single(Errors("#if 0\n#for i 1\n#loop\n#end if\ny = 1 + * 2"));
+    }
+
+    [Fact]
+    public void UnknownDirective_IsReported()
+    {
+        var parser = new ExpressionParser { Debug = true };
+        parser.Parse("#bogus 1\nx = 1", true, false);
+        Assert.Equal((1, "CPD-3403"), (parser.Errors[0].SourceLine, parser.Errors[0].Code));
+    }
+
+    [Theory]
+    [InlineData("#for i = 1 : 3\nc = 2*a\na = 5\n#loop\nd = c")]
+    [InlineData("#repeat 3\nc = 2*a\na = 5\n#loop\nd = c")]
+    [InlineData("#hide\n#for i = 1 : 3\nc = 2*a\na = 5\n#loop\n#show\nd = c")]
+    [InlineData("#for i = 1 : 3\nc = $Sum{a @ k = 1 : 2}\na = 5\n#loop\nd = c")]
+    [InlineData("#for i = 1 : 3\nc = $Inline{2*a}\na = 5\n#loop\nd = c")]
+    [InlineData("#hide\n#for i = 1 : 3\nc = $Inline{2*a}\na = 5\n#loop\n#show\nd = c")]
+    [InlineData("#for i = 1 : 3\nc = $Sum{$Inline{a} @ k = 1 : 2}\na = 5\n#loop\nd = c")]
+    public void UnitAssignedLaterInLoop_IsTheVariableOnLaterPasses(string code)
+    {
+        var parser = new ExpressionParser { Debug = true };
+        parser.Parse(code, true, false);
+        Assert.Empty(parser.Errors);
+        Assert.Contains("<var>d</var> = <var>c</var> = 10<", parser.HtmlResult);
+    }
+
+    [Fact]
+    public void UnitAssignedLaterInLoop_RendersTheVariable()
+    {
+        var parser = new ExpressionParser();
+        parser.Parse("#for i = 1 : 2\nc = 2*a\na = 5 m\n#loop", true, false);
+        Assert.Contains("2 · <var>a</var>", parser.HtmlResult);
+    }
+
+    [Fact]
+    public void NameAssignedLaterInLoop_IsReadInsideABlock()
+    {
+        var parser = new ExpressionParser();
+        parser.Parse("#for i = 1 : 3\nc = $Inline{2*x}\nx = 5\n#loop\nd = c", true, false);
+        Assert.Contains("<var>d</var> = <var>c</var> = 10<", parser.HtmlResult);
+    }
 }

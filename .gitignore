@@ -399,3 +399,6 @@ package-lock.json
 Calcpad.Web/frontend/vscode-calcpad/THIRD-PARTY-NOTICES.txt
 
 Calcpad.Web/frontend/vscode-calcpad/.package/
+
+# Local baseline written by tools/highlighter-examples-test
+tools/highlighter-examples-test/highlighter-examples-test.txt

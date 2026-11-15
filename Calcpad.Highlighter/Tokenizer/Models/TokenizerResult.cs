@@ -56,25 +56,6 @@ namespace Calcpad.Highlighter.Tokenizer.Models
         /// </summary>
         public Dictionary<string, CommandBlockInfo> CommandBlockFunctions { get; } = new(System.StringComparer.Ordinal);
 
-        // --- Macro mode only: macro definition metadata ---
-
-        /// <summary>
-        /// Full macro definitions with name, params, content, line numbers (only populated in Macro mode).
-        /// </summary>
-        public List<MacroDefinition> MacroDefinitions { get; } = new();
-
-        /// <summary>
-        /// Duplicate macro definitions detected during collection (only populated in Macro mode).
-        /// </summary>
-        public List<DuplicateMacro> DuplicateMacros { get; } = new();
-
-        /// <summary>
-        /// User-defined macro info for linting (only populated in Macro mode), keyed by macro name
-        /// (case-insensitive) with MacroInfo values carrying param counts. Built directly during
-        /// tokenization for a single source of truth.
-        /// </summary>
-        public Dictionary<string, MacroInfo> UserDefinedMacros { get; } = new(System.StringComparer.OrdinalIgnoreCase);
-
         /// <summary>
         /// Get all tokens for a specific line
         /// </summary>

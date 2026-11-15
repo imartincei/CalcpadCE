@@ -15,9 +15,11 @@ In VS Code, do not use VS Code's own settings editor.
 | **Format Equations** | on/off | *Professional* (on) renders equations in stacked math form; *Inline* (off) renders them on a single line. |
 | **Zero Small Matrix Elements** | on/off | Show very small matrix/vector values as `0` instead of using scientific notation. |
 | **Show Hidden Output** | on/off | Ignore `#hide` so suppressed content is rendered anyway. For debugging. |
+| **Calculate #post in Input Form** | on/off *(default on)* | On: `#post` blocks are still calculated, just hidden, while the input form is on screen, so a later `#pre` can use their variables. Off: they are skipped entirely in the Input form, which keeps typing responsive. Reports and Preview always calculate `#post`. See [UI Mode](new-ui-mode.md#pre-and-post). |
 | **Max Output Count** | 5–100 | Maximum number of rows/columns shown for large matrices and vectors. |
 | **Numerical Precision** | 1e-15–1e-2 | Relative precision used by integration, root-finding, and other numerical methods. |
 | **Solver Tolerance** | 1e-15–1e-2 | Target tolerance for the iterative (PCG/eigen) solver. |
+| **Macro Calls** | Auto / On / Off | When `name$` is parsed as a macro call. See [In a document](#in-a-document). |
 
 ## Plot
 
@@ -90,6 +92,8 @@ Pick the Monaco editor's font family from:
 - **Apply `#UI` Values in Preview** *(default off)* — Preview normally renders the document's own default values; turn this on and it renders the values entered into the input form instead, while still showing `#pre` and `#post` together. Useful for tracking down errors that only appear once a form is filled in. This also affects exporting and #write/#append.
 - **Render Preview as PDF** *(default off)* — **Preview** and **Report** show the [PDF export](new-exports.md#pdf-export) itself in a built-in PDF viewer, with its exact pages, headers and footers, zoom (− / + / Fit, or Ctrl+Wheel) and a page counter. It follows **Auto-Run Preview**, but each render generates a PDF, so it is slower than the HTML preview. **Unwrapped** and the input form are unaffected.
 - **Show File Metadata** *(default off)* — show the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the end of the file. Edit it in the [Properties tab](new-calcpad-panel.md#properties).
+- **Show UI Override Hints** *(default off)* — show [saved input values](new-ui-mode.md#saving-what-was-entered) above the lines they apply to. Click one to edit it in the [Properties tab](new-calcpad-panel.md#properties).
+- **Auto-Sync #UI Values** *(default off)* — keep `#UI` line defaults and the input form in sync. See [Auto-syncing values with the CalcpadCE file](new-ui-mode.md#auto-syncing-values-with-the-calcpadce-file).
 
 ## Data output
 
@@ -135,6 +139,37 @@ The **Configuration** section lets you keep more than one named set of settings 
 - **Reset to Default** — restore the default settings.
 
 Configurations persist between sessions.
+
+## In a document
+
+`#settings` overrides math and plot settings from that line on, using the JSON keys shown in the [Properties](new-calcpad-panel.md#properties) tab.
+`#end settings` restores the values the matching `#settings` changed:
+
+```calcpad
+#settings {"decimals": 4}
+x = 6.12345
+#end settings
+'Back to the previous decimals.
+y = 6.12345
+```
+
+`macroCalls` controls when `name$` is parsed as a macro call.
+
+| Value | Behavior |
+| --- | --- |
+| `"auto"` (default) | Once a macro has been defined with `#def`. |
+| `"on"` | Always. An undefined `name$` is an error, even before any `#def`. |
+| `"off"` | Never. `$` stays as text, so `'name$` is safe after a `#def`. |
+
+```calcpad
+#def area$ = b*h
+#settings {"macroCalls": "off"}
+'name$'
+#end settings
+A = area$
+```
+
+Unlike the other keys, `macroCalls` in `#settings` is applied before the calculation runs, so it still runs in a false `#if` branch.
 
 ## See also
 

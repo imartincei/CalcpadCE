@@ -564,6 +564,39 @@ export class TabManager {
     }
 }
 
+function withModelEol(model: monaco.editor.ITextModel, content: string): string {
+    return content.replace(/\r\n|\r|\n/g, model.getEOL());
+}
+
+/** True when `content` (as read from disk) is what the model already holds. */
+export function documentMatches(model: monaco.editor.ITextModel, content: string): boolean {
+    return model.getValue() === withModelEol(model, content);
+}
+
+/**
+ * Makes `content` the document's saved state in every tab sharing `model`. Only the changed
+ * span is replaced, as one undoable edit, so the cursor stays put and undo brings back the old text.
+ */
+export function reloadDocument(model: monaco.editor.ITextModel, content: string): void {
+    const current = model.getValue();
+    const next = withModelEol(model, content);
+    if (current !== next) {
+        const max = Math.min(current.length, next.length);
+        let start = 0;
+        while (start < max && current[start] === next[start]) start++;
+        let end = 0;
+        while (end < max - start && current[current.length - 1 - end] === next[next.length - 1 - end]) end++;
+        const range = monaco.Range.fromPositions(
+            model.getPositionAt(start), model.getPositionAt(current.length - end));
+        model.pushStackElement();
+        model.pushEditOperations([], [{ range, text: next.slice(start, next.length - end) }], () => null);
+        model.pushStackElement();
+    }
+    const doc = docFor(model);
+    doc.savedVersionId = model.getAlternativeVersionId();
+    for (const l of doc.onChanged) l();
+}
+
 function baseName(path: string): string {
     return path.split(/[\\/]/).pop() || path;
 }

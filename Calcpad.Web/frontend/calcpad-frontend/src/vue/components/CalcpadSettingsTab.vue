@@ -409,6 +409,30 @@
             </label>
           </div>
 
+          <div v-show="rowVisible('editor', 'showUiOverrideHints')" class="setting-group">
+            <label>
+              <input
+                v-model="showUiOverrideHints"
+                type="checkbox"
+                @change="updateShowUiOverrideHints"
+              />
+              <CalcpadSearchHighlight text="Show UI Override Hints" :query="query" />
+              <span class="setting-info" title="Show saved #UI values above the lines they apply to: the value for a lone #UI control, a count for loops, macro calls and #include lines. Click one to edit it in the Properties tab.">ⓘ</span>
+            </label>
+          </div>
+
+          <div v-show="rowVisible('editor', 'autoSyncUiValues')" class="setting-group">
+            <label>
+              <input
+                v-model="autoSyncUiValues"
+                type="checkbox"
+                @change="updateAutoSyncUiValues"
+              />
+              <CalcpadSearchHighlight text="Auto-Sync #UI Values" :query="query" />
+              <span class="setting-info" title="For #UI lines in this file excluding loops, macros, and includes: a value entered in the input form is written into the #UI line, and editing the value on that line removes its saved override.">ⓘ</span>
+            </label>
+          </div>
+
           <div v-if="versionConfig.isWebOrDesktop" v-show="rowVisible('editor', 'completionDelayMs')" class="setting-group">
             <label for="completionDelayMs">
               <CalcpadSearchHighlight text="Completion Delay (ms):" :query="query" />
@@ -770,6 +794,8 @@ interface Props {
   initialEnablePreviewUiOverrides?: boolean
   initialEnablePreviewPdf?: boolean
   initialShowFileMetadata?: boolean
+  initialShowUiOverrideHints?: boolean
+  initialAutoSyncUiValues?: boolean
   initialDarkBackground?: string
   initialLinterMinSeverity?: string
   initialLogLevel?: string
@@ -803,6 +829,8 @@ const props = withDefaults(defineProps<Props>(), {
   initialEnablePreviewUiOverrides: false,
   initialEnablePreviewPdf: false,
   initialShowFileMetadata: false,
+  initialShowUiOverrideHints: false,
+  initialAutoSyncUiValues: false,
   initialDarkBackground: '#1a1a2e',
   initialLinterMinSeverity: 'information',
   initialLogLevel: 'warning',
@@ -835,6 +863,8 @@ const emit = defineEmits<{
   updatePreviewUiOverrides: [enabled: boolean]
   updatePreviewPdf: [enabled: boolean]
   updateShowFileMetadata: [enabled: boolean]
+  updateShowUiOverrideHints: [enabled: boolean]
+  updateAutoSyncUiValues: [enabled: boolean]
   updateDarkBackground: [color: string]
   updateLinterMinSeverity: [severity: string]
   updateLogLevel: [level: string]
@@ -867,7 +897,7 @@ const localSettings = ref<Settings>({ ...props.settings })
 // field order unchanged.
 const MATH_KEYS = [
   'decimals', 'degrees', 'returnAngleUnits', 'complex', 'substitute', 'formatEquations',
-  'zeroSmallMatrixElements', 'showHiddenOutput', 'maxOutputCount', 'precision', 'tol',
+  'zeroSmallMatrixElements', 'showHiddenOutput', 'calculatePost', 'maxOutputCount', 'precision', 'tol', 'macroCalls',
 ].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_A = ['adaptivePlot'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
 const PLOT_KEYS_B = ['vectorGraphics', 'colorScale', 'smoothScale', 'shadows'].map(k => specForKey(METADATA_SETTINGS_KEYS, k)!)
@@ -926,6 +956,8 @@ const enableAutoInputMode = ref(props.initialEnableAutoInputMode)
 const enablePreviewUiOverrides = ref(props.initialEnablePreviewUiOverrides)
 const enablePreviewPdf = ref(props.initialEnablePreviewPdf)
 const showFileMetadata = ref(props.initialShowFileMetadata)
+const showUiOverrideHints = ref(props.initialShowUiOverrideHints)
+const autoSyncUiValues = ref(props.initialAutoSyncUiValues)
 const darkBackground = ref(props.initialDarkBackground)
 const linterMinSeverity = ref(props.initialLinterMinSeverity)
 const logLevel = ref(props.initialLogLevel)
@@ -962,9 +994,11 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       formatEquations: 'format equations professional inline',
       zeroSmallMatrixElements: 'zero small matrix elements scientific notation',
       showHiddenOutput: 'show hidden output hide debug debugging suppressed',
+      calculatePost: 'calculate post input form ui slow lag performance',
       maxOutputCount: 'max output count rows columns matrices vectors',
       precision: 'numerical precision integration root finding tolerance',
-      tol: 'solver tolerance pcg eigensolver iterative'
+      tol: 'solver tolerance pcg eigensolver iterative',
+      macroCalls: 'macro calls dollar $ def expansion'
     }
   },
   plot: {
@@ -1024,6 +1058,8 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
       previewUiOverrides: 'apply ui values preview entered overrides debug troubleshoot',
       previewPdf: 'render preview as pdf print preview pages viewer',
       showFileMetadata: 'show hide file metadata info ui overrides comment footer',
+      showUiOverrideHints: 'show ui override hints codelens saved values above #ui line loop macro include',
+      autoSyncUiValues: 'auto sync ui values overrides input form write source #ui line bidirectional',
       fontFamily: 'editor font family juliamono system',
       completionDelayMs: 'completion delay autocomplete code suggestions milliseconds ms',
       fontsFolder: 'open fonts folder custom',
@@ -1185,6 +1221,14 @@ const updatePreviewPdf = () => {
 
 const updateShowFileMetadata = () => {
   emit('updateShowFileMetadata', showFileMetadata.value)
+}
+
+const updateShowUiOverrideHints = () => {
+  emit('updateShowUiOverrideHints', showUiOverrideHints.value)
+}
+
+const updateAutoSyncUiValues = () => {
+  emit('updateAutoSyncUiValues', autoSyncUiValues.value)
 }
 
 const updateDarkBackground = () => {
@@ -1363,6 +1407,20 @@ watch(
   () => props.initialShowFileMetadata,
   (newValue) => {
     showFileMetadata.value = newValue
+  }
+)
+
+watch(
+  () => props.initialShowUiOverrideHints,
+  (newValue) => {
+    showUiOverrideHints.value = newValue
+  }
+)
+
+watch(
+  () => props.initialAutoSyncUiValues,
+  (newValue) => {
+    autoSyncUiValues.value = newValue
   }
 )
 

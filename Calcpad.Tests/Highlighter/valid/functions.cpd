@@ -92,8 +92,10 @@ length = 5m
 unitsOf = getunits(length)
 withUnits = setunits(5; m)
 noUnits = clrunits(length)
+#settings {"complex": false}
 hpConv = hp([1; 2; 3])
 isHpRes = ishp(hpConv)
+#settings {"complex": true}
 deepNest = sqr(abs(sin(45) + cos(45)))
 
 ' Function redefinition is allowed (reports CPD-3314 Information, not an error)
@@ -102,7 +104,7 @@ redef(a; b) = a + b
 redefUse = redef(2; 3)
 
 ' Optional parameters with defaults and keyword argument calls
-kwFunc(x; y = 2; z = 3kg) = x*y + z
+kwFunc(x; y = 2; z = 3kg) = x*y*kg + z
 kwAllDefaults = kwFunc(1)
 kwPositional = kwFunc(1; 5; 2kg)
 kwMixed = kwFunc(1; z = 4kg)
@@ -114,3 +116,9 @@ kwB = 7
 kwLaterUse = kwLater(1)
 kwNoDefaults(x; y) = x - y
 kwNoDefaultsUse = kwNoDefaults(y = 1; x = 5)
+
+' A redefinition only applies to calls after it
+redef(j) = 2*j
+redefOne = redef(1)
+redef(x; y) = x + y
+redefTwo = redef(1; 2)

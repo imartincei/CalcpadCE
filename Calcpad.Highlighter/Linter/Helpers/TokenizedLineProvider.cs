@@ -23,18 +23,10 @@ namespace Calcpad.Highlighter.Linter.Helpers
             _tokenizer = new CalcpadTokenizer();
         }
 
-        /// <summary>
-        /// Sets macro comment parameter information from ContentResolver Stage2.
-        /// Call this before Tokenize() to enable correct tokenization of macro call arguments.
-        /// </summary>
-        /// <param name="commentParams">Maps macro name to set of parameter names that are comment parameters</param>
-        /// <param name="paramOrder">Maps macro name to ordered list of parameter names</param>
-        public void SetMacroCommentParameters(
-            Dictionary<string, HashSet<string>> commentParams,
-            Dictionary<string, List<string>> paramOrder,
-            Dictionary<string, string> macroBodies = null)
+        /// <summary>Sets the macros' parameter names from ContentResolver Stage2. Call this before Tokenize().</summary>
+        public void SetMacroParameters(Dictionary<string, List<string>> paramOrder)
         {
-            _tokenizer.SetMacroCommentParameters(commentParams, paramOrder, macroBodies);
+            _tokenizer.SetMacroParameters(paramOrder);
         }
 
         /// <summary>

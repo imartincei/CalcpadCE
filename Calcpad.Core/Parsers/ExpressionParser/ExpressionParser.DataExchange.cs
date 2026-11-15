@@ -36,7 +36,7 @@ namespace Calcpad.Core
                 }
                 catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message, "CPD-5707");
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 
@@ -60,7 +60,7 @@ namespace Calcpad.Core
                 }
                 catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message, "CPD-5707");
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 
@@ -214,7 +214,7 @@ namespace Calcpad.Core
                 }
                 catch (Exception e) when (e is not MathParserException)
                 {
-                    throw new MathParserException(e.Message, "CPD-5707");
+                    throw new MathParserException(e.Message, "CPD-5707", CalcpadErrorKind.Values);
                 }
             }
 

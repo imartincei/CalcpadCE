@@ -70,7 +70,6 @@ export interface VariableItem {
   description?: string
   paramTypes?: string[]
   paramDescriptions?: string[]
-  defaults?: (string | null)[]
   /** Value/expression type for variables and custom units (e.g. "Scalar", "Vector"). */
   type?: string
   /** Return type for functions. */
@@ -121,4 +120,9 @@ export interface FileNode {
   isDirectory: boolean
   children?: FileNode[]
   loaded?: boolean
+}
+
+export interface OpenedFolder {
+  path: string | null
+  roots: FileNode[]
 }

@@ -26,6 +26,13 @@ namespace Calcpad.Tests.Highlighter
             result.Diagnostics.Count(d => d.Code == "CPD-3301" || d.Code == "CPD-3305");
 
         [Fact]
+        public void OuterScopeAssignment_ToOtherCaseVariable_IsUndefined()
+        {
+            var result = Lint("Q = 1\nq ← 2");
+            Assert.Contains(result.Diagnostics, d => d.Code == "CPD-3410" && d.Line == 1);
+        }
+
+        [Fact]
         public void UpperAndLowerCaseFunctions_AreDistinct_NoParamCountError()
         {
             var src =

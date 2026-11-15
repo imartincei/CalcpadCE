@@ -6,14 +6,15 @@
 Calcpad.Highlighter/
 ├── ContentResolution/
 │   ├── ContentResolver.cs          - 3-stage content processing (partial class)
-│   ├── ContentResolver.Stage1.cs   - Includes
-│   ├── ContentResolver.Stage2.cs   - Macros
+│   ├── ContentResolver.Stage1.cs   - Line continuations
+│   ├── ContentResolver.Stage2.cs   - Includes + macros, via Core's MacroParser trace
 │   ├── ContentResolver.Stage3.cs   - Definitions + type tracking
 │   ├── ContentResolverResult.cs    - Result structures
+│   ├── RuntimeOverlay.cs           - Core RuntimeTrace facts (types, executed lines) per Stage 3 line
 │   └── SymbolResolver.cs           - Cursor position → symbol + every occurrence
 ├── Tokenizer/
 │   ├── CalcpadTokenizer.cs         - Tokenization engine (partial: .Comments, .Definitions,
-│   │                                 .Helpers, .MacroCollection, .Macros, .Parsing, .TypeResolution)
+│   │                                 .Helpers, .Macros, .Parsing, .TypeResolution)
 │   └── Models/
 │       ├── Token.cs                - Token structure
 │       ├── TokenType.cs            - 29 token types (0 None … 28 SettingsJson)
@@ -39,7 +40,7 @@ Calcpad.Highlighter/
 │   │   ├── LineParser.cs           - Line parsing utilities
 │   │   ├── ParameterParser.cs      - Parameter list parsing
 │   │   ├── SourceMapper.cs         - Maps lines across stages
-│   │   ├── DirectiveState.cs / DirectiveJsonReporter.cs - Metadata directive plumbing
+│   │   ├── DirectiveJsonReporter.cs   - Metadata directive plumbing
 │   │   └── CalcpadCharacterHelpers.cs / ParsingHelpers.cs / DiagnosticExtensions.cs
 │   └── Validators/
 │       ├── Stage1/IncludeValidator.cs
@@ -49,12 +50,9 @@ Calcpad.Highlighter/
 │           ├── NamingValidator.cs       - Variable names
 │           ├── UsageValidator.cs        - Undefined checks
 │           ├── SemanticValidator.cs     - Operators/commands
-│           ├── FunctionTypeValidator.cs - Parameter types
-│           ├── CommandBlockValidator.cs - $Inline/$Block/$While contents
 │           ├── FormatValidator.cs       - Format specifiers
 │           ├── HtmlCommentValidator.cs  - Metadata comment directives
-│           ├── SettingsValidator.cs     - #Settings / settings directives
-│           └── UiValidator.cs           - #UI control directives
+│           └── CoreCheckValidator.cs    - Core's check pass (ExpressionParser.Check)
 ├── HtmlComment/
 │   ├── HtmlCommentParser.cs        - Metadata comment parsing
 │   └── PdfSettingsDto.cs           - Shared with the backend's PDF request

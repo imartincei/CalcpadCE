@@ -1,5 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { createApp, nextTick, watch, type Ref } from 'vue';
+import type { Composer } from 'vue-i18n';
 import App from './App.vue';
 import { createCalcpadI18n, readLocaleSetting, menuLabelsFor } from 'calcpad-frontend/i18n';
 import { invoke } from '@tauri-apps/api/core';
@@ -20,6 +21,8 @@ import {
     UiEditHistory,
     writeUiOverrides,
     extractUiControls,
+    readUiOverrides,
+    UiOverrideHintTracker,
     isCompiledPath,
     documentHasUiDirectives,
     DEFAULT_PREVIEW_SIZE_MB,
@@ -27,6 +30,10 @@ import {
     MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
     MAX_INLINE_IMAGE_TOTAL_BYTES,
     toRangeEdits,
+    planMetadataFooter,
+    planUiValueToSource,
+    uiOverrideKeysFor,
+    uiControlsWithEditedValues,
     planFileInfoStamp,
     onlyReviewChanged,
     previewSizeLimitChars,
@@ -61,15 +68,17 @@ import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge }
 import { EditorGroup } from './editor/editor-group';
 import { navigationDirection, type NavigationLocation } from './editor/navigation-history';
 import { createBrowserNavigationHistory, createDesktopNavigationHistory, type NavigationHistoryClient } from './services/navigation-history';
-import { UNTITLED_TITLE, type TabManager } from './tabs/tab-manager';
+import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from './tabs/tab-manager';
+import type { FileConflictChoice } from './services/file-change-tracker';
 import { setupTabDragging } from './tabs/tab-drag';
 import { toDisplayLogLevel } from 'calcpad-frontend';
-import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm } from 'calcpad-frontend';
+import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm, LineEdit, SourceEdit } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
 import { MetadataFooterView } from './editor/metadata-footer-view';
 import { registerAgentEditor } from './services/agent-chat';
+import { registerUiOverrideHints } from './editor/ui-override-hints';
 
 // Monaco worker setup — must run before editor creation
 import './editor/workers';
@@ -488,10 +497,14 @@ async function bootstrap(): Promise<void> {
         appInstance.setProblems(group.id, items);
     }
 
+    // Auto-run makes lint and definitions use the run's trace, so they wait for it.
+    const useTrace = () => editorBridge.getExtraSetting('autoRun') !== 'false';
+    const runFollows = () => useTrace() && appInstance.isPreviewVisible();
+
     async function refreshDefinitionsFor(group: EditorGroup): Promise<void> {
         const content = group.editor.getValue();
         const ctx = getFileContext ? await getFileContext(content) : {};
-        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`);
+        editorBridge.definitions.refreshDefinitions(content, docKeyFor(group), ctx.sourceFilePath, `defs:${group.id}`, useTrace());
     }
 
     // Also hands the result to App.vue, which themes the loading overlay with it.
@@ -522,6 +535,23 @@ async function bootstrap(): Promise<void> {
     // Controls each document's last input-form render produced, which is what tells the
     // Properties tab whether a saved value still applies to anything.
     const uiControls = new Map<string, UiControl[]>();
+
+    const uiOverrideHintsEnabled = () => editorBridge.getExtraSetting('uiOverrideHints') === 'true';
+    let uiOverrideHints: ReturnType<typeof registerUiOverrideHints> | null = null;
+    // Controls for the editor's override hints, which outlive edits where the cache above does not.
+    const uiHintControls = new UiOverrideHintTracker({
+        resolve: async (docKey) => {
+            if (!uiOverrideHintsEnabled() || docKey !== activeUiDocKey()) return null;
+            if (!readUiOverrides(activeGroup.editor.getValue())) return null;
+            return activeBridge.resolveUiControls();
+        },
+        changed: () => uiOverrideHints?.refresh(),
+    });
+
+    function recordUiControls(docKey: string, controls: UiControl[]): void {
+        uiControls.set(docKey, controls);
+        uiHintControls.setControls(docKey, controls);
+    }
 
     /** Caps what a preview render will inline, and says so rather than dropping images silently. */
     function previewImageBudget(group: EditorGroup): InlineImageBudget {
@@ -675,7 +705,7 @@ async function bootstrap(): Promise<void> {
         return uiOverrides.toRecord(activeUiDocKey());
     });
     activeBridge.setUiControlsProvider(() => uiControls.get(activeUiDocKey()) ?? null);
-    activeBridge.setUiControlsSink((controls) => uiControls.set(activeUiDocKey(), controls));
+    activeBridge.setUiControlsSink((controls) => recordUiControls(activeUiDocKey(), controls));
     activeBridge.setMetadataDirtySink((docKey, dirty, form) => {
         const forms = metadataDirty.get(docKey) ?? new Set<DraftForm>();
         if (dirty) forms.add(form);
@@ -735,6 +765,65 @@ async function bootstrap(): Promise<void> {
     function invalidateUiControls(group: EditorGroup): void {
         if (!uiControls.delete(uiDocKeyFor(group))) return;
         if (group === activeGroup) activeBridge.refreshUiControls();
+    }
+
+    const autoSyncUiValues = () => editorBridge.getExtraSetting('autoSyncUiValues') === 'true';
+
+    function sourceSyncable(group: EditorGroup): monaco.editor.ITextModel | null {
+        const activeId = group.tabs.activeId;
+        const path = activeId ? group.tabs.getFilePath(activeId) : null;
+        return autoSyncUiValues() && !(path && isCompiledPath(path)) ? group.editor.getModel() : null;
+    }
+
+    function applyModelLineEdits(model: monaco.editor.ITextModel, edits: LineEdit[], undoStop: boolean): void {
+        if (!edits.length) return;
+        const ranges = toRangeEdits(edits, model.getLineCount(), i => model.getLineMaxColumn(i + 1) - 1, model.getEOL());
+        if (undoStop) model.pushStackElement();
+        model.pushEditOperations([], ranges.map(r => ({
+            range: new monaco.Range(r.startLine + 1, r.startCharacter + 1, r.endLine + 1, r.endCharacter + 1),
+            text: r.text,
+        })), () => null);
+        if (undoStop) model.pushStackElement();
+    }
+
+    /** With auto-sync on, writes a form value into its `#UI` line. False when it stays an override. */
+    function syncUiValueToSource(group: EditorGroup, key: string, value: string): boolean {
+        const model = sourceSyncable(group);
+        const docKey = uiDocKeyFor(group);
+        const controls = uiHintControls.controlsFor(docKey) ?? uiControls.get(docKey);
+        const control = controls?.find(c => c.key === key);
+        if (!model || !controls || !control) return false;
+        const text = model.getValue();
+        const plan = planUiValueToSource(text.split(/\r?\n/), control, value, readUiOverrides(text) ?? {}, controls);
+        const entered = uiOverrideKeysFor(uiOverrides.toRecord(docKey) ?? {}, control, controls);
+        if (!plan || !entered) return false;
+        applyModelLineEdits(model, plan.edits, true);
+        uiOverrides.forget(docKey, [...plan.removed, ...entered], model.getValue());
+        return true;
+    }
+
+    /** With auto-sync on, typing into a `#UI` line's value drops the overrides that shadowed it. */
+    function clearEditedUiOverrides(group: EditorGroup, before: UiControl[], edits: SourceEdit[]): void {
+        const model = sourceSyncable(group);
+        if (!model) return;
+        const edited = uiControlsWithEditedValues(before, edits,
+            l => l >= 1 && l <= model.getLineCount() ? model.getLineContent(l) : undefined);
+        if (!edited.length) return;
+        // Edits can't be made from inside the change event.
+        setTimeout(() => {
+            if (model.isDisposed()) return;
+            const docKey = uiDocKeyFor(group);
+            const saved = readUiOverrides(model.getValue()) ?? {};
+            const entered = uiOverrides.toRecord(docKey) ?? {};
+            const savedKeys = new Set(edited.flatMap(c => uiOverrideKeysFor(saved, c, before) ?? []));
+            const enteredKeys = edited.flatMap(c => uiOverrideKeysFor(entered, c, before) ?? []);
+            if (!savedKeys.size && !enteredKeys.length) return;
+            const keep = Object.fromEntries(Object.entries(saved).filter(([k]) => !savedKeys.has(k)));
+            if (savedKeys.size)
+                applyModelLineEdits(model, planMetadataFooter(model.getValue().split(/\r?\n/), { uiOverrides: keep }), false);
+            uiOverrides.forget(docKey, [...savedKeys, ...enteredKeys], model.getValue());
+            if (group === activeGroup) activeBridge.refreshDocumentMetadata();
+        }, 0);
     }
 
     const PREVIEW_LOADING_DELAY_MS = 400;
@@ -797,6 +886,18 @@ async function bootstrap(): Promise<void> {
     }
 
     async function refreshPreviewFor(group: EditorGroup): Promise<void> {
+        const content = group.editor.getValue();
+        try {
+            await renderPreviewFor(group);
+        } finally {
+            if (useTrace() && group.editor.getValue() === content) {
+                void refreshDefinitionsFor(group);
+                void group.diagnostics?.refresh();
+            }
+        }
+    }
+
+    async function renderPreviewFor(group: EditorGroup): Promise<void> {
         if (!appInstance.isPreviewVisible()) return;
         if (appInstance.getResultMode() === 'ui' && group !== activeGroup) return;
 
@@ -881,7 +982,7 @@ async function bootstrap(): Promise<void> {
             }
             const committed = appInstance.setPreviewHtml(group.id, finalHtml, scrollToLine, uiDocKeyFor(group), frameHtml);
             if (mode === 'ui') {
-                uiControls.set(uiDocKeyFor(group), extractUiControls(result.html));
+                recordUiControls(uiDocKeyFor(group), extractUiControls(result.html, content));
                 uiPause.update(uiDocKeyFor(group), result.pause);
                 appInstance.setUiPauseState(uiPause.state(uiDocKeyFor(group)) ?? null);
             }
@@ -1032,7 +1133,7 @@ async function bootstrap(): Promise<void> {
         group.diagnostics = setupDiagnostics(ed, activeBridge.api, () => {
             const sev = editorBridge.getExtraSetting('linterMinSeverity');
             return (sev === 'error' || sev === 'warning') ? sev : 'information';
-        }, getFileContext, `lint:${group.id}`);
+        }, getFileContext, `lint:${group.id}`, useTrace, runFollows);
 
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
@@ -1122,11 +1223,20 @@ async function bootstrap(): Promise<void> {
         let tocTimer: ReturnType<typeof setTimeout> | null = null;
         group.disposables.push(
             new MetadataFooterView(ed, () => editorBridge.getExtraSetting('showFileMetadata') === 'true'),
-            ed.onDidChangeModelContent(() => {
+            ed.onDidChangeModelContent((e) => {
+                const sourceEdits = e.changes.map(c => ({
+                    startLine: c.range.startLineNumber,
+                    startColumn: c.range.startColumn,
+                    endLine: c.range.endLineNumber,
+                    endColumn: c.range.endColumn,
+                    text: c.text,
+                }));
+                const before = uiHintControls.applyEdits(uiDocKeyFor(group), sourceEdits);
+                if (before && !e.isFlush) clearEditedUiOverrides(group, before, sourceEdits);
                 if (definitionsTimer) clearTimeout(definitionsTimer);
                 definitionsTimer = setTimeout(() => {
                     invalidateUiControls(group);
-                    void refreshDefinitionsFor(group);
+                    if (!runFollows()) void refreshDefinitionsFor(group);
                 }, 800);
                 if (appInstance.isPreviewVisible() && editorBridge.getExtraSetting('autoRun') !== 'false') {
                     if (previewTimer) clearTimeout(previewTimer);
@@ -1177,7 +1287,8 @@ async function bootstrap(): Promise<void> {
             refreshProblemsFor(group);
             // Re-lint: content-change events don't fire on tab switch, so the
             // debounced lint in setupDiagnostics never re-runs for the new model.
-            void group.diagnostics?.refresh();
+            const deferToRun = runFollows();
+            if (!deferToRun) void group.diagnostics?.refresh();
             // The mode switch below renders the form itself, so rendering here first would
             // just be a preview nobody sees.
             if (!enteringUi && appInstance.isPreviewVisible()) void refreshPreviewFor(group);
@@ -1185,7 +1296,7 @@ async function bootstrap(): Promise<void> {
                 activeBridge.refreshHeadings();
                 activeBridge.refreshDocumentMetadata();
             }
-            void refreshDefinitionsFor(group);
+            if (!deferToRun) void refreshDefinitionsFor(group);
             if (enteringUi) autoEnterUiMode();
         });
 
@@ -1454,8 +1565,41 @@ async function bootstrap(): Promise<void> {
     registerRenameProvider(editorBridge, getFileContext);
     registerFormatDocumentProvider(editorBridge);
 
+    const groupForModel = (model: monaco.editor.ITextModel | string): EditorGroup | undefined => {
+        const uri = typeof model === 'string' ? model : model.uri.toString();
+        return [...groups.values()].find(g => g.editor.getModel()?.uri.toString() === uri);
+    };
+    uiOverrideHints = registerUiOverrideHints({
+        enabled: uiOverrideHintsEnabled,
+        t: (key, named = {}, plural) => {
+            const { t } = i18n.global as unknown as Composer;
+            return plural === undefined ? t(key, named) : t(key, named, plural);
+        },
+        controlsFor: (model) => {
+            const group = groupForModel(model);
+            return group ? uiHintControls.controlsFor(uiDocKeyFor(group)) : undefined;
+        },
+        requestControls: (model) => {
+            const group = groupForModel(model);
+            if (group === activeGroup) void uiHintControls.ensure(uiDocKeyFor(group));
+        },
+        reveal: (uri, line, keys) => {
+            const group = groupForModel(uri);
+            group?.editor.setPosition({ lineNumber: line, column: 1 });
+            appInstance.showSidebar();
+            window.dispatchEvent(new MessageEvent('message', { data: { type: 'revealUiOverrides', keys } }));
+        },
+    });
+
     window.addEventListener('message', (e: MessageEvent) => {
-        if (e.data?.type === 'autoRunChanged') appInstance.setAutoRunEnabled(e.data.enabled);
+        if (e.data?.type === 'showUiOverrideHintsChanged') uiOverrideHints?.refresh();
+        if (e.data?.type === 'autoRunChanged') {
+            appInstance.setAutoRunEnabled(e.data.enabled);
+            for (const g of groups.values()) {
+                void g.diagnostics?.refresh();
+                void refreshDefinitionsFor(g);
+            }
+        }
         if (e.data?.type === 'settingsResponse') appInstance.setAutoRunEnabled(e.data.enableAutoRun);
         if (e.data?.type === 'linterMinSeverityChanged') {
             for (const g of groups.values()) void g.diagnostics?.refresh();
@@ -1611,6 +1755,12 @@ async function bootstrap(): Promise<void> {
             || data.type === 'previewUiOverridesChanged' || data.type === 'previewPdfChanged') {
             if (!fromHost) return;
             refreshAllPreviews();
+            if (data.type === 'settingsChanged') {
+                for (const g of groups.values()) {
+                    void g.diagnostics?.refresh();
+                    void refreshDefinitionsFor(g);
+                }
+            }
             return;
         }
 
@@ -1620,6 +1770,10 @@ async function bootstrap(): Promise<void> {
             if (!fromPreview) return;
             const group = (data.groupId && groups.get(data.groupId)) || activeGroup;
             const docKey = uiDocKeyFor(group);
+            if (syncUiValueToSource(group, String(data.varName), String(data.newValue))) {
+                void refreshPreviewFor(group);
+                return;
+            }
             if (!uiHistory.set(docKeyFor(group), uiOverrides, docKey, String(data.varName), String(data.newValue))) return;
             uiOverridesDirty.add(docKey);
             refreshUiDirtyIndicator();
@@ -1841,7 +1995,10 @@ async function bootstrap(): Promise<void> {
     };
     const sidebarApp = createApp(CalcpadAppVue, { versionConfig, appVersion });
     sidebarApp.use(i18n);
-    const sidebarInstance = sidebarApp.mount('#vue-sidebar') as InstanceType<typeof CalcpadAppVue>;
+    const sidebarInstance = sidebarApp.mount('#vue-sidebar') as unknown as {
+        switchTab(tabId: string): void;
+        focusInsertSearch(): Promise<void>;
+    };
 
     window.addEventListener('keydown', (event) => {
         if (event.key.toLowerCase() === 'i' && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
@@ -1898,8 +2055,10 @@ async function bootstrap(): Promise<void> {
         appInstance.appendOutput('info', reason);
         try {
             for (const g of groups.values()) {
-                await g.diagnostics?.refresh();
-                await refreshDefinitionsFor(g);
+                if (!runFollows()) {
+                    await g.diagnostics?.refresh();
+                    await refreshDefinitionsFor(g);
+                }
                 if (appInstance.isPreviewVisible()) await refreshPreviewFor(g);
             }
             activeBridge.refreshHeadings();
@@ -2143,7 +2302,9 @@ async function bootstrap(): Promise<void> {
             tauriListen<T>(event, handler, { target: windowLabel });
         navigationHistory = await createDesktopNavigationHistory(historyCallbacks);
         await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-            if (focused) recordNavigation(activeGroup);
+            if (!focused) return;
+            recordNavigation(activeGroup);
+            tauriBridge!.fileTracker.pollSoon();
         });
         recordNavigation(activeGroup);
         // The seeded group was wired before this branch ran, so kick the first native title.
@@ -2384,6 +2545,68 @@ async function bootstrap(): Promise<void> {
             }
         }
 
+        // ---- External file changes (e.g. an agent editing an open file) ----
+        function tabsHolding(path: string): { group: EditorGroup; id: string }[] {
+            return [...groups.values()].flatMap(group =>
+                group.tabs.all.filter(t => t.filePath === path).map(t => ({ group, id: t.id })));
+        }
+
+        async function onExternalChange(path: string, disk: string): Promise<boolean> {
+            const holders = tabsHolding(path);
+            if (holders.length === 0) return true;
+            const { group, id } = holders[0];
+            const model = group.tabs.modelForTab(id)!;
+            const title = group.tabs.getTitle(id) ?? path;
+            const settle = () => {
+                for (const h of holders) {
+                    if (!h.group.tabs.isDirty(h.id)) void deleteDraft(h.id);
+                }
+            };
+
+            if (!group.tabs.isDirty(id) || documentMatches(model, disk)) {
+                reloadDocument(model, disk);
+                settle();
+                appInstance.appendOutput('info', `Reloaded ${title}: it was changed on disk.`);
+                return true;
+            }
+
+            const choice: FileConflictChoice | null = await appInstance.showFileConflict({
+                title,
+                filePath: path,
+                mine: model.getValue(),
+                theirs: disk,
+            });
+            if (choice === 'mine') return true;
+            if (choice === 'theirs') {
+                reloadDocument(model, disk);
+                settle();
+                return true;
+            }
+            if (choice === 'both') {
+                const mine = model.getValue();
+                try {
+                    const minePath = await tauriBridge!.saveSiblingCopy(path, 'mine', mine);
+                    const theirsPath = await tauriBridge!.saveSiblingCopy(path, 'theirs', disk);
+                    reloadDocument(model, disk);
+                    settle();
+                    activeGroup.tabs.openFile(minePath, mine);
+                    appInstance.appendOutput('info', `Kept both versions of ${title}: ${minePath} and ${theirsPath}.`);
+                    return true;
+                } catch (err) {
+                    appInstance.appendOutput('error',
+                        `Could not save copies of ${title}: ${err instanceof Error ? err.message : String(err)}`);
+                    appInstance.showOutput();
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        tauriBridge.fileTracker.start(
+            () => [...groups.values()].flatMap(g => g.tabs.all.flatMap(t => t.filePath ? [t.filePath] : [])),
+            onExternalChange,
+        );
+
         /**
          * Writes the file-info comment into the active model just before it is saved to
          * `filePath`, returning the content to write. `saved` is the file as it is on disk,
@@ -2415,6 +2638,9 @@ async function bootstrap(): Promise<void> {
             const active = tabs.activeTab;
             if (!active) return false;
             if (active.filePath) {
+                if (!await tauriBridge!.fileTracker.verifyBeforeSave(active.filePath)) return false;
+                // Keep Both already saved each version to its own file and opened one.
+                if (tabs.activeId !== active.id) return true;
                 // Saving an unchanged file is not an update.
                 const content = tabs.isDirty(active.id)
                     ? stampedContentFor(active.filePath, await tauriBridge!.readFile(active.filePath).catch(() => undefined))

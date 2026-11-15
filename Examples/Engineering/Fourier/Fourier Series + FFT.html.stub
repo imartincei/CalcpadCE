@@ -507,7 +507,6 @@ circle.Series2 {fill:YellowGreen;}
     </span>
     <var>n</var>
    </span>
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
   - cosine coefficients,
   <span class="eq">
@@ -528,7 +527,6 @@ circle.Series2 {fill:YellowGreen;}
     </span>
     <var>n</var>
    </span>
-   <b class="err" title=" Warning! Function redefined.">!!!</b>
   </span>
   -sine coefficients
  </p>

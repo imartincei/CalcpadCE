@@ -60,6 +60,8 @@
             internal long Index = -1;
             internal TokenTypes Type;
             internal sbyte Order = DefaultOrder;
+            // Offset in the line's expression, or -1
+            internal int Start = -1;
             internal const sbyte DefaultOrder = -1;
             internal Token(string content, TokenTypes type)
             {
@@ -145,6 +147,7 @@
             internal RenderToken(Token t, int level) : base(t.Content, t.Type, t.Order)
             {
                 Index = t.Index;
+                Start = t.Start;
                 Level = level;
                 Order = t.Order;
                 ParameterCount = -1;

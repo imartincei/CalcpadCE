@@ -12,7 +12,7 @@ namespace Calcpad.Tests.Highlighter
     {
         private static LinterResult Lint(string content)
         {
-            var staged = new ContentResolver().GetStagedContent(content, new Dictionary<string, string>());
+            var staged = new ContentResolver().GetStagedContent(content);
             var ignore = new LintIgnoreRegionParser().ExtractRegions(content);
             return new CalcpadLinter().Lint(staged, ignore);
         }

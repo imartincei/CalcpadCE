@@ -13,17 +13,22 @@ namespace Calcpad.Tests.Highlighter
             _fixture = fixture;
         }
 
+        // Includes resolve from disk, so the samples sit next to the source.
         private LinterResult Lint(string source)
         {
-            var path = Path.Combine(Path.GetTempPath(), $"legacy_input_{System.Guid.NewGuid():N}.cpd");
-            File.WriteAllText(path, source);
+            var dir = Directory.CreateTempSubdirectory("legacy_input_");
             try
             {
+                foreach (var file in Directory.GetFiles(_fixture.ValidDir, "*.cpd"))
+                    File.Copy(file, Path.Combine(dir.FullName, Path.GetFileName(file)));
+
+                var path = Path.Combine(dir.FullName, "main.cpd");
+                File.WriteAllText(path, source);
                 return _fixture.LintFile(path);
             }
             finally
             {
-                File.Delete(path);
+                dir.Delete(true);
             }
         }
 

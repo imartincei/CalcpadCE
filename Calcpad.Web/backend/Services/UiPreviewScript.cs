@@ -89,8 +89,21 @@ namespace Calcpad.Server.Services
         if (!sheet) return;
         jspreadsheet.current = sheet;
         sheet.updateSelectionFromCoords(cell[0], cell[1], cell[2], cell[3]);
+        // The host swaps in a new frame; without focus here the keys stay with the old one.
+        focusGrid(sheet);
         sheet.content.scrollLeft = scroll[0];
         sheet.content.scrollTop = scroll[1];
+    }
+
+    // The library's own hidden textarea: keys bubble from it to its document handlers.
+    function focusGrid(sheet) {
+        var target = sheet.textarea;
+        if (!target || !target.focus) {
+            target = sheet.element;
+            if (!target) return;
+            target.setAttribute('tabindex', '-1');
+        }
+        try { target.focus({ preventScroll: true }); } catch (e) { }
     }
 
     function restoreFocus(key, caret) {
@@ -334,6 +347,7 @@ namespace Calcpad.Server.Services
             sheet.calcpadUiKey = key;
             sheet.calcpadFlush = flushNow;
             sheetsByKey[key] = sheet;
+            renderHeaders(container, sheet, colHeaders);
             // Must stay synchronous: restoreState() paints the selection from live geometry.
             applyRowHeaderWidth(container, layout.rowHeader);
             capHeight(container, layout.width);
@@ -392,9 +406,11 @@ namespace Calcpad.Server.Services
     }
 
     // Breaking only at spaces, the longest word is the width below which a line starts to clip.
+    // Headers are measured as plain text, so markup that enlarges the font is underestimated.
     function widestWord(container, text, bold, cap) {
         if (text === null || text === undefined) return 0;
-        var words = String(text).split(/\s+/), max = 0;
+        // A no-break space joins its words, so it is not split on.
+        var words = String(text).split(/[^\S ]+/), max = 0;
         for (var i = 0; i < words.length; i++) {
             max = Math.max(max, measureText(container, words[i], bold));
             if (max >= cap) return cap;
@@ -458,7 +474,7 @@ namespace Calcpad.Server.Services
     // The longest word a column has to show, header included. Capped, not floored: the
     // caller floors a natural width at DEF_COL and a shrunk one at MIN_COL.
     function measureColumn(container, data, c, header, cap) {
-        var max = widestWord(container, header, true, cap) + HDR_PAD;
+        var max = widestWord(container, plainText(header), true, cap) + HDR_PAD;
         for (var r = 0; r < data.length && max < cap; r++)
             max = Math.max(max, widestWord(container, data[r][c], false, cap) + CELL_PAD);
 
@@ -479,7 +495,7 @@ namespace Calcpad.Server.Services
         if (rowHeader === null) {
             rowHeader = DEF_ROW_HDR;
             for (var h = 0; rowHeaders && h < rowHeaders.length; h++)
-                rowHeader = Math.max(rowHeader, Math.min(cap, widestWord(container, rowHeaders[h], true, cap) + HDR_PAD));
+                rowHeader = Math.max(rowHeader, Math.min(cap, widestWord(container, plainText(rowHeaders[h]), true, cap) + HDR_PAD));
         }
         // A declared width is a ratio, but its content still sets the floor it cannot shrink past.
         var w = [], floors = [];
@@ -499,6 +515,31 @@ namespace Calcpad.Server.Services
         var room = target - BORDERS - floorTotal;
         if (rowHeader > room && room >= MIN_ROW_HDR) rowHeader = room;
         return { rowHeader: rowHeader, cols: fitColumns(w, floors, target - rowHeader - BORDERS), width: page };
+    }
+
+    // Parsed, not rendered: no script runs and nothing loads.
+    function plainText(html) {
+        if (html === null || html === undefined) return html;
+        var s = String(html);
+        if (s.indexOf('<') === -1 && s.indexOf('&') === -1) return s;
+        // A <br> is a break, not nothing: without the space its two lines measure as one word.
+        s = s.replace(/<br\s*\/?>/gi, ' ');
+        try { return new DOMParser().parseFromString(s, 'text/html').body.textContent || ''; }
+        catch (e) { return s; }
+    }
+
+    // jspreadsheet writes column titles as text and row titles as HTML; both render as HTML here.
+    function renderHeaders(container, sheet, colHeaders) {
+        for (var c = 0; colHeaders && sheet.headers && c < colHeaders.length; c++) {
+            var cell = sheet.headers[c];
+            if (!cell || !colHeaders[c]) continue;
+            cell.innerHTML = colHeaders[c];
+            cell.title = plainText(colHeaders[c]);
+        }
+        container.querySelectorAll('td.jss_row').forEach(function (cell) {
+            if (cell.title || !cell.innerHTML) return;
+            cell.title = cell.textContent;
+        });
     }
 
     // jspreadsheet hardcodes width="50" on the first <col> and offers no option for it.

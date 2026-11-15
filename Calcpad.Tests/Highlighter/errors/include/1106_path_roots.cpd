@@ -1,0 +1,25 @@
+' CPD-1106: invalid #ProjectPath or #LibraryPath
+' A path root used before it is declared
+'expect: CPD-1106
+#include {project}/lib.cpd
+'expect: CPD-1106
+#include {library}/sub/uses_lib.cpd
+
+' A declaration without a path
+'expect: CPD-1106[#ProjectPath]
+#ProjectPath
+'expect: CPD-1106[#LibraryPath]
+#LibraryPath
+
+' A declaration that points at a missing folder
+'expect: CPD-1106
+#LibraryPath ../no_such_folder
+
+' Data files go through the same roots
+'expect: CPD-1106
+#read M from {library}/data.csv
+
+' Declared roots resolve
+#ProjectPath ../includes
+#include {project}/lib.cpd
+value = libSquare(libLength)

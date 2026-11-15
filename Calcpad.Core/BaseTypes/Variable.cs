@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Calcpad.Core
 {
@@ -12,11 +13,24 @@ namespace Calcpad.Core
         internal bool IsInitialized => _isIntialised;
         internal bool IsReadOnly;
         private bool _isIntialised;
+        private object _subscribed;
+        // Counts first assignments, so cached equations know when to recheck
+        internal static int Initializations => Volatile.Read(ref _initializations);
+        private static int _initializations;
 
         internal Variable(in IValue value)
         {
             _value = value;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            if (_isIntialised)
+                return;
+
             _isIntialised = true;
+            Interlocked.Increment(ref _initializations);
         }
 
         internal Variable(in Complex number) : this(new ComplexValue(number)) { }
@@ -58,24 +72,39 @@ namespace Calcpad.Core
         internal void SetValue(double number, Unit units)
         {
             _value = new RealValue(number, units);
-            _isIntialised = true;
+            Initialize();
         }
 
         internal void SetValue(in IValue value)
         {
             _value = value;
-            _isIntialised = true;
+            Initialize();
         }
 
         internal void Assign(in IValue value)
         {
             _value = value;
-            _isIntialised = true;
+            Initialize();
             OnChange?.Invoke();
+            if (ReferenceEquals(_subscribed, value))
+                return;
+
+            if (_subscribed is Vector oldVector)
+                oldVector.OnChange -= Change;
+            else if (_subscribed is Matrix oldMatrix)
+                oldMatrix.OnChange -= Change;
+
+            _subscribed = null;
             if (value is Vector vector)
+            {
                 vector.OnChange += Change;
+                _subscribed = vector;
+            }
             else if (value is Matrix matrix)
+            {
                 matrix.OnChange += Change;
+                _subscribed = matrix;
+            }
         }
     }
 }

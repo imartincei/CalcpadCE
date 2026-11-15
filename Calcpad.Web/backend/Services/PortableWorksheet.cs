@@ -26,13 +26,14 @@ namespace Calcpad.Server.Services
         /// reported rather than skipped: a worksheet that still reads a file beside it is not
         /// portable, so it is better not to write one at all.
         /// </summary>
-        public static Result Build(string content, string? sourceFilePath)
+        public static Result Build(string content, string? sourceFilePath, MacroCallMode macroCalls = MacroCallMode.Auto)
         {
             var errors = new List<string>();
             var macroParser = new MacroParser
             {
                 Include = ReadIncludeWithAbsoluteImages,
                 SourceFilePath = sourceFilePath,
+                DefaultMacroCalls = macroCalls,
             };
             macroParser.Parse(content, out var expanded, null, 0, false);
             foreach (var error in macroParser.Errors)

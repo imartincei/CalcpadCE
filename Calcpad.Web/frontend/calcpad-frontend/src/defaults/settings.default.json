@@ -32,7 +32,9 @@
             "url": "",
             "mode": "auto"
         },
-        "isUs": true
+        "isUs": true,
+        "macroCalls": "auto",
+        "calculatePost": true
     },
     "extras": {
         "previewTheme": "system",
@@ -47,6 +49,8 @@
         "previewUiOverrides": false,
         "previewPdf": false,
         "showFileMetadata": false,
+        "uiOverrideHints": false,
+        "autoSyncUiValues": false,
         "linterMinSeverity": "information",
         "logLevel": "warning",
         "maxOutputLines": 1000,

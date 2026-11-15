@@ -57,14 +57,6 @@ namespace Calcpad.Core
                         .Append(s)
                         .Append(assignment)
                         .Append(RenderRpn(cf.Rpn, false, writer, out _));
-                    if (_parser.ShowWarnings && _parser._functionDefinitionIndex < _functions.Count - 1)
-                    {
-                        string warning = Messages.Function_redefined;
-                        if (format == OutputWriter.OutputFormat.Text)
-                            _stringBuilder.Append(warning);
-                        else if (format == OutputWriter.OutputFormat.Html)
-                            _stringBuilder.Append($"<b class=\"err\" title = \"{warning}\"> !!!</b>");
-                    }
                 }
                 else
                 {
@@ -671,7 +663,7 @@ namespace Calcpad.Core
                     if (cfParameterCount < 0)
                     {
                         if (t.Index < 0)
-                            throw Exceptions.InvalidFunction(t.Content);
+                            throw SyntaxAnalyser.AtName(Exceptions.InvalidFunction(t.Content), t);
 
                         var cf = _functions[t.Index];
                         cfParameterCount = cf.ParameterCount - 1;

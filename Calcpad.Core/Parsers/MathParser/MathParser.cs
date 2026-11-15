@@ -81,7 +81,6 @@ namespace Calcpad.Core
         internal bool IsPlotting { get; set; }
         internal bool IsCalculation { get; set; }
         internal bool Split { get; set; }
-        internal bool ShowWarnings { get; set; } = true;
         internal bool Phasor { get; set; } = false;
         public int Degrees { get => _calc.Degrees;  set => _calc.Degrees = value; }
         internal double PlotSVG => GetSettingsVariable("PlotSVG", double.NaN);
@@ -516,16 +515,30 @@ namespace Calcpad.Core
 
         public void Parse(ReadOnlySpan<char> expression, bool allowAssignment = true)
         {
+            if (ReadNames is null)
+                ParseExpression(expression, allowAssignment);
+            else
+                ParseRecordingNames(expression, allowAssignment);
+        }
+
+        private void ParseExpression(ReadOnlySpan<char> expression, bool allowAssignment)
+        {
             _result = RealValue.Zero;
             _isCalculated = false;
             _functionDefinitionIndex = -1;
-            var input = ResolveCallArguments(_input.GetInput(expression, allowAssignment));
-            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled, out var isFunctionDefinition);
+            var input = ResolveCallArguments(_input.GetInput(expression, allowAssignment, true));
+            new SyntaxAnalyser(_functions).Check(input, IsCalculation && IsEnabled,
+                IsCalculation && (IsEnabled || ReadNames is not null), out var isFunctionDefinition);
             _input.OrderOperators(input, isFunctionDefinition || _isSolver > 0 || IsPlotting, _assignmentIndex);
             if (isFunctionDefinition)
             {
                 if (_isSolver > 0)
-                    throw Exceptions.FunctionDefinitionInSolver();
+                {
+                    var ex = Exceptions.FunctionDefinitionInSolver();
+                    ex.Position = expression.Length - expression.TrimStart().Length;
+                    ex.EndPosition = expression.TrimEnd().Length;
+                    throw ex;
+                }
 
                 _rpn = null;
                 AddFunction(input);
@@ -541,14 +554,18 @@ namespace Calcpad.Core
             _functionDefinitionIndex = -1;
             if (cacheId >= 0 && cacheId < _equationCache.Count)
             {
-                _targetUnits = _equationCache[cacheId].TargetUnits;
-                _rpn = _equationCache[cacheId].Rpn;
+                var equation = _equationCache[cacheId];
+                if (equation.IsStale)
+                    return false;
+
+                _targetUnits = equation.TargetUnits;
+                _rpn = equation.Rpn;
                 return true;
             }
             return false;
         }
 
-        public int WriteEquationToCache(bool isVisible = true)
+        public int WriteEquationToCache(bool isVisible = true, int cacheId = -1)
         {
             if (_rpn is null)
                 return -1;
@@ -557,7 +574,12 @@ namespace Calcpad.Core
             if (!isVisible)
                 f = _compiler.Compile(_rpn, true);
 
-            var equation = new Equation(_rpn, _targetUnits, f);
+            var equation = new Equation(_rpn, _targetUnits, f, this);
+            if (cacheId >= 0 && cacheId < _equationCache.Count)
+            {
+                _equationCache[cacheId] = equation;
+                return cacheId;
+            }
             _equationCache.Add(equation);
             return _equationCache.Count - 1;
         }
@@ -688,6 +710,7 @@ namespace Calcpad.Core
                         if (t.Type == TokenTypes.Variable)
                         {
                             parameters.Add(t.Content);
+                            BindName(t.Content);
                             if (input.Count != 0 &&
                                 input.Peek().Type == TokenTypes.Operator &&
                                 input.Peek().Content == "=")
@@ -807,7 +830,7 @@ namespace Calcpad.Core
                 return null;
 
             var input = ResolveCallArguments(_input.GetInput(expression, false));
-            new SyntaxAnalyser(_functions).Check(input, IsEnabled, out _);
+            new SyntaxAnalyser(_functions).Check(input, IsEnabled, IsEnabled, out _);
             _input.OrderOperators(input, true, 0);
             var rpn = Input.GetRpn(input);
             BindParameters(parameters, rpn);

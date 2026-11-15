@@ -2,14 +2,13 @@ using Calcpad.Core;
 using Calcpad.Highlighter.Tokenizer;
 using Calcpad.Highlighter.Tokenizer.Models;
 using Calcpad.Server.Controllers;
-using System.Text.RegularExpressions;
 
 namespace Calcpad.Server.Services
 {
     /// <summary>Where a stepped <c>#UI</c> form stopped, returned in <c>X-Calcpad-Pause</c>.</summary>
     public sealed record PauseInfo(string? Next, string? Previous);
 
-    public partial class CalcpadService
+    public class CalcpadService
     {
         private readonly string _tempDirectory;
 
@@ -33,7 +32,7 @@ namespace Calcpad.Server.Services
             {
                 try
                 {
-                    return ProcessIncludedContent(File.ReadAllText(fileName));
+                    return MacroParser.FilterIncludedContent(File.ReadAllText(fileName));
                 }
                 catch (Exception ex)
                 {
@@ -43,7 +42,8 @@ namespace Calcpad.Server.Services
             };
         }
 
-        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, PauseInfo? Pause) Convert(
+        /// <returns>Trace is what Core executed, recorded only when the run was in debug mode.</returns>
+        public (string Html, IReadOnlyList<string> OpenXmlExpressions, IReadOnlyList<CalcpadError> Errors, RuntimeTrace? Trace, PauseInfo? Pause) Convert(
             string calcpadContent,
             Settings? settings = null,
             bool forceUnwrappedCode = false,
@@ -91,11 +91,12 @@ namespace Calcpad.Server.Services
                 var macroParser = new MacroParser
                 {
                     Include = CreateIncludeDelegate(),
-                    SourceFilePath = sourceFilePath
+                    SourceFilePath = sourceFilePath,
+                    DefaultMacroCalls = coreSettings.MacroCalls
                 };
 
                 string outputText;
-                var hasMacroErrors = macroParser.Parse(calcpadContent, out outputText, null, 0, true);
+                macroParser.Parse(MetadataFooter.Remove(calcpadContent), out outputText, null, 0, true);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -103,27 +104,24 @@ namespace Calcpad.Server.Services
                 PauseInfo? pause = null;
                 IReadOnlyList<string> openXmlExpressions = Array.Empty<string>();
                 var errors = new List<CalcpadError>(macroParser.Errors);
+                RuntimeTrace? trace = null;
 
-                if (hasMacroErrors || forceUnwrappedCode)
+                if (forceUnwrappedCode)
                 {
-                    // Forced-unwrapped with no macro errors: silently run
-                    // ExpressionParser so the code view can highlight lines that
-                    // would error in the wrapped preview. Skip when macro errors
-                    // already exist since the expression pass would just fail.
-                    if (forceUnwrappedCode && !hasMacroErrors)
+                    // Silently run ExpressionParser so the code view can highlight lines that
+                    // would error in the wrapped preview.
+                    try
                     {
-                        try
-                        {
-                            // Hard-coded rather than threaded from `write`: this pass exists only to
-                            // collect error lines, so it must never repeat the document's writes.
-                            var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
-                            silent.Parse(outputText, true, false);
-                            errors.AddRange(silent.Errors);
-                        }
-                        catch (Exception silentEx)
-                        {
-                            FileLogger.LogWarning("Silent expression parse for error collection failed", silentEx.Message);
-                        }
+                        // Hard-coded rather than threaded from `write`: this pass exists only to
+                        // collect error lines, so it must never repeat the document's writes.
+                        var silent = new ExpressionParser { Settings = coreSettings, SourceFilePath = sourceFilePath, PathRoots = macroParser.PathRoots, Debug = true, AllowDataWrite = false };
+                        silent.Parse(outputText, true, false);
+                        errors.AddRange(silent.Errors);
+                        trace = silent.Trace;
+                    }
+                    catch (Exception silentEx)
+                    {
+                        FileLogger.LogWarning("Silent expression parse for error collection failed", silentEx.Message);
                     }
                     htmlResult = ConvertCodeToHtml(outputText, errors);
                 }
@@ -155,6 +153,7 @@ namespace Calcpad.Server.Services
                         if (stepPauses)
                             pause = new PauseInfo(parser.NextPauseKey, parser.PreviousPauseKey);
                         errors.AddRange(parser.Errors);
+                        trace = parser.Trace;
                         if (captureOpenXml)
                             openXmlExpressions = parser.OpenXmlExpressions.ToList();
                     }
@@ -165,13 +164,11 @@ namespace Calcpad.Server.Services
                     }
                 }
 
-                htmlResult = StripHostMetadata(htmlResult);
-
                 // 6. Apply HTML wrapper with theme support
                 var finalHtml = WrapHtmlResult(htmlResult, theme, enableUi);
                 FileLogger.LogVerbose("Conversion completed successfully", $"Output length: {finalHtml.Length}");
 
-                return (finalHtml, openXmlExpressions, errors, pause);
+                return (finalHtml, openXmlExpressions, errors, trace, pause);
             }
             catch (OperationCanceledException)
             {
@@ -289,7 +286,11 @@ tan_angle = tan(angle°)";
                 // original source line (mirrors WPF's CodeToHtml).
                 stringBuilder.Append($"<p class=\"line-text{errClass}\" id=\"line-{lineNumber}\"{errTitle}><a class=\"line-num\" href=\"#0\" data-text=\"{sourceLine}\" title=\"Source line {sourceLine}\">{paddedSpaces}{lineNumber}</a>&emsp;│&emsp;");
 
-                if (lineText.StartsWith(ErrorString))
+                if (MacroParser.TryParseErrorLine(lineText, out _, out var failedLine, out var macroMessage))
+                {
+                    stringBuilder.Append($"<span class=\"err\">{System.Web.HttpUtility.HtmlEncode(failedLine)}: {System.Web.HttpUtility.HtmlEncode(macroMessage)}</span>");
+                }
+                else if (lineText.StartsWith(ErrorString))
                 {
                     var errorText = lineText.Length > ErrorString.Length ? lineText.Substring(ErrorString.Length) : "";
                     // MacroParser already HTML encoded the error text, but we need to preserve HTML links
@@ -498,89 +499,6 @@ tan_angle = tan(angle°)";
             {
                 // Ignore cleanup errors
             }
-        }
-
-        /// <summary>
-        /// Processes included file content to respect #local and #global directives.
-        /// Following the pattern from Calcpad.Cli.CalcpadReader.Include
-        /// <para>
-        /// A saved 'uiOverrides' comment only has any effect on the file that carries it -
-        /// the host restores it by scanning the document you have open, before #include is
-        /// expanded. A 'fileInfo' comment goes too, so an included file's details
-        /// don't show up in the host file.
-        /// </para>
-        /// </summary>
-        private static string ProcessIncludedContent(string content)
-        {
-            if (string.IsNullOrEmpty(content))
-                return content;
-
-            var isLocal = false;
-            var isHostComment = false;
-            var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var outputLines = new List<string>();
-
-            foreach (var line in lines)
-            {
-                if (isHostComment)
-                {
-                    if (line.Contains("-->", StringComparison.Ordinal))
-                        isHostComment = false;
-
-                    continue;
-                }
-                if (Validator.IsKeyword(line, "#local"))
-                {
-                    isLocal = true;
-                }
-                else if (Validator.IsKeyword(line, "#global"))
-                {
-                    isLocal = false;
-                }
-                else if (IsHostCommentStart(line))
-                {
-                    isHostComment = !line.Contains("-->", StringComparison.Ordinal);
-                }
-                else
-                {
-                    // Only include lines that are not marked as local
-                    if (!isLocal)
-                    {
-                        outputLines.Add(line);
-                    }
-                }
-            }
-
-            return string.Join(Environment.NewLine, outputLines);
-        }
-
-        /// <summary>
-        /// True for the first line of a metadata comment ('<!--{...}-->) whose JSON carries
-        /// a 'uiOverrides' or 'fileInfo' key, or the footer's '<!--CalcpadCE Metadata--> anchor. A cheap substring check rather than a JSON parse,
-        /// matching the rest of this method's line-based approach - good enough since the host
-        /// always writes the keys verbatim.
-        /// </summary>
-        /// <summary>Removes the metadata footer's comments from rendered output and from the unwrapped listing.</summary>
-        internal static string StripHostMetadata(string html)
-        {
-            html = RenderedMetadataRegex().Replace(html, "");
-            return ListedMetadataRegex().Replace(html, "");
-        }
-
-        [GeneratedRegex(@"<!--(?:CalcpadCE Metadata|\{(?:(?!-->).)*?""(?:uiOverrides|fileInfo)""(?:(?!-->).)*)-->[ \t]*(?:\r?\n)?", RegexOptions.Singleline)]
-        private static partial Regex RenderedMetadataRegex();
-
-        [GeneratedRegex(@"<p class=""line-text""[^>]*>(?:(?!</p>).)*?<span class=""htmlComment"">&lt;!--(?:CalcpadCE Metadata|\{(?:(?!--&gt;).)*?&quot;(?:uiOverrides|fileInfo)&quot;(?:(?!--&gt;).)*)--&gt;</span></p>(?:\r?\n)?", RegexOptions.Singleline)]
-        private static partial Regex ListedMetadataRegex();
-
-        private static bool IsHostCommentStart(string line)
-        {
-            var trimmed = line.TrimStart();
-            return (trimmed.StartsWith('\'') || trimmed.StartsWith('"'))
-                && trimmed.Contains("<!--", StringComparison.Ordinal)
-                && (trimmed.Contains("\"uiOverrides\"", StringComparison.Ordinal)
-                    || trimmed.Contains("\"fileInfo\"", StringComparison.Ordinal)
-                    || trimmed.Contains("<!--CalcpadCE Metadata-->", StringComparison.Ordinal));
         }
     }
 }
