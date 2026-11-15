@@ -1,0 +1,6 @@
+#pre
+#UI 'a -' a = 1
+#UI 'b -' b = 2
+#post
+s = a + b
+s

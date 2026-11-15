@@ -1,0 +1,3 @@
+' QA plot
+f(x) = sin(x)
+$Plot{f(x) @ x = 0 : 6.283}
