@@ -22,7 +22,8 @@ pub struct PiSession {
 
 impl AgentBackend for PiSession {
     fn send_user(&self, text: &str) -> Result<(), String> {
-        self.link.write(&json!({"id": "prompt", "type": "prompt", "message": text}))
+        self.link
+            .write(&json!({"id": "prompt", "type": "prompt", "message": text}))
     }
 
     fn interrupt(&self) -> Result<(), String> {
@@ -33,8 +34,9 @@ impl AgentBackend for PiSession {
         let Some((provider, id)) = model.split_once('/') else {
             return Ok(());
         };
-        self.link
-            .write(&json!({"id": "set_model", "type": "set_model", "provider": provider, "modelId": id}))
+        self.link.write(
+            &json!({"id": "set_model", "type": "set_model", "provider": provider, "modelId": id}),
+        )
     }
 
     /// Modes that change the tool set restart the process instead.
@@ -69,7 +71,11 @@ pub fn build_args(launch: &Launch, extension: &std::path::Path) -> Vec<String> {
         "--mode".into(),
         "rpc".into(),
         "--session-dir".into(),
-        launch.data_dir.join("sessions").to_string_lossy().into_owned(),
+        launch
+            .data_dir
+            .join("sessions")
+            .to_string_lossy()
+            .into_owned(),
         "--session-id".into(),
         session,
         "-e".into(),
@@ -83,7 +89,13 @@ pub fn build_args(launch: &Launch, extension: &std::path::Path) -> Vec<String> {
         args.push("--skill".into());
         args.push(dir.to_string_lossy().into_owned());
     }
-    if let Some(model) = launch.options.model.as_deref().map(str::trim).filter(|m| !m.is_empty()) {
+    if let Some(model) = launch
+        .options
+        .model
+        .as_deref()
+        .map(str::trim)
+        .filter(|m| !m.is_empty())
+    {
         args.push("--model".into());
         args.push(model.into());
     }
@@ -103,7 +115,11 @@ fn content_text(content: &Value) -> String {
 }
 
 fn model_value(model: &Value) -> Option<String> {
-    Some(format!("{}/{}", model["provider"].as_str()?, model["id"].as_str()?))
+    Some(format!(
+        "{}/{}",
+        model["provider"].as_str()?,
+        model["id"].as_str()?
+    ))
 }
 
 /// Per-run state for turning pi's events into UI events.
@@ -131,7 +147,8 @@ impl Mapper {
                 let message = &line["message"];
                 self.cost += message["usage"]["cost"]["total"].as_f64().unwrap_or(0.0);
                 if message["stopReason"] == "error" {
-                    self.error = str_at(message, "errorMessage").or_else(|| Some("The model request failed".into()));
+                    self.error = str_at(message, "errorMessage")
+                        .or_else(|| Some("The model request failed".into()));
                 }
                 let text: Vec<&str> = message["content"]
                     .as_array()
@@ -146,7 +163,9 @@ impl Mapper {
                 if text.is_empty() {
                     vec![]
                 } else {
-                    vec![AgentEvent::AssistantText { text: text.join("\n\n") }]
+                    vec![AgentEvent::AssistantText {
+                        text: text.join("\n\n"),
+                    }]
                 }
             }
             Some("tool_execution_start") => vec![AgentEvent::ToolUse {
@@ -157,7 +176,10 @@ impl Mapper {
             Some("tool_execution_end") => vec![AgentEvent::ToolResult {
                 tool_use_id: str_at(line, "toolCallId").unwrap_or_default(),
                 is_error: line["isError"].as_bool().unwrap_or(false),
-                content: truncate(content_text(&line["result"]["content"]), MAX_TOOL_RESULT_CHARS),
+                content: truncate(
+                    content_text(&line["result"]["content"]),
+                    MAX_TOOL_RESULT_CHARS,
+                ),
             }],
             Some("auto_retry_start") => vec![AgentEvent::Status {
                 text: "Retrying the model request…".into(),
@@ -168,7 +190,14 @@ impl Mapper {
                 let cost = std::mem::take(&mut self.cost);
                 vec![AgentEvent::TurnComplete {
                     is_error: error.is_some(),
-                    subtype: if aborted { "interrupted" } else if error.is_some() { "error" } else { "success" }.into(),
+                    subtype: if aborted {
+                        "interrupted"
+                    } else if error.is_some() {
+                        "error"
+                    } else {
+                        "success"
+                    }
+                    .into(),
                     cost_usd: (cost > 0.0).then_some(cost),
                     error,
                 }]
@@ -180,7 +209,10 @@ impl Mapper {
     fn map_response(&mut self, line: &Value) -> Vec<AgentEvent> {
         let command = line["command"].as_str().unwrap_or_default();
         if line["success"] == false {
-            let message = line["error"].as_str().unwrap_or("pi rejected the request").to_string();
+            let message = line["error"]
+                .as_str()
+                .unwrap_or("pi rejected the request")
+                .to_string();
             return vec![if command == "prompt" {
                 AgentEvent::TurnComplete {
                     is_error: true,
@@ -239,7 +271,9 @@ pub fn dialog_question(request: &Value) -> Option<Value> {
         None => title.to_string(),
     };
     Some(match request["method"].as_str()? {
-        "select" => json!({"question": question, "options": request["options"], "allowOther": false}),
+        "select" => {
+            json!({"question": question, "options": request["options"], "allowOther": false})
+        }
         "confirm" => json!({"question": question, "options": ["Yes", "No"], "allowOther": false}),
         "input" | "editor" => json!({
             "question": question,
@@ -263,7 +297,8 @@ fn on_ui_request(link: &Arc<Link>, request: &Value) {
         tauri::async_runtime::spawn(async move {
             let tool = ask["tool_name"].as_str().unwrap_or_default().to_string();
             let allowed = link.approve(&tool, ask["input"].clone()).await;
-            let _ = link.write(&json!({"type": "extension_ui_response", "id": id, "confirmed": allowed}));
+            let _ = link
+                .write(&json!({"type": "extension_ui_response", "id": id, "confirmed": allowed}));
         });
         return;
     }
@@ -273,17 +308,26 @@ fn on_ui_request(link: &Arc<Link>, request: &Value) {
         }
         return;
     }
-    let Some(question) = dialog_question(request) else { return };
+    let Some(question) = dialog_question(request) else {
+        return;
+    };
     let link = link.clone();
     tauri::async_runtime::spawn(async move {
-        let key = question["question"].as_str().unwrap_or_default().to_string();
-        let answer = link
-            .ask(json!([question]))
-            .await
-            .and_then(|answers| answers.get(&key).and_then(Value::as_str).map(str::to_string));
+        let key = question["question"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
+        let answer = link.ask(json!([question])).await.and_then(|answers| {
+            answers
+                .get(&key)
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        });
         let response = match (answer, method.as_str()) {
             (None, _) => json!({"type": "extension_ui_response", "id": id, "cancelled": true}),
-            (Some(a), "confirm") => json!({"type": "extension_ui_response", "id": id, "confirmed": a == "Yes"}),
+            (Some(a), "confirm") => {
+                json!({"type": "extension_ui_response", "id": id, "confirmed": a == "Yes"})
+            }
             (Some(a), _) => json!({"type": "extension_ui_response", "id": id, "value": a}),
         };
         let _ = link.write(&response);
@@ -309,19 +353,27 @@ pub fn start(launch: Launch) -> Result<PiSession, String> {
         .env("CALCPAD_MCP_HEADERS", Value::Object(headers).to_string())
         .env("CALCPAD_AUTO_TOOLS", auto_approved_tools().join(","));
     let mut mapper = Mapper::default();
-    let link = process::spawn(&launch.app, &launch.key, launch.generation, command, "pi", None, move |link, line| {
-        let Ok(value) = serde_json::from_str::<Value>(line) else {
-            return false;
-        };
-        if value["type"] == "extension_ui_request" {
-            on_ui_request(link, &value);
-        } else {
-            for event in mapper.map(&value) {
-                link.emit(event);
+    let link = process::spawn(
+        &launch.app,
+        &launch.key,
+        launch.generation,
+        command,
+        "pi",
+        None,
+        move |link, line| {
+            let Ok(value) = serde_json::from_str::<Value>(line) else {
+                return false;
+            };
+            if value["type"] == "extension_ui_request" {
+                on_ui_request(link, &value);
+            } else {
+                for event in mapper.map(&value) {
+                    link.emit(event);
+                }
             }
-        }
-        true
-    })?;
+            true
+        },
+    )?;
     link.write(&json!({"id": "state", "type": "get_state"}))?;
     link.write(&json!({"id": "models", "type": "get_available_models"}))?;
     Ok(PiSession { link })
@@ -333,16 +385,25 @@ mod tests {
 
     #[test]
     fn replays_live_transcript() {
-        let Some(lines) = crate::agent::tests::live_transcript("pi.jsonl") else { return };
+        let Some(lines) = crate::agent::tests::live_transcript("pi.jsonl") else {
+            return;
+        };
         let mut mapper = Mapper::default();
         let events: Vec<AgentEvent> = lines
             .iter()
             .filter(|l| l["type"] != "extension_ui_request")
             .flat_map(|l| mapper.map(l))
             .collect();
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::SessionStarted { session_id, .. } if !session_id.is_empty())));
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::Models { models } if !models.is_empty())));
-        let approvals: Vec<&Value> = lines.iter().filter(|l| l["title"] == APPROVAL_TITLE).collect();
+        assert!(events.iter().any(
+            |e| matches!(e, AgentEvent::SessionStarted { session_id, .. } if !session_id.is_empty())
+        ));
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::Models { models } if !models.is_empty())));
+        let approvals: Vec<&Value> = lines
+            .iter()
+            .filter(|l| l["title"] == APPROVAL_TITLE)
+            .collect();
         assert!(!approvals.is_empty(), "no approval was asked");
         crate::agent::tests::check_live_run(&events);
     }
@@ -351,19 +412,38 @@ mod tests {
     fn maps_a_run() {
         let mut m = Mapper::default();
         let delta = json!({"type":"message_update","assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":"Hi"}});
-        assert_eq!(m.map(&delta), vec![AgentEvent::TextDelta { text: "Hi".into() }]);
+        assert_eq!(
+            m.map(&delta),
+            vec![AgentEvent::TextDelta { text: "Hi".into() }]
+        );
         let start = json!({"type":"tool_execution_start","toolCallId":"c1","toolName":"bash","args":{"command":"ls"}});
-        assert!(matches!(m.map(&start).as_slice(), [AgentEvent::ToolUse { id, name, .. }] if id == "c1" && name == "bash"));
+        assert!(
+            matches!(m.map(&start).as_slice(), [AgentEvent::ToolUse { id, name, .. }] if id == "c1" && name == "bash")
+        );
         let end = json!({"type":"tool_execution_end","toolCallId":"c1","toolName":"bash","result":{"content":[{"type":"text","text":"a.cpd"}]},"isError":false});
         assert_eq!(
             m.map(&end),
-            vec![AgentEvent::ToolResult { tool_use_id: "c1".into(), is_error: false, content: "a.cpd".into() }]
+            vec![AgentEvent::ToolResult {
+                tool_use_id: "c1".into(),
+                is_error: false,
+                content: "a.cpd".into()
+            }]
         );
         let done = json!({"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"Done"}],"usage":{"cost":{"total":0.25}},"stopReason":"stop"}});
-        assert_eq!(m.map(&done), vec![AgentEvent::AssistantText { text: "Done".into() }]);
+        assert_eq!(
+            m.map(&done),
+            vec![AgentEvent::AssistantText {
+                text: "Done".into()
+            }]
+        );
         assert_eq!(
             m.map(&json!({"type":"agent_settled","aborted":false})),
-            vec![AgentEvent::TurnComplete { is_error: false, subtype: "success".into(), cost_usd: Some(0.25), error: None }]
+            vec![AgentEvent::TurnComplete {
+                is_error: false,
+                subtype: "success".into(),
+                cost_usd: Some(0.25),
+                error: None
+            }]
         );
     }
 
@@ -380,16 +460,28 @@ mod tests {
             [AgentEvent::TurnComplete { is_error: false, subtype, .. }] if subtype == "interrupted"
         ));
         let rejected = json!({"type":"response","command":"prompt","success":false,"error":"busy"});
-        assert!(matches!(m.map(&rejected).as_slice(), [AgentEvent::TurnComplete { is_error: true, .. }]));
+        assert!(matches!(
+            m.map(&rejected).as_slice(),
+            [AgentEvent::TurnComplete { is_error: true, .. }]
+        ));
     }
 
     #[test]
     fn turns_dialogs_into_questions() {
         let select = json!({"method":"select","title":"Pick one","options":["A","B"]});
-        assert_eq!(dialog_question(&select).unwrap()["options"], json!(["A","B"]));
+        assert_eq!(
+            dialog_question(&select).unwrap()["options"],
+            json!(["A", "B"])
+        );
         let confirm = json!({"method":"confirm","title":"Clear session?","message":"All messages will be lost."});
-        assert_eq!(dialog_question(&confirm).unwrap()["question"], "Clear session?\nAll messages will be lost.");
-        assert_eq!(dialog_question(&json!({"method":"input","title":"Name"})).unwrap()["options"], json!([]));
+        assert_eq!(
+            dialog_question(&confirm).unwrap()["question"],
+            "Clear session?\nAll messages will be lost."
+        );
+        assert_eq!(
+            dialog_question(&json!({"method":"input","title":"Name"})).unwrap()["options"],
+            json!([])
+        );
         assert!(dialog_question(&json!({"method":"setStatus"})).is_none());
     }
 
@@ -404,7 +496,12 @@ mod tests {
         let models = json!({"type":"response","command":"get_available_models","success":true,"data":{"models":[{"provider":"openai","id":"gpt-x","name":"GPT X"}]}});
         assert_eq!(
             m.map(&models),
-            vec![AgentEvent::Models { models: vec![ModelOption { value: "openai/gpt-x".into(), label: "GPT X (openai)".into() }] }]
+            vec![AgentEvent::Models {
+                models: vec![ModelOption {
+                    value: "openai/gpt-x".into(),
+                    label: "GPT X (openai)".into()
+                }]
+            }]
         );
     }
 }

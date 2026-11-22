@@ -119,11 +119,18 @@ pub struct Launch {
 
 impl Launch {
     pub fn is_restricted(&self) -> bool {
-        matches!(self.options.permission_mode.as_deref(), Some("acceptEdits" | "auto" | "plan"))
+        matches!(
+            self.options.permission_mode.as_deref(),
+            Some("acceptEdits" | "auto" | "plan")
+        )
     }
 
     pub fn skill_dir(&self) -> Option<PathBuf> {
-        let dir = self.plugin_dir.as_ref()?.join("skills").join("calcpad-generator");
+        let dir = self
+            .plugin_dir
+            .as_ref()?
+            .join("skills")
+            .join("calcpad-generator");
         dir.join("SKILL.md").is_file().then_some(dir)
     }
 }
@@ -198,11 +205,19 @@ impl Harness {
 
     fn extra_paths(self, home: Option<&Path>) -> Vec<Extra> {
         let Some(home) = home else { return vec![] };
-        let exe = |name: &str| if cfg!(windows) { format!("{name}.exe") } else { name.to_string() };
+        let exe = |name: &str| {
+            if cfg!(windows) {
+                format!("{name}.exe")
+            } else {
+                name.to_string()
+            }
+        };
         let editor_extension = |prefix: &str| -> Vec<PathBuf> {
             [".vscode", ".vscode-oss", ".vscode-insiders", ".cursor"]
                 .iter()
-                .filter_map(|editor| detect::latest_child(&home.join(editor).join("extensions"), prefix))
+                .filter_map(|editor| {
+                    detect::latest_child(&home.join(editor).join("extensions"), prefix)
+                })
                 .collect()
         };
         match self {
@@ -211,14 +226,24 @@ impl Harness {
                 out.extend(
                     editor_extension("anthropic.claude-code-")
                         .into_iter()
-                        .map(|d| Extra::File(d.join("resources").join("native-binary").join(exe("claude")))),
+                        .map(|d| {
+                            Extra::File(
+                                d.join("resources")
+                                    .join("native-binary")
+                                    .join(exe("claude")),
+                            )
+                        }),
                 );
                 out
             }
             Harness::Codex => editor_extension("openai.chatgpt-")
                 .into_iter()
                 .filter_map(|d| std::fs::read_dir(d.join("bin")).ok())
-                .flat_map(|entries| entries.flatten().map(|e| Extra::File(e.path().join(exe("codex")))))
+                .flat_map(|entries| {
+                    entries
+                        .flatten()
+                        .map(|e| Extra::File(e.path().join(exe("codex"))))
+                })
                 .collect(),
             Harness::Opencode => vec![Extra::Dir(home.join(".opencode").join("bin"))],
             Harness::Pi => vec![Extra::Dir(home.join(".pi").join("agent").join("bin"))],
@@ -227,7 +252,11 @@ impl Harness {
     }
 
     pub fn find(self, configured: Option<&str>) -> Option<PathBuf> {
-        detect::find(configured, self.command(), self.extra_paths(detect::home().as_deref()))
+        detect::find(
+            configured,
+            self.command(),
+            self.extra_paths(detect::home().as_deref()),
+        )
     }
 
     fn modes(self) -> &'static [Mode] {

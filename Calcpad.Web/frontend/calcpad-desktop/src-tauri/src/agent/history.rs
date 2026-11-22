@@ -26,7 +26,10 @@ fn history_dir(app: &AppHandle) -> Result<PathBuf, String> {
 fn paths(app: &AppHandle, id: &str) -> Result<(PathBuf, PathBuf), String> {
     crate::validate_draft_id(id).map_err(|_| "invalid conversation id".to_string())?;
     let dir = history_dir(app)?;
-    Ok((dir.join(format!("{id}.json")), dir.join(format!("{id}.meta.json"))))
+    Ok((
+        dir.join(format!("{id}.json")),
+        dir.join(format!("{id}.meta.json")),
+    ))
 }
 
 #[tauri::command]

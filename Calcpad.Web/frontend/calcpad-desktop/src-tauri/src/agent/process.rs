@@ -34,7 +34,9 @@ const INHERITED_SESSION_VARS: &[&str] = &[
 
 /// VS Code's debugger auto-attach injects these; Node-based CLIs then exit without output.
 pub fn is_debugger_hook(node_options: &str) -> bool {
-    node_options.contains("--inspect") || node_options.contains("--require") || node_options.contains("-r ")
+    node_options.contains("--inspect")
+        || node_options.contains("--require")
+        || node_options.contains("-r ")
 }
 
 pub fn command(exe: &Path, cwd: &Path) -> tokio::process::Command {
@@ -116,7 +118,14 @@ impl Link {
 
     /// Asks the user questions in the chat panel; answers keyed by question text, or None if skipped.
     pub async fn ask(&self, questions: Value) -> Option<serde_json::Map<String, Value>> {
-        let answer = super::request_window(&self.app, self.key.clone(), "ask_user", json!({"questions": questions}), None).await;
+        let answer = super::request_window(
+            &self.app,
+            self.key.clone(),
+            "ask_user",
+            json!({"questions": questions}),
+            None,
+        )
+        .await;
         answer.ok()?.get("answers")?.as_object().cloned()
     }
 
@@ -152,7 +161,9 @@ pub fn spawn(
     cleanup: Option<PathBuf>,
     mut on_line: impl FnMut(&Arc<Link>, &str) -> bool + Send + 'static,
 ) -> Result<Arc<Link>, String> {
-    let mut child = command.spawn().map_err(|e| format!("Could not start {name}: {e}"))?;
+    let mut child = command
+        .spawn()
+        .map_err(|e| format!("Could not start {name}: {e}"))?;
     #[cfg(windows)]
     if let Some(pid) = child.id() {
         crate::assign_to_job_object(pid);
@@ -265,7 +276,9 @@ mod tests {
 
     #[test]
     fn detects_debugger_node_options() {
-        assert!(is_debugger_hook(" --require /x/js-debug/src/bootloader.js  --inspect-publish-uid=http"));
+        assert!(is_debugger_hook(
+            " --require /x/js-debug/src/bootloader.js  --inspect-publish-uid=http"
+        ));
         assert!(!is_debugger_hook("--max-old-space-size=4096"));
     }
 

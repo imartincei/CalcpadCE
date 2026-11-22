@@ -52,24 +52,32 @@ impl State {
             params["model"] = json!(model);
         }
         let state = self.clone();
-        self.rpc.request("turn/start", params, move |reply| match reply {
-            Ok(result) => {
-                if let Some(id) = result.pointer("/turn/id").and_then(Value::as_str) {
-                    state.thread().turn = Some(id.into());
+        self.rpc
+            .request("turn/start", params, move |reply| match reply {
+                Ok(result) => {
+                    if let Some(id) = result.pointer("/turn/id").and_then(Value::as_str) {
+                        state.thread().turn = Some(id.into());
+                    }
                 }
-            }
-            Err(message) => state.emit(failed_turn(message)),
-        })
+                Err(message) => state.emit(failed_turn(message)),
+            })
     }
 
     fn on_thread(self: &Arc<Self>, result: Value) {
-        let Some(id) = result.pointer("/thread/id").and_then(Value::as_str).map(str::to_string) else {
+        let Some(id) = result
+            .pointer("/thread/id")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+        else {
             self.emit(failed_turn("Codex did not start a thread".into()));
             return;
         };
         self.emit(AgentEvent::SessionStarted {
             session_id: id.clone(),
-            model: result.get("model").and_then(Value::as_str).map(str::to_string),
+            model: result
+                .get("model")
+                .and_then(Value::as_str)
+                .map(str::to_string),
             version: None,
             permission_mode: None,
         });
@@ -93,19 +101,32 @@ impl State {
             ),
             "item/fileChange/requestApproval" => {
                 let item = params["itemId"].as_str().unwrap_or_default();
-                let changes = self.thread().changes.get(item).cloned().unwrap_or(Value::Null);
-                ("apply_patch".to_string(), json!({"changes": changes, "reason": params["reason"]}))
+                let changes = self
+                    .thread()
+                    .changes
+                    .get(item)
+                    .cloned()
+                    .unwrap_or(Value::Null);
+                (
+                    "apply_patch".to_string(),
+                    json!({"changes": changes, "reason": params["reason"]}),
+                )
             }
             "mcpServer/elicitation/request" => {
-                let server = params["serverName"].as_str().or(params["server_name"].as_str()).unwrap_or_default();
+                let server = params["serverName"]
+                    .as_str()
+                    .or(params["server_name"].as_str())
+                    .unwrap_or_default();
                 if server == SERVER_NAME {
-                    self.rpc.respond(id, json!({"action": "accept", "content": {}}));
+                    self.rpc
+                        .respond(id, json!({"action": "accept", "content": {}}));
                     return;
                 }
                 (format!("mcp__{server}"), params.clone())
             }
             _ => {
-                self.rpc.respond_error(id, &format!("CalcpadCE does not support {method}"));
+                self.rpc
+                    .respond_error(id, &format!("CalcpadCE does not support {method}"));
                 return;
             }
         };
@@ -130,12 +151,17 @@ impl State {
     fn on_notification(&self, method: &str, params: &Value) {
         if method == "item/started" && params["item"]["type"] == "fileChange" {
             if let Some(id) = params["item"]["id"].as_str() {
-                self.thread().changes.insert(id.into(), params["item"]["changes"].clone());
+                self.thread()
+                    .changes
+                    .insert(id.into(), params["item"]["changes"].clone());
             }
         }
         match method {
             "turn/started" => {
-                self.thread().turn = params.pointer("/turn/id").and_then(Value::as_str).map(str::to_string);
+                self.thread().turn = params
+                    .pointer("/turn/id")
+                    .and_then(Value::as_str)
+                    .map(str::to_string);
             }
             "turn/completed" => {
                 self.thread().turn = None;
@@ -158,7 +184,10 @@ fn failed_turn(message: String) -> AgentEvent {
 }
 
 fn str_at(value: &Value, pointer: &str) -> Option<String> {
-    value.pointer(pointer).and_then(Value::as_str).map(str::to_string)
+    value
+        .pointer(pointer)
+        .and_then(Value::as_str)
+        .map(str::to_string)
 }
 
 /// Maps one app-server notification to UI events.
@@ -171,10 +200,20 @@ pub fn map_notification(method: &str, params: &Value) -> Vec<AgentEvent> {
             .unwrap_or_default(),
         "item/started" => {
             let (name, input) = match item["type"].as_str() {
-                Some("commandExecution") => ("shell".to_string(), json!({"command": item["command"], "cwd": item["cwd"]})),
-                Some("fileChange") => ("apply_patch".to_string(), json!({"changes": item["changes"]})),
+                Some("commandExecution") => (
+                    "shell".to_string(),
+                    json!({"command": item["command"], "cwd": item["cwd"]}),
+                ),
+                Some("fileChange") => (
+                    "apply_patch".to_string(),
+                    json!({"changes": item["changes"]}),
+                ),
                 Some("mcpToolCall") => (
-                    format!("mcp__{}__{}", item["server"].as_str().unwrap_or("?"), item["tool"].as_str().unwrap_or("?")),
+                    format!(
+                        "mcp__{}__{}",
+                        item["server"].as_str().unwrap_or("?"),
+                        item["tool"].as_str().unwrap_or("?")
+                    ),
                     item["arguments"].clone(),
                 ),
                 Some("webSearch") => ("web_search".to_string(), json!({"query": item["query"]})),
@@ -191,7 +230,8 @@ pub fn map_notification(method: &str, params: &Value) -> Vec<AgentEvent> {
                         .unwrap_or_default()
                 }
                 Some("commandExecution") => str_at(item, "/aggregatedOutput").unwrap_or_default(),
-                Some("mcpToolCall") => str_at(item, "/error/message").unwrap_or_else(|| content_text(&item["result"]["content"])),
+                Some("mcpToolCall") => str_at(item, "/error/message")
+                    .unwrap_or_else(|| content_text(&item["result"]["content"])),
                 Some("fileChange") => item["status"].as_str().unwrap_or_default().to_string(),
                 Some("webSearch") => String::new(),
                 _ => return vec![],
@@ -225,7 +265,9 @@ pub fn map_notification(method: &str, params: &Value) -> Vec<AgentEvent> {
         }
         "error" => {
             if params["willRetry"] == true {
-                return vec![AgentEvent::Status { text: "Retrying the model request…".into() }];
+                return vec![AgentEvent::Status {
+                    text: "Retrying the model request…".into(),
+                }];
             }
             let mut message = str_at(params, "/error/message")
                 .or_else(|| str_at(params, "/message"))
@@ -240,7 +282,10 @@ pub fn map_notification(method: &str, params: &Value) -> Vec<AgentEvent> {
 }
 
 fn parse_models(result: &Value) -> Vec<ModelOption> {
-    let list = result.get("data").or_else(|| result.get("models")).unwrap_or(result);
+    let list = result
+        .get("data")
+        .or_else(|| result.get("models"))
+        .unwrap_or(result);
     list.as_array()
         .map(|models| {
             models
@@ -270,9 +315,18 @@ pub fn build_args(launch: &Launch) -> Vec<String> {
         .map(|(k, v)| format!("{} = {}", toml_str(k), toml_str(&v)))
         .collect();
     let mut config = vec![
-        format!("mcp_servers.{SERVER_NAME}.url={}", toml_str(launch.mcp.url())),
-        format!("mcp_servers.{SERVER_NAME}.bearer_token_env_var={}", toml_str(TOKEN_VAR)),
-        format!("mcp_servers.{SERVER_NAME}.http_headers={{ {} }}", headers.join(", ")),
+        format!(
+            "mcp_servers.{SERVER_NAME}.url={}",
+            toml_str(launch.mcp.url())
+        ),
+        format!(
+            "mcp_servers.{SERVER_NAME}.bearer_token_env_var={}",
+            toml_str(TOKEN_VAR)
+        ),
+        format!(
+            "mcp_servers.{SERVER_NAME}.http_headers={{ {} }}",
+            headers.join(", ")
+        ),
         format!("mcp_servers.{SERVER_NAME}.default_tools_approval_mode=\"auto\""),
     ];
     if launch.is_restricted() {
@@ -299,7 +353,13 @@ fn thread_params(launch: &Launch) -> Value {
         "sandbox": if restricted { "read-only" } else { "workspace-write" },
         "developerInstructions": instructions,
     });
-    if let Some(model) = launch.options.model.as_deref().map(str::trim).filter(|m| !m.is_empty()) {
+    if let Some(model) = launch
+        .options
+        .model
+        .as_deref()
+        .map(str::trim)
+        .filter(|m| !m.is_empty())
+    {
         params["model"] = json!(model);
     }
     params
@@ -313,20 +373,34 @@ pub fn start(launch: Launch) -> Result<CodexSession, String> {
         restricted: launch.is_restricted(),
     });
     let mut command = process::command(&launch.exe, &launch.cwd);
-    command.args(build_args(&launch)).env(TOKEN_VAR, launch.mcp.token());
+    command
+        .args(build_args(&launch))
+        .env(TOKEN_VAR, launch.mcp.token());
     let link = {
         let state = state.clone();
-        process::spawn(&launch.app, &launch.key, launch.generation, command, "Codex", None, move |_, line| {
-            let Ok(message) = serde_json::from_str::<Value>(line) else {
-                return false;
-            };
-            match state.rpc.dispatch(message) {
-                Incoming::Request { id, method, params } => state.on_request(id, &method, params),
-                Incoming::Notification { method, params } => state.on_notification(&method, &params),
-                Incoming::Reply | Incoming::Invalid => {}
-            }
-            true
-        })?
+        process::spawn(
+            &launch.app,
+            &launch.key,
+            launch.generation,
+            command,
+            "Codex",
+            None,
+            move |_, line| {
+                let Ok(message) = serde_json::from_str::<Value>(line) else {
+                    return false;
+                };
+                match state.rpc.dispatch(message) {
+                    Incoming::Request { id, method, params } => {
+                        state.on_request(id, &method, params)
+                    }
+                    Incoming::Notification { method, params } => {
+                        state.on_notification(&method, &params)
+                    }
+                    Incoming::Reply | Incoming::Invalid => {}
+                }
+                true
+            },
+        )?
     };
     rpc.attach(link);
 
@@ -401,11 +475,11 @@ impl AgentBackend for CodexSession {
             (thread.id.clone(), thread.turn.clone())
         };
         match (thread_id, turn_id) {
-            (Some(thread_id), Some(turn_id)) => {
-                self.state
-                    .rpc
-                    .request("turn/interrupt", json!({"threadId": thread_id, "turnId": turn_id}), |_| {})
-            }
+            (Some(thread_id), Some(turn_id)) => self.state.rpc.request(
+                "turn/interrupt",
+                json!({"threadId": thread_id, "turnId": turn_id}),
+                |_| {},
+            ),
             _ => Ok(()),
         }
     }
@@ -433,7 +507,10 @@ mod tests {
     #[test]
     fn maps_items_and_turns() {
         let delta = json!({"threadId":"t","turnId":"u","itemId":"i","delta":"Hi"});
-        assert_eq!(map_notification("item/agentMessage/delta", &delta), vec![AgentEvent::TextDelta { text: "Hi".into() }]);
+        assert_eq!(
+            map_notification("item/agentMessage/delta", &delta),
+            vec![AgentEvent::TextDelta { text: "Hi".into() }]
+        );
         let started = json!({"item":{"type":"mcpToolCall","id":"i1","server":"calcpad","tool":"get_document","arguments":{"path":"/a.cpd"},"status":"inProgress"}});
         assert!(matches!(
             map_notification("item/started", &started).as_slice(),
@@ -442,10 +519,19 @@ mod tests {
         let done = json!({"item":{"type":"commandExecution","id":"i2","command":"ls","status":"completed","aggregatedOutput":"a.cpd","exitCode":1}});
         assert_eq!(
             map_notification("item/completed", &done),
-            vec![AgentEvent::ToolResult { tool_use_id: "i2".into(), is_error: true, content: "a.cpd".into() }]
+            vec![AgentEvent::ToolResult {
+                tool_use_id: "i2".into(),
+                is_error: true,
+                content: "a.cpd".into()
+            }]
         );
         let message = json!({"item":{"type":"agentMessage","id":"i3","text":"Done"}});
-        assert_eq!(map_notification("item/completed", &message), vec![AgentEvent::AssistantText { text: "Done".into() }]);
+        assert_eq!(
+            map_notification("item/completed", &message),
+            vec![AgentEvent::AssistantText {
+                text: "Done".into()
+            }]
+        );
         let interrupted = json!({"turn":{"id":"u","status":"interrupted"}});
         assert!(matches!(
             map_notification("turn/completed", &interrupted).as_slice(),
@@ -461,7 +547,13 @@ mod tests {
     #[test]
     fn parses_models_and_hides_hidden() {
         let result = json!({"data":[{"model":"gpt-x","displayName":"GPT X"},{"model":"secret","hidden":true}]});
-        assert_eq!(parse_models(&result), vec![ModelOption { value: "gpt-x".into(), label: "GPT X".into() }]);
+        assert_eq!(
+            parse_models(&result),
+            vec![ModelOption {
+                value: "gpt-x".into(),
+                label: "GPT X".into()
+            }]
+        );
     }
 
     #[test]

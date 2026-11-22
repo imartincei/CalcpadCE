@@ -30,7 +30,14 @@ pub fn latest_child(dir: &Path, prefix: &str) -> Option<PathBuf> {
 fn common_dirs(home: Option<&Path>) -> Vec<PathBuf> {
     let mut dirs = vec![];
     if let Some(home) = home {
-        for rel in [".local/bin", ".npm-global/bin", ".bun/bin", ".volta/bin", ".local/share/pnpm", "Library/pnpm"] {
+        for rel in [
+            ".local/bin",
+            ".npm-global/bin",
+            ".bun/bin",
+            ".volta/bin",
+            ".local/share/pnpm",
+            "Library/pnpm",
+        ] {
             dirs.push(home.join(rel));
         }
         if let Some(node) = latest_child(&home.join(".nvm").join("versions").join("node"), "v") {
@@ -59,7 +66,12 @@ pub enum Extra {
 }
 
 /// Candidate paths in priority order: PATH, then `extra`, then common install folders.
-pub fn candidates(name: &str, path_var: Option<&str>, extra: Vec<Extra>, home: Option<&Path>) -> Vec<PathBuf> {
+pub fn candidates(
+    name: &str,
+    path_var: Option<&str>,
+    extra: Vec<Extra>,
+    home: Option<&Path>,
+) -> Vec<PathBuf> {
     let names = file_names(name);
     let in_dir = |dir: &Path| names.iter().map(|n| dir.join(n)).collect::<Vec<_>>();
     let mut out: Vec<PathBuf> = path_var
@@ -100,7 +112,10 @@ mod tests {
         let found = candidates(
             "tool",
             path.to_str(),
-            vec![Extra::File(PathBuf::from("/ext/bundled/tool.bin")), Extra::Dir(PathBuf::from("/ext/dir"))],
+            vec![
+                Extra::File(PathBuf::from("/ext/bundled/tool.bin")),
+                Extra::Dir(PathBuf::from("/ext/dir")),
+            ],
             Some(Path::new("/home/u")),
         );
         assert_eq!(found[0], Path::new("/x/bin").join(exe("tool")));
@@ -113,7 +128,13 @@ mod tests {
 
     #[test]
     fn configured_path_wins_even_if_missing() {
-        assert_eq!(find(Some(" /opt/x/tool "), "tool", vec![]), Some(PathBuf::from("/opt/x/tool")));
-        assert_eq!(find(Some(""), "definitely-not-a-real-tool-xyz", vec![]), None);
+        assert_eq!(
+            find(Some(" /opt/x/tool "), "tool", vec![]),
+            Some(PathBuf::from("/opt/x/tool"))
+        );
+        assert_eq!(
+            find(Some(""), "definitely-not-a-real-tool-xyz", vec![]),
+            None
+        );
     }
 }

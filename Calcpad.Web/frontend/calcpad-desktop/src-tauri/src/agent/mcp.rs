@@ -174,7 +174,11 @@ pub const APPROVAL_TOOL: &str = "approve_tool";
 
 /// Tools that need no permission prompt.
 pub fn auto_approved_tools() -> Vec<&'static str> {
-    TOOLS.iter().filter(|t| t.auto_approve).map(|t| t.name).collect()
+    TOOLS
+        .iter()
+        .filter(|t| t.auto_approve)
+        .map(|t| t.name)
+        .collect()
 }
 
 fn tools(approval: bool) -> Vec<Tool> {
@@ -220,7 +224,9 @@ impl ServerHandler for CalcpadMcp {
         _request: Option<PaginatedRequestParams>,
         context: RequestContext<RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
-        Ok(ListToolsResult::with_all_items(tools(wants_approval(&context))))
+        Ok(ListToolsResult::with_all_items(tools(wants_approval(
+            &context,
+        ))))
     }
 
     async fn call_tool(
@@ -245,7 +251,9 @@ impl ServerHandler for CalcpadMcp {
             .iter()
             .find(|t| t.name == request.name)
             .filter(|t| t.name != APPROVAL_TOOL || wants_approval(&context))
-            .ok_or_else(|| ErrorData::invalid_params(format!("Unknown tool {}", request.name), None))?;
+            .ok_or_else(|| {
+                ErrorData::invalid_params(format!("Unknown tool {}", request.name), None)
+            })?;
         let args = Value::Object(request.arguments.unwrap_or_default());
         let result = self.bridge.call(key, spec.name, args, spec.timeout).await;
         Ok(match result {
@@ -263,7 +271,10 @@ fn random_token() -> Result<String, String> {
 }
 
 fn authorized(headers: &http::HeaderMap, expected: &str) -> bool {
-    let Some(value) = headers.get(http::header::AUTHORIZATION).and_then(|v| v.to_str().ok()) else {
+    let Some(value) = headers
+        .get(http::header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+    else {
         return false;
     };
     let Some(token) = value.strip_prefix("Bearer ") else {
@@ -286,7 +297,11 @@ pub async fn start(bridge: Arc<dyn ToolBridge>) -> Result<McpEndpoint, String> {
     let addr = listener.local_addr().map_err(|e| e.to_string())?;
 
     let service = StreamableHttpService::new(
-        move || Ok(CalcpadMcp { bridge: bridge.clone() }),
+        move || {
+            Ok(CalcpadMcp {
+                bridge: bridge.clone(),
+            })
+        },
         Arc::new(LocalSessionManager::default()),
         StreamableHttpServerConfig::default(),
     );

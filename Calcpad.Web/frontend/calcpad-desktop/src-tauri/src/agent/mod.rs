@@ -27,7 +27,11 @@ pub const EVENT_NAME: &str = "agent-event";
 const TOOL_REQUEST_EVENT: &str = "agent-tool-request";
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-#[serde(tag = "kind", rename_all = "camelCase", rename_all_fields = "camelCase")]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum AgentEvent {
     SessionStarted {
         session_id: String,
@@ -110,7 +114,8 @@ pub struct SessionKey {
 
 impl SessionKey {
     fn new(window: &tauri::WebviewWindow, conversation: String) -> Result<Self, String> {
-        crate::validate_draft_id(&conversation).map_err(|_| "invalid conversation id".to_string())?;
+        crate::validate_draft_id(&conversation)
+            .map_err(|_| "invalid conversation id".to_string())?;
         Ok(Self {
             window: window.label().to_string(),
             conversation,
@@ -191,8 +196,14 @@ pub(crate) fn emit_event(app: &AppHandle, key: &SessionKey, generation: u64, eve
 pub(crate) fn on_exited(app: &AppHandle, key: &SessionKey, generation: u64, event: AgentEvent) {
     emit_event(app, key, generation, event);
     let state = app.state::<AgentState>();
-    let mut sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
-    if sessions.get(key).is_some_and(|s| s.generation == generation) {
+    let mut sessions = state
+        .sessions
+        .lock()
+        .expect("agent sessions mutex poisoned");
+    if sessions
+        .get(key)
+        .is_some_and(|s| s.generation == generation)
+    {
         sessions.remove(key);
     }
 }
@@ -208,13 +219,17 @@ pub(crate) async fn request_window(
     let state = app.state::<AgentState>();
     let id = state.next_id.fetch_add(1, Ordering::Relaxed);
     let (tx, rx) = oneshot::channel();
-    state.pending.lock().expect("agent pending mutex poisoned").insert(
-        id,
-        Pending {
-            key: key.clone(),
-            tx,
-        },
-    );
+    state
+        .pending
+        .lock()
+        .expect("agent pending mutex poisoned")
+        .insert(
+            id,
+            Pending {
+                key: key.clone(),
+                tx,
+            },
+        );
     let request = ToolRequest {
         id,
         conversation: &key.conversation,
@@ -222,14 +237,22 @@ pub(crate) async fn request_window(
         args,
     };
     if let Err(err) = app.emit_to(key.window.as_str(), TOOL_REQUEST_EVENT, request) {
-        state.pending.lock().expect("agent pending mutex poisoned").remove(&id);
+        state
+            .pending
+            .lock()
+            .expect("agent pending mutex poisoned")
+            .remove(&id);
         return Err(format!("Calcpad window is unavailable: {err}"));
     }
     let answer = match timeout {
         Some(limit) => match tokio::time::timeout(limit, rx).await {
             Ok(answer) => answer,
             Err(_) => {
-                state.pending.lock().expect("agent pending mutex poisoned").remove(&id);
+                state
+                    .pending
+                    .lock()
+                    .expect("agent pending mutex poisoned")
+                    .remove(&id);
                 return Err("Calcpad did not respond in time".into());
             }
         },
@@ -260,7 +283,9 @@ fn resolve_cwd(requested: Option<&str>) -> PathBuf {
     requested
         .map(PathBuf::from)
         .filter(|p| p.is_dir())
-        .or_else(|| std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).map(PathBuf::from))
+        .or_else(|| {
+            std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).map(PathBuf::from)
+        })
         .unwrap_or_else(std::env::temp_dir)
 }
 
@@ -275,8 +300,17 @@ pub(crate) fn session_label(key: &SessionKey) -> String {
 
 fn plugin_dir(app: &AppHandle) -> Option<PathBuf> {
     // The folder name is the plugin name: the skill is calcpadce:calcpad-generator.
-    let dir = app.path().resource_dir().ok()?.join("agent-plugins").join("calcpadce");
-    dir.join("skills").join("calcpad-generator").join("SKILL.md").is_file().then_some(dir)
+    let dir = app
+        .path()
+        .resource_dir()
+        .ok()?
+        .join("agent-plugins")
+        .join("calcpadce");
+    dir.join("skills")
+        .join("calcpad-generator")
+        .join("SKILL.md")
+        .is_file()
+        .then_some(dir)
 }
 
 /// Every supported harness, whether it was found, and what the chat panel offers for it.
@@ -338,14 +372,18 @@ pub async fn agent_start(
         plugin_dir: plugin_dir(&app),
     };
     let backend = harness.start(launch)?;
-    state.sessions.lock().expect("agent sessions mutex poisoned").insert(
-        key,
-        Session {
-            generation,
-            harness,
-            backend,
-        },
-    );
+    state
+        .sessions
+        .lock()
+        .expect("agent sessions mutex poisoned")
+        .insert(
+            key,
+            Session {
+                generation,
+                harness,
+                backend,
+            },
+        );
     Ok(())
 }
 
@@ -354,7 +392,10 @@ fn with_session<T>(
     key: &SessionKey,
     f: impl FnOnce(&dyn AgentBackend) -> Result<T, String>,
 ) -> Result<T, String> {
-    let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
+    let sessions = state
+        .sessions
+        .lock()
+        .expect("agent sessions mutex poisoned");
     let session = sessions.get(key).ok_or("No agent session is running")?;
     f(session.backend.as_ref())
 }
@@ -366,7 +407,9 @@ pub fn agent_send(
     conversation: String,
     text: String,
 ) -> Result<(), String> {
-    with_session(&state, &SessionKey::new(&window, conversation)?, |b| b.send_user(&text))
+    with_session(&state, &SessionKey::new(&window, conversation)?, |b| {
+        b.send_user(&text)
+    })
 }
 
 #[tauri::command]
@@ -375,7 +418,9 @@ pub fn agent_interrupt(
     window: tauri::WebviewWindow,
     conversation: String,
 ) -> Result<(), String> {
-    with_session(&state, &SessionKey::new(&window, conversation)?, |b| b.interrupt())
+    with_session(&state, &SessionKey::new(&window, conversation)?, |b| {
+        b.interrupt()
+    })
 }
 
 /// Applies to the running session, if any; the next start picks the model from its options.
@@ -387,7 +432,10 @@ pub fn agent_set_model(
     model: String,
 ) -> Result<(), String> {
     let key = SessionKey::new(&window, conversation)?;
-    let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
+    let sessions = state
+        .sessions
+        .lock()
+        .expect("agent sessions mutex poisoned");
     match sessions.get(&key) {
         Some(session) => session.backend.set_model(model.trim()),
         None => Ok(()),
@@ -402,7 +450,10 @@ pub fn agent_set_permission_mode(
     mode: String,
 ) -> Result<(), String> {
     let key = SessionKey::new(&window, conversation)?;
-    let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
+    let sessions = state
+        .sessions
+        .lock()
+        .expect("agent sessions mutex poisoned");
     match sessions.get(&key) {
         Some(session) => {
             session.harness.mode(&mode)?;
@@ -457,7 +508,11 @@ mod tests {
     pub(crate) fn live_transcript(file: &str) -> Option<Vec<Value>> {
         let dir = std::env::var_os("CALCPAD_LIVE_DIR")?;
         let text = std::fs::read_to_string(std::path::Path::new(&dir).join(file)).ok()?;
-        Some(text.lines().filter_map(|l| serde_json::from_str(l).ok()).collect())
+        Some(
+            text.lines()
+                .filter_map(|l| serde_json::from_str(l).ok())
+                .collect(),
+        )
     }
 
     /// Checks a mapped live run: editor tools used, every tool finished, turn succeeded.
@@ -470,7 +525,10 @@ mod tests {
             })
             .collect();
         for expected in ["mcp__calcpad__get_document", "mcp__calcpad__propose_edit"] {
-            assert!(tools.contains(&expected), "{expected} missing from {tools:?}");
+            assert!(
+                tools.contains(&expected),
+                "{expected} missing from {tools:?}"
+            );
         }
         for event in events {
             if let AgentEvent::ToolUse { id, .. } = event {
@@ -480,11 +538,17 @@ mod tests {
                 );
             }
         }
-        assert!(events.iter().any(|e| matches!(e, AgentEvent::TextDelta { .. })));
-        assert!(matches!(
-            events.last(),
-            Some(AgentEvent::TurnComplete { is_error: false, subtype, .. }) if subtype == "success"
-        ), "last event: {:?}", events.last());
+        assert!(events
+            .iter()
+            .any(|e| matches!(e, AgentEvent::TextDelta { .. })));
+        assert!(
+            matches!(
+                events.last(),
+                Some(AgentEvent::TurnComplete { is_error: false, subtype, .. }) if subtype == "success"
+            ),
+            "last event: {:?}",
+            events.last()
+        );
     }
 
     #[test]

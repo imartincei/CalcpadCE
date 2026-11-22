@@ -89,7 +89,10 @@ fn failed_turn(message: String) -> AgentEvent {
 }
 
 fn str_at(value: &Value, pointer: &str) -> Option<String> {
-    value.pointer(pointer).and_then(Value::as_str).map(str::to_string)
+    value
+        .pointer(pointer)
+        .and_then(Value::as_str)
+        .map(str::to_string)
 }
 
 fn is_restricted(mode: &str) -> bool {
@@ -98,7 +101,11 @@ fn is_restricted(mode: &str) -> bool {
 
 /// Whether a permission request is for one of the editor's own tools.
 fn is_calcpad_tool(tool_call: &Value) -> bool {
-    if tool_call.pointer("/_meta/gemini-cli/mcp/server_name").and_then(Value::as_str) == Some(SERVER_NAME) {
+    if tool_call
+        .pointer("/_meta/gemini-cli/mcp/server_name")
+        .and_then(Value::as_str)
+        == Some(SERVER_NAME)
+    {
         return true;
     }
     let title = tool_call["title"].as_str().unwrap_or_default();
@@ -107,14 +114,21 @@ fn is_calcpad_tool(tool_call: &Value) -> bool {
 
 /// Whether a permission request asks to leave the agent's plan mode.
 fn is_plan_exit(tool_call: &Value) -> bool {
-    let title = tool_call["title"].as_str().unwrap_or_default().to_lowercase();
+    let title = tool_call["title"]
+        .as_str()
+        .unwrap_or_default()
+        .to_lowercase();
     tool_call["kind"] == "switch_mode" || title.contains("exit plan") || title.contains("plan mode")
 }
 
 /// The option id answering a permission request, or None to cancel it.
 fn pick_option(options: &Value, allow: bool) -> Option<String> {
     let options = options.as_array()?;
-    let kinds: &[&str] = if allow { &["allow_once", "allow_always"] } else { &["reject_once", "reject_always"] };
+    let kinds: &[&str] = if allow {
+        &["allow_once", "allow_always"]
+    } else {
+        &["reject_once", "reject_always"]
+    };
     kinds
         .iter()
         .find_map(|kind| options.iter().find(|o| o["kind"] == *kind))
@@ -123,31 +137,53 @@ fn pick_option(options: &Value, allow: bool) -> Option<String> {
 }
 
 fn parse_models(result: &Value) -> (Vec<ModelOption>, Option<String>, Option<ModelMethod>) {
-    if let Some(models) = result.pointer("/models/availableModels").and_then(Value::as_array) {
+    if let Some(models) = result
+        .pointer("/models/availableModels")
+        .and_then(Value::as_array)
+    {
         let list = models
             .iter()
             .filter_map(|m| {
                 let value = m["modelId"].as_str()?.to_string();
-                Some(ModelOption { label: m["name"].as_str().unwrap_or(&value).to_string(), value })
+                Some(ModelOption {
+                    label: m["name"].as_str().unwrap_or(&value).to_string(),
+                    value,
+                })
             })
             .collect();
-        return (list, str_at(result, "/models/currentModelId"), Some(ModelMethod::SetModel));
+        return (
+            list,
+            str_at(result, "/models/currentModelId"),
+            Some(ModelMethod::SetModel),
+        );
     }
-    let option = result["configOptions"]
-        .as_array()
-        .and_then(|options| options.iter().find(|o| o["id"] == "model" || o["category"] == "model"));
+    let option = result["configOptions"].as_array().and_then(|options| {
+        options
+            .iter()
+            .find(|o| o["id"] == "model" || o["category"] == "model")
+    });
     if let Some(option) = option {
         let mut list = vec![];
         for entry in option["options"].as_array().into_iter().flatten() {
             // Options may be grouped.
-            let entries = entry["options"].as_array().cloned().unwrap_or_else(|| vec![entry.clone()]);
+            let entries = entry["options"]
+                .as_array()
+                .cloned()
+                .unwrap_or_else(|| vec![entry.clone()]);
             for e in entries {
                 if let Some(value) = e["value"].as_str() {
-                    list.push(ModelOption { label: e["name"].as_str().unwrap_or(value).to_string(), value: value.into() });
+                    list.push(ModelOption {
+                        label: e["name"].as_str().unwrap_or(value).to_string(),
+                        value: value.into(),
+                    });
                 }
             }
         }
-        return (list, str_at(option, "/currentValue"), Some(ModelMethod::ConfigOption));
+        return (
+            list,
+            str_at(option, "/currentValue"),
+            Some(ModelMethod::ConfigOption),
+        );
     }
     (vec![], None, None)
 }
@@ -207,10 +243,14 @@ impl State {
     }
 
     fn set_agent_mode(&self, mode_id: &str) {
-        let Some(session_id) = self.session().id.clone() else { return };
-        let _ = self
-            .rpc
-            .request("session/set_mode", json!({"sessionId": session_id, "modeId": mode_id}), |_| {});
+        let Some(session_id) = self.session().id.clone() else {
+            return;
+        };
+        let _ = self.rpc.request(
+            "session/set_mode",
+            json!({"sessionId": session_id, "modeId": mode_id}),
+            |_| {},
+        );
     }
 
     /// Plan mode also switches the agent into its own plan mode when it has one.
@@ -240,7 +280,10 @@ impl State {
             return Ok(());
         };
         let (name, params) = match method {
-            ModelMethod::SetModel => ("session/set_model", json!({"sessionId": session_id, "modelId": model})),
+            ModelMethod::SetModel => (
+                "session/set_model",
+                json!({"sessionId": session_id, "modelId": model}),
+            ),
             ModelMethod::ConfigOption => (
                 "session/set_config_option",
                 json!({"sessionId": session_id, "configId": "model", "value": model}),
@@ -254,12 +297,23 @@ impl State {
         })
     }
 
-    fn on_session(self: &Arc<Self>, session_id: String, result: &Value, version: Option<String>, model: Option<String>) {
+    fn on_session(
+        self: &Arc<Self>,
+        session_id: String,
+        result: &Value,
+        version: Option<String>,
+        model: Option<String>,
+    ) {
         let (models, current, method) = parse_models(result);
         let agent_modes: Vec<String> = result
             .pointer("/modes/availableModes")
             .and_then(Value::as_array)
-            .map(|modes| modes.iter().filter_map(|m| m["id"].as_str().map(str::to_string)).collect())
+            .map(|modes| {
+                modes
+                    .iter()
+                    .filter_map(|m| m["id"].as_str().map(str::to_string))
+                    .collect()
+            })
             .unwrap_or_default();
         let queued = {
             let mut session = self.session();
@@ -292,7 +346,8 @@ impl State {
 
     fn on_request(self: &Arc<Self>, id: Value, method: &str, params: Value) {
         if method != "session/request_permission" {
-            self.rpc.respond_error(id, &format!("CalcpadCE does not support {method}"));
+            self.rpc
+                .respond_error(id, &format!("CalcpadCE does not support {method}"));
             return;
         }
         let tool_call = &params["toolCall"];
@@ -310,7 +365,9 @@ impl State {
         }
         let (name, input) = if is_plan_exit(tool_call) {
             let plan = match content_text(&tool_call["content"]) {
-                text if text.is_empty() => tool_call["title"].as_str().unwrap_or_default().to_string(),
+                text if text.is_empty() => {
+                    tool_call["title"].as_str().unwrap_or_default().to_string()
+                }
                 text => text,
             };
             // The app shows this as a plan to approve; approving leaves plan mode.
@@ -322,12 +379,18 @@ impl State {
                 respond(self, id, READ_KINDS.contains(&kind));
                 return;
             }
-            let name = tool_call["title"].as_str().or(tool_call["kind"].as_str()).unwrap_or("tool").to_string();
+            let name = tool_call["title"]
+                .as_str()
+                .or(tool_call["kind"].as_str())
+                .unwrap_or("tool")
+                .to_string();
             let input = tool_call
                 .get("rawInput")
                 .cloned()
                 .filter(|v| !v.is_null())
-                .unwrap_or_else(|| json!({"kind": tool_call["kind"], "locations": tool_call["locations"]}));
+                .unwrap_or_else(
+                    || json!({"kind": tool_call["kind"], "locations": tool_call["locations"]}),
+                );
             (name, input)
         };
         let state = self.clone();
@@ -338,7 +401,8 @@ impl State {
     }
 
     fn on_notification(&self, method: &str, params: &Value) {
-        if method != "session/update" || params.pointer("/_meta/opencode~1child-session").is_some() {
+        if method != "session/update" || params.pointer("/_meta/opencode~1child-session").is_some()
+        {
             return;
         }
         let update = &params["update"];
@@ -358,11 +422,14 @@ impl State {
             is_error: update["status"] == "failed",
             content: truncate(
                 match content_text(&update["content"]) {
-                    text if text.is_empty() => update.get("rawOutput").map(|v| match v {
-                        Value::String(s) => s.clone(),
-                        Value::Null => String::new(),
-                        other => other.to_string(),
-                    }).unwrap_or_default(),
+                    text if text.is_empty() => update
+                        .get("rawOutput")
+                        .map(|v| match v {
+                            Value::String(s) => s.clone(),
+                            Value::Null => String::new(),
+                            other => other.to_string(),
+                        })
+                        .unwrap_or_default(),
                     text => text,
                 },
                 MAX_TOOL_RESULT_CHARS,
@@ -370,13 +437,20 @@ impl State {
         };
         match update["sessionUpdate"].as_str() {
             Some("agent_message_chunk") => match str_at(update, "/content/text") {
-                Some(text) if !text.starts_with("[MODE_UPDATE]") => vec![AgentEvent::TextDelta { text }],
+                Some(text) if !text.starts_with("[MODE_UPDATE]") => {
+                    vec![AgentEvent::TextDelta { text }]
+                }
                 _ => vec![],
             },
             Some("tool_call") => {
                 self.session().tool_calls.insert(id.clone());
-                let input = tool_input(update).unwrap_or_else(|| json!({"locations": update["locations"]}));
-                let mut events = vec![AgentEvent::ToolUse { id: id.clone(), name: tool_name(update), input }];
+                let input =
+                    tool_input(update).unwrap_or_else(|| json!({"locations": update["locations"]}));
+                let mut events = vec![AgentEvent::ToolUse {
+                    id: id.clone(),
+                    name: tool_name(update),
+                    input,
+                }];
                 if finished {
                     events.push(result());
                 }
@@ -386,7 +460,11 @@ impl State {
                 let mut events = vec![];
                 // Some agents only fill in the input once the call starts.
                 if let Some(input) = tool_input(update) {
-                    events.push(AgentEvent::ToolUse { id: id.clone(), name: tool_name(update), input });
+                    events.push(AgentEvent::ToolUse {
+                        id: id.clone(),
+                        name: tool_name(update),
+                        input,
+                    });
                 }
                 if finished {
                     self.session().tool_calls.remove(&id);
@@ -408,9 +486,14 @@ fn tool_input(update: &Value) -> Option<Value> {
 
 /// The title, with opencode's `calcpad_<tool>` written like other harnesses' MCP names.
 fn tool_name(update: &Value) -> String {
-    let title = update["title"].as_str().or(update["kind"].as_str()).unwrap_or("tool");
+    let title = update["title"]
+        .as_str()
+        .or(update["kind"].as_str())
+        .unwrap_or("tool");
     match title.strip_prefix(&format!("{SERVER_NAME}_")) {
-        Some(tool) if auto_approved_tools().contains(&tool) => format!("mcp__{SERVER_NAME}__{tool}"),
+        Some(tool) if auto_approved_tools().contains(&tool) => {
+            format!("mcp__{SERVER_NAME}__{tool}")
+        }
         _ => title.to_string(),
     }
 }
@@ -427,37 +510,64 @@ fn mcp_servers(launch: &Launch) -> Value {
 
 pub fn start(launch: Launch, agent: Agent) -> Result<AcpSession, String> {
     let rpc = Rpc::new(true);
-    let mode = launch.options.permission_mode.clone().unwrap_or_else(|| "default".into());
+    let mode = launch
+        .options
+        .permission_mode
+        .clone()
+        .unwrap_or_else(|| "default".into());
     let state = Arc::new(State {
         agent,
         rpc: rpc.clone(),
-        session: Mutex::new(Session { mode, ..Default::default() }),
+        session: Mutex::new(Session {
+            mode,
+            ..Default::default()
+        }),
     });
     let mut command = process::command(&launch.exe, &launch.cwd);
     command.args(agent.args());
     if agent == Agent::Opencode {
         // opencode allows everything by default; make it ask.
-        command.env("OPENCODE_PERMISSION", r#"{"edit":"ask","bash":"ask","webfetch":"ask"}"#);
+        command.env(
+            "OPENCODE_PERMISSION",
+            r#"{"edit":"ask","bash":"ask","webfetch":"ask"}"#,
+        );
     }
     let link = {
         let state = state.clone();
-        process::spawn(&launch.app, &launch.key, launch.generation, command, agent.name(), None, move |_, line| {
-            let Ok(message) = serde_json::from_str::<Value>(line) else {
-                return false;
-            };
-            match state.rpc.dispatch(message) {
-                Incoming::Request { id, method, params } => state.on_request(id, &method, params),
-                Incoming::Notification { method, params } => state.on_notification(&method, &params),
-                Incoming::Reply | Incoming::Invalid => {}
-            }
-            true
-        })?
+        process::spawn(
+            &launch.app,
+            &launch.key,
+            launch.generation,
+            command,
+            agent.name(),
+            None,
+            move |_, line| {
+                let Ok(message) = serde_json::from_str::<Value>(line) else {
+                    return false;
+                };
+                match state.rpc.dispatch(message) {
+                    Incoming::Request { id, method, params } => {
+                        state.on_request(id, &method, params)
+                    }
+                    Incoming::Notification { method, params } => {
+                        state.on_notification(&method, &params)
+                    }
+                    Incoming::Reply | Incoming::Invalid => {}
+                }
+                true
+            },
+        )?
     };
     rpc.attach(link);
 
     let servers = mcp_servers(&launch);
     let cwd = launch.cwd.clone();
-    let model = launch.options.model.clone().map(|m| m.trim().to_string()).filter(|m| !m.is_empty());
+    let model = launch
+        .options
+        .model
+        .clone()
+        .map(|m| m.trim().to_string())
+        .filter(|m| !m.is_empty());
     let resume = launch.options.resume.clone().filter(|s| !s.is_empty());
     let init_state = state.clone();
     rpc.request(
@@ -541,7 +651,10 @@ impl AgentBackend for AcpSession {
 
     fn interrupt(&self) -> Result<(), String> {
         match self.state.session().id.clone() {
-            Some(id) => self.state.rpc.notify("session/cancel", json!({"sessionId": id})),
+            Some(id) => self
+                .state
+                .rpc
+                .notify("session/cancel", json!({"sessionId": id})),
             None => Ok(()),
         }
     }
@@ -570,35 +683,62 @@ mod tests {
 
     #[test]
     fn replays_live_transcript() {
-        let Some(lines) = crate::agent::tests::live_transcript("opencode.jsonl") else { return };
-        let state = State { agent: Agent::Opencode, rpc: Rpc::new(true), session: Mutex::new(Session::default()) };
-        let session = lines.iter().find_map(|l| l.get("result").filter(|r| r.get("sessionId").is_some())).unwrap();
+        let Some(lines) = crate::agent::tests::live_transcript("opencode.jsonl") else {
+            return;
+        };
+        let state = State {
+            agent: Agent::Opencode,
+            rpc: Rpc::new(true),
+            session: Mutex::new(Session::default()),
+        };
+        let session = lines
+            .iter()
+            .find_map(|l| l.get("result").filter(|r| r.get("sessionId").is_some()))
+            .unwrap();
         let (models, current, method) = parse_models(session);
-        assert!(!models.is_empty() && current.is_some() && method == Some(ModelMethod::ConfigOption));
+        assert!(
+            !models.is_empty() && current.is_some() && method == Some(ModelMethod::ConfigOption)
+        );
         let mut events = vec![];
         for line in &lines {
             match line["method"].as_str() {
-                Some("session/update") => events.extend(state.map_update(&line["params"]["update"])),
+                Some("session/update") => {
+                    events.extend(state.map_update(&line["params"]["update"]))
+                }
                 Some("session/request_permission") => {
                     let call = &line["params"]["toolCall"];
                     assert!(!is_calcpad_tool(call));
-                    assert_eq!(pick_option(&line["params"]["options"], true).as_deref(), Some("once"));
-                    assert_eq!(pick_option(&line["params"]["options"], false).as_deref(), Some("reject"));
+                    assert_eq!(
+                        pick_option(&line["params"]["options"], true).as_deref(),
+                        Some("once")
+                    );
+                    assert_eq!(
+                        pick_option(&line["params"]["options"], false).as_deref(),
+                        Some("reject")
+                    );
                 }
-                _ if line["result"]["stopReason"] == "end_turn" => events.push(AgentEvent::TurnComplete {
-                    is_error: false,
-                    subtype: "success".into(),
-                    cost_usd: None,
-                    error: None,
-                }),
+                _ if line["result"]["stopReason"] == "end_turn" => {
+                    events.push(AgentEvent::TurnComplete {
+                        is_error: false,
+                        subtype: "success".into(),
+                        cost_usd: None,
+                        error: None,
+                    })
+                }
                 _ => {}
             }
         }
         let get_document = events.iter().rev().find_map(|e| match e {
-            AgentEvent::ToolUse { name, input, .. } if name == "mcp__calcpad__get_document" => Some(input),
+            AgentEvent::ToolUse { name, input, .. } if name == "mcp__calcpad__get_document" => {
+                Some(input)
+            }
             _ => None,
         });
-        assert_eq!(get_document.unwrap()["path"], "/tmp/beam.cpd", "the later update should carry the real input");
+        assert_eq!(
+            get_document.unwrap()["path"],
+            "/tmp/beam.cpd",
+            "the later update should carry the real input"
+        );
         crate::agent::tests::check_live_run(&events);
     }
 
@@ -611,28 +751,45 @@ mod tests {
         ]);
         assert_eq!(pick_option(&options, true).as_deref(), Some("once"));
         assert_eq!(pick_option(&options, false).as_deref(), Some("reject"));
-        assert_eq!(pick_option(&json!([{"optionId":"a","kind":"allow_once"}]), false), None);
+        assert_eq!(
+            pick_option(&json!([{"optionId":"a","kind":"allow_once"}]), false),
+            None
+        );
     }
 
     #[test]
     fn recognizes_calcpad_tools() {
-        assert!(is_calcpad_tool(&json!({"title":"x","_meta":{"gemini-cli":{"mcp":{"server_name":"calcpad"}}}})));
+        assert!(is_calcpad_tool(
+            &json!({"title":"x","_meta":{"gemini-cli":{"mcp":{"server_name":"calcpad"}}}})
+        ));
         assert!(is_calcpad_tool(&json!({"title":"calcpad/get_document"})));
         assert!(!is_calcpad_tool(&json!({"title":"Shell: rm -rf build"})));
     }
 
     #[test]
     fn recognizes_plan_exits() {
-        assert!(is_plan_exit(&json!({"kind":"switch_mode","title":"Ready to code?"})));
-        assert!(is_plan_exit(&json!({"kind":"other","title":"Exit Plan Mode"})));
-        assert!(!is_plan_exit(&json!({"kind":"edit","title":"Write plan.md"})));
+        assert!(is_plan_exit(
+            &json!({"kind":"switch_mode","title":"Ready to code?"})
+        ));
+        assert!(is_plan_exit(
+            &json!({"kind":"other","title":"Exit Plan Mode"})
+        ));
+        assert!(!is_plan_exit(
+            &json!({"kind":"edit","title":"Write plan.md"})
+        ));
     }
 
     #[test]
     fn parses_models_from_either_shape() {
         let gemini = json!({"models":{"availableModels":[{"modelId":"pro","name":"Pro"}],"currentModelId":"pro"}});
         let (list, current, method) = parse_models(&gemini);
-        assert_eq!(list, vec![ModelOption { value: "pro".into(), label: "Pro".into() }]);
+        assert_eq!(
+            list,
+            vec![ModelOption {
+                value: "pro".into(),
+                label: "Pro".into()
+            }]
+        );
         assert_eq!(current.as_deref(), Some("pro"));
         assert!(method == Some(ModelMethod::SetModel));
         let opencode = json!({"configOptions":[{"id":"model","category":"model","currentValue":"a/b","options":[{"value":"a/b","name":"B"}]}]});

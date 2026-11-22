@@ -18,7 +18,10 @@ const DISALLOWED_TOOLS: &[&str] = &["Edit", "MultiEdit", "NotebookEdit"];
 const RESTRICTED_TOOLS: &[&str] = &["Write", "Bash"];
 
 fn is_restricted(options: &StartOptions) -> bool {
-    matches!(options.permission_mode.as_deref(), Some("acceptEdits" | "auto"))
+    matches!(
+        options.permission_mode.as_deref(),
+        Some("acceptEdits" | "auto")
+    )
 }
 
 pub struct ClaudeCodeSession {
@@ -64,7 +67,11 @@ impl ClaudeCodeSession {
     }
 }
 
-pub fn build_args(options: &StartOptions, mcp_config: &Path, plugin_dir: Option<&Path>) -> Vec<String> {
+pub fn build_args(
+    options: &StartOptions,
+    mcp_config: &Path,
+    plugin_dir: Option<&Path>,
+) -> Vec<String> {
     let mut args: Vec<String> = [
         "-p",
         "--input-format",
@@ -115,7 +122,11 @@ pub fn build_args(options: &StartOptions, mcp_config: &Path, plugin_dir: Option<
         args.push("--model".into());
         args.push(model.trim().into());
     }
-    if let Some(mode) = options.permission_mode.as_deref().filter(|m| *m != "default") {
+    if let Some(mode) = options
+        .permission_mode
+        .as_deref()
+        .filter(|m| *m != "default")
+    {
         args.push("--permission-mode".into());
         args.push(mode.into());
     }
@@ -173,7 +184,9 @@ pub fn map_line(line: &Value) -> Vec<AgentEvent> {
                 blocks
                     .iter()
                     .filter_map(|b| match b.get("type").and_then(Value::as_str) {
-                        Some("text") => str_at(b, "text").map(|text| AgentEvent::AssistantText { text }),
+                        Some("text") => {
+                            str_at(b, "text").map(|text| AgentEvent::AssistantText { text })
+                        }
                         Some("tool_use") => Some(AgentEvent::ToolUse {
                             id: str_at(b, "id").unwrap_or_default(),
                             name: str_at(b, "name").unwrap_or_default(),
@@ -216,7 +229,11 @@ pub fn map_line(line: &Value) -> Vec<AgentEvent> {
                 is_error,
                 subtype,
                 cost_usd: line["total_cost_usd"].as_f64(),
-                error: if is_error { str_at(line, "result") } else { None },
+                error: if is_error {
+                    str_at(line, "result")
+                } else {
+                    None
+                },
             }]
         }
         _ => vec![],
@@ -235,12 +252,19 @@ pub fn start(launch: Launch) -> Result<ClaudeCodeSession, String> {
         SERVER_NAME.into(),
         json!({"type": "http", "url": launch.mcp.url(), "headers": headers}),
     );
-    let config_path = launch.data_dir.join(format!("mcp-{}.json", super::session_label(&launch.key)));
-    process::write_private(&config_path, &json!({"mcpServers": servers}).to_string()).map_err(|e| e.to_string())?;
+    let config_path = launch
+        .data_dir
+        .join(format!("mcp-{}.json", super::session_label(&launch.key)));
+    process::write_private(&config_path, &json!({"mcpServers": servers}).to_string())
+        .map_err(|e| e.to_string())?;
 
     let mut command = process::command(&launch.exe, &launch.cwd);
     command
-        .args(build_args(&launch.options, &config_path, launch.plugin_dir.as_deref()))
+        .args(build_args(
+            &launch.options,
+            &config_path,
+            launch.plugin_dir.as_deref(),
+        ))
         .env("CLAUDE_CODE_STARTUP_FAILURE_RESULTS", "1");
     let link = process::spawn(
         &launch.app,
@@ -271,9 +295,14 @@ mod tests {
 
     #[test]
     fn replays_live_transcript() {
-        let Some(lines) = crate::agent::tests::live_transcript("claude.jsonl") else { return };
+        let Some(lines) = crate::agent::tests::live_transcript("claude.jsonl") else {
+            return;
+        };
         let events: Vec<AgentEvent> = lines.iter().flat_map(map_line).collect();
-        assert!(matches!(events.first(), Some(AgentEvent::SessionStarted { .. })));
+        assert!(matches!(
+            events.first(),
+            Some(AgentEvent::SessionStarted { .. })
+        ));
         crate::agent::tests::check_live_run(&events);
     }
 
@@ -290,11 +319,19 @@ mod tests {
             }]
         );
         let err = json!({"type":"control_response","response":{"subtype":"error","request_id":"calcpad-1","error":"Auto mode is unavailable"}});
-        assert_eq!(map_line(&err), vec![AgentEvent::Error { message: "Auto mode is unavailable".into() }]);
+        assert_eq!(
+            map_line(&err),
+            vec![AgentEvent::Error {
+                message: "Auto mode is unavailable".into()
+            }]
+        );
         let ok = json!({"type":"control_response","response":{"subtype":"success","request_id":"calcpad-1"}});
         assert!(map_line(&ok).is_empty());
         let delta = json!({"type":"stream_event","event":{"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ok"}},"parent_tool_use_id":null});
-        assert_eq!(map_line(&delta), vec![AgentEvent::TextDelta { text: "ok".into() }]);
+        assert_eq!(
+            map_line(&delta),
+            vec![AgentEvent::TextDelta { text: "ok".into() }]
+        );
     }
 
     #[test]
@@ -307,7 +344,9 @@ mod tests {
         assert_eq!(
             map_line(&assistant),
             vec![
-                AgentEvent::AssistantText { text: "Checking".into() },
+                AgentEvent::AssistantText {
+                    text: "Checking".into()
+                },
                 AgentEvent::ToolUse {
                     id: "t1".into(),
                     name: "Read".into(),
@@ -341,8 +380,11 @@ mod tests {
             }]
         );
         let stopped = json!({"type":"result","subtype":"error_during_execution","is_error":false});
-        assert!(matches!(map_line(&stopped).as_slice(), [AgentEvent::TurnComplete { subtype, .. }] if subtype == "interrupted"));
-        let failed = json!({"type":"result","subtype":"success","is_error":true,"result":"Not logged in"});
+        assert!(
+            matches!(map_line(&stopped).as_slice(), [AgentEvent::TurnComplete { subtype, .. }] if subtype == "interrupted")
+        );
+        let failed =
+            json!({"type":"result","subtype":"success","is_error":true,"result":"Not logged in"});
         assert!(matches!(
             map_line(&failed).as_slice(),
             [AgentEvent::TurnComplete { error: Some(e), .. }] if e == "Not logged in"
@@ -360,12 +402,19 @@ mod tests {
             resume: Some("abc".into()),
             ..Default::default()
         };
-        let args = build_args(&options, Path::new("/tmp/mcp.json"), Some(Path::new("/res/agent-plugins/calcpadce")));
+        let args = build_args(
+            &options,
+            Path::new("/tmp/mcp.json"),
+            Some(Path::new("/res/agent-plugins/calcpadce")),
+        );
         let value_after = |flag: &str| {
             let i = args.iter().position(|a| a == flag).unwrap();
             args[i + 1].clone()
         };
-        assert_eq!(value_after("--permission-prompt-tool"), "mcp__calcpad__approve_tool");
+        assert_eq!(
+            value_after("--permission-prompt-tool"),
+            "mcp__calcpad__approve_tool"
+        );
         assert_eq!(value_after("--model"), "sonnet");
         assert_eq!(value_after("--resume"), "abc");
         assert_eq!(value_after("--permission-mode"), "auto");
@@ -376,7 +425,10 @@ mod tests {
         assert!(value_after("--allowedTools").contains("mcp__calcpad__get_document"));
         assert!(!value_after("--allowedTools").contains("approve_tool"));
         let manual = build_args(&StartOptions::default(), Path::new("/tmp/mcp.json"), None);
-        let i = manual.iter().position(|a| a == "--disallowedTools").unwrap();
+        let i = manual
+            .iter()
+            .position(|a| a == "--disallowedTools")
+            .unwrap();
         assert!(!manual[i + 1].contains("Bash"));
         assert!(!manual.contains(&"--permission-mode".to_string()));
         assert!(!manual.contains(&"--strict-mcp-config".to_string()));
