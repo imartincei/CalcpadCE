@@ -165,7 +165,7 @@
               @wheel="onTabListWheel"
             />
             <!-- Anchors the reveal button to the code area, not the tab strip. -->
-            <div v-show="!uiModeFullscreen" class="editor-area">
+            <div v-show="!uiModeFullscreen" class="editor-area" :data-editor-group="group.id">
               <div class="editor-container" :ref="el => setEditorRef(group.id, el)"></div>
               <button
                 v-if="!sidebarVisible && gi === 0"
@@ -896,9 +896,10 @@ function onRunPreview(): void {
   onRunRequest.value?.()
 }
 
-function addGroup(id: string): void {
+function addGroup(id: string, atTop = false): void {
   if (groups.value.some(g => g.id === id)) return
-  groups.value.push(emptyGroup(id))
+  if (atTop) groups.value.unshift(emptyGroup(id))
+  else groups.value.push(emptyGroup(id))
 }
 function removeGroup(id: string): void {
   const idx = groups.value.findIndex(g => g.id === id)

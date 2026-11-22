@@ -73,7 +73,7 @@ import { navigationDirection, type NavigationLocation } from './editor/navigatio
 import { createBrowserNavigationHistory, createDesktopNavigationHistory, type NavigationHistoryClient } from './services/navigation-history';
 import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from './tabs/tab-manager';
 import type { FileConflictChoice } from './services/file-change-tracker';
-import { setupTabDragging } from './tabs/tab-drag';
+import { setupTabDragging, type SplitSide } from './tabs/tab-drag';
 import { toDisplayLogLevel } from 'calcpad-frontend';
 import type { UiControl, CalcpadLogLevel, DisplayLogLevel, DraftForm, LineEdit, SourceEdit } from 'calcpad-frontend';
 import './editor/vscode-variables.css';
@@ -1317,6 +1317,9 @@ async function bootstrap(): Promise<void> {
             }),
         );
 
+        // An emptied split group is merged away by handleEmptyGroup.
+        group.tabs.allowEmpty = () => groups.size > 1;
+
         // Tab list -> App.vue tab strip for this group.
         group.tabs.onTabsChanged((snapshots) => {
             appInstance.setTabs(group.id, snapshots);
@@ -1355,16 +1358,26 @@ async function bootstrap(): Promise<void> {
      * is given the new group's first tab shares that group's active tab's model instead of
      * starting blank, which is how a split defaults to a live-synced view of the current file.
      */
-    async function createAndWireGroup(id: string, seedContent = '', linkFrom?: EditorGroup): Promise<EditorGroup> {
-        appInstance.addGroup(id);
+    async function createAndWireGroup(id: string, seedContent = '', linkFrom?: EditorGroup,
+        atTop = false, link?: monaco.editor.ITextModel): Promise<EditorGroup> {
+        appInstance.addGroup(id, atTop);
         await nextTick();
         const container = appInstance.getEditorContainer(id) as HTMLElement | null;
         if (!container) throw new Error(`Editor container for group ${id} not found`);
         const group = new EditorGroup(id, container, { wordWrap: initialWordWrap, fontFamily: initialEditorFontFamily, completionDelayMs });
-        groups.set(id, group);
+        // Map order mirrors the on-screen order, top first.
+        if (atTop) {
+            const others = [...groups];
+            groups.clear();
+            groups.set(id, group);
+            for (const [key, other] of others) groups.set(key, other);
+        } else {
+            groups.set(id, group);
+        }
         wireGroupCommon(group);
         for (const hook of groupWireHooks) hook(group);
-        const linkModel = linkFrom?.tabs.activeId ? linkFrom.tabs.modelForTab(linkFrom.tabs.activeId) : null;
+        const linkModel = link
+            ?? (linkFrom?.tabs.activeId ? linkFrom.tabs.modelForTab(linkFrom.tabs.activeId) : null);
         if (linkModel) group.tabs.openLinked(linkModel);
         else group.tabs.newUntitled(seedContent);
         return group;
@@ -1392,21 +1405,24 @@ async function bootstrap(): Promise<void> {
     // group may be the second one, so a fixed 'g1' would collide on the next split.
     let groupSeq = 0;
 
-    async function splitEditor(): Promise<void> {
+    /** `link` undefined mirrors the active tab, null seeds a blank tab, a model mirrors that model. */
+    async function splitEditor(side: SplitSide = 'bottom', link?: monaco.editor.ITextModel | null): Promise<EditorGroup | null> {
         if (groups.size >= 2) {
             activeGroup.editor.focus();
-            return;
+            return null;
         }
         // The input form owns the window and shows one document; a second group
         // would have nowhere to render and would share this one's entered values.
         if (appInstance.getResultMode() === 'ui' && appInstance.isPreviewVisible()) {
             appInstance.appendOutput('info', 'Exit input mode to split the editor.');
-            return;
+            return null;
         }
         const source = activeGroup;
-        const group = await createAndWireGroup(`g${++groupSeq}`, '', source);
+        const group = await createAndWireGroup(`g${++groupSeq}`, '', link === undefined ? source : undefined,
+            side === 'top', link ?? undefined);
         setActiveGroup(group);
         group.editor.focus();
+        return group;
     }
 
     async function closeGroup(groupId: string): Promise<void> {
@@ -2264,15 +2280,23 @@ async function bootstrap(): Promise<void> {
                 && !await confirmDiscardMetadataDraft(metadataDocKeyFor(group, tabId), group.tabs.getTitle(tabId)!)) return null;
             return group.tabs.exportTab(tabId);
         },
-        async move(sourceGroupId, tabId, groupId, beforeId) {
+        async move(sourceGroupId, tabId, groupId, beforeId, split) {
             const source = groups.get(sourceGroupId)!;
-            const target = groups.get(groupId)!;
-            if (source === target) {
+            if (!split && source === groups.get(groupId)) {
                 source.tabs.reorder(tabId, beforeId);
+                return;
+            }
+            // A group's only tab splits into a mirrored view rather than leaving the group empty.
+            if (split && source.tabs.count === 1) {
+                await splitEditor(split, source.tabs.modelForTab(tabId)!);
                 return;
             }
             if (!await confirmLeaveUiDoc()) return;
             if (!await confirmDiscardMetadataDraft(metadataDocKeyFor(source, tabId), source.tabs.getTitle(tabId)!)) return;
+            const created = split ? await splitEditor(split, null) : null;
+            if (split && !created) return;
+            const target = created ?? groups.get(groupId)!;
+            const seed = created?.tabs.activeId;
             const snapshot = source.tabs.exportTab(tabId);
             const model = source.tabs.modelForTab(tabId)!;
             const existing = target.tabs.all.find(tab => target.tabs.modelForTab(tab.id) === model);
@@ -2280,15 +2304,16 @@ async function bootstrap(): Promise<void> {
             const id = existing?.id ?? target.tabs.importTab(snapshot, model);
             target.tabs.activate(id);
             target.tabs.reorder(id, beforeId);
+            if (seed && seed !== id) target.tabs.close(seed);
             await persistTransferredTab(id);
             source.tabs.close(tabId);
+            await handleEmptyGroup(source);
             setActiveGroup(target);
             target.editor.focus();
         },
-        async receive(snapshot, groupId, beforeId) {
-            const target = groups.get(groupId);
+        async receive(snapshot, groupId, beforeId, split) {
+            let target = groups.get(groupId);
             if (!target || !await confirmLeaveUiDoc()) return false;
-            const existing = snapshot.filePath ? target.tabs.findByPath(snapshot.filePath) : null;
             const documentGroup = snapshot.filePath
                 ? [...groups.values()].find(group => group.tabs.findByPath(snapshot.filePath!))
                 : undefined;
@@ -2299,6 +2324,12 @@ async function bootstrap(): Promise<void> {
                 appInstance.showOutput();
                 return false;
             }
+            if (split) {
+                const created = await splitEditor(split, null);
+                if (!created) return false;
+                target = created;
+            }
+            const existing = snapshot.filePath ? target.tabs.findByPath(snapshot.filePath) : null;
             const scratch = target.tabs.activeTab;
             const replaceScratch = scratch?.filePath === null && !scratch.dirty
                 && target.tabs.getContent(scratch.id) === ''
@@ -2325,6 +2356,17 @@ async function bootstrap(): Promise<void> {
                 return;
             }
             group!.tabs.close(tabId);
+            void handleEmptyGroup(group!);
+        },
+        async openWindow() {
+            try {
+                const { invoke } = await import('@tauri-apps/api/core');
+                return await invoke<string>('new_window', { atCursor: true });
+            } catch (err) {
+                appInstance.appendOutput('error', `Could not open a new window: ${err}`);
+                appInstance.showOutput();
+                return null;
+            }
         },
     });
 
@@ -3407,7 +3449,10 @@ async function bootstrap(): Promise<void> {
                 }
             }
             for (const { group, id } of dirty) {
-                if (!await tryCloseTab(group, id)) return false;
+                if (!await tryCloseTab(group, id)) {
+                    for (const g of [...groups.values()]) await handleEmptyGroup(g);
+                    return false;
+                }
             }
             return true;
         }
