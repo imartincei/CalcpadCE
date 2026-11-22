@@ -578,7 +578,7 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         await app.fileOpen(main, file);
         await app.evaluate(main, sidebarTab('Settings'));
         await app.evaluate(main, `(() => { const search = document.querySelector('.settings-toolbar input'); search.value = 'prettify'; search.dispatchEvent(new Event('input', {bubbles: true})); window.calcpadActiveEditor.setValue('a = 1   '); })()`);
-        assert.equal(await app.evaluate(main, `document.querySelector('.settings-tab .formatting-tab').checkVisibility()`), true);
+        assert.equal(await app.evaluate(main, `document.querySelector('.settings-tab [data-setting-id="formatting.prettify"]').checkVisibility()`), true);
         await app.evaluate(main, `document.querySelector('.settings-tab .formatting-tab button').click()`);
         await until(() => app.evaluate(main, `window.calcpadActiveEditor.getValue() === 'a = 1'`), 'Prettify in Settings trims whitespace');
         await app.evaluate(main, `(() => { const search = document.querySelector('.settings-toolbar input'); search.value = 'auto-run'; search.dispatchEvent(new Event('input', {bubbles: true})); })()`);
