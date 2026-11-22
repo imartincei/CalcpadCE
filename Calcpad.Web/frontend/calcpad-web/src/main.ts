@@ -2484,7 +2484,18 @@ async function bootstrap(): Promise<void> {
             groups: () => [...groups.values()],
             activeGroup: () => activeGroup,
             openFile: loadFile,
-        }, (locale, messages) => i18n.global.mergeLocaleMessage(locale, messages));
+            createDocument: (path) => { activeGroup.tabs.openFile(path, ''); },
+            closeDocument: (path) => {
+                for (const group of groups.values()) {
+                    const tab = group.tabs.findByPath(path);
+                    if (tab) group.tabs.close(tab.id);
+                }
+            },
+            pathExists: async (path) => {
+                const { invoke } = await import('@tauri-apps/api/core');
+                return invoke<boolean>('agent_path_exists', { path });
+            },
+        });
 
         // Files-tab clicks arrive via a custom event dispatched by the bridge.
         window.addEventListener('calcpad-open-file', (e: Event) => {

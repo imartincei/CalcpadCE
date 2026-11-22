@@ -7,6 +7,11 @@ export interface AgentEditorContext {
     groups(): EditorGroup[];
     activeGroup(): EditorGroup;
     openFile(path: string): Promise<void>;
+    /** Opens an empty, unsaved tab for a worksheet that does not exist on disk yet. */
+    createDocument(path: string): void;
+    /** Closes a worksheet's tab without saving. */
+    closeDocument(path: string): void;
+    pathExists(path: string): Promise<boolean>;
 }
 
 export interface DocRef {
@@ -21,6 +26,16 @@ export interface PreparedEdit {
     modified: string;
     summary: string;
 }
+
+/** A new worksheet; its tab is opened only once the edit is accepted. */
+export interface PreparedCreate {
+    create: string;
+    original: '';
+    modified: string;
+    summary: string;
+}
+
+export type ProposedEdit = PreparedEdit | PreparedCreate;
 
 type Args = Record<string, unknown>;
 
@@ -47,6 +62,29 @@ export function findDoc(ctx: AgentEditorContext, ref: unknown): DocRef {
         }
     }
     throw new Error(`"${ref}" is not open in Calcpad. Use list_open_documents, or open_document to open it.`);
+}
+
+function isAbsolutePath(ref: string): boolean {
+    return ref.startsWith('/') || /^[A-Za-z]:[\\/]/.test(ref) || ref.startsWith('\\\\');
+}
+
+/** Like findDoc, but opens a worksheet given by absolute path when it is not open yet. */
+export async function resolveDoc(ctx: AgentEditorContext, ref: unknown): Promise<DocRef> {
+    try {
+        return findDoc(ctx, ref);
+    } catch (err) {
+        if (typeof ref !== 'string' || !isAbsolutePath(ref.trim())) throw err;
+    }
+    const path = (ref as string).trim();
+    if (!await ctx.pathExists(path)) {
+        throw new Error(`"${path}" does not exist. To create it, call propose_edit with this path and the full \`text\`.`);
+    }
+    await ctx.openFile(path);
+    try {
+        return findDoc(ctx, path);
+    } catch {
+        throw new Error(`Could not open "${path}" in Calcpad. Check that the file exists.`);
+    }
 }
 
 function describe(doc: DocRef) {
@@ -125,9 +163,17 @@ function countOccurrences(haystack: string, needle: string): number {
     return count;
 }
 
-/** Builds the proposed text without touching the editor. Throws a message the agent can act on. */
-export function prepareEdit(ctx: AgentEditorContext, args: Args): PreparedEdit {
-    const doc = findDoc(ctx, args.path);
+/** Builds the proposed text without changing the editor (it may open the worksheet). Throws a message the agent can act on. */
+export async function prepareEdit(ctx: AgentEditorContext, args: Args): Promise<ProposedEdit> {
+    const summary = typeof args.summary === 'string' ? args.summary : '';
+    const path = typeof args.path === 'string' ? args.path.trim() : '';
+    if (path && isAbsolutePath(path) && !isOpen(ctx, path) && !await ctx.pathExists(path)) {
+        if (typeof args.text !== 'string' || !args.text) {
+            throw new Error(`"${path}" does not exist. To create it, give the full \`text\`.`);
+        }
+        return { create: path, original: '', modified: args.text, summary };
+    }
+    const doc = await resolveDoc(ctx, args.path);
     const original = doc.model.getValue();
     let modified: string;
     if (typeof args.text === 'string') {
@@ -150,7 +196,23 @@ export function prepareEdit(ctx: AgentEditorContext, args: Args): PreparedEdit {
         throw new Error('Provide either `edits` or the full `text`.');
     }
     if (modified === original) throw new Error('The proposed edit does not change the document.');
-    return { doc, original, modified, summary: typeof args.summary === 'string' ? args.summary : '' };
+    return { doc, original, modified, summary };
+}
+
+function isOpen(ctx: AgentEditorContext, path: string): boolean {
+    try {
+        findDoc(ctx, path);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+/** Opens the tab for an accepted new worksheet so the edit can be applied to it. */
+export function materialize(ctx: AgentEditorContext, edit: ProposedEdit): PreparedEdit {
+    if (!('create' in edit)) return edit;
+    ctx.createDocument(edit.create);
+    return { doc: findDoc(ctx, edit.create), original: '', modified: edit.modified, summary: edit.summary };
 }
 
 /** Applies only the changed span so undo, cursor and folding survive. */
@@ -183,13 +245,13 @@ export async function runEditorTool(ctx: AgentEditorContext, tool: string, args:
         case 'list_open_documents':
             return listOpenDocuments(ctx);
         case 'get_document': {
-            const doc = findDoc(ctx, args.path);
+            const doc = await resolveDoc(ctx, args.path);
             return { ...describe(doc), text: doc.model.getValue() };
         }
         case 'get_selection':
             return getSelection(ctx);
         case 'get_diagnostics':
-            return getDiagnostics(findDoc(ctx, args.path));
+            return getDiagnostics(await resolveDoc(ctx, args.path));
         case 'open_document': {
             if (typeof args.path !== 'string' || !args.path) throw new Error('`path` is required.');
             await ctx.openFile(args.path);

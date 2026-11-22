@@ -40,6 +40,7 @@ pub trait ToolBridge: Send + Sync + 'static {
 pub const SERVER_NAME: &str = "calcpad";
 const WINDOW_HEADER: &str = "x-calcpad-window";
 const CONVERSATION_HEADER: &str = "x-calcpad-conversation";
+const APPROVAL_HEADER: &str = "x-calcpad-approval";
 const DATA_TIMEOUT: Option<Duration> = Some(Duration::from_secs(30));
 
 #[derive(Clone)]
@@ -49,20 +50,25 @@ pub struct McpEndpoint {
 }
 
 impl McpEndpoint {
-    /// Everything a provider needs to connect its agent to this server.
-    pub fn descriptor(&self, key: &SessionKey) -> Value {
-        json!({
-            "name": SERVER_NAME,
-            "type": "http",
-            "url": self.url,
-            "headers": {
-                "Authorization": format!("Bearer {}", self.token),
-                "X-Calcpad-Window": key.window,
-                "X-Calcpad-Conversation": key.conversation,
-            },
-            "autoApprovedTools": auto_approved_tools(),
-            "approvalTool": APPROVAL_TOOL,
-        })
+    pub fn url(&self) -> &str {
+        &self.url
+    }
+
+    pub fn token(&self) -> &str {
+        &self.token
+    }
+
+    /// Headers an agent sends on every request; `approval` exposes the approval tool.
+    pub fn headers(&self, key: &SessionKey, approval: bool) -> Vec<(&'static str, String)> {
+        let mut headers = vec![
+            ("Authorization", format!("Bearer {}", self.token)),
+            ("X-Calcpad-Window", key.window.clone()),
+            ("X-Calcpad-Conversation", key.conversation.clone()),
+        ];
+        if approval {
+            headers.push(("X-Calcpad-Approval", "1".into()));
+        }
+        headers
     }
 }
 
@@ -80,7 +86,7 @@ fn path_arg() -> Value {
     json!({
         "type": "object",
         "properties": {
-            "path": {"type": "string", "description": "Absolute path of an open worksheet, or its id from list_open_documents if untitled. Defaults to the active one."}
+            "path": {"type": "string", "description": "Absolute path of a worksheet (opened in Calcpad if it isn't already), or an id from list_open_documents for untitled ones. Defaults to the active one."}
         }
     })
 }
@@ -95,7 +101,7 @@ const TOOLS: &[ToolSpec] = &[
     },
     ToolSpec {
         name: "get_document",
-        description: "Read an open worksheet's current text from the editor, including unsaved changes. Prefer this over reading the file from disk.",
+        description: "Read a worksheet's current text from the editor, including unsaved changes; opens it first if needed. Prefer this over reading the file from disk.",
         schema: path_arg,
         timeout: DATA_TIMEOUT,
         auto_approve: true,
@@ -127,11 +133,11 @@ const TOOLS: &[ToolSpec] = &[
     },
     ToolSpec {
         name: "propose_edit",
-        description: "Propose a change to an open worksheet. The user reviews a diff and accepts or rejects it; accepted changes land in the editor buffer (unsaved, undoable). Give either `edits` (each oldText must match exactly once) or the full new `text`.",
+        description: "Propose a change to a worksheet; it is opened in Calcpad first if needed. The user reviews a diff and accepts or rejects it; accepted changes land in the editor buffer (unsaved, undoable). Give either `edits` (each oldText must match exactly once) or the full new `text`. To create a new worksheet, give a path that does not exist yet and the full `text`; it opens as an unsaved tab. Use this instead of writing .cpd files directly.",
         schema: || json!({
             "type": "object",
             "properties": {
-                "path": {"type": "string", "description": "Absolute path of an open worksheet, or its id from list_open_documents if untitled. Defaults to the active one."},
+                "path": {"type": "string", "description": "Absolute path of a worksheet (opened in Calcpad if it isn't already), or an id from list_open_documents for untitled ones. Defaults to the active one."},
                 "edits": {
                     "type": "array",
                     "items": {
@@ -171,9 +177,10 @@ pub fn auto_approved_tools() -> Vec<&'static str> {
     TOOLS.iter().filter(|t| t.auto_approve).map(|t| t.name).collect()
 }
 
-fn tools() -> Vec<Tool> {
+fn tools(approval: bool) -> Vec<Tool> {
     TOOLS
         .iter()
+        .filter(|t| approval || t.name != APPROVAL_TOOL)
         .map(|t| {
             let Value::Object(schema) = (t.schema)() else {
                 unreachable!("tool schemas are objects")
@@ -190,6 +197,13 @@ fn render(value: Value) -> String {
     }
 }
 
+fn wants_approval(context: &RequestContext<RoleServer>) -> bool {
+    context
+        .extensions
+        .get::<http::request::Parts>()
+        .is_some_and(|p| p.headers.contains_key(APPROVAL_HEADER))
+}
+
 #[derive(Clone)]
 struct CalcpadMcp {
     bridge: Arc<dyn ToolBridge>,
@@ -204,9 +218,9 @@ impl ServerHandler for CalcpadMcp {
     async fn list_tools(
         &self,
         _request: Option<PaginatedRequestParams>,
-        _context: RequestContext<RoleServer>,
+        context: RequestContext<RoleServer>,
     ) -> Result<ListToolsResult, ErrorData> {
-        Ok(ListToolsResult::with_all_items(tools()))
+        Ok(ListToolsResult::with_all_items(tools(wants_approval(&context))))
     }
 
     async fn call_tool(
@@ -230,6 +244,7 @@ impl ServerHandler for CalcpadMcp {
         let spec = TOOLS
             .iter()
             .find(|t| t.name == request.name)
+            .filter(|t| t.name != APPROVAL_TOOL || wants_approval(&context))
             .ok_or_else(|| ErrorData::invalid_params(format!("Unknown tool {}", request.name), None))?;
         let args = Value::Object(request.arguments.unwrap_or_default());
         let result = self.bridge.call(key, spec.name, args, spec.timeout).await;
@@ -336,6 +351,7 @@ mod tests {
 
     #[test]
     fn every_tool_schema_is_an_object() {
-        assert_eq!(tools().len(), TOOLS.len());
+        assert_eq!(tools(true).len(), TOOLS.len());
+        assert!(tools(false).iter().all(|t| t.name != APPROVAL_TOOL));
     }
 }

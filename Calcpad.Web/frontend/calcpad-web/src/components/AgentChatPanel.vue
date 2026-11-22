@@ -76,14 +76,28 @@
     </div>
 
     <form v-if="showSettings" class="agent-settings" @submit.prevent="applySettings">
-      <label v-for="field in agentChat.provider?.settings ?? []" :key="field.key" class="agent-field">
-        <span class="agent-field-label">{{ t(field.label) }}</span>
-        <input v-model="draftSettings.values[field.key]" type="text" spellcheck="false" :placeholder="field.placeholder ? t(field.placeholder) : ''" />
+      <label class="agent-field">
+        <span class="agent-field-label">{{ t('Agent') }}</span>
+        <select :value="draftSettings.harness" class="agent-select" @change="onDraftHarness">
+          <option v-for="harness in agentChat.harnesses" :key="harness.id" :value="harness.id">{{ harnessLabel(harness) }}</option>
+        </select>
       </label>
-      <label v-if="modelOptions.length" class="agent-field">
+      <label class="agent-field">
+        <span class="agent-field-label">{{ t('{name} executable', { name: draftHarness?.name ?? '' }) }}</span>
+        <input
+          v-model="draftSettings.executable"
+          type="text"
+          spellcheck="false"
+          :placeholder="draftHarness?.installed && !draftSettings.executable ? draftHarness.path ?? '' : t('Found automatically')"
+        />
+        <span v-if="draftHarness && !draftHarness.installed" class="agent-field-hint">
+          {{ t('Not found. Install it ({hint}) or enter the full path to its executable.', { hint: draftHarness.installHint }) }}
+        </span>
+      </label>
+      <label v-if="draftModelOptions.length > 1" class="agent-field">
         <span class="agent-field-label">{{ t('Model') }}</span>
         <select v-model="draftSettings.model" class="agent-select">
-          <option v-for="option in modelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
+          <option v-for="option in draftModelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
         </select>
       </label>
       <div class="agent-actions">
@@ -186,7 +200,11 @@
         <span class="agent-empty-logo" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
         </span>
-        <p>{{ t('Ask {name} about your open worksheets. It can read them, check their errors, and propose edits for you to review.', { name: assistantName() }) }}</p>
+        <template v-if="harness && !harness.installed">
+          <p>{{ t('{name} was not found. Install it ({hint}), or set the path to its executable.', { name: harness.name, hint: harness.installHint }) }}</p>
+          <button class="agent-btn" @click="openSettings">{{ t('Set path') }}</button>
+        </template>
+        <p v-else>{{ t('Ask {name} about your open worksheets. It can read them, check their errors, and propose edits for you to review.', { name: assistantName() }) }}</p>
       </div>
 
       <template v-for="(item, index) in conversation.items" :key="conversation.id + ':' + index">
@@ -207,10 +225,68 @@
             <svg class="agent-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg>
           </summary>
           <div class="agent-tool-body">
-            <pre>{{ formatInput(item.input) }}</pre>
+            <ul v-if="todos(item.input)" class="agent-todos">
+              <li v-for="(todo, ti) in todos(item.input)" :key="ti" :class="todo.status">{{ todo.content }}</li>
+            </ul>
+            <pre v-else>{{ formatInput(item.input) }}</pre>
             <pre v-if="item.result" class="agent-tool-result">{{ item.result }}</pre>
           </div>
         </details>
+
+        <div v-else-if="item.kind === 'question'" class="agent-card agent-question" :class="item.state">
+          <div class="agent-card-head">
+            <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13m0 1.25a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5m0 7.5a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7M8 4.25c1.3 0 2.25.86 2.25 2 0 .9-.55 1.38-1.03 1.73-.4.3-.47.4-.47.62v.15a.75.75 0 0 1-1.5 0V8.6c0-.98.6-1.45 1.07-1.8.37-.27.43-.36.43-.55 0-.3-.28-.5-.75-.5-.4 0-.68.17-.85.5a.75.75 0 1 1-1.33-.68c.42-.83 1.2-1.32 2.18-1.32"/></svg>
+            <span class="agent-card-title">{{ item.questions.length > 1 ? t('Questions') : t('Question') }}</span>
+          </div>
+          <div v-for="(q, qi) in item.questions" :key="qi" class="agent-question-block">
+            <div class="agent-question-text">
+              <span v-if="q.header" class="agent-chip">{{ q.header }}</span>
+              <span>{{ q.question }}</span>
+            </div>
+            <template v-if="item.state === 'pending'">
+              <div v-if="q.options.length" class="agent-question-options">
+                <button
+                  v-for="option in q.options"
+                  :key="option.label"
+                  class="agent-option"
+                  :class="{ selected: isPicked(item, qi, option.label) }"
+                  :aria-pressed="isPicked(item, qi, option.label)"
+                  @click="pickOption(item, qi, option.label)"
+                >
+                  <span class="agent-option-label">{{ option.label }}</span>
+                  <span v-if="option.description" class="agent-option-desc">{{ option.description }}</span>
+                </button>
+              </div>
+              <input
+                v-if="q.allowOther !== false"
+                v-model="questionDraft(item).other[qi]"
+                class="agent-question-other"
+                type="text"
+                :placeholder="q.placeholder || (q.options.length ? t('Other answer…') : t('Your answer…'))"
+                @keydown.enter.prevent="canSubmit(item) && submitQuestions(item)"
+              />
+            </template>
+            <div v-else-if="item.answers?.[q.question]" class="agent-question-answer">{{ item.answers[q.question] }}</div>
+          </div>
+          <div v-if="item.state === 'pending'" class="agent-actions">
+            <button class="agent-btn primary" :disabled="!canSubmit(item)" @click="submitQuestions(item)">{{ t('Submit') }}</button>
+            <button class="agent-btn ghost" @click="answerQuestions(conversation.id, item.requestId, null)">{{ t('Skip') }}</button>
+          </div>
+          <div v-else-if="item.state !== 'allowed'" class="agent-card-state">{{ item.state === 'denied' ? t('Skipped') : t('No longer pending') }}</div>
+        </div>
+
+        <div v-else-if="item.kind === 'approval' && isPlanTool(item.toolName)" class="agent-card agent-plan" :class="item.state">
+          <div class="agent-card-head">
+            <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 1.5h5a1 1 0 0 1 1 1V3h1a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h1v-.5a1 1 0 0 1 1-1m.25 1.25v1h4.5v-1zM4.25 4.25v9h7.5v-9h-.25V5a.75.75 0 0 1-.75.75h-5.5A.75.75 0 0 1 4.5 5v-.75zm6.28 2.97a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1.5-1.5a.75.75 0 1 1 1.06-1.06l.97.97 1.97-1.97a.75.75 0 0 1 1.06 0"/></svg>
+            <span class="agent-card-title">{{ t('Plan') }}</span>
+          </div>
+          <div class="agent-plan-body agent-msg assistant" v-html="renderChatMarkdown(planText(item.input))"></div>
+          <div v-if="item.state === 'pending'" class="agent-actions">
+            <button class="agent-btn primary" @click="approvePlan(conversation.id, item.requestId)">{{ t('Approve plan') }}</button>
+            <button class="agent-btn ghost" @click="keepPlanning(conversation.id, item.requestId)">{{ t('Keep planning') }}</button>
+          </div>
+          <div v-else class="agent-card-state">{{ planStateLabel(item.state) }}</div>
+        </div>
 
         <div v-else-if="item.kind === 'approval'" class="agent-card" :class="item.state">
           <div class="agent-card-head">
@@ -254,6 +330,11 @@
     </div>
 
     <div class="agent-composer-wrap">
+      <div v-if="currentMode.edits === 'blocked'" class="agent-plan-banner">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
+        <span class="agent-plan-banner-text">{{ t('Plan mode: {name} can read and plan, but not change anything.', { name: assistantName() }) }}</span>
+        <button class="agent-btn ghost" @click="exitPlanMode">{{ t('Exit plan mode') }}</button>
+      </div>
       <div class="agent-composer">
         <textarea
           ref="input"
@@ -286,7 +367,15 @@
         </button>
       </div>
       <div class="agent-composer-footer">
-        <label v-if="modelOptions.length" class="agent-model-picker" :title="t('Model')">
+        <label class="agent-model-picker" :title="t('Agent')">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1m.25 1.25v7.5h10.5v-7.5zm1.72 1.47a.75.75 0 0 1 1.06 0l1.75 1.75a.75.75 0 0 1 0 1.06l-1.75 1.75a.75.75 0 1 1-1.06-1.06L5.69 8 4.47 6.78a.75.75 0 0 1 0-1.06M8 9.25h3a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1 0-1.5"/></svg>
+          <span class="agent-picker-label">{{ providerName() }}</span>
+          <select :value="conversation.provider" :aria-label="t('Agent')" @change="onHarnessPicked">
+            <option v-for="h in agentChat.harnesses" :key="h.id" :value="h.id">{{ harnessLabel(h) }}</option>
+          </select>
+          <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+        </label>
+        <label v-if="modelOptions.length > 1" class="agent-model-picker agent-model-name" :title="t('Model') + ': ' + currentModelLabel">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
           <span class="agent-picker-label">{{ currentModelLabel }}</span>
           <select :value="conversation.model" :aria-label="t('Model')" @change="onModelPicked">
@@ -294,7 +383,7 @@
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
         </label>
-        <label class="agent-model-picker agent-mode-picker" :class="'edits-' + currentMode.edits" :title="modeHint + ' (Shift+Tab)'">
+        <label v-if="permissionModes().length > 1" class="agent-model-picker agent-mode-picker" :class="'edits-' + currentMode.edits" :title="modeHint + ' (Shift+Tab)'">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
           <span class="agent-picker-label">{{ t(currentMode.label) }}</span>
           <select :value="conversation.permissionMode" :aria-label="t('Permission mode')" @change="onModePicked">
@@ -314,8 +403,18 @@ import { useI18n } from 'vue-i18n'
 import {
   activateConversation,
   activeConversation,
+  activeHarness,
   agentChat,
   answerApproval,
+  answerQuestions,
+  approvePlan,
+  exitPlanMode,
+  isPlanTool,
+  keepPlanning,
+  harnessInfo,
+  selectHarness,
+  settingsFor,
+  type HarnessInfo,
   closeConversation,
   currentText,
   cyclePermissionMode,
@@ -343,6 +442,7 @@ import {
   setModel,
   showHistory,
   type ApprovalState,
+  type ChatItem,
 } from '../services/agent-chat'
 import { renderChatMarkdown } from '../services/chat-markdown'
 
@@ -354,7 +454,7 @@ const drafts = reactive<Record<string, string>>({})
 const scroller = ref<HTMLElement | null>(null)
 const input = ref<HTMLTextAreaElement | null>(null)
 const showSettings = ref(false)
-const draftSettings = reactive({ values: {} as Record<string, string>, model: '' })
+const draftSettings = reactive({ harness: '', executable: '', model: '' })
 
 const conversation = computed(() => activeConversation())
 const draft = computed({
@@ -367,13 +467,15 @@ const isStreaming = computed(() => {
   const last = items[items.length - 1]
   return last?.kind === 'assistant' && last.streaming
 })
-/** Keeps a model typed in an older version selectable. */
-const modelOptions = computed(() => {
-  const models = providerModels()
-  if (!models.length) return []
-  const extra = [conversation.value.model, draftSettings.model].filter(m => m && !models.some(o => o.value === m))
-  return [...models, ...[...new Set(extra)].map(m => ({ value: m, label: m }))]
-})
+/** Keeps a model that is no longer listed selectable. */
+function withCurrent(models: { value: string; label: string }[], current: string) {
+  if (!models.length || !current || models.some(o => o.value === current)) return models
+  return [...models, { value: current, label: current }]
+}
+const harness = computed(() => activeHarness())
+const modelOptions = computed(() => withCurrent(providerModels(harness.value), conversation.value.model))
+const draftHarness = computed(() => harnessInfo(draftSettings.harness))
+const draftModelOptions = computed(() => withCurrent(providerModels(draftHarness.value), draftSettings.model))
 const subtitle = computed(() => [conversation.value.resolvedModel, conversation.value.version && `v${conversation.value.version}`].filter(Boolean).join(' · '))
 
 function modelLabel(option: { value: string; label: string }): string {
@@ -455,28 +557,132 @@ function submit(): void {
   void sendMessage(text)
 }
 
+function loadDraft(id: string): void {
+  const settings = settingsFor(id)
+  Object.assign(draftSettings, { harness: id, executable: settings.executable, model: settings.model })
+}
+
+function openSettings(): void {
+  showSettings.value = true
+  loadDraft(conversation.value.provider || agentChat.harnessId)
+}
+
 function toggleSettings(): void {
-  showSettings.value = !showSettings.value
-  if (showSettings.value) Object.assign(draftSettings, { values: { ...agentChat.settings.values }, model: agentChat.settings.model })
+  if (showSettings.value) showSettings.value = false
+  else openSettings()
+}
+
+function onDraftHarness(event: Event): void {
+  loadDraft((event.target as HTMLSelectElement).value)
 }
 
 function applySettings(): void {
-  void saveSettings({ values: { ...draftSettings.values }, model: draftSettings.model })
+  void saveSettings(draftSettings.harness, { executable: draftSettings.executable, model: draftSettings.model })
   showSettings.value = false
 }
 
+function harnessLabel(h: HarnessInfo): string {
+  return h.installed ? h.name : t('{name} (not found)', { name: h.name })
+}
+
+function onHarnessPicked(event: Event): void {
+  selectHarness((event.target as HTMLSelectElement).value)
+}
+
+type QuestionItem = Extract<ChatItem, { kind: 'question' }>
+const questionDrafts = reactive<Record<number, { picked: string[][]; other: string[] }>>({})
+
+function questionDraft(item: QuestionItem) {
+  return (questionDrafts[item.requestId] ??= { picked: item.questions.map(() => []), other: item.questions.map(() => '') })
+}
+
+function isPicked(item: QuestionItem, qi: number, label: string): boolean {
+  return questionDraft(item).picked[qi]?.includes(label) ?? false
+}
+
+function answerFor(item: QuestionItem, qi: number): string {
+  const draft = questionDraft(item)
+  return draft.other[qi]?.trim() || draft.picked[qi].join(', ')
+}
+
+function canSubmit(item: QuestionItem): boolean {
+  return item.questions.every((_, qi) => answerFor(item, qi))
+}
+
+function submitQuestions(item: QuestionItem): void {
+  const answers: Record<string, string> = {}
+  item.questions.forEach((q, qi) => { answers[q.question] = answerFor(item, qi) })
+  void answerQuestions(conversation.value.id, item.requestId, answers)
+}
+
+/** A lone single-choice question is answered by its click. */
+function pickOption(item: QuestionItem, qi: number, label: string): void {
+  const draft = questionDraft(item)
+  const question = item.questions[qi]
+  draft.other[qi] = ''
+  if (question.multiSelect) {
+    const picked = draft.picked[qi]
+    draft.picked[qi] = picked.includes(label) ? picked.filter(l => l !== label) : [...picked, label]
+    return
+  }
+  draft.picked[qi] = [label]
+  if (item.questions.length === 1) submitQuestions(item)
+}
+
+function todos(input: unknown): { content: string; status: string }[] | null {
+  const list = input && typeof input === 'object' ? (input as Record<string, unknown>).todos : null
+  return Array.isArray(list) && list.length ? list as { content: string; status: string }[] : null
+}
+
+function planText(input: unknown): string {
+  const plan = input && typeof input === 'object' ? (input as Record<string, unknown>).plan : null
+  return typeof plan === 'string' ? plan : JSON.stringify(input, null, 2)
+}
+
+function planStateLabel(state: ApprovalState): string {
+  if (state === 'allowed') return t('Plan approved')
+  if (state === 'denied') return t('Kept planning')
+  return t('No longer pending')
+}
+
 function toolLabel(name: string): string {
+  if (isPlanTool(name)) return t('Plan')
+  if (name === 'TodoWrite') return t('Todos')
+  if (name === 'Task' || name === 'Agent') return t('Subagent')
+  if (name === 'AskUserQuestion') return t('Question')
+  if (name === 'EnterPlanMode') return t('Enter plan mode')
   return name.replace(/^mcp__calcpad__/, '').replace(/^mcp__([^_]+)__/, '$1: ')
 }
 
 function toolDetail(input: unknown): string {
   if (!input || typeof input !== 'object') return ''
   const o = input as Record<string, unknown>
-  const value = o.command ?? o.file_path ?? o.path ?? o.pattern ?? o.url ?? o.query ?? o.summary
+  const list = todos(input)
+  if (list) return t('{done} of {total} done', { done: list.filter(td => td.status === 'completed').length, total: list.length })
+  const value = o.command ?? o.file_path ?? o.filePath ?? o.path ?? o.pattern ?? o.url ?? o.query ?? o.description ?? o.summary
   return typeof value === 'string' ? value.split('\n')[0] : ''
 }
 
+/** Write and edit tools (Claude's snake_case, opencode's camelCase) shown as the file plus text. */
+function fileChangeText(o: Record<string, unknown>): string | null {
+  const str = (...keys: string[]) => keys.map(k => o[k]).find((v): v is string => typeof v === 'string')
+  const path = str('file_path', 'filePath', 'path')
+  if (!path) return null
+  const content = str('content')
+  if (content !== undefined) return `${path}\n\n${content}`
+  const before = str('old_string', 'oldString')
+  const after = str('new_string', 'newString')
+  if (before === undefined || after === undefined) return null
+  const lines = (text: string, mark: string) => text.split('\n').map(l => `${mark} ${l}`).join('\n')
+  return `${path}\n\n${lines(before, '-')}\n${lines(after, '+')}`
+}
+
 function formatInput(input: unknown): string {
+  if (input && typeof input === 'object' && typeof (input as Record<string, unknown>).plan === 'string') {
+    return (input as Record<string, string>).plan
+  }
+  const fileChange = input && typeof input === 'object' ? fileChangeText(input as Record<string, unknown>) : null
+  if (fileChange) return fileChange
   if (input && typeof input === 'object' && typeof (input as Record<string, unknown>).command === 'string') {
     return (input as Record<string, string>).command
   }
@@ -519,6 +725,10 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-panel {
   --agent-accent: var(--vscode-button-background, #0e639c);
   --agent-accent-fg: var(--vscode-button-foreground, #fff);
+  /* CalcpadCE logo blues */
+  --agent-brand: #118bd1;
+  --agent-brand-light: #22a7ef;
+  --agent-brand-dark: #016fb3;
   --agent-border: var(--vscode-widget-border, rgba(128, 128, 128, 0.25));
   --agent-muted: var(--vscode-descriptionForeground, rgba(204, 204, 204, 0.7));
   --agent-surface: color-mix(in srgb, var(--vscode-foreground) 5%, transparent);
@@ -570,7 +780,7 @@ defineExpose({ focus: () => input.value?.focus() })
   width: 26px;
   height: 26px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #d97757, #c15f3c);
+  background: linear-gradient(135deg, var(--agent-brand-light), var(--agent-brand-dark));
   color: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
@@ -641,6 +851,11 @@ defineExpose({ focus: () => input.value?.focus() })
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.agent-field-hint {
+  color: var(--agent-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
 .agent-field input {
   width: 100%;
   padding: 6px 8px;
@@ -681,9 +896,9 @@ defineExpose({ focus: () => input.value?.focus() })
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #d97757, #c15f3c);
+  background: linear-gradient(135deg, var(--agent-brand-light), var(--agent-brand-dark));
   color: #fff;
-  box-shadow: 0 4px 14px rgba(193, 95, 60, 0.35);
+  box-shadow: 0 4px 14px rgba(1, 111, 179, 0.35);
 }
 .agent-empty-logo svg {
   width: 22px;
@@ -896,6 +1111,135 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-card-summary {
   line-height: 1.45;
 }
+.agent-question-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agent-question-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.agent-question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agent-option {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 10px;
+  border: 1px solid var(--agent-border);
+  border-radius: 8px;
+  background: var(--agent-surface);
+  color: var(--vscode-foreground);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.agent-option:hover {
+  background: var(--agent-surface-strong);
+}
+.agent-option.selected {
+  border-color: var(--agent-brand);
+  background: color-mix(in srgb, var(--agent-brand) 14%, transparent);
+}
+.agent-option-label {
+  font-weight: 600;
+}
+.agent-option-desc {
+  color: var(--agent-muted);
+  font-size: 12px;
+}
+.agent-question-other {
+  padding: 5px 8px;
+  border: 1px solid var(--vscode-input-border, var(--agent-border));
+  border-radius: 6px;
+  background: var(--vscode-input-background, transparent);
+  color: var(--vscode-input-foreground, inherit);
+  font: inherit;
+}
+.agent-question-other:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder, var(--agent-brand));
+}
+.agent-question-answer {
+  padding-left: 10px;
+  border-left: 2px solid var(--agent-brand);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.agent-todos {
+  margin: 4px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.agent-todos li {
+  position: relative;
+  padding: 1px 0 1px 18px;
+  line-height: 1.45;
+}
+.agent-todos li::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--agent-muted);
+  border-radius: 3px;
+}
+.agent-todos li.in_progress::before {
+  border-color: var(--agent-brand-light);
+  background: color-mix(in srgb, var(--agent-brand) 35%, transparent);
+}
+.agent-todos li.completed {
+  color: var(--agent-muted);
+  text-decoration: line-through;
+}
+.agent-todos li.completed::before {
+  border-color: var(--agent-brand);
+  background: var(--agent-brand);
+}
+.agent-plan-body {
+  max-height: 360px;
+  overflow: auto;
+  padding: 2px 2px 2px 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.agent-plan-body :deep(pre) {
+  white-space: pre-wrap;
+}
+.agent-plan-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 4px 4px 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--agent-brand) 45%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--agent-brand) 10%, transparent);
+  font-size: 12px;
+}
+.agent-plan-banner svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  fill: var(--agent-brand-light);
+}
+.agent-plan-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+.agent-plan-banner .agent-btn {
+  flex-shrink: 0;
+}
 .agent-card-state {
   color: var(--agent-muted);
   font-size: 12px;
@@ -1019,6 +1363,7 @@ defineExpose({ focus: () => input.value?.focus() })
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
+  min-width: 0;
   margin-top: 6px;
   padding: 0 2px;
 }
@@ -1056,6 +1401,15 @@ defineExpose({ focus: () => input.value?.focus() })
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
+}
+.agent-model-name {
+  flex-shrink: 1;
+  min-width: 0;
+}
+.agent-model-name .agent-picker-label {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .agent-model-picker select {
   position: absolute;
@@ -1173,7 +1527,7 @@ defineExpose({ focus: () => input.value?.focus() })
   animation: agent-pulse 1.2s ease-in-out infinite;
 }
 .agent-tab-dot.attention {
-  background: #d97757;
+  background: var(--agent-brand);
   animation: none;
 }
 .agent-tab-title {
@@ -1282,7 +1636,7 @@ defineExpose({ focus: () => input.value?.focus() })
   height: 14px;
   padding: 0 3px;
   border-radius: 7px;
-  background: #d97757;
+  background: var(--agent-brand);
   color: #fff;
   font-size: 9.5px;
   font-weight: 700;
@@ -1334,7 +1688,7 @@ defineExpose({ focus: () => input.value?.focus() })
   text-decoration: underline;
 }
 .agent-mode-picker.edits-auto {
-  color: #d97757;
+  color: var(--agent-brand-light);
 }
 .agent-mode-picker.edits-blocked {
   color: var(--vscode-textLink-foreground, #3794ff);

@@ -447,7 +447,7 @@
       </div><!-- /.document-panes -->
     </div><!-- /.work-area -->
 
-    <template v-if="isDesktop && agentChat.provider">
+    <template v-if="isDesktop">
       <div
         v-show="agentChat.panelOpen"
         class="resize-handle agent-resize-handle"
@@ -606,11 +606,11 @@
       ● {{ serverStatusLabel }}
     </span>
     <button
-      v-if="isDesktop && agentChat.provider"
+      v-if="isDesktop"
       class="status-agent"
       :class="{ active: agentChat.panelOpen }"
-      :title="t('Toggle {name} chat', { name: agentChat.provider.name })"
-      :aria-label="t('Toggle {name} chat', { name: agentChat.provider.name })"
+      :title="t('Toggle {name} chat', { name: providerName() })"
+      :aria-label="t('Toggle {name} chat', { name: providerName() })"
       :aria-pressed="agentChat.panelOpen"
       @click.stop="setPanelOpen(!agentChat.panelOpen)"
     >
@@ -628,7 +628,7 @@ import DesktopTitleBar from './components/DesktopTitleBar.vue'
 import DocumentTabStrip from './components/DocumentTabStrip.vue'
 import AgentChatPanel from './components/AgentChatPanel.vue'
 import AgentDiffModal from './components/AgentDiffModal.vue'
-import { agentChat, closeChangeDiff, keepChange, resolveEdit, revertChange, setPanelOpen } from './services/agent-chat'
+import { agentChat, closeChangeDiff, keepChange, providerName, resolveEdit, revertChange, setPanelOpen } from './services/agent-chat'
 import FileConflictDialog from './components/FileConflictDialog.vue'
 import type { FileConflictChoice } from './services/file-change-tracker'
 import RefreshIcon from 'calcpad-frontend/vue/components/RefreshIcon.vue'

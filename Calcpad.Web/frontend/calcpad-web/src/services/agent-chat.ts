@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { applyEdit, findDoc, prepareEdit, runEditorTool, type AgentEditorContext, type PreparedEdit } from './agent-tools';
+import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, type AgentEditorContext, type PreparedEdit, type ProposedEdit } from './agent-tools';
 
 export type ApprovalState = 'pending' | 'allowed' | 'denied' | 'expired';
 
@@ -9,9 +9,39 @@ export type ChatItem =
     | { kind: 'tool'; id: string; name: string; input: unknown; result?: string; isError?: boolean; done: boolean }
     | { kind: 'approval'; requestId: number; toolName: string; input: unknown; state: ApprovalState }
     | { kind: 'edit'; requestId: number; title: string; summary: string; state: ApprovalState; auto?: boolean }
+    | { kind: 'question'; requestId: number; questions: AgentQuestion[]; state: ApprovalState; answers?: Record<string, string>; via: 'approval' | 'ask' }
     | { kind: 'notice'; text: string; error: boolean };
 
 export type AgentStatus = 'idle' | 'starting' | 'ready' | 'busy';
+
+/** A question an agent asks the user, from Claude's AskUserQuestion or a harness dialog. */
+export interface AgentQuestion {
+    question: string;
+    header?: string;
+    options: { label: string; description?: string }[];
+    multiSelect?: boolean;
+    /** Free-text answers; defaults to true. */
+    allowOther?: boolean;
+    placeholder?: string;
+}
+
+function toQuestions(value: unknown): AgentQuestion[] {
+    if (!Array.isArray(value)) return [];
+    return value
+        .filter(q => q && typeof q.question === 'string')
+        .map(q => ({
+            question: q.question,
+            header: typeof q.header === 'string' ? q.header : undefined,
+            options: Array.isArray(q.options)
+                ? q.options
+                    .map((o: unknown) => typeof o === 'string' ? { label: o } : o as { label: string; description?: string })
+                    .filter((o: { label?: unknown }) => typeof o?.label === 'string')
+                : [],
+            multiSelect: q.multiSelect === true,
+            allowOther: q.allowOther !== false,
+            placeholder: typeof q.placeholder === 'string' ? q.placeholder : undefined,
+        }));
+}
 
 export type PermissionMode = string;
 
@@ -32,50 +62,59 @@ export interface PermissionModeInfo {
     profile?: string;
 }
 
-export interface SettingField {
-    key: string;
-    label: string;
-    placeholder?: string;
-}
-
-/** An agent provider's extension.json, as returned by agent_providers. */
-export interface ProviderInfo {
+/** A supported agent CLI, as returned by agent_harnesses. */
+export interface HarnessInfo {
     id: string;
     name: string;
-    assistantName?: string;
+    assistantName: string;
+    installed: boolean;
+    /** Detected or configured executable; null when not found. */
+    path: string | null;
+    installHint: string;
+    /** Fixed models; empty when `dynamicModels`. */
     models: ModelOption[];
+    /** Models come from the running agent and are remembered between sessions. */
+    dynamicModels: boolean;
     /** Shift+Tab cycling order; the first is the default. */
     permissionModes: PermissionModeInfo[];
-    settings: SettingField[];
-    i18n?: Record<string, Record<string, string>>;
 }
-
-export type MergeMessages = (locale: string, messages: Record<string, string>) => void;
 
 const FALLBACK_MODE: PermissionModeInfo = { value: 'default', label: 'Default', hint: '', edits: 'review' };
+const DEFAULT_MODEL: ModelOption = { value: '', label: 'Default' };
 
-export function permissionModes(): PermissionModeInfo[] {
-    return agentChat.provider?.permissionModes.length ? agentChat.provider.permissionModes : [FALLBACK_MODE];
+export function harnessInfo(id: string | undefined): HarnessInfo | null {
+    return agentChat.harnesses.find(h => h.id === id) ?? null;
 }
 
-export function modeInfo(mode: PermissionMode): PermissionModeInfo {
-    return permissionModes().find(m => m.value === mode) ?? permissionModes()[0];
+export function activeHarness(): HarnessInfo | null {
+    return harnessInfo(activeConversation().provider);
 }
 
-export function modelOptions(): ModelOption[] {
-    return agentChat.provider?.models ?? [];
+export function permissionModes(harness = activeHarness()): PermissionModeInfo[] {
+    return harness?.permissionModes.length ? harness.permissionModes : [FALLBACK_MODE];
 }
 
-export function providerName(): string {
-    return agentChat.provider?.name ?? 'Agent';
+export function modeInfo(mode: PermissionMode, harness = activeHarness()): PermissionModeInfo {
+    const modes = permissionModes(harness);
+    return modes.find(m => m.value === mode) ?? modes[0];
 }
 
-export function assistantName(): string {
-    return agentChat.provider?.assistantName || providerName();
+export function modelOptions(harness = activeHarness()): ModelOption[] {
+    if (!harness) return [];
+    return harness.dynamicModels ? [DEFAULT_MODEL, ...(agentChat.models[harness.id] ?? [])] : harness.models;
 }
 
-function toMode(value: unknown): PermissionMode {
-    return permissionModes().some(m => m.value === value) ? value as PermissionMode : permissionModes()[0].value;
+export function providerName(harness = activeHarness()): string {
+    return harness?.name ?? 'Agent';
+}
+
+export function assistantName(harness = activeHarness()): string {
+    return harness?.assistantName || providerName(harness);
+}
+
+function toMode(value: unknown, harness: HarnessInfo | null): PermissionMode {
+    const modes = permissionModes(harness);
+    return modes.some(m => m.value === value) ? value as PermissionMode : modes[0].value;
 }
 
 /** Backup of a document taken before the agent first changed it in a conversation. */
@@ -85,6 +124,8 @@ export interface ChangeRecord {
     title: string;
     baseline: string;
     changedAt: number;
+    /** The agent created this worksheet; reverting closes it. */
+    created?: boolean;
 }
 
 export interface Conversation {
@@ -114,9 +155,10 @@ export interface HistoryMeta {
     updatedAt: number;
 }
 
+/** Per-harness settings. */
 export interface AgentSettings {
-    /** Values for the provider's settings fields. */
-    values: Record<string, string>;
+    /** Executable path that overrides auto-detection; empty to detect. */
+    executable: string;
     /** Model and permission mode for new conversations. */
     model: string;
     permissionMode: PermissionMode;
@@ -140,7 +182,8 @@ type AgentEvent =
     | { kind: 'turnComplete'; isError: boolean; subtype: string; costUsd: number | null; error: string | null }
     | { kind: 'status'; text: string }
     | { kind: 'exited'; code: number | null; output: string }
-    | { kind: 'error'; message: string };
+    | { kind: 'error'; message: string }
+    | { kind: 'models'; models: ModelOption[] };
 
 interface ToolRequest {
     id: number;
@@ -150,35 +193,50 @@ interface ToolRequest {
 }
 
 const SETTINGS_KEY = 'calcpad.agent.settings';
+const HARNESS_KEY = 'calcpad.agent.harness';
+const MODELS_KEY = 'calcpad.agent.models';
 const PANEL_KEY = 'calcpad.agent.panelOpen';
 const TABS_KEY = 'calcpad.agent.tabs';
 const SAVE_DELAY_MS = 800;
 const TITLE_LENGTH = 60;
 
-function settingsKey(): string {
-    return agentChat.provider ? `${SETTINGS_KEY}.${agentChat.provider.id}` : SETTINGS_KEY;
-}
-
-function loadSettings(): AgentSettings {
+function readJson(key: string): Record<string, unknown> {
     try {
-        const raw = JSON.parse(localStorage.getItem(settingsKey()) ?? '{}');
-        const values: Record<string, string> = {};
-        for (const [key, value] of Object.entries(raw.values ?? {})) values[key] = String(value);
-        return { values, model: String(raw.model ?? ''), permissionMode: toMode(raw.permissionMode) };
+        const value = JSON.parse(localStorage.getItem(key) ?? '{}');
+        return value && typeof value === 'object' ? value : {};
     } catch {
-        return { values: {}, model: '', permissionMode: toMode(null) };
+        return {};
     }
 }
 
-function storeSettings(): void {
-    localStorage.setItem(settingsKey(), JSON.stringify(agentChat.settings));
+function loadSettings(harness: HarnessInfo): AgentSettings {
+    const raw = readJson(`${SETTINGS_KEY}.${harness.id}`);
+    return {
+        executable: String(raw.executable ?? ''),
+        model: String(raw.model ?? ''),
+        permissionMode: toMode(raw.permissionMode, harness),
+    };
 }
 
-function createConversation(settings: AgentSettings): Conversation {
+export function settingsFor(id: string): AgentSettings {
+    return agentChat.settings[id] ?? { executable: '', model: '', permissionMode: toMode(null, harnessInfo(id)) };
+}
+
+function storeSettings(id: string): void {
+    localStorage.setItem(`${SETTINGS_KEY}.${id}`, JSON.stringify(settingsFor(id)));
+}
+
+function loadModels(id: string): ModelOption[] {
+    const raw = readJson(`${MODELS_KEY}.${id}`);
+    return Array.isArray(raw.models) ? raw.models.filter(m => m && typeof m.value === 'string' && m.value) : [];
+}
+
+function createConversation(harnessId: string): Conversation {
     const now = Date.now();
+    const settings = settingsFor(harnessId);
     return {
         id: crypto.randomUUID(),
-        provider: agentChat.provider?.id ?? '',
+        provider: harnessId,
         title: '',
         createdAt: now,
         updatedAt: now,
@@ -195,10 +253,14 @@ function createConversation(settings: AgentSettings): Conversation {
 }
 
 export const agentChat = reactive({
-    /** Null until providers load, or when no agent extension is installed. */
-    provider: null as ProviderInfo | null,
+    /** Every supported harness, empty until detection finishes. */
+    harnesses: [] as HarnessInfo[],
+    /** Harness for new conversations. */
+    harnessId: localStorage.getItem(HARNESS_KEY) ?? '',
     panelOpen: localStorage.getItem(PANEL_KEY) === 'true',
-    settings: { values: {}, model: '', permissionMode: FALLBACK_MODE.value } as AgentSettings,
+    settings: {} as Record<string, AgentSettings>,
+    /** Models reported by harnesses with `dynamicModels`. */
+    models: {} as Record<string, ModelOption[]>,
     conversations: [] as Conversation[],
     activeId: '',
     view: 'chat' as 'chat' | 'history' | 'changes',
@@ -207,14 +269,14 @@ export const agentChat = reactive({
     reviewChange: null as { conversationId: string; key: string; title: string; baseline: string; current: string } | null,
 });
 
-agentChat.conversations.push(createConversation(agentChat.settings));
+agentChat.conversations.push(createConversation(agentChat.harnessId));
 agentChat.activeId = agentChat.conversations[0].id;
 
 let editorContext: AgentEditorContext | null = null;
 let listening: Promise<void> | null = null;
 let restored: Promise<void> | null = null;
 // Kept out of the reactive store: prepared edits hold Monaco objects.
-const editQueue: { view: PendingEdit; edit: PreparedEdit }[] = [];
+const editQueue: { view: PendingEdit; edit: ProposedEdit }[] = [];
 const sessionAllowed = new Map<string, Set<string>>();
 const approvalInputs = new Map<number, unknown>();
 const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -237,7 +299,7 @@ function find(id: string): Conversation | undefined {
 }
 
 export function needsAttention(conversation: Conversation): boolean {
-    return conversation.items.some(i => (i.kind === 'approval' || i.kind === 'edit') && i.state === 'pending');
+    return conversation.items.some(i => (i.kind === 'approval' || i.kind === 'edit' || i.kind === 'question') && i.state === 'pending');
 }
 
 // ---- Persistence ----
@@ -300,18 +362,18 @@ function revive(raw: Record<string, unknown>): Conversation | null {
     const items = (raw.items as ChatItem[]).map(item => {
         if (item.kind === 'assistant') return { ...item, streaming: false };
         if (item.kind === 'tool') return { ...item, done: true };
-        if ((item.kind === 'approval' || item.kind === 'edit') && item.state === 'pending') return { ...item, state: 'expired' as const };
+        if ((item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question') && item.state === 'pending') return { ...item, state: 'expired' as const };
         return item;
     });
     return {
         id: raw.id,
-        provider: typeof raw.provider === 'string' ? raw.provider : agentChat.provider?.id ?? '',
+        provider: typeof raw.provider === 'string' ? raw.provider : 'claude-code',
         title: String(raw.title ?? ''),
         createdAt: Number(raw.createdAt ?? Date.now()),
         updatedAt: Number(raw.updatedAt ?? Date.now()),
         sessionId: typeof raw.sessionId === 'string' ? raw.sessionId : null,
         model: String(raw.model ?? ''),
-        permissionMode: toMode(raw.permissionMode),
+        permissionMode: toMode(raw.permissionMode, harnessInfo(typeof raw.provider === 'string' ? raw.provider : 'claude-code')),
         restartPending: false,
         resolvedModel: typeof raw.resolvedModel === 'string' ? raw.resolvedModel : null,
         version: null,
@@ -376,8 +438,12 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             conversation.sessionId = event.sessionId;
             conversation.resolvedModel = event.model;
             conversation.version = event.version;
-            if (permissionModes().some(m => m.value === event.permissionMode)) conversation.permissionMode = event.permissionMode!;
+            if (permissionModes(harnessInfo(conversation.provider)).some(m => m.value === event.permissionMode)) conversation.permissionMode = event.permissionMode!;
             break;
+        case 'models':
+            agentChat.models[conversation.provider] = event.models;
+            localStorage.setItem(`${MODELS_KEY}.${conversation.provider}`, JSON.stringify({ models: event.models }));
+            return;
         case 'error':
             notice(conversation, event.message, true);
             break;
@@ -397,10 +463,17 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             }
             break;
         }
-        case 'toolUse':
+        case 'toolUse': {
+            const existing = conversation.items.find(i => i.kind === 'tool' && i.id === event.id);
+            if (existing?.kind === 'tool') {
+                existing.name = event.name;
+                existing.input = event.input;
+                break;
+            }
             finishStreaming(conversation);
             conversation.items.push({ kind: 'tool', id: event.id, name: event.name, input: event.input, done: false });
             break;
+        }
         case 'toolResult': {
             const item = conversation.items.find(i => i.kind === 'tool' && i.id === event.toolUseId);
             if (item?.kind === 'tool') {
@@ -414,7 +487,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             finishStreaming(conversation);
             conversation.status = 'ready';
             if (conversation.restartPending) void restartForMode(conversation);
-            if (event.subtype === 'error_during_execution' && !event.error) notice(conversation, 'Stopped.');
+            if (event.subtype === 'interrupted' && !event.error) notice(conversation, 'Stopped.');
             else if (event.isError) notice(conversation, event.error || `The turn ended early (${event.subtype}).`, true);
             break;
         case 'status':
@@ -426,7 +499,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
             dropQueuedEdits(conversation.id);
             if (event.code !== 0) {
                 const detail = event.output.trim().split('\n').slice(-6).join('\n');
-                notice(conversation, `${providerName()} exited${event.code === null ? '' : ` with code ${event.code}`}.${detail ? '\n' + detail : ''}`, true);
+                notice(conversation, `${providerName(harnessInfo(conversation.provider))} exited${event.code === null ? '' : ` with code ${event.code}`}.${detail ? '\n' + detail : ''}`, true);
             }
             break;
     }
@@ -459,8 +532,27 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
         await respond(id, { error: 'This conversation was closed.' });
         return;
     }
+    if (tool === 'ask_user') {
+        const questions = toQuestions(args.questions);
+        if (!questions.length) {
+            await respond(id, { result: { cancelled: true } });
+            return;
+        }
+        conversation.items.push({ kind: 'question', requestId: id, questions, state: 'pending', via: 'ask' });
+        touch(conversation);
+        openPanel();
+        return;
+    }
     if (tool === 'approve_tool') {
         const toolName = String(args.tool_name ?? '');
+        if (toolName === 'AskUserQuestion') {
+            const input = (args.input ?? {}) as Record<string, unknown>;
+            approvalInputs.set(id, input);
+            conversation.items.push({ kind: 'question', requestId: id, questions: toQuestions(input.questions), state: 'pending', via: 'approval' });
+            touch(conversation);
+            openPanel();
+            return;
+        }
         if (sessionAllowed.get(conversation.id)?.has(toolName)) {
             await respond(id, { result: { behavior: 'allow', updatedInput: args.input ?? {} } });
             return;
@@ -476,20 +568,21 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
         return;
     }
     if (tool === 'propose_edit') {
-        const mode = modeInfo(conversation.permissionMode);
+        const mode = modeInfo(conversation.permissionMode, harnessInfo(conversation.provider));
         if (mode.edits === 'blocked') {
             await respond(id, { error: `${mode.label} is on, so worksheets cannot be edited. Present your plan instead.` });
             return;
         }
         try {
-            const edit = prepareEdit(editorContext, args);
-            const title = edit.doc.tab.filePath ?? edit.doc.tab.title;
+            const edit = await prepareEdit(editorContext, args);
+            const title = 'create' in edit ? edit.create : edit.doc.tab.filePath ?? edit.doc.tab.title;
             if (mode.edits === 'auto') {
-                recordChange(conversation, edit);
-                applyEdit(edit);
+                applyProposed(conversation, edit);
                 conversation.items.push({ kind: 'edit', requestId: id, title, summary: edit.summary, state: 'allowed', auto: true });
                 touch(conversation);
-                await respond(id, { result: 'The edit was applied in the editor and not yet saved.' });
+                await respond(id, { result: 'create' in edit
+                    ? 'The new worksheet was opened in the editor and not yet saved.'
+                    : 'The edit was applied in the editor and not yet saved.' });
                 return;
             }
             conversation.items.push({ kind: 'edit', requestId: id, title, summary: edit.summary, state: 'pending' });
@@ -513,14 +606,14 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
 
 function setItemState(conversationId: string, requestId: number, state: ApprovalState): void {
     const conversation = find(conversationId);
-    const item = conversation?.items.find(i => (i.kind === 'approval' || i.kind === 'edit') && i.requestId === requestId);
-    if (conversation && item && (item.kind === 'approval' || item.kind === 'edit')) {
+    const item = conversation?.items.find(i => (i.kind === 'approval' || i.kind === 'edit' || i.kind === 'question') && i.requestId === requestId);
+    if (conversation && item && (item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question')) {
         item.state = state;
         touch(conversation);
     }
 }
 
-export async function answerApproval(conversationId: string, requestId: number, allow: boolean, forSession = false): Promise<void> {
+export async function answerApproval(conversationId: string, requestId: number, allow: boolean, forSession = false, denial = 'The user denied this action.'): Promise<void> {
     const item = find(conversationId)?.items.find(i => i.kind === 'approval' && i.requestId === requestId);
     if (!item || item.kind !== 'approval' || item.state !== 'pending') return;
     if (allow && forSession) {
@@ -533,8 +626,58 @@ export async function answerApproval(conversationId: string, requestId: number, 
     await respond(requestId, {
         result: allow
             ? { behavior: 'allow', updatedInput: input }
-            : { behavior: 'deny', message: 'The user denied this action.' },
+            : { behavior: 'deny', message: denial },
     });
+    const conversation = find(conversationId);
+    if (allow && conversation && item.toolName === 'EnterPlanMode') {
+        const plan = permissionModes(harnessInfo(conversation.provider)).find(m => m.edits === 'blocked');
+        if (plan) await setPermissionMode(plan.value, conversation, false);
+    }
+}
+
+/** Answers a question card; null skips it. Answers are keyed by question text. */
+export async function answerQuestions(conversationId: string, requestId: number, answers: Record<string, string> | null): Promise<void> {
+    const conversation = find(conversationId);
+    const item = conversation?.items.find(i => i.kind === 'question' && i.requestId === requestId);
+    if (!conversation || !item || item.kind !== 'question' || item.state !== 'pending') return;
+    item.state = answers ? 'allowed' : 'denied';
+    if (answers) item.answers = answers;
+    touch(conversation);
+    if (item.via === 'approval') {
+        const input = approvalInputs.get(requestId) ?? {};
+        approvalInputs.delete(requestId);
+        await respond(requestId, {
+            result: answers
+                ? { behavior: 'allow', updatedInput: { ...input, answers } }
+                : { behavior: 'deny', message: 'The user declined to answer.' },
+        });
+    } else {
+        await respond(requestId, { result: answers ? { answers } : { cancelled: true } });
+    }
+}
+
+/** Tool names agents use to leave their plan mode with a plan for the user to approve. */
+export function isPlanTool(toolName: string): boolean {
+    return toolName === 'ExitPlanMode';
+}
+
+/** Approves a plan and leaves plan mode for this conversation only. */
+export async function approvePlan(conversationId: string, requestId: number): Promise<void> {
+    await answerApproval(conversationId, requestId, true);
+    const conversation = find(conversationId);
+    if (conversation && modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).edits === 'blocked') {
+        await setPermissionMode(permissionModes(harnessInfo(conversation.provider))[0].value, conversation, false);
+    }
+}
+
+export function keepPlanning(conversationId: string, requestId: number): Promise<void> {
+    return answerApproval(conversationId, requestId, false, false, 'The user wants to keep planning. Ask what they would like to change.');
+}
+
+/** Leaves plan mode for the active conversation. */
+export function exitPlanMode(): Promise<void> {
+    const conversation = activeConversation();
+    return setPermissionMode(permissionModes(harnessInfo(conversation.provider))[0].value, conversation, false);
 }
 
 export async function resolveEdit(accept: boolean): Promise<void> {
@@ -549,8 +692,8 @@ export async function resolveEdit(accept: boolean): Promise<void> {
     }
     try {
         const conversation = find(conversationId);
-        if (conversation) recordChange(conversation, next.edit);
-        applyEdit(next.edit);
+        if (conversation) applyProposed(conversation, next.edit);
+        else applyEdit(materialize(editorContext!, next.edit));
         setItemState(conversationId, requestId, 'allowed');
         await respond(requestId, { result: 'The user accepted the edit. It is applied in the editor and not yet saved.' });
     } catch (err) {
@@ -575,34 +718,67 @@ function ensureListening(): Promise<void> {
     return listening;
 }
 
-async function loadProvider(mergeMessages: MergeMessages): Promise<void> {
-    let providers: ProviderInfo[] = [];
+function executablePaths(): Record<string, string> {
+    const paths: Record<string, string> = {};
+    for (const [id, settings] of Object.entries(agentChat.settings)) if (settings.executable) paths[id] = settings.executable;
+    return paths;
+}
+
+/** Re-runs detection, e.g. after a path setting changes. */
+export async function refreshHarnesses(): Promise<void> {
     try {
-        providers = await invoke<ProviderInfo[]>('agent_providers');
+        const found = await invoke<HarnessInfo[]>('agent_harnesses', { paths: executablePaths() });
+        if (found.length) agentChat.harnesses = found;
     } catch {
         // No agent support in this build.
     }
-    const provider = providers[0];
-    if (!provider) return;
-    provider.models ??= [];
-    provider.settings ??= [];
-    for (const [locale, messages] of Object.entries(provider.i18n ?? {})) mergeMessages(locale, messages);
-    agentChat.provider = provider;
-    agentChat.settings = loadSettings();
+}
+
+async function loadHarnesses(): Promise<void> {
+    try {
+        agentChat.harnesses = await invoke<HarnessInfo[]>('agent_harnesses', { paths: {} });
+    } catch {
+        return;
+    }
+    for (const harness of agentChat.harnesses) {
+        agentChat.settings[harness.id] = loadSettings(harness);
+        agentChat.models[harness.id] = loadModels(harness.id);
+    }
+    if (Object.keys(executablePaths()).length) await refreshHarnesses();
+    if (!harnessInfo(agentChat.harnessId)) {
+        agentChat.harnessId = (agentChat.harnesses.find(h => h.installed) ?? agentChat.harnesses[0])?.id ?? '';
+    }
     for (const conversation of agentChat.conversations.filter(c => !c.items.length)) {
-        conversation.provider = provider.id;
-        conversation.model = agentChat.settings.model;
-        conversation.permissionMode = agentChat.settings.permissionMode;
+        Object.assign(conversation, { ...createConversation(agentChat.harnessId), id: conversation.id });
     }
 }
 
-export function registerAgentEditor(context: AgentEditorContext, mergeMessages: MergeMessages): void {
+export function registerAgentEditor(context: AgentEditorContext): void {
     editorContext = context;
-    restored ??= loadProvider(mergeMessages).then(() => {
-        if (!agentChat.provider) return;
+    restored ??= loadHarnesses().then(() => {
+        if (!agentChat.harnesses.length) return;
         void ensureListening();
         return restoreTabs();
     });
+}
+
+/**
+ * Makes `id` the harness for new conversations. A conversation that has started keeps
+ * its harness, so picking another opens a new tab.
+ */
+export function selectHarness(id: string): void {
+    if (!harnessInfo(id)) return;
+    agentChat.harnessId = id;
+    localStorage.setItem(HARNESS_KEY, id);
+    const active = activeConversation();
+    if (active.provider === id) return;
+    if (!active.items.length) {
+        Object.assign(active, { ...createConversation(id), id: active.id });
+        return;
+    }
+    const conversation = createConversation(id);
+    agentChat.conversations.push(conversation);
+    activateConversation(conversation.id);
 }
 
 // ---- Commands from the panel ----
@@ -617,7 +793,7 @@ function cwdForActiveDocument(): string | null {
 export async function sendMessage(text: string): Promise<void> {
     const conversation = activeConversation();
     const trimmed = text.trim();
-    if (!trimmed || !agentChat.provider || conversation.status === 'starting' || conversation.status === 'busy') return;
+    if (!trimmed || !conversation.provider || conversation.status === 'starting' || conversation.status === 'busy') return;
     conversation.items.push({ kind: 'user', text: trimmed });
     if (!conversation.title) conversation.title = trimmed.replace(/\s+/g, ' ').slice(0, TITLE_LENGTH);
     touch(conversation);
@@ -629,8 +805,8 @@ export async function sendMessage(text: string): Promise<void> {
             await invoke('agent_start', {
                 conversation: conversation.id,
                 options: {
-                    provider: conversation.provider || agentChat.provider.id,
-                    settings: agentChat.settings.values,
+                    harness: conversation.provider,
+                    executable: settingsFor(conversation.provider).executable || null,
                     model: conversation.model || null,
                     permissionMode: conversation.permissionMode,
                     cwd: cwdForActiveDocument(),
@@ -666,7 +842,7 @@ async function stopProcess(conversation: Conversation): Promise<void> {
     finishStreaming(conversation);
     dropQueuedEdits(conversation.id);
     for (const item of conversation.items) {
-        if ((item.kind === 'approval' || item.kind === 'edit') && item.state === 'pending') item.state = 'expired';
+        if ((item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question') && item.state === 'pending') item.state = 'expired';
     }
 }
 
@@ -679,7 +855,7 @@ export function activateConversation(id: string): void {
 
 export function newConversation(): void {
     const blank = agentChat.conversations.find(c => !c.items.length);
-    const conversation = blank ?? createConversation(agentChat.settings);
+    const conversation = blank ?? createConversation(agentChat.harnessId);
     if (!blank) agentChat.conversations.push(conversation);
     activateConversation(conversation.id);
 }
@@ -692,7 +868,7 @@ export async function closeConversation(id: string): Promise<void> {
     await flush(conversation);
     sessionAllowed.delete(id);
     agentChat.conversations.splice(index, 1);
-    if (!agentChat.conversations.length) agentChat.conversations.push(createConversation(agentChat.settings));
+    if (!agentChat.conversations.length) agentChat.conversations.push(createConversation(agentChat.harnessId));
     if (agentChat.activeId === id) {
         agentChat.activeId = agentChat.conversations[Math.min(index, agentChat.conversations.length - 1)].id;
     }
@@ -737,8 +913,8 @@ export function showHistory(show: boolean): void {
 export async function setModel(model: string): Promise<void> {
     const next = model.trim();
     const conversation = activeConversation();
-    agentChat.settings = { ...agentChat.settings, model: next };
-    storeSettings();
+    agentChat.settings[conversation.provider] = { ...settingsFor(conversation.provider), model: next };
+    storeSettings(conversation.provider);
     if (next === conversation.model) return;
     conversation.model = next;
     touch(conversation);
@@ -753,20 +929,22 @@ export async function setModel(model: string): Promise<void> {
 async function restartForMode(conversation: Conversation): Promise<void> {
     conversation.restartPending = false;
     await stopProcess(conversation);
-    notice(conversation, `${modeInfo(conversation.permissionMode).label} applies from your next message.`);
+    notice(conversation, `${modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).label} applies from your next message.`);
 }
 
 /** Switches the active conversation's mode and makes it the default for new ones. */
-export async function setPermissionMode(mode: PermissionMode): Promise<void> {
-    const conversation = activeConversation();
-    agentChat.settings = { ...agentChat.settings, permissionMode: mode };
-    storeSettings();
+export async function setPermissionMode(mode: PermissionMode, conversation = activeConversation(), remember = true): Promise<void> {
+    const harness = harnessInfo(conversation.provider);
+    if (remember) {
+        agentChat.settings[conversation.provider] = { ...settingsFor(conversation.provider), permissionMode: mode };
+        storeSettings(conversation.provider);
+    }
     const previous = conversation.permissionMode;
     if (mode === previous) return;
     conversation.permissionMode = mode;
     touch(conversation);
     if (conversation.status === 'idle') return;
-    if ((modeInfo(mode).profile ?? '') !== (modeInfo(previous).profile ?? '')) {
+    if ((modeInfo(mode, harness).profile ?? '') !== (modeInfo(previous, harness).profile ?? '')) {
         if (conversation.status === 'busy' || conversation.status === 'starting') conversation.restartPending = true;
         else await restartForMode(conversation);
         return;
@@ -790,7 +968,14 @@ function docKey(edit: PreparedEdit): string {
     return edit.doc.tab.filePath ?? `untitled:${edit.doc.tab.id}`;
 }
 
-function recordChange(conversation: Conversation, edit: PreparedEdit): void {
+/** Opens a new worksheet if needed, records the backup, and applies the edit. */
+function applyProposed(conversation: Conversation, proposed: ProposedEdit): void {
+    const edit = materialize(editorContext!, proposed);
+    recordChange(conversation, edit, 'create' in proposed);
+    applyEdit(edit);
+}
+
+function recordChange(conversation: Conversation, edit: PreparedEdit, created = false): void {
     const key = docKey(edit);
     const existing = conversation.changes.find(c => c.key === key);
     if (existing) {
@@ -803,6 +988,7 @@ function recordChange(conversation: Conversation, edit: PreparedEdit): void {
         title: edit.doc.tab.title,
         baseline: edit.original,
         changedAt: Date.now(),
+        ...(created ? { created: true } : {}),
     });
 }
 
@@ -855,6 +1041,15 @@ export async function revertChange(conversationId: string, key: string): Promise
     const change = conversation?.changes.find(c => c.key === key);
     if (!conversation || !change || !editorContext) return;
     try {
+        if (change.created && change.path) {
+            editorContext.closeDocument(change.path);
+            keepChange(conversationId, key);
+            const saved = await editorContext.pathExists(change.path);
+            notice(conversation, saved
+                ? `Closed ${change.path}. It had been saved, so the file is still on disk.`
+                : `Removed the new worksheet ${change.path}.`);
+            return;
+        }
         if (currentText(change) === null) {
             if (!change.path) throw new Error('This untitled worksheet was closed, so it cannot be restored.');
             await editorContext.openFile(change.path);
@@ -885,15 +1080,21 @@ export function showChanges(show: boolean): void {
     agentChat.view = show ? 'changes' : 'chat';
 }
 
-/** Changed provider settings need new processes; each conversation resumes on its next message. */
-export async function saveSettings(settings: Pick<AgentSettings, 'values' | 'model'>): Promise<void> {
-    const values: Record<string, string> = {};
-    for (const [key, value] of Object.entries(settings.values)) if (value.trim()) values[key] = value.trim();
-    const changed = JSON.stringify(values) !== JSON.stringify(agentChat.settings.values);
-    agentChat.settings = { ...agentChat.settings, values };
-    storeSettings();
-    await setModel(settings.model);
-    if (changed) await Promise.all(agentChat.conversations.map(stopProcess));
+/**
+ * Saves a harness's settings and makes it the default. A changed executable needs new
+ * processes; each of its conversations resumes on its next message.
+ */
+export async function saveSettings(id: string, settings: Pick<AgentSettings, 'executable' | 'model'>): Promise<void> {
+    const executable = settings.executable.trim();
+    const changed = executable !== settingsFor(id).executable;
+    agentChat.settings[id] = { ...settingsFor(id), executable, model: settings.model.trim() };
+    storeSettings(id);
+    selectHarness(id);
+    if (activeConversation().provider === id) await setModel(settings.model);
+    if (changed) {
+        await Promise.all(agentChat.conversations.filter(c => c.provider === id).map(stopProcess));
+        await refreshHarnesses();
+    }
 }
 
 export function setPanelOpen(open: boolean): void {

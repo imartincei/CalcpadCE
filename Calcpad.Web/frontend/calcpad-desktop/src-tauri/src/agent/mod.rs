@@ -1,14 +1,21 @@
-//! Coding-agent chat: a provider extension process per conversation tab, plus an MCP server
+//! Coding-agent chat: an agent CLI process per conversation tab, plus an MCP server
 //! that exposes the live editor to it.
 
-mod extension;
+mod acp;
+mod claude_code;
+mod codex;
+mod detect;
+mod harness;
 pub mod history;
 mod mcp;
+mod pi;
+mod process;
+mod rpc;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::Mutex;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
@@ -60,6 +67,16 @@ pub enum AgentEvent {
     Error {
         message: String,
     },
+    /// Models the running agent offers, for harnesses without a fixed list.
+    Models {
+        models: Vec<ModelOption>,
+    },
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct ModelOption {
+    pub value: String,
+    pub label: String,
 }
 
 /// One running agent conversation.
@@ -75,14 +92,13 @@ pub trait AgentBackend: Send + Sync {
 #[derive(Debug, Default, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StartOptions {
-    pub provider: String,
+    pub harness: String,
+    /// Overrides auto-detection.
+    pub executable: Option<String>,
     pub cwd: Option<String>,
     pub model: Option<String>,
     pub permission_mode: Option<String>,
     pub resume: Option<String>,
-    /// Values for the provider's manifest `settings`.
-    #[serde(default)]
-    pub settings: serde_json::Map<String, Value>,
 }
 
 /// A conversation tab in a window.
@@ -104,7 +120,7 @@ impl SessionKey {
 
 struct Session {
     generation: u64,
-    provider: Arc<extension::Provider>,
+    harness: harness::Harness,
     backend: Box<dyn AgentBackend>,
 }
 
@@ -119,7 +135,6 @@ pub struct AgentState {
     pending: Mutex<HashMap<u64, Pending>>,
     next_id: AtomicU64,
     mcp: OnceCell<mcp::McpEndpoint>,
-    providers: OnceLock<Vec<Arc<extension::Provider>>>,
 }
 
 #[derive(Clone, Serialize)]
@@ -137,10 +152,6 @@ struct ToolRequest<'a> {
 }
 
 impl AgentState {
-    fn providers(&self, app: &AppHandle) -> &[Arc<extension::Provider>] {
-        self.providers.get_or_init(|| extension::discover(app))
-    }
-
     fn is_current(&self, key: &SessionKey, generation: u64) -> bool {
         self.sessions
             .lock()
@@ -253,7 +264,7 @@ fn resolve_cwd(requested: Option<&str>) -> PathBuf {
         .unwrap_or_else(std::env::temp_dir)
 }
 
-fn session_label(key: &SessionKey) -> String {
+pub(crate) fn session_label(key: &SessionKey) -> String {
     let window: String = key
         .window
         .chars()
@@ -262,10 +273,24 @@ fn session_label(key: &SessionKey) -> String {
     format!("{window}-{}", key.conversation)
 }
 
-/// Manifests of the installed agent providers.
+fn plugin_dir(app: &AppHandle) -> Option<PathBuf> {
+    // The folder name is the plugin name: the skill is calcpadce:calcpad-generator.
+    let dir = app.path().resource_dir().ok()?.join("agent-plugins").join("calcpadce");
+    dir.join("skills").join("calcpad-generator").join("SKILL.md").is_file().then_some(dir)
+}
+
+/// Every supported harness, whether it was found, and what the chat panel offers for it.
+/// `paths` holds user-set executable paths by harness id.
 #[tauri::command]
-pub fn agent_providers(app: AppHandle, state: State<'_, AgentState>) -> Vec<Value> {
-    state.providers(&app).iter().map(|p| p.info.clone()).collect()
+pub async fn agent_harnesses(paths: HashMap<String, String>) -> Vec<Value> {
+    tauri::async_runtime::spawn_blocking(move || {
+        harness::Harness::ALL
+            .iter()
+            .map(|h| h.info(paths.get(h.id()).map(String::as_str)))
+            .collect()
+    })
+    .await
+    .unwrap_or_default()
 }
 
 #[tauri::command]
@@ -276,16 +301,16 @@ pub async fn agent_start(
     options: StartOptions,
 ) -> Result<(), String> {
     let key = SessionKey::new(&window, conversation)?;
-    let state = app.state::<AgentState>();
-    let provider = state
-        .providers(&app)
-        .iter()
-        .find(|p| p.id == options.provider)
-        .cloned()
-        .ok_or_else(|| format!("The {} extension is not installed", options.provider))?;
+    let harness = harness::Harness::from_id(&options.harness)
+        .ok_or_else(|| format!("Unknown agent harness {}", options.harness))?;
     if let Some(mode) = options.permission_mode.as_deref() {
-        provider.check_mode(mode)?;
+        harness.mode(mode)?;
     }
+    let exe = harness
+        .find(options.executable.as_deref())
+        .filter(|p| p.is_file())
+        .ok_or_else(|| harness.not_found())?;
+    let state = app.state::<AgentState>();
     state.stop_where(|k| *k == key);
 
     let endpoint = state
@@ -299,30 +324,26 @@ pub async fn agent_start(
         .app_data_dir()
         .map_err(|e| e.to_string())?
         .join("agent")
-        .join(&provider.id);
+        .join(harness.id());
     std::fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
-    let start = serde_json::json!({
-        "type": "start",
-        "protocol": extension::PROTOCOL_VERSION,
-        "session": session_label(&key),
-        "dataDir": data_dir,
-        "extensionDir": provider.dir,
-        "options": {
-            "model": options.model,
-            "permissionMode": options.permission_mode,
-            "resume": options.resume,
-            "settings": options.settings,
-        },
-        "mcp": endpoint.descriptor(&key),
-    });
-    let cwd = resolve_cwd(options.cwd.as_deref());
-    let backend = extension::spawn(&app, &key, generation, &provider, start, &cwd)?;
+    let launch = harness::Launch {
+        app: app.clone(),
+        key: key.clone(),
+        generation,
+        exe,
+        cwd: resolve_cwd(options.cwd.as_deref()),
+        options,
+        mcp: endpoint,
+        data_dir,
+        plugin_dir: plugin_dir(&app),
+    };
+    let backend = harness.start(launch)?;
     state.sessions.lock().expect("agent sessions mutex poisoned").insert(
         key,
         Session {
             generation,
-            provider,
-            backend: Box::new(backend),
+            harness,
+            backend,
         },
     );
     Ok(())
@@ -384,7 +405,7 @@ pub fn agent_set_permission_mode(
     let sessions = state.sessions.lock().expect("agent sessions mutex poisoned");
     match sessions.get(&key) {
         Some(session) => {
-            session.provider.check_mode(&mode)?;
+            session.harness.mode(&mode)?;
             session.backend.set_permission_mode(&mode)
         }
         None => Ok(()),
@@ -400,6 +421,12 @@ pub fn agent_stop(
     let key = SessionKey::new(&window, conversation)?;
     state.stop_where(|k| *k == key);
     Ok(())
+}
+
+/// Lets the chat tell a new worksheet from one it cannot read.
+#[tauri::command]
+pub fn agent_path_exists(path: String) -> bool {
+    std::path::Path::new(&path).exists()
 }
 
 #[tauri::command]
@@ -425,6 +452,40 @@ pub fn stop_all(app: &AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Lines of a transcript recorded from a real CLI, when `CALCPAD_LIVE_DIR` is set.
+    pub(crate) fn live_transcript(file: &str) -> Option<Vec<Value>> {
+        let dir = std::env::var_os("CALCPAD_LIVE_DIR")?;
+        let text = std::fs::read_to_string(std::path::Path::new(&dir).join(file)).ok()?;
+        Some(text.lines().filter_map(|l| serde_json::from_str(l).ok()).collect())
+    }
+
+    /// Checks a mapped live run: editor tools used, every tool finished, turn succeeded.
+    pub(crate) fn check_live_run(events: &[AgentEvent]) {
+        let tools: Vec<&str> = events
+            .iter()
+            .filter_map(|e| match e {
+                AgentEvent::ToolUse { name, .. } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect();
+        for expected in ["mcp__calcpad__get_document", "mcp__calcpad__propose_edit"] {
+            assert!(tools.contains(&expected), "{expected} missing from {tools:?}");
+        }
+        for event in events {
+            if let AgentEvent::ToolUse { id, .. } = event {
+                assert!(
+                    events.iter().any(|e| matches!(e, AgentEvent::ToolResult { tool_use_id, .. } if tool_use_id == id)),
+                    "tool {id} has no result"
+                );
+            }
+        }
+        assert!(events.iter().any(|e| matches!(e, AgentEvent::TextDelta { .. })));
+        assert!(matches!(
+            events.last(),
+            Some(AgentEvent::TurnComplete { is_error: false, subtype, .. }) if subtype == "success"
+        ), "last event: {:?}", events.last());
+    }
 
     #[test]
     fn events_round_trip_with_camel_case_fields() {
