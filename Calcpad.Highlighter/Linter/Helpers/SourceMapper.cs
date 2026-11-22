@@ -96,6 +96,44 @@ namespace Calcpad.Highlighter.Linter.Helpers
             };
         }
 
+        /// <summary>Maps columns on a Stage 2 line to the original source; a negative column covers the whole line.</summary>
+        public static MappedPosition MapStage2PositionToOriginal(int stage2Line, int column, int endColumn, Stage2Context stage2, Stage1Context stage1)
+        {
+            var stage1Line = stage2.Stage2ToStage1Map.TryGetValue(stage2Line, out var s1) ? s1 : stage2Line;
+            if (column < 0)
+                return MapWholeLineToOriginal(stage1Line, stage1);
+
+            if (stage1.LineContinuationSegments.TryGetValue(stage1Line, out var segments) && segments.Count > 1)
+                return MapPositionWithContinuations(column, endColumn, segments);
+
+            return new MappedPosition
+            {
+                Line = stage1.SourceMap.TryGetValue(stage1Line, out var orig) ? orig : stage1Line,
+                Column = column,
+                EndColumn = endColumn
+            };
+        }
+
+        /// <summary>Prefixes the included file and line to a diagnostic moved to its #include line, and records its place there. A negative column covers the whole line.</summary>
+        internal static void MarkIncluded(LinterDiagnostic diagnostic, SourceInfo source, int column, int endColumn)
+        {
+            var prefix = $"{System.IO.Path.GetFileName(source.SourceFile)} line {source.OriginalLine + 1}: ";
+            diagnostic.Message = prefix + diagnostic.Message;
+            diagnostic.IncludeMessageStart = prefix.Length;
+            if (source.FilePath is null || source.OriginalLine < 0)
+                return;
+
+            var origin = new IncludeOrigin { FilePath = source.FilePath, Line = source.OriginalLine, Column = -1, EndColumn = -1 };
+            if (column >= 0 && source.Segments is { Count: > 1 } segments)
+            {
+                var mapped = MapPositionWithContinuations(column, Math.Max(endColumn, column + 1), segments);
+                (origin.Line, origin.Column, origin.EndColumn) = (mapped.Line, mapped.Column, mapped.EndColumn);
+            }
+            else if (column >= 0)
+                (origin.Column, origin.EndColumn) = (column, Math.Max(endColumn, column + 1));
+            diagnostic.IncludeOrigins = [origin];
+        }
+
         private static bool TryProjectToCallSite(MacroExpansionInfo expansion, SourceInfo source, ref int column, ref int endColumn)
         {
             var columns = expansion.SourceColumns;

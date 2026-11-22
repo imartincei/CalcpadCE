@@ -224,19 +224,7 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
 
     // ===== Metadata comment JSON autocomplete =====
 
-    /** Valid paramType values for custom functions */
-    private static readonly FUNCTION_PARAM_TYPES = ['value', 'vector', 'matrix', 'any'];
-
-    /** Valid paramType values for macros (TokenType names) */
-    private static readonly MACRO_PARAM_TYPES = [
-        'None', 'Const', 'Operator', 'Bracket', 'LineContinuation',
-        'Variable', 'LocalVariable', 'Function', 'Macro', 'MacroParameter',
-        'Units', 'Setting',
-        'Keyword', 'ControlBlockKeyword', 'EndKeyword', 'Command',
-        'Include', 'FilePath', 'DataExchangeKeyword',
-        'Comment', 'HtmlComment', 'Tag', 'HtmlContent', 'JavaScript', 'Css', 'Svg',
-        'Input', 'Format',
-    ];
+    private static readonly PARAM_TYPES = ['value', 'vector', 'matrix', 'any'];
 
     /**
      * Provide completions when inside a metadata comment JSON block.
@@ -450,29 +438,15 @@ export class CalcpadCompletionProvider implements vscode.CompletionItemProvider 
         return items;
     }
 
-    /**
-     * Get completion items for paramType values.
-     * Offers both function types and macro types.
-     */
+    /** Get completion items for paramType values. */
     private getParamTypeValueCompletions(range: vscode.Range): vscode.CompletionItem[] {
         const items: vscode.CompletionItem[] = [];
 
-        for (const type of CalcpadCompletionProvider.FUNCTION_PARAM_TYPES) {
+        for (const type of CalcpadCompletionProvider.PARAM_TYPES) {
             const item = new vscode.CompletionItem('"' + type + '"', vscode.CompletionItemKind.EnumMember);
-            item.detail = 'Function param type';
+            item.detail = 'Parameter type';
             item.insertText = '"' + type + '"';
             item.sortText = '0_' + type;
-            item.filterText = type;
-            item.range = range;
-            items.push(item);
-        }
-
-        for (const type of CalcpadCompletionProvider.MACRO_PARAM_TYPES) {
-            if (CalcpadCompletionProvider.FUNCTION_PARAM_TYPES.includes(type.toLowerCase())) continue;
-            const item = new vscode.CompletionItem('"' + type + '"', vscode.CompletionItemKind.EnumMember);
-            item.detail = 'Macro param type (TokenType)';
-            item.insertText = '"' + type + '"';
-            item.sortText = '1_' + type;
             item.filterText = type;
             item.range = range;
             items.push(item);

@@ -10,6 +10,16 @@ Diagnostics appear as squiggles in the editor and entries in the Problems panel.
 - **As you type**, the linter checks the document without running it, including `#include` and `#def` errors and code in branches and loops that don't run.
 - **When the preview runs** the document's calculation errors also appear in the Problems panel.
 
+## Errors inside macros and functions
+
+A macro body is checked with the arguments of each call.
+An error in the body is marked on the call, and the first call also marks the place in the `#def` where the error is.
+Each mark links to the other.
+
+A custom function body is checked at its first call: every variable the body uses must be defined by then.
+If one is not, the linter marks both the call and the variable in the function body.
+A function that is never called is checked at the end of the document.
+
 ## Diagnostic codes
 
 Every diagnostic has a `CPD-` code.

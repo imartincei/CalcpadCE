@@ -13,11 +13,12 @@ x = 1
     #conceal
 #end if
 
-' Inside a multi-line macro, reported where it expands
+' Inside a multi-line macro, marked at the call and in the body
+'expect+1: CPD-3403[#nonsense]->+3[setup\$]
 #def setup$
 #nonsense
 #end def
-'expect: CPD-3403
+'expect: CPD-3403[setup\$]->-3[#nonsense]
 setup$
 
 ' Misspelled keywords are not read as the keyword they start with

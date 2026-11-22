@@ -24,7 +24,8 @@ c = g(1; _
 'expect: CPD-3302[libSquare(1; 2)]
 d = libSquare(1; 2) + libLength
 
-' From a macro body, the whole call is marked
+' From a macro body, marked at the call and in the body
+'expect: CPD-3302[square(a\$; 1)]->+2[callSquare\$(2)]
 #def callSquare$(a$) = square(a$; 1)
-'expect: CPD-3302[callSquare$(2)]
+'expect: CPD-3302[callSquare\$(2)]->-2[square(a\$; 1)]
 fromMacro = callSquare$(2)

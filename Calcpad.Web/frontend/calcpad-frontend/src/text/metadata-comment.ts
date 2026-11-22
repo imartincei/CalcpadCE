@@ -135,19 +135,8 @@ export interface MetadataLineContext {
     insideOpenLintRegion: boolean;
 }
 
-/** Valid `paramTypes` values for custom functions (f(x;y) = ...). */
-export const FUNCTION_PARAM_TYPES = ['value', 'vector', 'matrix', 'any'] as const;
-
-/** Valid `paramTypes` values for macros (#def) — TokenType enum names. */
-export const MACRO_PARAM_TYPES = [
-    'None', 'Const', 'Operator', 'Bracket', 'LineContinuation',
-    'Variable', 'LocalVariable', 'Function', 'Macro', 'MacroParameter',
-    'Units', 'Setting',
-    'Keyword', 'ControlBlockKeyword', 'EndKeyword', 'Command',
-    'Include', 'FilePath', 'DataExchangeKeyword',
-    'Comment', 'HtmlComment', 'Tag', 'HtmlContent', 'JavaScript', 'Css', 'Svg',
-    'Input', 'Format',
-] as const;
+/** Valid `paramTypes` and `returnType` values for custom functions and macros. */
+export const PARAM_TYPES = ['value', 'vector', 'matrix', 'any'] as const;
 
 export interface LintCode {
     code: string;

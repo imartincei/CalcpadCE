@@ -2267,7 +2267,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Initialize hover provider (Hover Tooltips)
         outputChannel.appendLine('Initializing hover provider...', 'verbose');
-        const hoverProviderDisposable = CalcpadHoverProvider.register(definitionsService, insertManager, outputChannel);
+        const hoverProviderDisposable = CalcpadHoverProvider.register(definitionsService, insertManager, outputChannel,
+            (uri, position, sourceFile) => linter.includedErrorAt(uri, position, sourceFile));
 
         // Initialize the compiled worksheet editor (.cpdz opens as an input form, with
         // the report available beside it). Both of its panels are standalone: there is no
@@ -2438,7 +2439,14 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!editor) return;
         await refreshPreviewPanels(editor.document);
     };
+    let lintedComplex = settingsManager.getSettings().math.isComplex;
     vueUiProvider.onSettingsChanged = async () => {
+        const isComplex = settingsManager.getSettings().math.isComplex;
+        if (isComplex !== lintedComplex) {
+            lintedComplex = isComplex;
+            for (const document of vscode.workspace.textDocuments)
+                if (document.fileName.endsWith('.cpd')) void linter.lintDocument(document, useTrace());
+        }
         const editor = vscode.window.activeTextEditor ?? previewSourceEditor;
         if (!editor) return;
         await refreshPreviewPanels(editor.document);
@@ -2923,6 +2931,7 @@ export async function activate(context: vscode.ExtensionContext) {
         vueUiProvider?.discardMetadataDraft(document.uri.toString());
         uiHistory.clear(document.uri.toString());
         runDiagnostics?.delete(document.uri);
+        linter?.forgetDocument(document.uri);
     });
 
     const onWillSaveTextDocument = vscode.workspace.onWillSaveTextDocument(event => {
@@ -2932,6 +2941,11 @@ export async function activate(context: vscode.ExtensionContext) {
     // Process document on save
     const onDidSaveTextDocument = vscode.workspace.onDidSaveTextDocument(document => {
         processDocument(document).catch(e => outputChannel.appendLine('[processDocument] Error: ' + e, 'warning'));
+        // Files that may include the saved one see its new text
+        if (document.fileName.endsWith('.cpd'))
+            for (const other of vscode.workspace.textDocuments)
+                if (other !== document && other.fileName.endsWith('.cpd') && /^\s*#include\b/im.test(other.getText()))
+                    void linter.lintDocument(other, useTrace());
         vueUiProvider?.refreshDocumentMetadata();
     });
 
@@ -2963,6 +2977,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Also where a compiled worksheet coming to the front reaches the Info tab.
     const onTabsChanged = () => {
         syncInputMode();
+        linter?.publishIncluded();
         vueUiProvider?.refreshDocumentMetadata();
     };
     const onDidChangeTabs = vscode.window.tabGroups.onDidChangeTabs(onTabsChanged);

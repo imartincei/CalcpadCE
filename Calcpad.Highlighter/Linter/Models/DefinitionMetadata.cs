@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Calcpad.Highlighter.Tokenizer.Models;
 
 namespace Calcpad.Highlighter.Linter.Models
 {
     /// <summary>
     /// Metadata parsed from a JSON comment on the line preceding a definition.
-    /// Syntax: '<!--{"desc":"...","paramTypes":["vector","scalar"],"paramDesc":["desc1","desc2"]}-->
+    /// Syntax: '<!--{"desc":"...","paramTypes":["vector","value"],"paramDesc":["desc1","desc2"]}-->
     /// </summary>
     public class DefinitionMetadata
     {
@@ -19,13 +18,9 @@ namespace Calcpad.Highlighter.Linter.Models
         /// <summary>User-declared return type for custom functions (value/vector/matrix/any).</summary>
         public string ReturnType { get; set; }
 
-        /// <summary>Valid paramType and returnType values for custom functions (f(x;y) = ...)</summary>
-        public static readonly HashSet<string> ValidFunctionParamTypes = new(StringComparer.OrdinalIgnoreCase)
+        /// <summary>Valid paramTypes and returnType values for custom functions and macros.</summary>
+        public static readonly HashSet<string> ValidParamTypes = new(StringComparer.OrdinalIgnoreCase)
             { "value", "vector", "matrix", "any" };
-
-        /// <summary>Valid paramType values for macros (#def) — all TokenType enum names</summary>
-        public static readonly HashSet<string> ValidMacroParamTypes =
-            new(Enum.GetNames(typeof(TokenType)), StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Maps a metadata returnType string to a <see cref="CalcpadType"/>, or null when

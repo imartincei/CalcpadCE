@@ -99,12 +99,7 @@
               <div v-for="(_, i) in model.paramTypes" :key="'pt' + i" class="list-row">
                 <select v-model="model.paramTypes[i]">
                   <option value="">(none)</option>
-                  <optgroup v-if="showFunctionTypes" :label="t('Function')">
-                    <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
-                  </optgroup>
-                  <optgroup v-if="showMacroTypes" :label="t('Macro (TokenType)')">
-                    <option v-for="t in macroTypes" :key="t" :value="t">{{ t }}</option>
-                  </optgroup>
+                  <option v-for="t in paramTypes" :key="t" :value="t">{{ t }}</option>
                 </select>
                 <button class="icon" :title="t('Remove')" @click="model.paramTypes.splice(i, 1)">✕</button>
               </div>
@@ -124,7 +119,7 @@
               <label><CalcpadSearchHighlight :text="t('Return type')" :query="query" /></label>
               <select v-model="model.returnType">
                 <option value="">(none)</option>
-                <option v-for="t in functionTypes" :key="t" :value="t">{{ t }}</option>
+                <option v-for="t in paramTypes" :key="t" :value="t">{{ t }}</option>
               </select>
             </div>
 
@@ -407,8 +402,7 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import {
-  FUNCTION_PARAM_TYPES,
-  MACRO_PARAM_TYPES,
+  PARAM_TYPES,
   LINT_CODES,
 } from '../../text/metadata-comment'
 import type { MetadataCommentBlock, MetadataCommentData, MetadataDefKind, PdfCommentValues, SettingsValues } from '../../text/metadata-comment'
@@ -615,8 +609,7 @@ watch(() => props.uiOverridesReveal?.seq, seq => {
 /** The block the form is editing - not the one under the cursor while edits are held. */
 const boundBlock = ref<MetadataCommentBlock | null>(null)
 
-const functionTypes = FUNCTION_PARAM_TYPES
-const macroTypes = MACRO_PARAM_TYPES
+const paramTypes = PARAM_TYPES
 const settingKeys = METADATA_SETTINGS_KEYS
 const pdfKeys = PDF_SETTING_KEYS
 const lintCodes = LINT_CODES
@@ -683,11 +676,6 @@ const showParams = computed(() =>
   || model.paramTypes.length > 0
   || model.paramDesc.length > 0
   || added.has('params'))
-
-// A function takes value/vector/matrix/any; a macro takes TokenType names. When
-// the kind is unknown (no context, or user-added on a variable) offer both.
-const showFunctionTypes = computed(() => defKind.value !== 'macro')
-const showMacroTypes = computed(() => defKind.value !== 'function')
 
 // A return type only applies to custom functions.
 const showReturnType = computed(() =>

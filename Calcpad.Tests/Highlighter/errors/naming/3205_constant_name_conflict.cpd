@@ -10,9 +10,10 @@ e(x) = x
 'expect: CPD-3205[π], CPD-3409[π]
 π = 3
 
-' Inside a multi-line macro, reported where it expands
+' Inside a multi-line macro, marked at the call and in the body
+'expect+1: CPD-3205[e]->+3[setE\$]
 #def setE$
 e = 3
 #end def
-'expect: CPD-3205
+'expect: CPD-3205[setE\$]->-3[e]
 setE$

@@ -170,8 +170,8 @@ export class CalcpadApiClient {
         })();
     }
 
-    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean }): Promise<LintResponse | null> {
-        const request: LintRequest = { content, sourceFilePath, useTrace: opts?.useTrace, macroCalls: this.macroCalls };
+    public async lint(content: string, sourceFilePath?: string, opts?: { key?: string; useTrace?: boolean; isComplex?: boolean }): Promise<LintResponse | null> {
+        const request: LintRequest = { content, sourceFilePath, useTrace: opts?.useTrace, isComplex: opts?.isComplex, macroCalls: this.macroCalls };
         return this.post<LintResponse>('/api/calcpad/lint', request, 'Lint', opts?.key);
     }
 

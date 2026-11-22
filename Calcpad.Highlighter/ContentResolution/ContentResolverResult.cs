@@ -20,7 +20,7 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>User-provided description from a metadata comment on the preceding line.</summary>
         public string Description { get; set; }
 
-        /// <summary>User-provided type hints per parameter (e.g., "vector", "scalar").</summary>
+        /// <summary>User-provided type hints per parameter (e.g., "vector", "value").</summary>
         public List<string> ParamTypes { get; set; }
 
         /// <summary>User-provided descriptions per parameter.</summary>
@@ -58,7 +58,7 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>User-provided description from a metadata comment on the preceding line.</summary>
         public string Description { get; set; }
 
-        /// <summary>User-provided type hints per parameter (e.g., "vector", "scalar").</summary>
+        /// <summary>User-provided type hints per parameter (e.g., "vector", "value").</summary>
         public List<string> ParamTypes { get; set; }
 
         /// <summary>User-provided descriptions per parameter.</summary>
@@ -176,6 +176,9 @@ namespace Calcpad.Highlighter.ContentResolution
 
         /// <summary>Column in the call site line of each character, or -1 for macro body text.</summary>
         public IReadOnlyList<int> SourceColumns { get; set; }
+
+        /// <summary>Stage 2 line and column of each character, or (-1, -1) when it was not read from the source.</summary>
+        public IReadOnlyList<(int Line, int Column)> Origins { get; set; }
     }
 
     /// <summary>A line a macro call expanded to.</summary>
@@ -194,6 +197,12 @@ namespace Calcpad.Highlighter.ContentResolution
         /// -1 means not applicable (local source).
         /// </summary>
         public int OriginalLine { get; set; } = -1;
+
+        /// <summary>Resolved path of the included file; null for local lines and failed includes.</summary>
+        public string FilePath { get; set; }
+
+        /// <summary>The included file's lines a continued line was merged from; null when not continued.</summary>
+        public List<LineContinuationSegment> Segments { get; set; }
     }
 
     /// <summary>
@@ -407,7 +416,16 @@ namespace Calcpad.Highlighter.ContentResolution
         /// <summary>What Core executed for this content; null when no trace matched.</summary>
         public RuntimeOverlay Runtime { get; set; }
 
-        /// <summary>Core's check pass over the Stage 3 lines, run once on first use.</summary>
-        public Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> CoreCheck { get; set; }
+        /// <summary>Core's check pass over the Stage 3 lines, run once per starting mode on first use.</summary>
+        public CoreCheckResults CoreCheck { get; set; }
+    }
+
+    /// <summary>The check pass for each complex mode the document can start in; #settings may switch it later.</summary>
+    public sealed class CoreCheckResults(Func<bool, IReadOnlyList<Calcpad.Core.CalcpadError>> check)
+    {
+        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _real = new(() => check(false));
+        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _complex = new(() => check(true));
+
+        public IReadOnlyList<Calcpad.Core.CalcpadError> Get(bool isComplex) => (isComplex ? _complex : _real).Value;
     }
 }

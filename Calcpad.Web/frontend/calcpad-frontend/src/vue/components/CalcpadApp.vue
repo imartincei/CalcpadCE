@@ -52,6 +52,7 @@
         @open-file="handleOpenFile"
         @expand-folder="handleExpandFolder"
         @open-containing-folder="handleOpenContainingFolder"
+        @insert-file-reference="handleInsertFileReference"
         @close-folder="handleCloseFolder"
         @refresh-folder="handleRefreshFolder"
       />
@@ -412,6 +413,10 @@ const handleExpandFolder = (path: string) => {
 
 const handleOpenContainingFolder = (path: string) => {
   postMessage({ type: 'openContainingFolder', path })
+}
+
+const handleInsertFileReference = (path: string, kind: 'include' | 'read' | 'image', absolute: boolean) => {
+  postMessage({ type: 'insertFileReference', path, kind, absolute })
 }
 
 const handleCloseFolder = (slot: number) => {

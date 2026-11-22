@@ -30,7 +30,7 @@ Put this on the line above a variable, function, macro, or custom unit:
 | Field | What it's for |
 | ----- | ------------- |
 | **Description** | A sentence explaining what the definition is. |
-| **Parameter types** | The kind of value each input expects. Functions take `value`, `vector`, `matrix`, or `any`; macros use CalcpadCE's token names (this is work-in-progress). |
+| **Parameter types** | The kind of value each input expects: `value`, `vector`, `matrix`, or `any`. |
 | **Parameter descriptions** | A short note for each input, in order. |
 | **Return type** | What a function gives back: `value`, `vector`, `matrix`, or `any`. |
 
