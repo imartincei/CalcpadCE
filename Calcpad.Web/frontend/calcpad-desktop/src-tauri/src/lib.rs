@@ -868,6 +868,10 @@ fn navigate_to_open_file(
     Ok(true)
 }
 
+/// Cursor offset in a detached tab's window: on the tab strip (36px title bar + half the 30px strip).
+const DETACHED_TAB_GRAB_X: f64 = 120.0;
+const DETACHED_TAB_GRAB_Y: f64 = 51.0;
+
 /// Opens another window in this process — one sidecar, one store, one drafts dir. Cloning
 /// the configured window carries its CSP, min sizes and browser args over. Async because
 /// building a webview from a sync command deadlocks on Windows.
@@ -898,8 +902,8 @@ async fn new_window(app: AppHandle, at_cursor: Option<bool>) -> Result<String, S
                 .flatten()
                 .map_or(1.0, |monitor| monitor.scale_factor());
             tauri::PhysicalPosition::new(
-                (cursor.x - 120.0 * scale) as i32,
-                (cursor.y - 16.0 * scale) as i32,
+                (cursor.x - DETACHED_TAB_GRAB_X * scale) as i32,
+                (cursor.y - DETACHED_TAB_GRAB_Y * scale) as i32,
             )
         });
     if position.is_some() {
