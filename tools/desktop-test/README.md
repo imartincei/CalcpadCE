@@ -60,7 +60,7 @@ bash tools/desktop-test/linux-tests.sh
 
 Use `--skip-build` to reuse the test build.
 Tests use an isolated application profile and a separate display.
-They exercise real pointer dragging, tab reordering, cancellation, split groups, and transfers between GTK windows.
+They exercise real pointer dragging, tab reordering, cancellation, split groups, transfers between GTK windows, and detaching tabs into new windows.
 Navigation tests cover keyboard shortcuts, mouse side buttons, previews, selections, tabs, split groups, and windows.
 Run `GDK_SCALE=2 bash tools/desktop-test/linux-tests.sh --skip-build` to check display scaling.
 Run `bash tools/desktop-test/linux-tests.sh --wayland --skip-build` to test native Wayland.

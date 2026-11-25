@@ -337,11 +337,25 @@ describe('Linux GTK editor', {skip: process.platform !== 'linux', concurrency: f
         assert.deepEqual(await app.evaluate(main, 'window.calcpadTabs.all'), before);
     });
 
-    test('dropping outside preserves the tabs', {timeout: 60000}, async t => {
+    test('dropping outside opens the tab in a new window', {timeout: 60000}, async t => {
         const {app, main} = await start(t);
-        const id = await app.evaluate(main, `window.calcpadTabs.newUntitled('', 'Outside')`);
-        const before = await app.evaluate(main, 'window.calcpadTabs.all');
+        const id = await app.evaluate(main, `(() => {
+            const id = window.calcpadTabs.newUntitled('', 'Outside');
+            window.calcpadActiveEditor.setValue('outside = 1');
+            return id;
+        })()`);
         await app.drag(main, id, main, '.tab-new', {outside: true});
+        const label = await until(async () => [...(await app.windows()).keys()].find(label => label !== 'main'), 'detached GTK window opened');
+        const detached = await app.window(label);
+        await until(async () => await app.evaluate(detached, 'window.calcpadActiveEditor.getValue()') === 'outside = 1', 'detached GTK document received');
+        await until(async () => !(await app.evaluate(main, 'window.calcpadTabs.all')).some(tab => tab.id === id), 'source removed');
+        assert.equal(await app.evaluate(detached, 'window.calcpadTabs.count'), 1);
+        assert.equal(await app.evaluate(detached, 'window.calcpadTabs.activeTab.title'), 'Outside');
+
+        const before = await app.evaluate(main, 'window.calcpadTabs.all');
+        await app.drag(main, before[0].id, main, '.tab-new', {outside: true});
+        await pause(1000);
+        assert.equal((await app.windows()).size, 2);
         assert.deepEqual(await app.evaluate(main, 'window.calcpadTabs.all'), before);
     });
 

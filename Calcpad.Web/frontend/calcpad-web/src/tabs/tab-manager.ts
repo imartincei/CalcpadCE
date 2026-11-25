@@ -95,6 +95,9 @@ export class TabManager {
         private idPrefix: string = '',
     ) {}
 
+    /** When true, closing the last tab leaves the manager empty instead of seeding an untitled tab. */
+    allowEmpty: () => boolean = () => false;
+
     // ---- Subscription ----
 
     onTabsChanged(listener: TabsListener): () => void {
@@ -374,7 +377,7 @@ export class TabManager {
                     this.editor.restoreViewState(nextActive.viewState);
                 }
                 this.editor.focus();
-            } else {
+            } else if (!this.allowEmpty()) {
                 // No tabs left — give the editor an empty model so it stays usable.
                 this.newUntitled();
                 return; // newUntitled() emits already
@@ -382,7 +385,7 @@ export class TabManager {
         }
 
         this.emit();
-        if (wasActive) this.emitActiveModel();
+        if (wasActive && this._activeId) this.emitActiveModel();
     }
 
     /**

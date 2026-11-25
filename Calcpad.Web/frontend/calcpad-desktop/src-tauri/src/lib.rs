@@ -869,11 +869,15 @@ fn navigate_to_open_file(
     Ok(true)
 }
 
+/// Cursor offset in a detached tab's window: on the tab strip (36px title bar + half the 30px strip).
+const DETACHED_TAB_GRAB_X: f64 = 120.0;
+const DETACHED_TAB_GRAB_Y: f64 = 51.0;
+
 /// Opens another window in this process — one sidecar, one store, one drafts dir. Cloning
 /// the configured window carries its CSP, min sizes and browser args over. Async because
 /// building a webview from a sync command deadlocks on Windows.
 #[tauri::command]
-async fn new_window(app: AppHandle) -> Result<String, String> {
+async fn new_window(app: AppHandle, at_cursor: Option<bool>) -> Result<String, String> {
     let mut config = app
         .config()
         .app
@@ -888,6 +892,26 @@ async fn new_window(app: AppHandle) -> Result<String, String> {
     );
     config.label = label.clone();
 
+    // Physical coordinates so mixed-DPI monitors don't misplace it; Wayland ignores positions.
+    let position = (at_cursor == Some(true))
+        .then(|| app.cursor_position().ok())
+        .flatten()
+        .map(|cursor| {
+            let scale = app
+                .monitor_from_point(cursor.x, cursor.y)
+                .ok()
+                .flatten()
+                .map_or(1.0, |monitor| monitor.scale_factor());
+            tauri::PhysicalPosition::new(
+                (cursor.x - DETACHED_TAB_GRAB_X * scale) as i32,
+                (cursor.y - DETACHED_TAB_GRAB_Y * scale) as i32,
+            )
+        });
+    if position.is_some() {
+        config.center = false;
+        config.visible = false;
+    }
+
     let menu = build_menu(&app).map_err(|e| e.to_string())?;
     let window = tauri::WebviewWindowBuilder::from_config(&app, &config)
         .map_err(|e| e.to_string())?
@@ -895,6 +919,10 @@ async fn new_window(app: AppHandle) -> Result<String, String> {
         .focused(true)
         .build()
         .map_err(|e| e.to_string())?;
+    if let Some(position) = position {
+        window.set_position(position).map_err(|e| e.to_string())?;
+        window.show().map_err(|e| e.to_string())?;
+    }
     window.set_focus().map_err(|e| e.to_string())?;
     window.as_ref().set_focus().map_err(|e| e.to_string())?;
     Ok(label)
@@ -1641,7 +1669,7 @@ pub fn run() {
             if files.is_empty() {
                 let app = app.clone();
                 tauri::async_runtime::spawn(async move {
-                    new_window(app)
+                    new_window(app, None)
                         .await
                         .expect("failed to open window for application launch");
                 });

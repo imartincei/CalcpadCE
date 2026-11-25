@@ -572,6 +572,14 @@ select option {
     z-index: 10000;
 }
 
+.tab-drop-overlay {
+    position: fixed;
+    background: var(--vscode-editorGroup-dropBackground, color-mix(in srgb, var(--vscode-focusBorder, #007acc) 18%, transparent));
+    pointer-events: none;
+    z-index: 9999;
+    transition: top 0.1s ease-out, height 0.1s ease-out;
+}
+
 .tab[data-tab-id] {
     touch-action: none;
 }

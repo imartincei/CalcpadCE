@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { describe, test } from 'node:test';
-import { TestApp, invoke, until } from './test-app.mjs';
+import { TestApp, invoke, pause, until } from './test-app.mjs';
 
 async function dragTab(app, source, tabId, target, beforeId, {cancel = false, outside = false} = {}) {
     await app.setGeometry(source, {width: 1400, height: 700}, {x: 10, y: 10});
@@ -360,10 +360,37 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         assert.equal(await app.evaluate(main, 'window.calcpadTabs.isDirty()'), false);
 
         await dragTab(app, main, ids[0], main, ids[1], {cancel: true});
-        await dragTab(app, main, ids[0], main, null, {outside: true});
         assert.deepEqual(await app.evaluate(main, 'window.calcpadTabs.all.map(tab => tab.title)'), ['B', 'A', 'C']);
         await dragTab(app, main, ids[1], main, null);
         await until(async () => (await app.evaluate(main, 'window.calcpadTabs.all.map(tab => tab.title).join()')) === 'A,C,B', 'tab moved to end');
+        await app.stop(main, 'main');
+    });
+
+    test('dropping a tab outside every window opens it in a new window', {timeout: 90000}, async t => {
+        const app = new TestApp();
+        t.after(() => app.dispose());
+        const main = await app.start();
+        const id = await app.evaluate(main, `(() => {
+            const id = window.calcpadTabs.newUntitled('', 'Detached');
+            window.calcpadActiveEditor.executeEdits('test', [{range: {startLineNumber: 1, startColumn: 1, endLineNumber: 1, endColumn: 1}, text: 'detached = 1'}]);
+            return id;
+        })()`);
+        await dragTab(app, main, id, main, null, {outside: true});
+        const label = await until(async () => [...(await app.windows()).keys()].find(label => label !== 'main'), 'detached window opened');
+        const detached = await app.window(label);
+        await until(async () => await app.evaluate(detached, 'window.calcpadActiveEditor.getValue()') === 'detached = 1', 'detached document received');
+        await until(async () => !(await app.evaluate(main, 'window.calcpadTabs.all')).some(tab => tab.id === id), 'source tab removed');
+        assert.equal(await app.evaluate(detached, 'window.calcpadTabs.count'), 1);
+        assert.equal(await app.evaluate(detached, 'window.calcpadTabs.activeTab.title'), 'Detached');
+        assert.equal(await app.evaluate(detached, 'window.calcpadTabs.isDirty()'), true);
+
+        const only = await app.evaluate(main, 'window.calcpadTabs.activeId');
+        await dragTab(app, main, only, main, null, {outside: true});
+        await pause(1000);
+        assert.equal((await app.windows()).size, 2);
+        assert.equal(await app.evaluate(main, 'window.calcpadTabs.activeId'), only);
+        await app.evaluate(detached, "window.calcpadBridge.confirmThreeWay = async () => 'no'");
+        await app.closeAndWait(detached, label);
         await app.stop(main, 'main');
     });
 
