@@ -460,8 +460,6 @@ const zh: Record<string, string> = {
     "Remove ~{key}": "移除 ~{key}",
     "letters": "字母",
     "Add": "添加",
-    "Save": "保存",
-    "Delete": "删除",
     "Type ~ then the letters and a space to insert this item.": "输入 ~、字母和空格即可插入此条目。",
     "Enter the text to insert": "请输入要插入的文本",
     "Enter 1 to {max} characters": "请输入 1 到 {max} 个字符",
