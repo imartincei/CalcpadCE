@@ -80,6 +80,7 @@ import './editor/vscode-variables.css';
 import 'calcpad-frontend/vue/styles/base.css';
 import './styles/app.css';
 import { MetadataFooterView } from './editor/metadata-footer-view';
+import { registerAgentEditor } from './services/agent-chat';
 import { registerUiOverrideHints } from './editor/ui-override-hints';
 
 // Monaco worker setup — must run before editor creation
@@ -2527,6 +2528,23 @@ async function bootstrap(): Promise<void> {
                 appInstance.appendOutput('error', 'Failed to open file: ' + (err instanceof Error ? err.message : String(err)));
             }
         }
+
+        registerAgentEditor({
+            groups: () => [...groups.values()],
+            activeGroup: () => activeGroup,
+            openFile: loadFile,
+            createDocument: (path) => { activeGroup.tabs.openFile(path, ''); },
+            closeDocument: (path) => {
+                for (const group of groups.values()) {
+                    const tab = group.tabs.findByPath(path);
+                    if (tab) group.tabs.close(tab.id);
+                }
+            },
+            pathExists: async (path) => {
+                const { invoke } = await import('@tauri-apps/api/core');
+                return invoke<boolean>('agent_path_exists', { path });
+            },
+        });
 
         // Files-tab clicks arrive via a custom event dispatched by the bridge.
         window.addEventListener('calcpad-open-file', (e: Event) => {

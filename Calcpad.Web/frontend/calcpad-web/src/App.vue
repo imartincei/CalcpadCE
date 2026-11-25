@@ -447,6 +447,40 @@
       </div><!-- /.document-panes -->
     </div><!-- /.work-area -->
 
+    <template v-if="isDesktop">
+      <div
+        v-show="agentChat.panelOpen"
+        class="resize-handle agent-resize-handle"
+        :class="{ dragging: draggingAgentDivider }"
+        @mousedown="onAgentHandleMouseDown"
+        title="Drag to resize"
+        role="separator"
+        aria-orientation="vertical"
+      ></div>
+      <AgentChatPanel v-show="agentChat.panelOpen" :style="{ width: agentPanelWidth + 'px' }" @close="setPanelOpen(false)" />
+      <AgentDiffModal
+        v-if="agentChat.pendingEdit"
+        :key="agentChat.pendingEdit.requestId"
+        :title="agentChat.pendingEdit.title"
+        :summary="agentChat.pendingEdit.summary"
+        :original="agentChat.pendingEdit.original"
+        :modified="agentChat.pendingEdit.modified"
+        @resolve="resolveEdit"
+      />
+      <AgentDiffModal
+        v-else-if="agentChat.reviewChange"
+        :key="agentChat.reviewChange.key"
+        review
+        :title="agentChat.reviewChange.title"
+        summary=""
+        :original="agentChat.reviewChange.baseline"
+        :modified="agentChat.reviewChange.current"
+        @revert="revertChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
+        @keep="keepChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
+        @close="closeChangeDiff"
+      />
+    </template>
+
     <!-- Replaces the broken native WebView menu (see injectLineLinks). Viewport
          coordinates, and outside the editor pane, which UI mode hides. -->
     <div
@@ -571,6 +605,19 @@
     <span v-if="serverStatus !== 'connected'" class="status-server" :class="serverStatus" :title="serverStatusTitle">
       ● {{ serverStatusLabel }}
     </span>
+    <button
+      v-if="isDesktop"
+      class="status-agent"
+      :class="{ active: agentChat.panelOpen }"
+      :title="t('Toggle {name} chat', { name: providerName() })"
+      :aria-label="t('Toggle {name} chat', { name: providerName() })"
+      :aria-pressed="agentChat.panelOpen"
+      @click.stop="setPanelOpen(!agentChat.panelOpen)"
+    >
+      <svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/>
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -579,6 +626,9 @@ import { useI18n } from 'vue-i18n'
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import DesktopTitleBar from './components/DesktopTitleBar.vue'
 import DocumentTabStrip from './components/DocumentTabStrip.vue'
+import AgentChatPanel from './components/AgentChatPanel.vue'
+import AgentDiffModal from './components/AgentDiffModal.vue'
+import { agentChat, closeChangeDiff, keepChange, providerName, resolveEdit, revertChange, setPanelOpen } from './services/agent-chat'
 import FileConflictDialog from './components/FileConflictDialog.vue'
 import type { FileConflictChoice } from './services/file-change-tracker'
 import RefreshIcon from 'calcpad-frontend/vue/components/RefreshIcon.vue'
@@ -829,7 +879,8 @@ const draggingUiPrintDivider = ref(false)
 // Drives `.app-layout.resizing`, which kills pointer-events on the iframes: a cursor
 // crossing into one mid-drag would otherwise steal the mousemove/mouseup.
 const isAnyDividerDragging = computed(() =>
-  isResizing.value || draggingEditorDivider.value || draggingPreviewDivider.value || draggingUiPrintDivider.value)
+  isResizing.value || draggingEditorDivider.value || draggingPreviewDivider.value || draggingUiPrintDivider.value
+  || draggingAgentDivider.value)
 
 function previewPaneStyle(): Record<string, string> | undefined {
   if (uiModeFullscreen.value) {
@@ -1648,6 +1699,37 @@ function onSidebarHandleMouseDown(e: MouseEvent): void {
     if (moved) {
       localStorage.setItem('calcpad.sidebarWidth', String(sidebarWidth.value))
     }
+  }
+  window.addEventListener('mousemove', onMove)
+  window.addEventListener('mouseup', onUp)
+}
+
+// ---- Chat panel drag-to-resize ----
+const AGENT_PANEL_MIN = 260
+const AGENT_PANEL_MAX = 900
+const AGENT_PANEL_WIDTH_KEY = 'calcpad.agentPanelWidth'
+const agentPanelWidth = ref<number>(loadAgentPanelWidth())
+const draggingAgentDivider = ref(false)
+
+function loadAgentPanelWidth(): number {
+  const raw = parseInt(localStorage.getItem(AGENT_PANEL_WIDTH_KEY) ?? '', 10)
+  if (!Number.isFinite(raw)) return 380
+  return Math.min(AGENT_PANEL_MAX, Math.max(AGENT_PANEL_MIN, raw))
+}
+
+function onAgentHandleMouseDown(e: MouseEvent): void {
+  e.preventDefault()
+  draggingAgentDivider.value = true
+  const startX = e.clientX
+  const startWidth = agentPanelWidth.value
+  const onMove = (ev: MouseEvent) => {
+    agentPanelWidth.value = Math.min(AGENT_PANEL_MAX, Math.max(AGENT_PANEL_MIN, startWidth - (ev.clientX - startX)))
+  }
+  const onUp = () => {
+    draggingAgentDivider.value = false
+    window.removeEventListener('mousemove', onMove)
+    window.removeEventListener('mouseup', onUp)
+    localStorage.setItem(AGENT_PANEL_WIDTH_KEY, String(agentPanelWidth.value))
   }
   window.addEventListener('mousemove', onMove)
   window.addEventListener('mouseup', onUp)
