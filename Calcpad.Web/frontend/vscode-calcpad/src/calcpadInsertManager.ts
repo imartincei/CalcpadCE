@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import type { ILogger } from 'calcpad-frontend';
+import type { ILogger, UserCustomizations } from 'calcpad-frontend';
 import {
     CalcpadSnippetService,
     CalcpadApiClient,
@@ -50,8 +50,20 @@ export class CalcpadInsertManager {
         this.snippetService.onSnippetsLoaded(callback);
     }
 
+    public quickTypeSnippet(text: string): string | null {
+        return this.snippetService.quickTypeSnippet(text);
+    }
+
     public buildQuickTypeMap(): Map<string, string> {
         return this.snippetService.buildQuickTypeMap();
+    }
+
+    public getCustomizations(): UserCustomizations | null {
+        return this.snippetService.getCustomizations();
+    }
+
+    public setCustomizationsProvider(provider: () => UserCustomizations): void {
+        this.snippetService.setCustomizationsProvider(provider);
     }
 
     public dispose(): void {

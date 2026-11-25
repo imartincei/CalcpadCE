@@ -272,6 +272,9 @@ export function getDefaultSettingsBlob(): CalcpadSettingsBlob {
     return structuredClone(defaultSettingsJson) as CalcpadSettingsBlob;
 }
 
+/** Maps merged over their defaults key by key, so new defaults reach old files; `""` disables an entry. */
+const MERGED_EXTRAS = ['keybindings', 'quickTypes'];
+
 /**
  * Convert the on-disk / imported blob to the internal (settings, extras)
  * pair. Missing keys fall back to defaults so newly added default keys are
@@ -284,6 +287,12 @@ export function deserializeSettingsBlob(
     const b = (blob ?? {}) as Partial<CalcpadSettingsBlob>;
     const core = deepMerge(defaults.core, b.core ?? {}) as CalcpadSettings;
     const rawExtras = { ...defaults.extras, ...(b.extras ?? {}) };
+    for (const key of MERGED_EXTRAS) {
+        const user = b.extras?.[key];
+        if (user && typeof user === 'object' && !Array.isArray(user)) {
+            rawExtras[key] = { ...(defaults.extras[key] as object), ...user };
+        }
+    }
     return { settings: core, extras: typedExtrasToInternal(rawExtras) };
 }
 

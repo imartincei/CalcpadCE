@@ -5,8 +5,8 @@ using Calcpad.Highlighter.Snippets.Models;
 namespace Calcpad.Highlighter.Snippets.Data
 {
     /// <summary>
-    /// Snippet definitions for Greek characters and other special symbols. QuickType values
-    /// match the QUICK_TYPE_MAP in calcpad-frontend (quick-type.ts).
+    /// Snippet definitions for Greek characters and other special symbols. The frontends read
+    /// quick types from `extras.quickTypes` in calcpad-frontend's settings.default.json, not QuickType.
     /// </summary>
     public static class SymbolSnippets
     {

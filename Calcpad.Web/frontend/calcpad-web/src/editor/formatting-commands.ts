@@ -17,8 +17,8 @@ import {
 } from 'calcpad-frontend';
 
 /**
- * Register the 18 CalcPad text-formatting commands plus their keybindings on the editor.
- * Every command is gated on `extraSettings.formattingHotkeys !== 'false'`.
+ * Register the 18 CalcPad text-formatting commands on the editor. Their hotkeys come from the
+ * `keybindings` setting, dispatched in main.ts. Every command is gated on `formattingHotkeys`.
  */
 export function registerFormattingCommands(
     editor: monaco.editor.IStandaloneCodeEditor,
@@ -31,44 +31,35 @@ export function registerFormattingCommands(
         await run();
     };
 
-    function add(id: string, label: string, keybindings: number[], run: () => void | Promise<void>): void {
+    function add(id: string, label: string, run: () => void | Promise<void>): void {
         disposables.push(editor.addAction({
             id,
             label,
-            keybindings,
             run: guard(run),
         }));
     }
 
-    const KM = monaco.KeyMod;
-    const KC = monaco.KeyCode;
-
     // Inline formatting
-    add('calcpad.formatBold',         'CalcpadCE: Bold',         [KM.CtrlCmd | KC.KeyB], () => wrapInline(editor, bridge, 'bold'));
-    add('calcpad.formatItalic',       'CalcpadCE: Italic',       [KM.CtrlCmd | KC.KeyI], () => wrapInline(editor, bridge, 'italic'));
-    add('calcpad.formatUnderline',    'CalcpadCE: Underline',    [KM.CtrlCmd | KC.KeyU], () => wrapInline(editor, bridge, 'underline'));
-    add('calcpad.formatSubscript',    'CalcpadCE: Subscript',    [KM.CtrlCmd | KC.Equal], () => wrapInline(editor, bridge, 'subscript'));
-    add('calcpad.formatSuperscript',  'CalcpadCE: Superscript',  [KM.CtrlCmd | KM.Shift | KC.Equal], () => wrapInline(editor, bridge, 'superscript'));
+    add('calcpad.formatBold',         'CalcpadCE: Bold',         () => wrapInline(editor, bridge, 'bold'));
+    add('calcpad.formatItalic',       'CalcpadCE: Italic',       () => wrapInline(editor, bridge, 'italic'));
+    add('calcpad.formatUnderline',    'CalcpadCE: Underline',    () => wrapInline(editor, bridge, 'underline'));
+    add('calcpad.formatSubscript',    'CalcpadCE: Subscript',    () => wrapInline(editor, bridge, 'subscript'));
+    add('calcpad.formatSuperscript',  'CalcpadCE: Superscript',  () => wrapInline(editor, bridge, 'superscript'));
 
-    // Headings (Ctrl+1..Ctrl+6)
-    const digitKeys = [KC.Digit1, KC.Digit2, KC.Digit3, KC.Digit4, KC.Digit5, KC.Digit6];
-    for (let i = 0; i < 6; i++) {
-        const level = i + 1;
-        add(`calcpad.formatHeading${level}`, `CalcpadCE: Heading ${level}`,
-            [KM.CtrlCmd | digitKeys[i]],
-            () => insertHeading(editor, bridge, level));
+    for (let level = 1; level <= 6; level++) {
+        add(`calcpad.formatHeading${level}`, `CalcpadCE: Heading ${level}`, () => insertHeading(editor, bridge, level));
     }
 
     // Block elements
-    add('calcpad.formatParagraph',    'CalcpadCE: Paragraph',     [KM.CtrlCmd | KC.KeyL], () => insertParagraph(editor, bridge));
-    add('calcpad.formatLineBreak',    'CalcpadCE: Line Break',    [KM.CtrlCmd | KC.KeyR], () => insertLineBreak(editor, bridge));
-    add('calcpad.formatBulletedList', 'CalcpadCE: Bulleted List', [KM.CtrlCmd | KM.Shift | KC.KeyL], () => insertBulletedList(editor, bridge));
-    add('calcpad.formatNumberedList', 'CalcpadCE: Numbered List', [KM.CtrlCmd | KM.Shift | KC.KeyN], () => insertNumberedList(editor, bridge));
+    add('calcpad.formatParagraph',    'CalcpadCE: Paragraph',     () => insertParagraph(editor, bridge));
+    add('calcpad.formatLineBreak',    'CalcpadCE: Line Break',    () => insertLineBreak(editor, bridge));
+    add('calcpad.formatBulletedList', 'CalcpadCE: Bulleted List', () => insertBulletedList(editor, bridge));
+    add('calcpad.formatNumberedList', 'CalcpadCE: Numbered List', () => insertNumberedList(editor, bridge));
 
     // Comments
-    add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   [KM.CtrlCmd | KC.KeyQ], () => toggleComment(editor, bridge));
-    add('calcpad.uncomment',      'CalcpadCE: Uncomment',        [KM.CtrlCmd | KM.Shift | KC.KeyQ], () => uncomment(editor, bridge));
-    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', [KM.CtrlCmd | KM.Shift | KC.KeyV], () => pasteAsComment(editor, bridge));
+    add('calcpad.toggleComment',  'CalcpadCE: Toggle Comment',   () => toggleComment(editor, bridge));
+    add('calcpad.uncomment',      'CalcpadCE: Uncomment',        () => uncomment(editor, bridge));
+    add('calcpad.pasteAsComment', 'CalcpadCE: Paste as Comment', () => pasteAsComment(editor, bridge));
 
     return { dispose() { for (const d of disposables) d.dispose(); } };
 }

@@ -45,6 +45,8 @@ export interface InsertItem {
   isElementWise?: boolean
   acceptsAnyCount?: boolean
   parameters?: SnippetParameter[]
+  key?: string
+  customId?: string
 }
 
 export interface InsertCategory {

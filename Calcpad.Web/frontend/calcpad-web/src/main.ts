@@ -12,6 +12,8 @@ import type { TauriServerManager } from './services/server-manager';
 import { WorkspaceStateStore, isResultMode, type ResultMode, type WorkspaceLayout } from './services/workspace-state';
 import { buildApiSettings, DEFAULT_COMPLETION_DELAY_MS } from 'calcpad-frontend/types/settings';
 import { ConnectionMonitor, setLogLevel, coerceLogLevel, stripCpdSnippetWrapper } from 'calcpad-frontend';
+import { hotkeyFromEvent, hotkeyMapFromSetting, keybindingCommand, SETTING_KEYBINDING_PREFIX, snippetDraftAt, snippetDraftFromText } from 'calcpad-frontend';
+import type { CustomSnippet } from 'calcpad-frontend';
 import {
     findMetadataCommentBlock,
     serializeMetadataComment,
@@ -1181,23 +1183,48 @@ async function bootstrap(): Promise<void> {
             getFileContext, `lint:${group.id}`, useTrace, runFollows, onLinted, linkFile,
             () => activeBridge.getSettings().math.isComplex);
 
+        const draftForSymbolAt = async (model: monaco.editor.ITextModel, pos: monaco.Position) => {
+            const defs = editorBridge.definitions.getCachedDefinitions(getActiveDocumentKey());
+            if (!defs) return null;
+            const content = model.getValue();
+            const ctx = getFileContext ? await getFileContext(content) : {};
+            const symbol = await editorBridge.api.symbolAtPosition(content, pos.lineNumber - 1, pos.column - 1, ctx.sourceFilePath)
+                .catch(() => null);
+            return snippetDraftAt(defs, symbol, model.getWordAtPosition(pos)?.word);
+        };
+        ed.addAction({
+            id: 'calcpad.saveAsCustomSnippet',
+            label: (i18n.global as unknown as Composer).t('Save as Custom Snippet'),
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 1.7,
+            run: async (edEditor) => {
+                const model = edEditor.getModel();
+                const pos = edEditor.getPosition();
+                if (!model || !pos) return;
+                const selection = edEditor.getSelection();
+                const draft = selection && !selection.isEmpty()
+                    ? snippetDraftFromText(model.getValueInRange(selection))
+                    : await draftForSymbolAt(model, pos);
+                if (!draft) return;
+                appInstance.showSidebar();
+                await sidebarInstance.openSnippetDraft(draft);
+            },
+        });
+
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
             id: 'calcpad.focusPreviewToLine',
             label: uiText('Focus Preview to Line', '预览定位到光标行'),
-            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Backquote],
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 1.5,
             run: () => syncPreviewToCursorFor(group, true),
         });
 
-        // Manual "run" — re-renders all previews, for when Auto-Run Preview is off. The
-        // Ctrl+Alt+X shortcut is bound both here and at the window level (Tauri) so it fires
-        // from anywhere in the app.
+        // Manual "run" — re-renders all previews, for when Auto-Run Preview is off. Its
+        // shortcut comes from the `keybindings` setting, dispatched at the window level.
         ed.addAction({
             id: 'calcpad.runPreview',
             label: uiText('Run Preview', '运行预览'),
-            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyX],
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 1.4,
             run: () => { void runRefresh(); },
@@ -2063,14 +2090,33 @@ async function bootstrap(): Promise<void> {
     const sidebarInstance = sidebarApp.mount('#vue-sidebar') as unknown as {
         switchTab(tabId: string): void;
         focusInsertSearch(): Promise<void>;
+        openSnippetDraft(snippet: Omit<CustomSnippet, 'id'>): Promise<void>;
     };
 
+    // Rebindable shortcuts from the `keybindings` setting, from any focus.
     window.addEventListener('keydown', (event) => {
-        if (event.key.toLowerCase() === 'i' && event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+        if (event.isComposing) return;
+        const target = event.target as HTMLElement | null;
+        if (target?.closest?.('[data-hotkey-recorder]')) return;
+        const hotkey = hotkeyFromEvent(event);
+        if (!hotkey) return;
+        const id = hotkeyMapFromSetting(activeBridge.getExtraSetting('keybindings')).get(hotkey);
+        if (!id) return;
+        if (id.startsWith(SETTING_KEYBINDING_PREFIX)) {
             event.preventDefault();
-            event.stopPropagation();
+            event.stopImmediatePropagation();
+            if (!event.repeat) void activeBridge.runSettingHotkey(id.slice(SETTING_KEYBINDING_PREFIX.length));
+            return;
+        }
+        const command = keybindingCommand(id);
+        if (!command || (command.editorOnly && !target?.closest?.('.monaco-editor'))) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (id === 'insertSearch') {
             appInstance.showSidebar();
             void sidebarInstance.focusInsertSearch();
+        } else if (command.monacoAction) {
+            void activeGroup.editor.getAction(command.monacoAction)?.run();
         }
     }, true);
 
@@ -2104,6 +2150,7 @@ async function bootstrap(): Promise<void> {
 
     // The sidebar's own hide button, relayed by the bridge's 'hideSidebar'.
     window.addEventListener('calcpad-toggle-sidebar', () => { appInstance.toggleSidebar(); });
+    window.addEventListener('calcpad-show-sidebar', () => { appInstance.showSidebar(); });
 
     // Manual refresh: re-lint, refresh definitions/headings, redraw previews, and re-extract
     // Export-tab plots. From the Server > Refresh menu, the Run action, and on reconnect.
@@ -3361,12 +3408,6 @@ async function bootstrap(): Promise<void> {
         // preview iframe parent, etc.). Editor-focused variants are bound per
         // group in wireGroupTauri.
         window.addEventListener('keydown', (e) => {
-            // Ctrl+Alt+X — run/refresh (bound here so it fires from any focus).
-            if ((e.key === 'x' || e.key === 'X') && e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey) {
-                e.preventDefault();
-                void runRefresh();
-                return;
-            }
             // F5 — run/refresh instead of reloading the webview.
             if (e.key === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
                 e.preventDefault();

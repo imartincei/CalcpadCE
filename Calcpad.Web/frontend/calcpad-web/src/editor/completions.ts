@@ -1,11 +1,12 @@
 import * as monaco from 'monaco-editor';
 import {
+    completableSnippets,
     completionRangeStart,
+    FAVORITE_COMPLETION_MARK,
     formatBuiltinSnippetCompletion,
     formatFunctionCompletion,
     formatMacroCompletion,
     formatVariableCompletion,
-    isCompletableBuiltin,
 } from 'calcpad-frontend/text/completion-format';
 import type { CompletionData, CompletionKind } from 'calcpad-frontend/text/completion-format';
 import { getActiveDocumentKey, type EditorBridge } from './bridge';
@@ -46,9 +47,8 @@ export function registerCompletionProvider(bridge: EditorBridge): monaco.IDispos
                 for (const variable of defs.variables) suggestions.push(toMonaco(formatVariableCompletion(variable), range));
             }
 
-            for (const item of bridge.snippets.getAllItems()) {
-                if (!isCompletableBuiltin(item)) continue;
-                suggestions.push(toMonaco(formatBuiltinSnippetCompletion(item), range));
+            for (const { item, favorite } of completableSnippets(bridge.snippets.getAllItems(), bridge.snippets.getCustomizations())) {
+                suggestions.push(toMonaco(formatBuiltinSnippetCompletion(item, favorite), range));
             }
 
             return { suggestions };
@@ -67,7 +67,7 @@ const KIND_MAP: Record<CompletionKind, monaco.languages.CompletionItemKind> = {
 
 function toMonaco(data: CompletionData, range: monaco.IRange): monaco.languages.CompletionItem {
     return {
-        label: data.label,
+        label: data.favorite ? { label: data.label, detail: FAVORITE_COMPLETION_MARK } : data.label,
         kind: KIND_MAP[data.kind],
         insertText: data.insertText,
         insertTextRules: data.isSnippet

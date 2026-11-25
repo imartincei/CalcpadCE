@@ -167,6 +167,24 @@ export {
     consoleRelayGuardScript,
 } from './services/preview-limits';
 export type { PreviewLimitNotice } from './services/preview-limits';
+export {
+    CUSTOMIZATION_KEYS, CUSTOM_SNIPPETS_CATEGORY, QUICK_TYPE_MAX_LENGTH, DEFAULT_KEYBINDINGS, DEFAULT_QUICK_TYPES,
+    readCustomizations, customizationExtras, snippetKey, newCustomSnippetId, applySnippetCustomizations,
+    quickTypesFor, buildQuickTypeMap, removeQuickType, validateQuickType, customSnippetFromDefinition, snippetDraftForSymbol, snippetDraftAt, snippetDraftFromText,
+    CUSTOM_SNIPPET_TYPES, sanitizeCustomSnippet,
+} from './services/customizations';
+export type { CustomSnippet, UserCustomizations, SnippetLike, QuickTypeError, DefinitionKind, DefinitionLike, CustomSnippetType } from './services/customizations';
+export {
+    hotkeyFromEvent, normalizeHotkey, formatHotkey, toVSCodeKey, toPortableHotkey, validateHotkey, reservedHotkeys, isMacPlatform,
+} from './services/hotkeys';
+export type { HotkeyBinding } from './services/hotkeys';
+export {
+    KEYBINDING_COMMANDS, SETTING_KEYBINDING_PREFIX, RUN_SETTING_HOTKEY_COMMAND, keybindingCommand, defaultKeybinding,
+    buildHotkeyMap, hotkeyMapFromSetting, findKeybindingConflict,
+} from './services/keybindings';
+export type { KeybindingCommand, KeybindingConflict } from './services/keybindings';
+export { SETTING_TOGGLES, isToggleSetting, buildSettingToggle } from './services/setting-actions';
+export type { SettingToggleContext, SettingToggleResult } from './services/setting-actions';
 
 export type { ScrollAnchor, PreviewScrollState } from './services/scroll-anchor';
 export { scrollAnchorScript, parseScrollState } from './services/scroll-anchor';
@@ -265,6 +283,9 @@ export {
     getVariableTypeAt,
     formatBuiltinSnippetCompletion,
     isCompletableBuiltin,
+    completableSnippets,
+    builtinSortText,
+    FAVORITE_COMPLETION_MARK,
 } from './text/completion-format';
 export {
     INDENT_INCREASE_PATTERNS,

@@ -50,6 +50,10 @@ export interface InsertItem {
     isElementWise?: boolean;
     acceptsAnyCount?: boolean;
     parameters?: SnippetParameterDto[];
+    /** Set by applySnippetCustomizations. */
+    key?: string;
+    /** Id of a user-defined snippet. */
+    customId?: string;
 }
 
 // Hierarchical structure for tree view

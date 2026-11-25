@@ -10,6 +10,9 @@ import { CalcpadVueUIProvider } from './calcpadVueUIProvider';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { OperatorReplacer } from './operatorReplacer';
 import { QuickTyper } from './quickTyper';
+import { collectVSCodeHotkeys, syncKeybindings } from './keybindingSync';
+import { readCustomizations, RUN_SETTING_HOTKEY_COMMAND, snippetDraftAt, snippetDraftFromText } from 'calcpad-frontend';
+import type { HotkeyBinding } from 'calcpad-frontend';
 import { CalcpadCompletionProvider } from './calcpadCompletionProvider';
 import { CalcpadIncludeCompletionProvider } from './calcpadIncludeCompletionProvider';
 import { CalcpadInsertManager } from './calcpadInsertManager';
@@ -2409,6 +2412,20 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     vueUiProvider = new CalcpadVueUIProvider(context.extensionUri, context, settingsManager, insertManager);
+    const readUserCustomizations = () => readCustomizations(key => settingsManager.getExtra(key));
+    insertManager.setCustomizationsProvider(readUserCustomizations);
+    const syncHotkeys = () => void syncKeybindings(context, readUserCustomizations().keybindings,
+        message => outputChannel.appendLine(message, 'information'));
+    vueUiProvider.onKeybindingsChanged = syncHotkeys;
+    void settingsManager.ready.then(syncHotkeys);
+    // Returns the last snapshot and refreshes it, so edits to keybindings.json show on the next look.
+    let hostHotkeys: HotkeyBinding[] = [];
+    const refreshHostHotkeys = async () => { hostHotkeys = await collectVSCodeHotkeys(context); };
+    void refreshHostHotkeys();
+    vueUiProvider.getHostHotkeys = () => {
+        void refreshHostHotkeys();
+        return hostHotkeys;
+    };
     vueUiProvider.getSourceEditor = () => vscode.window.activeTextEditor ?? previewSourceEditor;
     vueUiProvider.getParseMode = (document, line) =>
         definitionsService?.getCachedParseMode(document.uri.toString(), line)
@@ -2609,6 +2626,33 @@ export async function activate(context: vscode.ExtensionContext) {
     const showInsertCommand = vscode.commands.registerCommand('vscode-calcpad.showInsert', async () => {
         await vscode.commands.executeCommand('calcpadVueUI.focus');
         vueUiProvider?.focusInsertSearch();
+    });
+
+    const runSettingHotkeyCommand = vscode.commands.registerCommand(RUN_SETTING_HOTKEY_COMMAND, (args?: { id?: unknown }) => {
+        if (typeof args?.id === 'string') void vueUiProvider?.runSettingHotkey(args.id);
+    });
+
+    const saveAsCustomSnippetCommand = vscode.commands.registerCommand('vscode-calcpad.saveAsCustomSnippet', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+        const doc = editor.document;
+        if (!editor.selection.isEmpty) {
+            const draft = snippetDraftFromText(doc.getText(editor.selection));
+            if (draft) await vueUiProvider?.openSnippetDraft(draft);
+            return;
+        }
+        const pos = editor.selection.active;
+        const defs = definitionsService?.getCachedDefinitions(doc.uri.toString());
+        const symbol = defs
+            ? await sharedApiClient?.symbolAtPosition(doc.getText(), pos.line, pos.character, doc.uri.fsPath).catch(() => null) ?? null
+            : null;
+        const wordRange = doc.getWordRangeAtPosition(pos);
+        const draft = defs ? snippetDraftAt(defs, symbol, wordRange ? doc.getText(wordRange) : undefined) : null;
+        if (!draft) {
+            vscode.window.setStatusBarMessage('CalcpadCE: Select text, or right-click a variable, function, macro or custom unit', 3000);
+            return;
+        }
+        await vueUiProvider?.openSnippetDraft(draft);
     });
 
     const editMetadataPropertiesCommand = vscode.commands.registerCommand('vscode-calcpad.editMetadataProperties', async () => {
@@ -3029,6 +3073,8 @@ export async function activate(context: vscode.ExtensionContext) {
             focusPreviewToLineCommand,
             onDidChangeTextEditorSelection,
             showInsertCommand,
+            runSettingHotkeyCommand,
+            saveAsCustomSnippetCommand,
             editMetadataPropertiesCommand,
             printToPdfCommand,
             saveSourceHtmlCommand,
