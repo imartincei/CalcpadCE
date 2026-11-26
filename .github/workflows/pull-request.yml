@@ -32,6 +32,33 @@ jobs:
     with:
       version: ${{ needs.determine-version.outputs.version }}
 
+  linux-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      desktop: ${{ steps.diff.outputs.desktop }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for desktop app or Linux test changes
+        id: diff
+        run: |
+          if git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.sha }}" \
+            | grep -qE '^(Calcpad\.Web/frontend/calcpad-desktop/|tools/desktop-test/(linux|test-app\.mjs|wayland-pointer\.py|sway-test\.conf)|\.github/workflows/build-desktop-linux\.yml)'; then
+            echo "desktop=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "desktop=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-desktop-linux:
+    needs: [determine-version, linux-changes]
+    if: needs.linux-changes.outputs.desktop == 'true'
+    uses: ./.github/workflows/build-desktop-linux.yml
+    with:
+      version: ${{ needs.determine-version.outputs.version }}
+
   test:
     needs: determine-version
     uses: ./.github/workflows/run-tests.yml

@@ -63,8 +63,16 @@ export class LinuxTestApp {
         this.session = session.sessionId;
         await this.request(`/session/${this.session}/timeouts`, {script: 20000});
         const main = await this.window('main');
+        this.main = main;
         assert.equal(await this.evaluate(main, invoke('plugin:app|identifier')), 'org.calcpad-ce.linux-tests');
         assert.equal(await this.evaluate(main, invoke('use_system_tab_drag')), this.isWayland);
+        await this.evaluate(main, `window.testReadyWindows = [];
+            window.__TAURI_INTERNALS__.invoke('plugin:event|listen', {
+                event: 'calcpad-tab-drag', target: {kind: 'Any'},
+                handler: window.__TAURI_INTERNALS__.transformCallback(event => {
+                    if (event.payload.kind === 'ready') window.testReadyWindows.push(event.payload.windowId);
+                }),
+            })`);
         await this.observeDrags(main);
         return main;
     }
@@ -93,17 +101,25 @@ export class LinuxTestApp {
         return result.value;
     }
 
+    // Probes new handles only after their ready message, so polling never switches into a loading webview.
     async windows() {
         const handles = await this.request(`/session/${this.session}/window/handles`);
-        const windows = new Map();
-        for (const handle of handles) {
+        this.labels ??= new Map();
+        for (const handle of this.labels.keys()) if (!handles.includes(handle)) this.labels.delete(handle);
+        let unknown = handles.filter(handle => !this.labels.has(handle));
+        if (unknown.length && this.labels.has(this.main)) {
+            const known = new Set(this.labels.values());
+            const ready = await this.evaluate(this.main, 'window.testReadyWindows ?? []');
+            if (!ready.some(label => !known.has(label))) unknown = [];
+        }
+        for (const handle of unknown) {
             const state = await this.evaluate(handle, `({
                 label: window.__TAURI_INTERNALS__?.metadata.currentWindow.label,
                 ready: !!document.querySelector('.tab-drop-marker'),
             })`);
-            if (state.ready) windows.set(state.label, handle);
+            if (state.ready) this.labels.set(handle, state.label);
         }
-        return windows;
+        return new Map([...this.labels].map(([handle, label]) => [label, handle]));
     }
 
     window(label) {
@@ -310,6 +326,25 @@ export class LinuxTestApp {
     }
 
     async diagnostics(handle) {
+        this.nativeDiagnostics();
+        try {
+            await this.webDiagnostics(handle);
+        } catch (error) {
+            writeFileSync(path.join(this.profile, 'state.json'), JSON.stringify({webdriver: String(error), drag: this.lastDrag}, null, 2));
+        }
+    }
+
+    // Works after the WebDriver session dies.
+    nativeDiagnostics() {
+        const run = (command, ...args) => {
+            try { return execFileSync(command, args, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']}); }
+            catch (error) { return `${command} failed: ${error.message}`; }
+        };
+        writeFileSync(path.join(this.profile, 'processes.txt'), run('ps', '-eo', 'pid,ppid,stat,etime,rss,args', '--forest'));
+        if (!this.isWayland) run('import', '-window', 'root', '-resize', '25%', path.join(this.profile, 'native-screenshot.png'));
+    }
+
+    async webDiagnostics(handle) {
         await this.evaluate(handle, '0');
         const screenshot = await this.request(`/session/${this.session}/screenshot`);
         writeFileSync(path.join(this.profile, 'screenshot.png'), Buffer.from(screenshot, 'base64'));
@@ -330,7 +365,7 @@ export class LinuxTestApp {
     }
 
     async dispose() {
-        if (this.session) await this.request(`/session/${this.session}`, undefined, 'DELETE');
+        if (this.session) await this.request(`/session/${this.session}`, undefined, 'DELETE').catch(() => {});
         if (this.driver?.exitCode === null) {
             const exited = once(this.driver, 'exit');
             process.kill(-this.driver.pid, 'SIGTERM');
