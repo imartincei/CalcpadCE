@@ -893,20 +893,29 @@ async fn new_window(app: AppHandle, at_cursor: Option<bool>) -> Result<String, S
     config.label = label.clone();
 
     // Physical coordinates so mixed-DPI monitors don't misplace it; Wayland ignores positions.
-    let position = (at_cursor == Some(true))
-        .then(|| app.cursor_position().ok())
-        .flatten()
-        .map(|cursor| {
-            let scale = app
-                .monitor_from_point(cursor.x, cursor.y)
-                .ok()
-                .flatten()
-                .map_or(1.0, |monitor| monitor.scale_factor());
-            tauri::PhysicalPosition::new(
-                (cursor.x - DETACHED_TAB_GRAB_X * scale) as i32,
-                (cursor.y - DETACHED_TAB_GRAB_Y * scale) as i32,
-            )
-        });
+    // On the main thread because monitor_from_point calls GDK directly, which corrupts the X connection.
+    let position = if at_cursor == Some(true) {
+        let (sender, receiver) = tokio::sync::oneshot::channel();
+        let handle = app.clone();
+        app.run_on_main_thread(move || {
+            let position = handle.cursor_position().ok().map(|cursor| {
+                let scale = handle
+                    .monitor_from_point(cursor.x, cursor.y)
+                    .ok()
+                    .flatten()
+                    .map_or(1.0, |monitor| monitor.scale_factor());
+                tauri::PhysicalPosition::new(
+                    (cursor.x - DETACHED_TAB_GRAB_X * scale) as i32,
+                    (cursor.y - DETACHED_TAB_GRAB_Y * scale) as i32,
+                )
+            });
+            let _ = sender.send(position);
+        })
+        .map_err(|e| e.to_string())?;
+        receiver.await.map_err(|e| e.to_string())?
+    } else {
+        None
+    };
     if position.is_some() {
         config.center = false;
         config.visible = false;

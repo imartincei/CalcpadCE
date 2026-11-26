@@ -66,6 +66,7 @@ jobs:
             sway \
             wtype \
             python3 \
+            imagemagick \
             patchelf \
             xdg-utils \
             file \
@@ -100,6 +101,10 @@ jobs:
         timeout-minutes: 10
         run: bash tools/desktop-test/linux-tests.sh --wayland --skip-build
 
+      - name: Collect kernel crash messages
+        if: failure()
+        run: sudo dmesg --ctime | grep -iE 'segfault|trap|killed process|WebKit|calcpad' > tools/desktop-test/.work/linux-tests/dmesg.txt || true
+
       - name: Upload GTK test diagnostics
         if: failure()
         uses: actions/upload-artifact@v7
@@ -109,6 +114,9 @@ jobs:
             tools/desktop-test/.work/linux-tests/profile-*/driver.log
             tools/desktop-test/.work/linux-tests/profile-*/screenshot.png
             tools/desktop-test/.work/linux-tests/profile-*/state.json
+            tools/desktop-test/.work/linux-tests/profile-*/processes.txt
+            tools/desktop-test/.work/linux-tests/profile-*/native-screenshot.png
+            tools/desktop-test/.work/linux-tests/dmesg.txt
             tools/desktop-test/.work/linux-tests/profile-*/data/**/logs/*.log
             tools/desktop-test/.work/linux-tests/openbox.log
             tools/desktop-test/.work/linux-tests/sway.log
