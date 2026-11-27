@@ -20,7 +20,7 @@
           @click="showChanges(agentChat.view !== 'changes')"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 1.5a2 2 0 0 1 .75 3.85v5.3a2 2 0 1 1-1.5 0v-5.3A2 2 0 0 1 4.5 1.5m0 1.25a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5m0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5M11.5 14.5a2 2 0 0 1-.75-3.85V7a1.25 1.25 0 0 0-1.25-1.25H8.06l.97.97a.75.75 0 0 1-1.06 1.06L5.72 5.53a.75.75 0 0 1 0-1.06l2.25-2.25a.75.75 0 0 1 1.06 1.06l-.97.97H9.5A2.75 2.75 0 0 1 12.25 7v3.65a2 2 0 0 1-.75 3.85m0-1.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5"/></svg>
-          <span v-if="conversation.changes.length" class="agent-badge">{{ conversation.changes.length }}</span>
+          <span v-if="changeRows.length" class="agent-badge">{{ changeRows.length }}</span>
         </button>
         <button
           class="agent-icon-btn"
@@ -108,18 +108,18 @@
 
     <div v-if="agentChat.view === 'changes'" class="agent-history agent-changes">
       <div class="agent-changes-head">
-        <span class="agent-history-title">{{ t('Changes in this conversation') }}</span>
-        <template v-if="conversation.changes.length">
-          <button class="agent-icon-btn" :title="t('Revert all')" :aria-label="t('Revert all')" @click="revertAllChanges(conversation.id)">
+        <span class="agent-history-title">{{ t('Changes in open conversations') }}</span>
+        <template v-if="changeRows.length">
+          <button class="agent-icon-btn" :title="t('Revert all')" :aria-label="t('Revert all')" @click="revertAllChanges()">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.53 2.47a.75.75 0 0 1 0 1.06L4.06 5H9.5a4.5 4.5 0 1 1 0 9H6a.75.75 0 0 1 0-1.5h3.5a3 3 0 1 0 0-6H4.06l1.47 1.47a.75.75 0 0 1-1.06 1.06L1.72 6.28a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0"/></svg>
           </button>
-          <button class="agent-icon-btn" :title="t('Keep all')" :aria-label="t('Keep all')" @click="keepAllChanges(conversation.id)">
+          <button class="agent-icon-btn" :title="t('Keep all')" :aria-label="t('Keep all')" @click="keepAllChanges()">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0"/></svg>
           </button>
         </template>
       </div>
-      <div v-if="!conversation.changes.length" class="agent-empty">
-        <p>{{ t('{name} has not changed any worksheets in this conversation. Each worksheet is backed up before its first change.', { name: assistantName() }) }}</p>
+      <div v-if="!changeRows.length" class="agent-empty">
+        <p>{{ t('No open conversation has changed a worksheet. Each worksheet is backed up before its first change.') }}</p>
       </div>
       <div
         v-for="change in changeRows"
@@ -129,8 +129,8 @@
         role="button"
         tabindex="0"
         :title="change.current === null ? t('Closed; reverting reopens it') : t('Show changes')"
-        @click="openChangeDiff(conversation.id, change.key)"
-        @keydown.enter="openChangeDiff(conversation.id, change.key)"
+        @click="openChangeDiff(change.key)"
+        @keydown.enter="openChangeDiff(change.key)"
       >
         <svg class="agent-change-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.3L13 5.2v8.3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1m.25 1.25v10.5h7.5V6H8.5V2.75zM9.75 3.3v1.45h1.45z"/></svg>
         <div class="agent-history-text">
@@ -144,18 +144,19 @@
         </span>
         <button
           class="agent-icon-btn agent-history-delete"
-          :title="t('Revert to backup')"
+          :title="change.locked ? t('Running in another window') : t('Revert to backup')"
           :aria-label="t('Revert to backup')"
-          :disabled="change.current === null && !change.path"
-          @click.stop="revertChange(conversation.id, change.key)"
+          :disabled="change.locked || (change.current === null && !change.path)"
+          @click.stop="revertChange(change.key)"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.53 2.47a.75.75 0 0 1 0 1.06L4.06 5H9.5a4.5 4.5 0 1 1 0 9H6a.75.75 0 0 1 0-1.5h3.5a3 3 0 1 0 0-6H4.06l1.47 1.47a.75.75 0 0 1-1.06 1.06L1.72 6.28a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0"/></svg>
         </button>
         <button
           class="agent-icon-btn agent-history-delete"
-          :title="t('Keep changes')"
+          :title="change.locked ? t('Running in another window') : t('Keep changes')"
           :aria-label="t('Keep changes')"
-          @click.stop="keepChange(conversation.id, change.key)"
+          :disabled="change.locked"
+          @click.stop="keepChange(change.key)"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0"/></svg>
         </button>
@@ -195,7 +196,7 @@
     </div>
 
     <template v-else>
-    <div ref="scroller" class="agent-messages">
+    <div ref="scroller" class="agent-messages" :class="{ elsewhere }">
       <div v-if="!conversation.items.length" class="agent-empty">
         <span class="agent-empty-logo" aria-hidden="true">
           <svg viewBox="0 0 16 16"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
@@ -330,6 +331,9 @@
     </div>
 
     <div class="agent-composer-wrap">
+      <div v-if="elsewhere" class="agent-plan-banner">
+        <span class="agent-plan-banner-text">{{ t('Running in another window. You can continue here when it finishes.') }}</span>
+      </div>
       <div v-if="currentMode.edits === 'blocked'" class="agent-plan-banner">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
         <span class="agent-plan-banner-text">{{ t('Plan mode: {name} can read and plan, but not change anything.', { name: assistantName() }) }}</span>
@@ -340,6 +344,7 @@
           ref="input"
           v-model="draft"
           rows="1"
+          :disabled="elsewhere"
           :placeholder="t('Message {name}…', { name: assistantName() })"
           :title="t('Enter to send · Shift+Enter for a new line')"
           @input="autoSize"
@@ -349,6 +354,7 @@
         <button
           v-if="isWorking"
           class="agent-send stop"
+          :disabled="elsewhere"
           :title="t('Stop')"
           :aria-label="t('Stop')"
           @click="interrupt"
@@ -416,7 +422,9 @@ import {
   settingsFor,
   type HarnessInfo,
   closeConversation,
-  currentText,
+  changeText,
+  pollChangeTexts,
+  pooledChanges,
   cyclePermissionMode,
   deleteFromHistory,
   interrupt,
@@ -431,6 +439,7 @@ import {
   assistantName,
   revertAllChanges,
   revertChange,
+  runningElsewhere,
   setPermissionMode,
   showChanges,
   type PermissionMode,
@@ -461,6 +470,7 @@ const draft = computed({
   get: () => drafts[conversation.value.id] ?? '',
   set: (value: string) => { drafts[conversation.value.id] = value },
 })
+const elsewhere = computed(() => runningElsewhere(conversation.value))
 const isWorking = computed(() => conversation.value.status === 'busy' || conversation.value.status === 'starting')
 const isStreaming = computed(() => {
   const items = conversation.value.items
@@ -497,12 +507,17 @@ const liveTick = ref(0)
 let liveTimer: ReturnType<typeof setInterval> | undefined
 watch(() => agentChat.view === 'changes', open => {
   clearInterval(liveTimer)
-  if (open) liveTimer = setInterval(() => { liveTick.value++ }, 1000)
+  if (!open) return
+  void pollChangeTexts()
+  liveTimer = setInterval(() => {
+    liveTick.value++
+    void pollChangeTexts()
+  }, 1000)
 }, { immediate: true })
 onBeforeUnmount(() => clearInterval(liveTimer))
 
-const changeRows = computed(() => (void liveTick.value, conversation.value.changes).map(change => {
-  const current = currentText(change)
+const changeRows = computed(() => (void liveTick.value, pooledChanges()).map(change => {
+  const current = changeText(change)
   return { ...change, current, ...(current === null ? { added: 0, removed: 0 } : lineStats(change.baseline, current)) }
 }))
 
@@ -1240,6 +1255,10 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-plan-banner .agent-btn {
   flex-shrink: 0;
 }
+.agent-messages.elsewhere :is(.agent-actions, .agent-question-options, .agent-question-other) {
+  pointer-events: none;
+  opacity: 0.5;
+}
 .agent-card-state {
   color: var(--agent-muted);
   font-size: 12px;
@@ -1472,6 +1491,14 @@ defineExpose({ focus: () => input.value?.focus() })
 .agent-panel .agent-send.stop {
   background: var(--agent-surface-strong);
   color: var(--vscode-foreground);
+}
+.agent-panel .agent-send.stop:disabled {
+  color: var(--agent-muted);
+  cursor: default;
+}
+.agent-composer textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 .agent-send svg {
   width: 16px;

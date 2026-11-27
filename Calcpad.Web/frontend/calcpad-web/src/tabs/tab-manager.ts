@@ -576,11 +576,29 @@ export function documentMatches(model: monaco.editor.ITextModel, content: string
     return model.getValue() === withModelEol(model, content);
 }
 
+/** File path of a tab's document; null for untitled ones and models no tab owns. */
+export function documentPath(model: monaco.editor.ITextModel): string | null {
+    return docs.get(model)?.filePath ?? null;
+}
+
+export function documentDirty(model: monaco.editor.ITextModel): boolean {
+    const doc = docs.get(model);
+    return !!doc && model.getAlternativeVersionId() !== doc.savedVersionId;
+}
+
 /**
  * Makes `content` the document's saved state in every tab sharing `model`. Only the changed
  * span is replaced, as one undoable edit, so the cursor stays put and undo brings back the old text.
  */
 export function reloadDocument(model: monaco.editor.ITextModel, content: string): void {
+    replaceDocumentText(model, content);
+    const doc = docFor(model);
+    doc.savedVersionId = model.getAlternativeVersionId();
+    for (const l of doc.onChanged) l();
+}
+
+/** Like reloadDocument, but leaves the saved state alone. */
+export function replaceDocumentText(model: monaco.editor.ITextModel, content: string): void {
     const current = model.getValue();
     const next = withModelEol(model, content);
     if (current !== next) {
@@ -595,9 +613,6 @@ export function reloadDocument(model: monaco.editor.ITextModel, content: string)
         model.pushEditOperations([], [{ range, text: next.slice(start, next.length - end) }], () => null);
         model.pushStackElement();
     }
-    const doc = docFor(model);
-    doc.savedVersionId = model.getAlternativeVersionId();
-    for (const l of doc.onChanged) l();
 }
 
 function baseName(path: string): string {

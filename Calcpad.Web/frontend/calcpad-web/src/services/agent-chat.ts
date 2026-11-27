@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, STALE_NOTE, type AgentEditorContext, type PreparedEdit, type ProposedEdit, type ReadLog } from './agent-tools';
+import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, STALE_NOTE, type AgentEditorContext, type DocRef, type PreparedEdit, type ProposedEdit, type ReadLog } from './agent-tools';
 
 export type ApprovalState = 'pending' | 'allowed' | 'denied' | 'expired';
 
@@ -126,6 +126,10 @@ export interface ChangeRecord {
     changedAt: number;
     /** The agent created this worksheet; reverting closes it. */
     created?: boolean;
+    /** When the backup was taken; older records lack it. */
+    backedUpAt?: number;
+    /** Window whose editor buffer the agent changed; others may hold a stale copy. */
+    window?: string;
 }
 
 export interface Conversation {
@@ -144,6 +148,8 @@ export interface Conversation {
     resolvedModel: string | null;
     version: string | null;
     status: AgentStatus;
+    /** Label of the window running the agent process; null when none runs. */
+    owner: string | null;
     items: ChatItem[];
     changes: ChangeRecord[];
 }
@@ -224,6 +230,7 @@ export function settingsFor(id: string): AgentSettings {
 
 function storeSettings(id: string): void {
     localStorage.setItem(`${SETTINGS_KEY}.${id}`, JSON.stringify(settingsFor(id)));
+    broadcastSettings();
 }
 
 function loadModels(id: string): ModelOption[] {
@@ -247,6 +254,7 @@ function createConversation(harnessId: string): Conversation {
         resolvedModel: null,
         version: null,
         status: 'idle',
+        owner: null,
         items: [],
         changes: [],
     };
@@ -266,7 +274,9 @@ export const agentChat = reactive({
     view: 'chat' as 'chat' | 'history' | 'changes',
     history: [] as HistoryMeta[],
     pendingEdit: null as PendingEdit | null,
-    reviewChange: null as { conversationId: string; key: string; title: string; baseline: string; current: string } | null,
+    reviewChange: null as { key: string; title: string; baseline: string; current: string } | null,
+    /** Text of changed worksheets open only in other windows, by change key. */
+    remoteTexts: {} as Record<string, string | null>,
 });
 
 agentChat.conversations.push(createConversation(agentChat.harnessId));
@@ -309,7 +319,41 @@ export function needsAttention(conversation: Conversation): boolean {
     return conversation.items.some(i => (i.kind === 'approval' || i.kind === 'edit' || i.kind === 'question') && i.state === 'pending');
 }
 
-// ---- Persistence ----
+// ---- Persistence and sync between windows ----
+// Only the active tab and panel view are per window; conversations sync when saved.
+
+const SYNC_EVENT = 'agent-sync';
+const WINDOW_CLOSED_EVENT = 'agent-window-closed';
+
+type SyncMessage =
+    | { kind: 'conversation'; conversation: Record<string, unknown>; reopen?: boolean }
+    | { kind: 'closed' | 'deleted'; id: string }
+    | { kind: 'settings'; harnessId: string; settings: Record<string, AgentSettings>; models: Record<string, ModelOption[]> }
+    | { kind: 'request' };
+
+let windowLabel = '';
+const closedIds = new Set<string>();
+/** Status and owner each conversation had when last broadcast. */
+const syncedState = new Map<string, string>();
+
+function broadcast(message: SyncMessage): void {
+    void import('@tauri-apps/api/event')
+        .then(({ emit }) => emit(SYNC_EVENT, { source: windowLabel, ...message }))
+        .catch(() => { /* other windows just won't sync */ });
+}
+
+function ownedElsewhere(conversation: Conversation): boolean {
+    return !!conversation.owner && conversation.owner !== windowLabel;
+}
+
+/** A turn is running in another window, so this one shows the conversation read-only. */
+export function runningElsewhere(conversation: Conversation): boolean {
+    return ownedElsewhere(conversation) && (conversation.status === 'starting' || conversation.status === 'busy');
+}
+
+function syncState(conversation: Conversation): string {
+    return `${conversation.status}|${conversation.owner ?? ''}`;
+}
 
 function persistTabs(): void {
     localStorage.setItem(TABS_KEY, JSON.stringify({
@@ -318,8 +362,8 @@ function persistTabs(): void {
     }));
 }
 
-function snapshot(conversation: Conversation): string {
-    return JSON.stringify({
+function serialize(conversation: Conversation) {
+    return {
         version: 1,
         id: conversation.id,
         provider: conversation.provider,
@@ -332,29 +376,52 @@ function snapshot(conversation: Conversation): string {
         resolvedModel: conversation.resolvedModel,
         items: conversation.items,
         changes: conversation.changes,
+    };
+}
+
+function historyMeta(conversation: Conversation): HistoryMeta {
+    return {
+        id: conversation.id,
+        title: conversation.title,
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt,
+    };
+}
+
+function upsertHistory(meta: HistoryMeta): void {
+    agentChat.history = [meta, ...agentChat.history.filter(h => h.id !== meta.id)];
+}
+
+function publish(conversation: Conversation, reopen = false): void {
+    syncedState.set(conversation.id, syncState(conversation));
+    broadcast({
+        kind: 'conversation',
+        conversation: { ...serialize(conversation), status: conversation.status, owner: conversation.owner },
+        ...(reopen ? { reopen } : {}),
     });
 }
 
 async function saveNow(conversation: Conversation): Promise<void> {
     saveTimers.delete(conversation.id);
     if (!conversation.items.some(i => i.kind === 'user')) return;
-    const meta: HistoryMeta = {
-        id: conversation.id,
-        title: conversation.title,
-        createdAt: conversation.createdAt,
-        updatedAt: conversation.updatedAt,
-    };
+    publish(conversation);
+    const meta = historyMeta(conversation);
+    upsertHistory(meta);
     try {
-        await invoke('agent_history_write', { meta, data: snapshot(conversation) });
-        agentChat.history = [meta, ...agentChat.history.filter(h => h.id !== meta.id)];
+        await invoke('agent_history_write', { meta, data: JSON.stringify(serialize(conversation)) });
     } catch {
         // History is best-effort.
     }
 }
 
+/** Saves after a pause, or at once when the status or owner changed so other windows see it. */
 function touch(conversation: Conversation): void {
     conversation.updatedAt = Date.now();
     clearTimeout(saveTimers.get(conversation.id));
+    if (syncedState.get(conversation.id) !== syncState(conversation)) {
+        void saveNow(conversation);
+        return;
+    }
     saveTimers.set(conversation.id, setTimeout(() => void saveNow(conversation), SAVE_DELAY_MS));
 }
 
@@ -364,9 +431,12 @@ function flush(conversation: Conversation): Promise<void> {
     return saveNow(conversation);
 }
 
-function revive(raw: Record<string, unknown>): Conversation | null {
+const STATUSES: AgentStatus[] = ['idle', 'starting', 'ready', 'busy'];
+
+/** `live` keeps the status, owner and pending cards of a conversation synced from another window. */
+function revive(raw: Record<string, unknown>, live = false): Conversation | null {
     if (typeof raw.id !== 'string' || !Array.isArray(raw.items)) return null;
-    const items = (raw.items as ChatItem[]).map(item => {
+    const items = live ? raw.items as ChatItem[] : (raw.items as ChatItem[]).map(item => {
         if (item.kind === 'assistant') return { ...item, streaming: false };
         if (item.kind === 'tool') return { ...item, done: true };
         if ((item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question') && item.state === 'pending') return { ...item, state: 'expired' as const };
@@ -384,7 +454,8 @@ function revive(raw: Record<string, unknown>): Conversation | null {
         restartPending: false,
         resolvedModel: typeof raw.resolvedModel === 'string' ? raw.resolvedModel : null,
         version: null,
-        status: 'idle',
+        status: live && STATUSES.includes(raw.status as AgentStatus) ? raw.status as AgentStatus : 'idle',
+        owner: live && typeof raw.owner === 'string' ? raw.owner : null,
         items,
         changes: Array.isArray(raw.changes) ? raw.changes as ChangeRecord[] : [],
     };
@@ -414,13 +485,109 @@ async function restoreTabs(): Promise<void> {
     } catch {
         // Start fresh.
     }
-    const loaded = (await Promise.all((saved.ids ?? []).map(load))).filter((c): c is Conversation => !!c);
+    const loaded = (await Promise.all((saved.ids ?? []).map(load)))
+        .filter((c): c is Conversation => !!c && !find(c.id) && !closedIds.has(c.id));
     if (loaded.length) {
-        const blank = agentChat.conversations.filter(c => c.items.length);
-        agentChat.conversations = [...loaded, ...blank];
+        const started = agentChat.conversations.filter(c => c.items.length);
+        agentChat.conversations = [...loaded, ...started];
         agentChat.activeId = loaded.some(c => c.id === saved.active) ? saved.active! : loaded[0].id;
     }
     await refreshHistory();
+    // Windows running a conversation answer with its live state.
+    broadcast({ kind: 'request' });
+}
+
+function removeTab(id: string): void {
+    const index = agentChat.conversations.findIndex(c => c.id === id);
+    if (index < 0) return;
+    sessionAllowed.delete(id);
+    readLogs.delete(id);
+    dropQueuedEdits(id);
+    agentChat.conversations.splice(index, 1);
+    if (!agentChat.conversations.length) agentChat.conversations.push(createConversation(agentChat.harnessId));
+    if (agentChat.activeId === id) {
+        agentChat.activeId = agentChat.conversations[Math.min(index, agentChat.conversations.length - 1)].id;
+    }
+}
+
+function applySync(message: SyncMessage & { source: string }): void {
+    if (message.source === windowLabel) return;
+    switch (message.kind) {
+        case 'conversation': {
+            const incoming = revive(message.conversation, true);
+            if (!incoming) return;
+            if (message.reopen) closedIds.delete(incoming.id);
+            if (closedIds.has(incoming.id)) return;
+            upsertHistory(historyMeta(incoming));
+            const local = find(incoming.id);
+            if (!local) {
+                agentChat.conversations.push(incoming);
+                return;
+            }
+            if (incoming.updatedAt < local.updatedAt) return;
+            if (incoming.owner === windowLabel && (local.status === 'busy' || local.status === 'starting')) return;
+            if (local.owner === windowLabel && incoming.owner !== windowLabel) {
+                // Another window took over; Rust already stopped this window's agent.
+                dropQueuedEdits(local.id);
+                sessionAllowed.delete(local.id);
+            }
+            clearTimeout(saveTimers.get(local.id));
+            saveTimers.delete(local.id);
+            syncedState.set(local.id, syncState(incoming));
+            Object.assign(local, { ...incoming, restartPending: local.restartPending, version: local.version });
+            return;
+        }
+        case 'closed':
+        case 'deleted':
+            closedIds.add(message.id);
+            removeTab(message.id);
+            if (message.kind === 'deleted') agentChat.history = agentChat.history.filter(h => h.id !== message.id);
+            return;
+        case 'settings': {
+            const executableChanged = Object.entries(message.settings).some(([id, s]) => s.executable !== settingsFor(id).executable);
+            agentChat.settings = message.settings;
+            agentChat.models = message.models;
+            if (message.harnessId !== agentChat.harnessId && harnessInfo(message.harnessId)) {
+                agentChat.harnessId = message.harnessId;
+                for (const conversation of agentChat.conversations.filter(c => !c.items.length)) {
+                    Object.assign(conversation, { ...createConversation(message.harnessId), id: conversation.id });
+                }
+            }
+            if (executableChanged) void refreshHarnesses();
+            return;
+        }
+        case 'request':
+            for (const conversation of agentChat.conversations) {
+                if (conversation.owner === windowLabel || saveTimers.has(conversation.id)) void flushNow(conversation);
+            }
+            return;
+    }
+}
+
+function flushNow(conversation: Conversation): Promise<void> {
+    clearTimeout(saveTimers.get(conversation.id));
+    return saveNow(conversation);
+}
+
+function broadcastSettings(): void {
+    broadcast({ kind: 'settings', harnessId: agentChat.harnessId, settings: agentChat.settings, models: agentChat.models });
+}
+
+/** The window running these conversations closed, so their agents stopped. */
+function onWindowClosed(label: string): void {
+    for (const conversation of agentChat.conversations) {
+        if (conversation.owner !== label) continue;
+        conversation.owner = null;
+        conversation.status = 'idle';
+        finishStreaming(conversation);
+        expirePending(conversation);
+    }
+}
+
+function expirePending(conversation: Conversation): void {
+    for (const item of conversation.items) {
+        if ((item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question') && item.state === 'pending') item.state = 'expired';
+    }
 }
 
 // ---- Events from the agent ----
@@ -450,6 +617,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
         case 'models':
             agentChat.models[conversation.provider] = event.models;
             localStorage.setItem(`${MODELS_KEY}.${conversation.provider}`, JSON.stringify({ models: event.models }));
+            broadcastSettings();
             return;
         case 'error':
             notice(conversation, event.message, true);
@@ -503,6 +671,7 @@ function onEvent(conversation: Conversation, event: AgentEvent): void {
         case 'exited':
             finishStreaming(conversation);
             conversation.status = 'idle';
+            conversation.owner = null;
             dropQueuedEdits(conversation.id);
             if (event.code !== 0) {
                 const detail = event.output.trim().split('\n').slice(-6).join('\n');
@@ -620,8 +789,15 @@ function setItemState(conversationId: string, requestId: number, state: Approval
     }
 }
 
+/** Pending cards can only be answered in the window whose agent asked. */
+function answerable(conversation: Conversation | undefined): conversation is Conversation {
+    return !!conversation && !ownedElsewhere(conversation);
+}
+
 export async function answerApproval(conversationId: string, requestId: number, allow: boolean, forSession = false, denial = 'The user denied this action.'): Promise<void> {
-    const item = find(conversationId)?.items.find(i => i.kind === 'approval' && i.requestId === requestId);
+    const owner = find(conversationId);
+    if (!answerable(owner)) return;
+    const item = owner.items.find(i => i.kind === 'approval' && i.requestId === requestId);
     if (!item || item.kind !== 'approval' || item.state !== 'pending') return;
     if (allow && forSession) {
         if (!sessionAllowed.has(conversationId)) sessionAllowed.set(conversationId, new Set());
@@ -645,8 +821,9 @@ export async function answerApproval(conversationId: string, requestId: number, 
 /** Answers a question card; null skips it. Answers are keyed by question text. */
 export async function answerQuestions(conversationId: string, requestId: number, answers: Record<string, string> | null): Promise<void> {
     const conversation = find(conversationId);
-    const item = conversation?.items.find(i => i.kind === 'question' && i.requestId === requestId);
-    if (!conversation || !item || item.kind !== 'question' || item.state !== 'pending') return;
+    if (!answerable(conversation)) return;
+    const item = conversation.items.find(i => i.kind === 'question' && i.requestId === requestId);
+    if (!item || item.kind !== 'question' || item.state !== 'pending') return;
     item.state = answers ? 'allowed' : 'denied';
     if (answers) item.answers = answers;
     touch(conversation);
@@ -670,6 +847,7 @@ export function isPlanTool(toolName: string): boolean {
 
 /** Approves a plan and leaves plan mode for this conversation only. */
 export async function approvePlan(conversationId: string, requestId: number): Promise<void> {
+    if (!answerable(find(conversationId))) return;
     await answerApproval(conversationId, requestId, true);
     const conversation = find(conversationId);
     if (conversation && modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).edits === 'blocked') {
@@ -716,11 +894,16 @@ function ensureListening(): Promise<void> {
             import('@tauri-apps/api/window'),
         ]);
         const target = getCurrentWindow().label;
+        windowLabel = target;
         await listen<{ conversation: string; event: AgentEvent }>('agent-event', e => {
             const conversation = find(e.payload.conversation);
             if (conversation) onEvent(conversation, e.payload.event);
         }, { target });
         await listen<ToolRequest>('agent-tool-request', e => void onToolRequest(e.payload), { target });
+        await listen<SyncMessage & { source: string }>(SYNC_EVENT, e => applySync(e.payload));
+        await listen<string>(WINDOW_CLOSED_EVENT, e => onWindowClosed(e.payload));
+        await listen<DocRequest>(DOC_REQUEST_EVENT, e => onDocRequest(e.payload));
+        await listen<DocResponse>(DOC_RESPONSE_EVENT, e => docWaiters.get(e.payload.id)?.(e.payload));
     })();
     return listening;
 }
@@ -762,9 +945,9 @@ async function loadHarnesses(): Promise<void> {
 
 export function registerAgentEditor(context: AgentEditorContext): void {
     editorContext = context;
-    restored ??= loadHarnesses().then(() => {
+    restored ??= loadHarnesses().then(async () => {
         if (!agentChat.harnesses.length) return;
-        void ensureListening();
+        await ensureListening();
         return restoreTabs();
     });
 }
@@ -777,6 +960,7 @@ export function selectHarness(id: string): void {
     if (!harnessInfo(id)) return;
     agentChat.harnessId = id;
     localStorage.setItem(HARNESS_KEY, id);
+    broadcastSettings();
     const active = activeConversation();
     if (active.provider === id) return;
     if (!active.items.length) {
@@ -807,8 +991,11 @@ export async function sendMessage(text: string): Promise<void> {
     persistTabs();
     try {
         await ensureListening();
-        if (conversation.status === 'idle') {
+        // An agent idle in another window is stopped and resumed here.
+        if (conversation.status === 'idle' || conversation.owner !== windowLabel) {
             conversation.status = 'starting';
+            conversation.owner = windowLabel;
+            touch(conversation);
             await invoke('agent_start', {
                 conversation: conversation.id,
                 options: {
@@ -822,15 +1009,19 @@ export async function sendMessage(text: string): Promise<void> {
             });
         }
         conversation.status = 'busy';
+        touch(conversation);
         await invoke('agent_send', { conversation: conversation.id, text: trimmed });
     } catch (err) {
         conversation.status = 'idle';
+        conversation.owner = null;
         notice(conversation, errorText(err), true);
+        touch(conversation);
     }
 }
 
 export async function interrupt(): Promise<void> {
     const conversation = activeConversation();
+    if (runningElsewhere(conversation)) return;
     try {
         await invoke('agent_interrupt', { conversation: conversation.id });
     } catch (err) {
@@ -846,11 +1037,11 @@ async function stopProcess(conversation: Conversation): Promise<void> {
         // Already stopped.
     }
     conversation.status = 'idle';
+    conversation.owner = null;
     finishStreaming(conversation);
     dropQueuedEdits(conversation.id);
-    for (const item of conversation.items) {
-        if ((item.kind === 'approval' || item.kind === 'edit' || item.kind === 'question') && item.state === 'pending') item.state = 'expired';
-    }
+    expirePending(conversation);
+    touch(conversation);
 }
 
 export function activateConversation(id: string): void {
@@ -873,13 +1064,9 @@ export async function closeConversation(id: string): Promise<void> {
     const conversation = agentChat.conversations[index];
     await stopProcess(conversation);
     await flush(conversation);
-    sessionAllowed.delete(id);
-    readLogs.delete(id);
-    agentChat.conversations.splice(index, 1);
-    if (!agentChat.conversations.length) agentChat.conversations.push(createConversation(agentChat.harnessId));
-    if (agentChat.activeId === id) {
-        agentChat.activeId = agentChat.conversations[Math.min(index, agentChat.conversations.length - 1)].id;
-    }
+    closedIds.add(id);
+    removeTab(id);
+    if (conversation.items.length) broadcast({ kind: 'closed', id });
     persistTabs();
 }
 
@@ -899,6 +1086,8 @@ export async function openFromHistory(id: string): Promise<void> {
     } else {
         agentChat.conversations.push(conversation);
     }
+    closedIds.delete(id);
+    publish(conversation, true);
     activateConversation(conversation.id);
 }
 
@@ -910,6 +1099,7 @@ export async function deleteFromHistory(id: string): Promise<void> {
         // Already gone.
     }
     agentChat.history = agentChat.history.filter(h => h.id !== id);
+    broadcast({ kind: 'deleted', id });
 }
 
 export function showHistory(show: boolean): void {
@@ -923,7 +1113,8 @@ export async function setModel(model: string): Promise<void> {
     const conversation = activeConversation();
     agentChat.settings[conversation.provider] = { ...settingsFor(conversation.provider), model: next };
     storeSettings(conversation.provider);
-    if (next === conversation.model) return;
+    if (next === conversation.model || runningElsewhere(conversation)) return;
+    if (ownedElsewhere(conversation)) await stopProcess(conversation);
     conversation.model = next;
     touch(conversation);
     if (conversation.status === 'idle') return;
@@ -938,6 +1129,7 @@ async function restartForMode(conversation: Conversation): Promise<void> {
     conversation.restartPending = false;
     await stopProcess(conversation);
     notice(conversation, `${modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).label} applies from your next message.`);
+    touch(conversation);
 }
 
 /** Switches the active conversation's mode and makes it the default for new ones. */
@@ -948,7 +1140,8 @@ export async function setPermissionMode(mode: PermissionMode, conversation = act
         storeSettings(conversation.provider);
     }
     const previous = conversation.permissionMode;
-    if (mode === previous) return;
+    if (mode === previous || runningElsewhere(conversation)) return;
+    if (ownedElsewhere(conversation)) await stopProcess(conversation);
     conversation.permissionMode = mode;
     touch(conversation);
     if (conversation.status === 'idle') return;
@@ -993,6 +1186,7 @@ function recordChange(conversation: Conversation, edit: PreparedEdit, created = 
     const existing = conversation.changes.find(c => c.key === key);
     if (existing) {
         existing.changedAt = Date.now();
+        existing.window = windowLabel;
         return;
     }
     conversation.changes.push({
@@ -1001,18 +1195,165 @@ function recordChange(conversation: Conversation, edit: PreparedEdit, created = 
         title: edit.doc.tab.title,
         baseline: edit.original,
         changedAt: Date.now(),
+        backedUpAt: Date.now(),
+        window: windowLabel,
         ...(created ? { created: true } : {}),
     });
 }
 
-/** Live text of a changed document, or null when it is no longer open. */
-export function currentText(change: ChangeRecord): string | null {
+/** A worksheet changed by any open conversation, with the oldest backup. */
+export interface PooledChange extends ChangeRecord {
+    conversations: string[];
+    /** A conversation holding it is running in another window. */
+    locked: boolean;
+}
+
+export function pooledChanges(): PooledChange[] {
+    const byKey = new Map<string, PooledChange>();
+    for (const conversation of agentChat.conversations) {
+        for (const change of conversation.changes) {
+            const pooled = byKey.get(change.key);
+            const locked = runningElsewhere(conversation);
+            if (!pooled) {
+                byKey.set(change.key, { ...change, conversations: [conversation.id], locked });
+                continue;
+            }
+            pooled.conversations.push(conversation.id);
+            pooled.locked ||= locked;
+            if ((change.backedUpAt ?? change.changedAt) < (pooled.backedUpAt ?? pooled.changedAt)) {
+                Object.assign(pooled, { baseline: change.baseline, backedUpAt: change.backedUpAt ?? change.changedAt, created: change.created });
+            }
+            if (change.changedAt > pooled.changedAt) Object.assign(pooled, { changedAt: change.changedAt, window: change.window });
+        }
+    }
+    return [...byKey.values()].sort((a, b) => b.changedAt - a.changedAt);
+}
+
+function pooledChange(key: string): PooledChange | undefined {
+    return pooledChanges().find(c => c.key === key);
+}
+
+function docRefOf(change: ChangeRecord): string {
+    return change.path ?? change.key.slice('untitled:'.length);
+}
+
+/** The buffer in this window; `anyCopy` also accepts a copy that another window's agent did not change. */
+function localDoc(change: ChangeRecord, anyCopy = false) {
     if (!editorContext) return null;
+    const elsewhere = !!change.window && change.window !== windowLabel;
+    // Untitled tab ids repeat across windows, so only the recorded window can resolve one.
+    if (elsewhere && (!anyCopy || !change.path)) return null;
     try {
-        return findDoc(editorContext, change.path ?? change.key.slice('untitled:'.length)).model.getValue();
+        return findDoc(editorContext, docRefOf(change));
     } catch {
         return null;
     }
+}
+
+// ---- Changed worksheets open in other windows ----
+
+const DOC_REQUEST_EVENT = 'agent-doc-request';
+const DOC_RESPONSE_EVENT = 'agent-doc-response';
+const DOC_TIMEOUT_MS = 1500;
+
+interface DocRequest { id: string; source: string; window?: string; ref: string; op: 'text' | 'revert' | 'close'; baseline?: string }
+interface DocResponse { id: string; found: boolean; text?: string; error?: string }
+
+const docWaiters = new Map<string, (response: DocResponse) => void>();
+
+/** Runs `op` in the other window that has the worksheet open; null when none has. */
+async function inOtherWindow(change: ChangeRecord, op: DocRequest['op'], target?: string): Promise<DocResponse | null> {
+    const [{ emit }, { getAllWindows }] = await Promise.all([import('@tauri-apps/api/event'), import('@tauri-apps/api/window')]);
+    const others = (await getAllWindows()).filter(w => w.label !== windowLabel).length;
+    if (!others) return null;
+    const id = crypto.randomUUID();
+    return new Promise(resolve => {
+        let missing = 0;
+        const done = (response: DocResponse | null) => {
+            clearTimeout(timer);
+            docWaiters.delete(id);
+            resolve(response);
+        };
+        const timer = setTimeout(() => done(null), DOC_TIMEOUT_MS);
+        docWaiters.set(id, response => {
+            if (response.found) done(response);
+            else if (++missing >= (target ? 1 : others)) done(null);
+        });
+        const request: DocRequest = { id, source: windowLabel, window: target, ref: docRefOf(change), op, baseline: change.baseline };
+        emit(DOC_REQUEST_EVENT, request).catch(() => done(null));
+    });
+}
+
+function onDocRequest(request: DocRequest): void {
+    if (request.source === windowLabel || (request.window && request.window !== windowLabel)) return;
+    const reply = (response: Omit<DocResponse, 'id'>) => {
+        void import('@tauri-apps/api/event').then(({ emit }) => emit(DOC_RESPONSE_EVENT, { id: request.id, ...response }));
+    };
+    let doc = null;
+    if (editorContext) {
+        try {
+            doc = findDoc(editorContext, request.ref);
+        } catch {
+            // Not open here.
+        }
+    }
+    if (!doc || !editorContext) {
+        reply({ found: false });
+        return;
+    }
+    try {
+        if (request.op === 'revert' && request.baseline !== undefined) {
+            const now = doc.model.getValue();
+            if (now !== request.baseline) applyEdit({ doc, original: now, modified: request.baseline, summary: '' });
+        }
+        if (request.op === 'close') editorContext.closeDocument(request.ref);
+        reply({ found: true, text: doc.model.isDisposed() ? undefined : doc.model.getValue() });
+    } catch (err) {
+        reply({ found: true, error: errorText(err) });
+    }
+}
+
+/** Finds the changed buffer: the recorded window first, then this window, then any window. */
+async function locate(change: ChangeRecord, op: DocRequest['op']): Promise<{ doc: DocRef } | { response: DocResponse } | null> {
+    const preferred = localDoc(change);
+    if (preferred) return { doc: preferred };
+    if (change.window && change.window !== windowLabel) {
+        const response = await inOtherWindow(change, op, change.window);
+        if (response) return { response };
+        if (!change.path) return null;
+    }
+    const copy = localDoc(change, true);
+    if (copy) return { doc: copy };
+    const response = await inOtherWindow(change, op);
+    return response ? { response } : null;
+}
+
+function locatedText(found: Awaited<ReturnType<typeof locate>>): string | null {
+    if (!found) return null;
+    return 'doc' in found ? found.doc.model.getValue() : found.response.text ?? null;
+}
+
+let pollingTexts = false;
+
+/** Refreshes the text of changed worksheets that are open only in other windows. */
+export async function pollChangeTexts(): Promise<void> {
+    if (pollingTexts) return;
+    pollingTexts = true;
+    try {
+        const texts: Record<string, string | null> = {};
+        for (const change of pooledChanges()) {
+            if (!localDoc(change)) texts[change.key] = locatedText(await locate(change, 'text'));
+        }
+        agentChat.remoteTexts = texts;
+    } finally {
+        pollingTexts = false;
+    }
+}
+
+/** Live text of a changed worksheet in any window, or null when it is closed everywhere. */
+export function changeText(change: ChangeRecord): string | null {
+    const doc = localDoc(change);
+    return doc ? doc.model.getValue() : agentChat.remoteTexts[change.key] ?? null;
 }
 
 export function lineStats(before: string, after: string): { added: number; removed: number } {
@@ -1029,64 +1370,71 @@ export function lineStats(before: string, after: string): { added: number; remov
     return { added, removed };
 }
 
-export function openChangeDiff(conversationId: string, key: string): void {
-    const change = find(conversationId)?.changes.find(c => c.key === key);
-    const current = change ? currentText(change) : null;
-    if (!change || current === null) return;
-    agentChat.reviewChange = { conversationId, key, title: change.path ?? change.title, baseline: change.baseline, current };
+export async function openChangeDiff(key: string): Promise<void> {
+    const change = pooledChange(key);
+    if (!change) return;
+    const current = locatedText(await locate(change, 'text'));
+    if (current === null) return;
+    agentChat.reviewChange = { key, title: change.path ?? change.title, baseline: change.baseline, current };
 }
 
 export function closeChangeDiff(): void {
     agentChat.reviewChange = null;
 }
 
-export function keepChange(conversationId: string, key: string): void {
-    const conversation = find(conversationId);
-    if (!conversation) return;
-    conversation.changes = conversation.changes.filter(c => c.key !== key);
-    if (agentChat.reviewChange?.key === key) agentChat.reviewChange = null;
-    touch(conversation);
+function forgetChange(key: string, message?: { text: string; error?: boolean }): void {
+    for (const conversation of agentChat.conversations) {
+        if (!conversation.changes.some(c => c.key === key) || runningElsewhere(conversation)) continue;
+        if (!message?.error) conversation.changes = conversation.changes.filter(c => c.key !== key);
+        if (message) notice(conversation, message.text, message.error);
+        touch(conversation);
+    }
+    if (!message?.error && agentChat.reviewChange?.key === key) agentChat.reviewChange = null;
 }
 
-/** Restores the backup into the editor buffer as one undoable edit; reopens the file if needed. */
-export async function revertChange(conversationId: string, key: string): Promise<void> {
-    const conversation = find(conversationId);
-    const change = conversation?.changes.find(c => c.key === key);
-    if (!conversation || !change || !editorContext) return;
+export function keepChange(key: string): void {
+    if (pooledChange(key)?.locked === false) forgetChange(key);
+}
+
+/** Restores the oldest backup as one undoable edit, in whichever window has it open; reopens it if closed. */
+export async function revertChange(key: string): Promise<void> {
+    const change = pooledChange(key);
+    if (!change || change.locked || !editorContext) return;
+    const name = change.path ?? change.title;
     try {
         if (change.created && change.path) {
-            editorContext.closeDocument(change.path);
-            keepChange(conversationId, key);
+            const found = await locate(change, 'close');
+            if (found && 'doc' in found) editorContext.closeDocument(change.path);
             const saved = await editorContext.pathExists(change.path);
-            notice(conversation, saved
+            forgetChange(key, { text: saved
                 ? `Closed ${change.path}. It had been saved, so the file is still on disk.`
-                : `Removed the new worksheet ${change.path}.`);
+                : `Removed the new worksheet ${change.path}.` });
             return;
         }
-        if (currentText(change) === null) {
+        const found = await locate(change, 'revert');
+        if (found && 'response' in found && found.response.error) throw new Error(found.response.error);
+        let doc = found && 'doc' in found ? found.doc : null;
+        if (!found) {
             if (!change.path) throw new Error('This untitled worksheet was closed, so it cannot be restored.');
             await editorContext.openFile(change.path);
+            doc = findDoc(editorContext, change.path);
         }
-        const doc = findDoc(editorContext, change.path ?? change.key.slice('untitled:'.length));
-        const now = doc.model.getValue();
-        if (now !== change.baseline) applyEdit({ doc, original: now, modified: change.baseline, summary: '' });
-        keepChange(conversationId, key);
-        notice(conversation, `Reverted ${change.path ?? change.title} to its backup.`);
+        if (doc) {
+            const now = doc.model.getValue();
+            if (now !== change.baseline) applyEdit({ doc, original: now, modified: change.baseline, summary: '' });
+        }
+        forgetChange(key, { text: `Reverted ${name} to its backup.` });
     } catch (err) {
-        notice(conversation, errorText(err), true);
+        forgetChange(key, { text: errorText(err), error: true });
     }
 }
 
-export async function revertAllChanges(conversationId: string): Promise<void> {
-    for (const change of [...(find(conversationId)?.changes ?? [])]) await revertChange(conversationId, change.key);
+export async function revertAllChanges(): Promise<void> {
+    for (const change of pooledChanges()) await revertChange(change.key);
 }
 
-export function keepAllChanges(conversationId: string): void {
-    const conversation = find(conversationId);
-    if (!conversation) return;
-    conversation.changes = [];
-    agentChat.reviewChange = null;
-    touch(conversation);
+export function keepAllChanges(): void {
+    for (const change of pooledChanges()) keepChange(change.key);
 }
 
 export function showChanges(show: boolean): void {
