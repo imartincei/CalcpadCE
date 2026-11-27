@@ -1436,6 +1436,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#errors-inside-included-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside included files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3131,6 +3142,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#errors-inside-included-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside included files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostic-codes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3301,6 +3323,10 @@ Each mark links to the other.</p>
 <p>A custom function body is checked at its first call: every variable the body uses must be defined by then.
 If one is not, the linter marks both the call and the variable in the function body.
 A function that is never called is checked at the end of the document.</p>
+<h2 id="errors-inside-included-files">Errors inside included files<a class="headerlink" href="#errors-inside-included-files" title="Permanent link">&para;</a></h2>
+<p>An error in an included file is marked across the whole <code>#include</code> line, with the file and line number at the start of the message.
+If the included file is open in another tab, the error is also marked there, linked back to the file that includes it.
+Hover over an error and click the <strong>Source:</strong> file to jump to the error in that file.</p>
 <h2 id="diagnostic-codes">Diagnostic codes<a class="headerlink" href="#diagnostic-codes" title="Permanent link">&para;</a></h2>
 <p>Every diagnostic has a <code>CPD-</code> code.
 The tables below group them by the kind of problem.</p>

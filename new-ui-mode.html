@@ -1692,6 +1692,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#undo-and-redo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undo and redo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#saving-what-was-entered" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3565,6 +3576,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#undo-and-redo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undo and redo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#saving-what-was-entered" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4081,6 +4103,11 @@ A <code>reportStyle</code> class lands on the line's element, which is a paragra
 <h3 id="inside-a-datagrid">Inside a datagrid<a class="headerlink" href="#inside-a-datagrid" title="Permanent link">&para;</a></h3>
 <p>A grid is a third-party widget, so a <code>style</code> class reaches its outer container but not the cells, headers or context menu inside it.</p>
 <p>There is limited customization available using the datagrid properties, and more customization is planned.</p>
+<h2 id="undo-and-redo">Undo and redo<a class="headerlink" href="#undo-and-redo" title="Permanent link">&para;</a></h2>
+<p>Press <strong>Ctrl+Z</strong> to undo a value entered into the input form, and <strong>Ctrl+Y</strong> or <strong>Ctrl+Shift+Z</strong> to redo it.
+<strong>Undo</strong> and <strong>Redo</strong> are also in the form's right-click menu and the datagrid menu.
+While you are still typing in a box, Ctrl+Z undoes the typing in that box first.
+The form's history is kept per tab, apart from the editor's own undo history.</p>
 <h2 id="saving-what-was-entered">Saving what was entered<a class="headerlink" href="#saving-what-was-entered" title="Permanent link">&para;</a></h2>
 <p>Saving input values writes them into a metadata comment at the end of the document, which is what restores them the next time you open it:</p>
 <div class="language-text highlight"><pre><span></span><code>'&lt;!--CalcpadCE Metadata--&gt;
@@ -4173,7 +4200,7 @@ Beam$(6m)
 #loop
 </code></pre></div>
 <h2 id="pause-in-ui-mode"><code>#pause</code> in UI mode<a class="headerlink" href="#pause-in-ui-mode" title="Permanent link">&para;</a></h2>
-<p>The input form recalculates the whole document every time a value changes. 
+<p>The input form recalculates the whole document every time a value changes.
 Put <code>#pause</code> after inputs that come before something slow such as a long loop, a large matrix solve, heavy JavaScript, etc. 
 The form stops there, so editing values stays responsive, and the slow part runs only once the user presses Next.</p>
 <p><code>#pause</code> splits the input form into steps.

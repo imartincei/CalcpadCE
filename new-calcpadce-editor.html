@@ -1307,6 +1307,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#custom-snippets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Snippets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3081,6 +3092,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#custom-snippets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Snippets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#operator-replacement-and-auto-indent" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3190,12 +3212,19 @@ Highlighting updates per line as you type, for both dark and light themes.</p>
 <li><strong>Setting keys</strong> (<code>decimals</code>, <code>degrees</code>, <code>complex</code>, <code>units</code>, <code>colorScale</code>, …) where a setting is expected.</li>
 <li><strong><a href="new-metadata-comments.html">Metadata keys</a></strong> inside an HTML-comment block placed directly above a definition.
   The <strong>Properties</strong> panel tab also edits these through a form.</li>
+<li><strong><a href="new-calcpad-panel.html#insert">Favorites</a></strong> first, marked with ★.</li>
+<li><strong><a href="new-calcpad-panel.html#custom-snippets">Custom snippets</a></strong> alongside the built-in ones.</li>
 </ul>
 <h2 id="quick-type-symbols">Quick-type symbols<a class="headerlink" href="#quick-type-symbols" title="Permanent link">&para;</a></h2>
 <p>Type <code>~</code> followed by a key and press <strong>space</strong> to insert a Greek letter or math symbol.
 For example <code>~a</code> + space → <code>α</code>, <code>~p</code> + space → <code>π</code>, <code>~S</code> + space → <code>Σ</code>.
 The full set is shown in the <strong>Insert</strong> tab's Symbol Palette.
 Toggle this with the <code>quickTyping</code> setting in the CalcpadCE <strong>Settings</strong> tab.</p>
+<p>Any Insert tab item can have quick-type keys: click the <strong>~</strong> beside it to add or remove them.</p>
+<h2 id="custom-snippets">Custom Snippets<a class="headerlink" href="#custom-snippets" title="Permanent link">&para;</a></h2>
+<p>You can right-click variables, custom units, custom functions, or macros and save it as a custom snippet.
+Metadata comments for these items will be inserted into the custom snippet form where they exist.
+See <strong><a href="new-calcpad-panel.html#custom-snippets">Custom snippets</a></strong> for more information.</p>
 <h2 id="operator-replacement-and-auto-indent">Operator replacement and auto-indent<a class="headerlink" href="#operator-replacement-and-auto-indent" title="Permanent link">&para;</a></h2>
 <p>Typing ASCII operators auto-converts them to Unicode: <code>&lt;=</code> → <code>≤</code>, <code>&gt;=</code> → <code>≥</code>, <code>!=</code> → <code>≠</code>.
 Block keywords indent automatically: <code>#if</code> / <code>#else</code> / <code>#end if</code>, <code>#for</code> / <code>#end for</code>, and <code>#def</code> / <code>#end def</code> for example.</p>
@@ -3265,7 +3294,7 @@ Whether HTML or Markdown is emitted depends on the <code>commentFormat</code> se
 </tbody>
 </table>
 <p>On macOS use <strong>Cmd</strong> instead of <strong>Ctrl</strong>.
-Turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
+Rebind any of them in <strong>Settings → <a href="new-settings.html#keyboard-shortcuts">Keyboard Shortcuts</a></strong>, or turn the whole set off with the <code>enableFormattingHotkeys</code> setting if it conflicts with your other bindings.</p>
 <h2 id="navigating-symbols">Navigating symbols<a class="headerlink" href="#navigating-symbols" title="Permanent link">&para;</a></h2>
 <p>The editor provides IDE-grade navigation across variables, functions, macros, and custom units — including across <code>#include</code> files:</p>
 <table>
