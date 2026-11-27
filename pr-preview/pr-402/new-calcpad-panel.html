@@ -1322,6 +1322,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Insert">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-snippets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom snippets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3074,6 +3091,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Insert">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-snippets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom snippets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -3230,7 +3264,24 @@ Because every CalcpadCE frontend embeds the same panel, the tabs and settings ar
 Typing filters the list; clicking an item inserts it at the cursor.
 Function entries insert with placeholders.
 The <strong>Symbol Palette</strong> section is a condensed version of the symbols dropdown that allows inserting symbols by how they appear in the text.
-An <strong>Insert Image</strong> button opens a file picker and inserts an <code>&lt;img&gt;</code> tag with the selected path.</p>
+An <strong>Insert Image</strong> button opens a file picker and inserts an <code>&lt;img&gt;</code> tag with the selected path.
+Press <strong>Alt+I</strong> to jump to the search field.</p>
+<p>Click the ☆ beside an item to add it to the <strong>Favorites</strong> section at the top of the tab.
+Favorites are also listed first in autocomplete, marked with ★.</p>
+<p>Click the <strong>~</strong> beside an item to add or remove its <a href="new-calcpadce-editor.html#quick-type-symbols">quick-type</a> keys.
+A key that is already used by another item can't be saved.</p>
+<h4 id="custom-snippets">Custom snippets<a class="headerlink" href="#custom-snippets" title="Permanent link">&para;</a></h4>
+<p><strong>Custom Snippets</strong> is the last category in the tab, and its items also show in autocomplete.
+Click <strong>Add custom snippet</strong> to create one, or use <strong>Save as Custom Snippet</strong> from the <a href="#variables">Variables</a> tab or the editor's right-click menu.</p>
+<p>Like built-in items, each custom snippet has:</p>
+<ul>
+<li><strong>Name</strong>, <strong>Description</strong> and <strong>Example</strong></li>
+<li><strong>Type</strong> — Text, Function, Macro, Variable or Unit</li>
+<li><strong>Inserted text</strong> — <code>§</code> marks where each parameter goes</li>
+<li><strong>Parameters</strong> — a name, type and description for each, filling the <code>§</code> placeholders in order</li>
+<li><strong>Return type</strong> (functions) or <strong>Value type</strong></li>
+<li><strong>Quick type</strong> keys</li>
+</ul>
 <h3 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h3>
 <p>Lists everything the current document defines, grouped and counted:</p>
 <ul>
@@ -3240,7 +3291,8 @@ An <strong>Insert Image</strong> button opens a file picker and inserts an <code
 <li><strong>Custom Units</strong> — with their definition</li>
 </ul>
 <p>Entries are from the active document (and its <code>#include</code> files).<br />
-Click any entry to insert its name at the cursor.</p>
+Click any entry to insert its name at the cursor.
+Right-click an entry and choose <strong>Save as Custom Snippet</strong> to add it to the Insert tab's <a href="#custom-snippets">custom snippets</a>.</p>
 <h3 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h3>
 <p>A form-based editor for the <a href="new-metadata-comments.html">metadata comment</a>, <code>#settings</code> directive JSON, and <code>#UI</code> directive JSON.<br />
 Put the cursor on a JSON line, and the tab shows exactly the fields that apply.
@@ -3288,7 +3340,8 @@ While a <a href="new-ui-mode.html"><code>#UI</code> input form</a> is open and t
 </table>
 <p>See <a href="new-exports.html">Exports</a> for what each rendering captures, which formats it offers, how PDF page setup is resolved, and what the two portable formats produce.</p>
 <h2 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h2>
-<p>The <strong>Settings</strong> tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Linter, Diagnostics, and named configurations.<br />
+<p>The <strong>Settings</strong> tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Keyboard Shortcuts, Linter, Diagnostics, and named configurations.<br />
+Starred settings are pinned to a <strong>Favorites</strong> section at the top, and any setting can be given a hotkey.
 See <a href="new-settings.html">Settings</a> for the full reference.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

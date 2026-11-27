@@ -1287,6 +1287,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Opening files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-files-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Files tab
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-changed-by-other-programs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files changed by other programs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1347,6 +1375,56 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-chat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-the-agent-works-with-your-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the agent works with your files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conversations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3172,6 +3250,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Opening files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-files-tab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Files tab
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-changed-by-other-programs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files changed by other programs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3232,6 +3338,56 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-chat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Agent chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-the-agent-works-with-your-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the agent works with your files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conversations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3430,6 +3586,7 @@ On Linux, the app will tell you which package to install if none is found — se
 <li><strong>Opening an already-open file</strong> activates its existing tab instead of duplicating it.</li>
 <li><strong>Opening a file from an empty Untitled tab</strong> replaces it in place rather than stacking a new tab.</li>
 <li><strong>Closing a tab with unsaved changes</strong> prompts Save / Don't Save / Cancel. Quitting the app walks through every unsaved tab; cancel any prompt to abort the quit.</li>
+<li><strong>Dragging a tab</strong> reorders it, moves it to another CalcpadCE window, or opens it in a new window. Drop it on the top or bottom third of an editor to <a href="#splitting-the-editor">split the editor</a>.</li>
 </ul>
 <h2 id="opening-files">Opening files<a class="headerlink" href="#opening-files" title="Permanent link">&para;</a></h2>
 <p>There are several ways to open documents:</p>
@@ -3440,6 +3597,41 @@ On Linux, the app will tell you which package to install if none is found — se
 </ul>
 <p>Compiled <strong><code>.cpdz</code></strong> worksheets open the same way and are registered as their own file type.
 See <a href="new-ui-mode.html#compiled-cpdz-worksheets">UI Mode</a>.</p>
+<h3 id="the-files-tab">The Files tab<a class="headerlink" href="#the-files-tab" title="Permanent link">&para;</a></h3>
+<p>Click <strong>Open Folder</strong> to browse a folder, and <strong>Open Another Folder</strong> to show a second one below it.
+Each folder has its own <strong>Collapse</strong>, <strong>Refresh</strong>, <strong>Collapse All</strong> and <strong>Close Folder</strong> buttons.
+Every window shares the same opened folders.</p>
+<p>Right-click a file to insert a reference to it at the cursor, with a relative or absolute path:</p>
+<table>
+<thead>
+<tr>
+<th>File type</th>
+<th>Menu items</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.cpd</code>, <code>.txt</code></td>
+<td><strong>Insert #include</strong></td>
+</tr>
+<tr>
+<td><code>.csv</code>, <code>.tsv</code>, <code>.xlsx</code>, <code>.xlsm</code>, <code>.xls</code>, <code>.txt</code></td>
+<td><strong>Insert #read</strong></td>
+</tr>
+<tr>
+<td><code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.gif</code>, <code>.webp</code>, <code>.svg</code></td>
+<td><strong>Insert Image</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="files-changed-by-other-programs">Files changed by other programs<a class="headerlink" href="#files-changed-by-other-programs" title="Permanent link">&para;</a></h3>
+<p>When another program changes an open file, the tab reloads it.
+If the tab has unsaved edits, saving it asks which version to keep:</p>
+<ul>
+<li><strong>Keep Mine</strong> — keep your edits and overwrite the file on disk.</li>
+<li><strong>Keep Theirs</strong> — discard your edits and load the file from disk.</li>
+<li><strong>Keep Both</strong> — save each version as a copy next to the file.</li>
+</ul>
 <h2 id="the-editor">The editor<a class="headerlink" href="#the-editor" title="Permanent link">&para;</a></h2>
 <p>The editor is the same across every CalcpadCE frontend — see <strong><a href="new-calcpadce-editor.html">The CalcpadCE Editor</a></strong>.</p>
 <p>Desktop specifics:</p>
@@ -3472,6 +3664,55 @@ If you turn <strong>Settings → Auto-Run Preview</strong> off, the preview only
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click <strong>Unsplit</strong> (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
 The active group drives the sidebar.</p>
+<p>You can also split by dragging a tab onto the top or bottom third of an editor.</p>
+<h2 id="agent-chat">Agent chat<a class="headerlink" href="#agent-chat" title="Permanent link">&para;</a></h2>
+<p>The agent chat panel lets an AI coding agent read, check, and edit your CalcpadCE files.
+It drives an agent CLI you already have installed: <strong>Claude Code</strong>, <strong>Codex</strong>, <strong>GitHub Copilot</strong>, <strong>Gemini CLI</strong>, <strong>opencode</strong> or <strong>pi</strong>.</p>
+<p>Toggle the panel with the sparkle button at the right end of the status bar.</p>
+<h3 id="setting-up">Setting up<a class="headerlink" href="#setting-up" title="Permanent link">&para;</a></h3>
+<p>Click the panel's <strong>Settings</strong> button to choose the <strong>Agent</strong> and, where the agent offers more than one, the <strong>Model</strong>.
+Installed agents are found automatically.
+If one is not found, you can enter the full path to its executable.</p>
+<h3 id="how-the-agent-works-with-your-files">How the agent works with your files<a class="headerlink" href="#how-the-agent-works-with-your-files" title="Permanent link">&para;</a></h3>
+<p>The agent works through a local MCP server.
+It can read the open CalcpadCE files, check them for errors, and propose edits.
+It can also open files that aren't open yet and create new files as unsaved tabs.</p>
+<p>Pick a permission mode below the message box, or press <strong>Shift+Tab</strong> in it to cycle through them:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What the agent can do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Manual</strong></td>
+<td>Asks before running commands or editing. Each edit shows a diff to <strong>Accept</strong> or <strong>Reject</strong>.</td>
+</tr>
+<tr>
+<td><strong>Edit automatically</strong></td>
+<td>Applies edits to CalcpadCE files without review. Commands and other file writes are blocked.</td>
+</tr>
+<tr>
+<td><strong>Plan mode</strong></td>
+<td>Reads and proposes a plan, with <strong>Approve plan</strong> and <strong>Keep planning</strong> buttons. No edits are made. Not available for pi.</td>
+</tr>
+<tr>
+<td><strong>Auto mode</strong></td>
+<td>Works without asking, changing only CalcpadCE files. Claude Code and pi only.</td>
+</tr>
+</tbody>
+</table>
+<p>Each file is backed up before the agent first changes it.
+The <strong>Changes</strong> button lists every file changed in the conversation, with a diff against the backup and buttons to keep or revert each change, or <strong>Keep all</strong> and <strong>Revert all</strong>.</p>
+<p>Edits the agent makes with its own file tools instead of the CalcpadCE edit tool are not tracked.
+Manual mode asks before allowing them, and the automatic modes block them.</p>
+<h3 id="conversations">Conversations<a class="headerlink" href="#conversations" title="Permanent link">&para;</a></h3>
+<p>Each conversation opens in its own tab.
+Use <strong>New conversation</strong> to start one and <strong>Conversation history</strong> to reopen a saved one.
+The agent can show a plan, ask questions with answer cards, and keep a todo checklist in the chat.</p>
+<p>Claude Code and pi get a bundled <code>calcpad-generator</code> skill that teaches them CalcpadCE syntax.</p>
 <h2 id="errors">Errors<a class="headerlink" href="#errors" title="Permanent link">&para;</a></h2>
 <p><strong>Linter</strong> — CalcpadCE checks your document as you write and flags problems before they're converted to HTML.
 Issues are marked in red, yellow, or blue at the spot with the problem, based on severity, and appear in the <strong>Problems</strong> panel with a link to the offending line.</p>
