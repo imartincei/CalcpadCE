@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, type AgentEditorContext, type PreparedEdit, type ProposedEdit } from './agent-tools';
+import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, STALE_NOTE, type AgentEditorContext, type PreparedEdit, type ProposedEdit, type ReadLog } from './agent-tools';
 
 export type ApprovalState = 'pending' | 'allowed' | 'denied' | 'expired';
 
@@ -280,6 +280,13 @@ const editQueue: { view: PendingEdit; edit: ProposedEdit }[] = [];
 const sessionAllowed = new Map<string, Set<string>>();
 const approvalInputs = new Map<number, unknown>();
 const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const readLogs = new Map<string, ReadLog>();
+
+function readLog(conversationId: string): ReadLog {
+    let log = readLogs.get(conversationId);
+    if (!log) readLogs.set(conversationId, log = new WeakMap());
+    return log;
+}
 
 async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
     const { invoke } = await import('@tauri-apps/api/core');
@@ -574,7 +581,7 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
             return;
         }
         try {
-            const edit = await prepareEdit(editorContext, args);
+            const edit = await prepareEdit(editorContext, args, readLog(conversation.id));
             const title = 'create' in edit ? edit.create : edit.doc.tab.filePath ?? edit.doc.tab.title;
             if (mode.edits === 'auto') {
                 applyProposed(conversation, edit);
@@ -582,7 +589,7 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
                 touch(conversation);
                 await respond(id, { result: 'create' in edit
                     ? 'The new worksheet was opened in the editor and not yet saved.'
-                    : 'The edit was applied in the editor and not yet saved.' });
+                    : withStale(edit, 'The edit was applied in the editor and not yet saved.') });
                 return;
             }
             conversation.items.push({ kind: 'edit', requestId: id, title, summary: edit.summary, state: 'pending' });
@@ -598,7 +605,7 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
         return;
     }
     try {
-        await respond(id, { result: await runEditorTool(editorContext, tool, args) });
+        await respond(id, { result: await runEditorTool(editorContext, tool, args, readLog(conversation.id)) });
     } catch (err) {
         await respond(id, { error: errorText(err) });
     }
@@ -695,7 +702,7 @@ export async function resolveEdit(accept: boolean): Promise<void> {
         if (conversation) applyProposed(conversation, next.edit);
         else applyEdit(materialize(editorContext!, next.edit));
         setItemState(conversationId, requestId, 'allowed');
-        await respond(requestId, { result: 'The user accepted the edit. It is applied in the editor and not yet saved.' });
+        await respond(requestId, { result: withStale(next.edit, 'The user accepted the edit. It is applied in the editor and not yet saved.') });
     } catch (err) {
         setItemState(conversationId, requestId, 'denied');
         await respond(requestId, { error: errorText(err) });
@@ -867,6 +874,7 @@ export async function closeConversation(id: string): Promise<void> {
     await stopProcess(conversation);
     await flush(conversation);
     sessionAllowed.delete(id);
+    readLogs.delete(id);
     agentChat.conversations.splice(index, 1);
     if (!agentChat.conversations.length) agentChat.conversations.push(createConversation(agentChat.harnessId));
     if (agentChat.activeId === id) {
@@ -973,6 +981,11 @@ function applyProposed(conversation: Conversation, proposed: ProposedEdit): void
     const edit = materialize(editorContext!, proposed);
     recordChange(conversation, edit, 'create' in proposed);
     applyEdit(edit);
+    readLog(conversation.id).set(edit.doc.model, edit.doc.model.getValue());
+}
+
+function withStale(edit: ProposedEdit, result: string): string {
+    return 'stale' in edit && edit.stale ? `${result} ${STALE_NOTE}` : result;
 }
 
 function recordChange(conversation: Conversation, edit: PreparedEdit, created = false): void {

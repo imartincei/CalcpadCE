@@ -22,6 +22,7 @@ use rmcp::{ErrorData, ServerHandler};
 use serde_json::{json, Value};
 use tower_service::Service;
 
+use super::reference::{self, Reference};
 use super::SessionKey;
 
 pub type BridgeFuture<'a> = Pin<Box<dyn Future<Output = Result<Value, String>> + Send + 'a>>;
@@ -42,6 +43,7 @@ const WINDOW_HEADER: &str = "x-calcpad-window";
 const CONVERSATION_HEADER: &str = "x-calcpad-conversation";
 const APPROVAL_HEADER: &str = "x-calcpad-approval";
 const DATA_TIMEOUT: Option<Duration> = Some(Duration::from_secs(30));
+const RUN_TIMEOUT: Option<Duration> = Some(Duration::from_secs(150));
 
 #[derive(Clone)]
 pub struct McpEndpoint {
@@ -93,6 +95,19 @@ fn path_arg() -> Value {
 
 const TOOLS: &[ToolSpec] = &[
     ToolSpec {
+        name: reference::TOOL,
+        description: "CalcpadCE syntax rules, workflow and documentation for the installed version. Call with no arguments first: it returns the rules for writing Calcpad and the list of topics. Then pass a `topic` to read a page, and `section` to read one heading of a long page.",
+        schema: || json!({
+            "type": "object",
+            "properties": {
+                "topic": {"type": "string", "description": "A topic from the list, e.g. quick-reference, units, functions, matrices."},
+                "section": {"type": "string", "description": "A heading within the topic's page."}
+            }
+        }),
+        timeout: DATA_TIMEOUT,
+        auto_approve: true,
+    },
+    ToolSpec {
         name: "list_open_documents",
         description: "List the worksheets open in Calcpad, with their paths, which one is active, and whether each has unsaved changes.",
         schema: || json!({"type": "object", "properties": {}}),
@@ -115,9 +130,23 @@ const TOOLS: &[ToolSpec] = &[
     },
     ToolSpec {
         name: "get_diagnostics",
-        description: "Get the linter and calculation errors/warnings currently shown for an open worksheet (1-based lines).",
+        description: "Get what the Problems panel currently shows for an open worksheet: linter entries, and runtime entries from the last preview run (1-based lines).",
         schema: path_arg,
         timeout: DATA_TIMEOUT,
+        auto_approve: true,
+    },
+    ToolSpec {
+        name: "check_worksheet",
+        description: "Lint and run a worksheet now, from the editor's current text, and return linter and runtime entries in one list (1-based lines). Use after every change; unlike get_diagnostics it doesn't depend on the preview having run.",
+        schema: path_arg,
+        timeout: RUN_TIMEOUT,
+        auto_approve: true,
+    },
+    ToolSpec {
+        name: "render_worksheet",
+        description: "Run a worksheet and return its report as plain text, the way a reviewer sees it, with calculation errors (1-based lines). Never runs #write.",
+        schema: path_arg,
+        timeout: RUN_TIMEOUT,
         auto_approve: true,
     },
     ToolSpec {
@@ -133,7 +162,7 @@ const TOOLS: &[ToolSpec] = &[
     },
     ToolSpec {
         name: "propose_edit",
-        description: "Propose a change to a worksheet; it is opened in Calcpad first if needed. The user reviews a diff and accepts or rejects it; accepted changes land in the editor buffer (unsaved, undoable). Give either `edits` (each oldText must match exactly once) or the full new `text`. To create a new worksheet, give a path that does not exist yet and the full `text`; it opens as an unsaved tab. Use this instead of writing .cpd files directly.",
+        description: "Propose a change to a worksheet; it is opened in Calcpad first if needed. The user reviews a diff and accepts or rejects it; accepted changes land in the editor buffer (unsaved, undoable). Give either `edits` (each oldText must match exactly once) or the full new `text`; full `text` is refused unless you read the current text with get_document first. To create a new worksheet, give a path that does not exist yet and the full `text`; it opens as an unsaved tab. Use this instead of writing .cpd files directly.",
         schema: || json!({
             "type": "object",
             "properties": {
@@ -208,15 +237,31 @@ fn wants_approval(context: &RequestContext<RoleServer>) -> bool {
         .is_some_and(|p| p.headers.contains_key(APPROVAL_HEADER))
 }
 
+pub const INSTRUCTIONS: &str = "Tools for the CalcpadCE worksheets open in the user's editor. \
+Before writing or reviewing Calcpad code, call calcpad_reference with no arguments once: it holds the syntax rules and the docs for this version. \
+Change worksheets only with propose_edit.";
+
 #[derive(Clone)]
 struct CalcpadMcp {
     bridge: Arc<dyn ToolBridge>,
+    reference: Option<Arc<Reference>>,
+}
+
+impl CalcpadMcp {
+    fn reference(&self, args: &Value) -> Result<String, String> {
+        let text = |key: &str| args.get(key).and_then(Value::as_str);
+        self.reference
+            .as_ref()
+            .ok_or("The CalcpadCE reference is not bundled with this build.")?
+            .lookup(text("topic"), text("section"))
+    }
 }
 
 impl ServerHandler for CalcpadMcp {
     fn get_info(&self) -> ServerConfig {
         ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
             .with_server_info(Implementation::new("calcpad", env!("CARGO_PKG_VERSION")))
+            .with_instructions(INSTRUCTIONS)
     }
 
     async fn list_tools(
@@ -255,7 +300,11 @@ impl ServerHandler for CalcpadMcp {
                 ErrorData::invalid_params(format!("Unknown tool {}", request.name), None)
             })?;
         let args = Value::Object(request.arguments.unwrap_or_default());
-        let result = self.bridge.call(key, spec.name, args, spec.timeout).await;
+        let result = if spec.name == reference::TOOL {
+            self.reference(&args).map(Value::String)
+        } else {
+            self.bridge.call(key, spec.name, args, spec.timeout).await
+        };
         Ok(match result {
             Ok(value) => CallToolResult::success(vec![ContentBlock::text(render(value))]),
             Err(err) => CallToolResult::error(vec![ContentBlock::text(err)]),
@@ -289,7 +338,11 @@ fn authorized(headers: &http::HeaderMap, expected: &str) -> bool {
             == 0
 }
 
-pub async fn start(bridge: Arc<dyn ToolBridge>) -> Result<McpEndpoint, String> {
+pub async fn start(
+    bridge: Arc<dyn ToolBridge>,
+    reference: Option<Reference>,
+) -> Result<McpEndpoint, String> {
+    let reference = reference.map(Arc::new);
     let token = random_token()?;
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
@@ -300,6 +353,7 @@ pub async fn start(bridge: Arc<dyn ToolBridge>) -> Result<McpEndpoint, String> {
         move || {
             Ok(CalcpadMcp {
                 bridge: bridge.clone(),
+                reference: reference.clone(),
             })
         },
         Arc::new(LocalSessionManager::default()),
@@ -361,6 +415,7 @@ mod tests {
     fn approval_tool_is_never_auto_approved() {
         let names = auto_approved_tools();
         assert!(names.contains(&"get_document"));
+        assert!(names.contains(&reference::TOOL));
         assert!(!names.contains(&APPROVAL_TOOL));
     }
 
