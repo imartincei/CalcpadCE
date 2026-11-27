@@ -3,6 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { resolveVersion, rpmVersion, windowsInstallerVersion } from '../../../tools/version.mjs';
+import { stageAgentDocs } from '../../../tools/agent-docs.mjs';
 
 const directory = fileURLToPath(new URL('.', import.meta.url));
 const [command, ...rawArgs] = process.argv.slice(2);
@@ -21,6 +22,10 @@ function run(executable, arguments_) {
     const result = spawnSync(executable, arguments_, { cwd: directory, env: process.env, stdio: 'inherit' });
     if (result.error) throw result.error;
     if (result.status !== 0) process.exit(result.status ?? 1);
+}
+
+if (command === 'dev' || command === 'build') {
+    stageAgentDocs({ outDir: resolve(directory, 'src-tauri/agent-docs'), version: process.env.CALCPAD_VERSION });
 }
 
 if (command === 'dev' || (command === 'build' && stagedIndex === -1)) {

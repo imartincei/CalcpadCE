@@ -19,6 +19,8 @@
 !macroend
 
 !macro NSIS_HOOK_PREINSTALL
+  RMDir /r "$INSTDIR\agent-docs"
+  RMDir /r "$INSTDIR\agent-plugins"
   InitPluginsDir
   File /oname=$PLUGINSDIR\install-dotnet.ps1 "${CALCPAD_DOTNET_HOOK_DIR}\install-dotnet.ps1"
   File /oname=$PLUGINSDIR\runtimeconfig.json "${CALCPAD_DOTNET_HOOK_DIR}\..\..\src-tauri\binaries\Calcpad.Server.runtimeconfig.json"

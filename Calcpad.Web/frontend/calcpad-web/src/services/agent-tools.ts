@@ -1,6 +1,8 @@
 import * as monaco from 'monaco-editor';
 import type { EditorGroup } from '../editor/editor-group';
 import type { TabState } from '../tabs/tab-manager';
+import type { ConvertResult, LintResponse } from 'calcpad-frontend/types/api';
+import { checkResult, renderResult } from './agent-report';
 
 /** What the agent tools need from main.ts's editor groups. */
 export interface AgentEditorContext {
@@ -12,6 +14,9 @@ export interface AgentEditorContext {
     /** Closes a worksheet's tab without saving. */
     closeDocument(path: string): void;
     pathExists(path: string): Promise<boolean>;
+    lint(content: string, sourceFilePath?: string): Promise<LintResponse | null>;
+    /** Runs a worksheet as a print report with line anchors, never firing `#write`. */
+    run(content: string, sourceFilePath?: string): Promise<ConvertResult | null>;
 }
 
 export interface DocRef {
@@ -130,13 +135,14 @@ function getDiagnostics(doc: DocRef) {
     return {
         path: doc.tab.filePath ?? doc.tab.title,
         diagnostics: markers.map(m => ({
+            source: m.owner === 'calcpad-run' ? 'runtime' : 'linter',
             severity: SEVERITY[m.severity] ?? 'info',
             line: m.startLineNumber,
             column: m.startColumn,
             endLine: m.endLineNumber,
             endColumn: m.endColumn,
             code: typeof m.code === 'string' ? m.code : m.code?.value,
-            message: m.message.replace(/^\[Linter\] /, ''),
+            message: m.message.replace(/^\[(Linter|Runtime)\] /, ''),
         })),
     };
 }
@@ -252,6 +258,18 @@ export async function runEditorTool(ctx: AgentEditorContext, tool: string, args:
             return getSelection(ctx);
         case 'get_diagnostics':
             return getDiagnostics(await resolveDoc(ctx, args.path));
+        case 'check_worksheet': {
+            const doc = await resolveDoc(ctx, args.path);
+            const text = doc.model.getValue();
+            const source = doc.tab.filePath ?? undefined;
+            const [lint, run] = await Promise.all([ctx.lint(text, source), ctx.run(text, source)]);
+            return checkResult(doc.tab.filePath ?? doc.tab.title, lint, run);
+        }
+        case 'render_worksheet': {
+            const doc = await resolveDoc(ctx, args.path);
+            const run = await ctx.run(doc.model.getValue(), doc.tab.filePath ?? undefined);
+            return renderResult(doc.tab.filePath ?? doc.tab.title, run);
+        }
         case 'open_document': {
             if (typeof args.path !== 'string' || !args.path) throw new Error('`path` is required.');
             await ctx.openFile(args.path);

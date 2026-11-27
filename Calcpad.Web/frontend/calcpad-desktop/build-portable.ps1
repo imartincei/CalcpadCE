@@ -64,7 +64,7 @@ Get-ChildItem -Path $ReleaseDir -File |
     } |
     Copy-Item -Destination $StageDir
 
-foreach ($sub in 'bg', 'zh', 'Fonts') {
+foreach ($sub in 'bg', 'zh', 'Fonts', 'agent-docs') {
     $srcSub = Join-Path $ReleaseDir $sub
     if (Test-Path $srcSub) {
         Copy-Item -Recurse -Path $srcSub -Destination (Join-Path $StageDir $sub)

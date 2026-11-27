@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use serde_json::{json, Value};
 
-use super::harness::{Launch, RESTRICTED_PROMPT, SKILL_PROMPT, SYSTEM_PROMPT};
+use super::harness::{Launch, RESTRICTED_PROMPT, SYSTEM_PROMPT};
 use super::mcp::{auto_approved_tools, APPROVAL_TOOL, SERVER_NAME};
 use super::process::{self, truncate, Link};
 use super::{AgentBackend, AgentEvent, StartOptions};
@@ -67,11 +67,7 @@ impl ClaudeCodeSession {
     }
 }
 
-pub fn build_args(
-    options: &StartOptions,
-    mcp_config: &Path,
-    plugin_dir: Option<&Path>,
-) -> Vec<String> {
+pub fn build_args(options: &StartOptions, mcp_config: &Path) -> Vec<String> {
     let mut args: Vec<String> = [
         "-p",
         "--input-format",
@@ -106,18 +102,11 @@ pub fn build_args(
     args.push("--disallowedTools".into());
     args.push(disallowed.join(","));
     let mut prompt = SYSTEM_PROMPT.to_string();
-    if plugin_dir.is_some() {
-        prompt.push_str(SKILL_PROMPT);
-    }
     if restricted {
         prompt.push_str(RESTRICTED_PROMPT);
     }
     args.push("--append-system-prompt".into());
     args.push(prompt);
-    if let Some(dir) = plugin_dir {
-        args.push("--plugin-dir".into());
-        args.push(dir.to_string_lossy().into_owned());
-    }
     if let Some(model) = options.model.as_deref().filter(|m| !m.trim().is_empty()) {
         args.push("--model".into());
         args.push(model.trim().into());
@@ -260,11 +249,7 @@ pub fn start(launch: Launch) -> Result<ClaudeCodeSession, String> {
 
     let mut command = process::command(&launch.exe, &launch.cwd);
     command
-        .args(build_args(
-            &launch.options,
-            &config_path,
-            launch.plugin_dir.as_deref(),
-        ))
+        .args(build_args(&launch.options, &config_path))
         .env("CLAUDE_CODE_STARTUP_FAILURE_RESULTS", "1");
     let link = process::spawn(
         &launch.app,
@@ -402,11 +387,7 @@ mod tests {
             resume: Some("abc".into()),
             ..Default::default()
         };
-        let args = build_args(
-            &options,
-            Path::new("/tmp/mcp.json"),
-            Some(Path::new("/res/agent-plugins/calcpadce")),
-        );
+        let args = build_args(&options, Path::new("/tmp/mcp.json"));
         let value_after = |flag: &str| {
             let i = args.iter().position(|a| a == flag).unwrap();
             args[i + 1].clone()
@@ -420,11 +401,12 @@ mod tests {
         assert_eq!(value_after("--permission-mode"), "auto");
         assert!(value_after("--disallowedTools").contains("Bash"));
         assert!(value_after("--disallowedTools").contains("Write"));
-        assert!(value_after("--append-system-prompt").contains("calcpad-generator"));
+        assert!(value_after("--append-system-prompt").contains("calcpad_reference"));
+        assert!(!args.contains(&"--plugin-dir".to_string()));
         assert!(args.contains(&"--strict-mcp-config".to_string()));
         assert!(value_after("--allowedTools").contains("mcp__calcpad__get_document"));
         assert!(!value_after("--allowedTools").contains("approve_tool"));
-        let manual = build_args(&StartOptions::default(), Path::new("/tmp/mcp.json"), None);
+        let manual = build_args(&StartOptions::default(), Path::new("/tmp/mcp.json"));
         let i = manual
             .iter()
             .position(|a| a == "--disallowedTools")

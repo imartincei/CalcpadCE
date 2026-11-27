@@ -9,11 +9,12 @@ use super::detect::{self, Extra};
 use super::mcp::McpEndpoint;
 use super::{acp, claude_code, codex, pi, AgentBackend, SessionKey, StartOptions};
 
-pub const SYSTEM_PROMPT: &str = "You are running inside the CalcpadCE desktop app, next to the user's open worksheets. \
-Use the calcpad MCP tools to work with them: read open worksheets with get_document (it includes unsaved changes) rather than from disk, \
-check get_diagnostics after changes, and change worksheets (.cpd files) only with propose_edit, never by writing the file: it opens worksheets that aren't open yet, creates new ones from a path and full text, and shows the user a diff to accept.";
-pub const SKILL_PROMPT: &str = " Use the calcpad-generator skill for Calcpad syntax.";
-pub const RESTRICTED_PROMPT: &str = " You cannot run shell commands or write files in this mode; change only worksheets open in Calcpad, with propose_edit.";
+pub const SYSTEM_PROMPT: &str = "You are in the CalcpadCE desktop app. \
+Work on the user's worksheets (.cpd) only through the calcpad MCP tools: read them with get_document, not from disk, and change them only with propose_edit, never by writing files. \
+Before writing or reviewing Calcpad, call calcpad_reference once with no arguments.";
+
+pub const RESTRICTED_PROMPT: &str =
+    " In this mode you cannot run commands or write files; propose_edit is the only way to make changes.";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Harness {
@@ -113,8 +114,6 @@ pub struct Launch {
     pub options: StartOptions,
     pub mcp: McpEndpoint,
     pub data_dir: PathBuf,
-    /// Bundled Claude Code plugin with the calcpad-generator skill.
-    pub plugin_dir: Option<PathBuf>,
 }
 
 impl Launch {
@@ -123,15 +122,6 @@ impl Launch {
             self.options.permission_mode.as_deref(),
             Some("acceptEdits" | "auto" | "plan")
         )
-    }
-
-    pub fn skill_dir(&self) -> Option<PathBuf> {
-        let dir = self
-            .plugin_dir
-            .as_ref()?
-            .join("skills")
-            .join("calcpad-generator");
-        dir.join("SKILL.md").is_file().then_some(dir)
     }
 }
 
@@ -353,6 +343,11 @@ mod tests {
         assert!(Harness::Pi.mode("auto").is_ok());
         assert!(Harness::Pi.mode("plan").is_err());
         assert!(Harness::Codex.mode("auto").is_err());
+    }
+
+    #[test]
+    fn every_harness_is_told_about_the_reference_tool() {
+        assert!(SYSTEM_PROMPT.contains(super::super::reference::TOOL));
     }
 
     #[test]

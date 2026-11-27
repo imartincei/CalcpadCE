@@ -2633,6 +2633,13 @@ async function bootstrap(): Promise<void> {
                 const { invoke } = await import('@tauri-apps/api/core');
                 return invoke<boolean>('agent_path_exists', { path });
             },
+            lint: (content, sourceFilePath) => activeBridge.api.lint(content, sourceFilePath,
+                { isComplex: activeBridge.getSettings().math.isComplex }),
+            run: async (content, sourceFilePath) => {
+                const result = await activeBridge.api.convert(content, buildApiSettings(activeBridge.getSettings()),
+                    'html', true, sourceFilePath, undefined, undefined, true, { write: false });
+                return result instanceof ArrayBuffer ? null : result;
+            },
         });
 
         // Files-tab clicks arrive via a custom event dispatched by the bridge.

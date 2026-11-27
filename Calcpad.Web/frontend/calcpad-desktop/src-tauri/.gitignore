@@ -7,3 +7,6 @@
 # Sidecar binaries populated by build-desktop.{sh,ps1}; large and per-platform
 /binaries/*
 !/binaries/.gitkeep
+
+# Docs for the agent, staged by desktop.mjs
+/agent-docs/
