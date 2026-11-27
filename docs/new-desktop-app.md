@@ -66,6 +66,7 @@ How tabs behave:
 - **Opening an already-open file** activates its existing tab instead of duplicating it.
 - **Opening a file from an empty Untitled tab** replaces it in place rather than stacking a new tab.
 - **Closing a tab with unsaved changes** prompts Save / Don't Save / Cancel. Quitting the app walks through every unsaved tab; cancel any prompt to abort the quit.
+- **Dragging a tab** reorders it, moves it to another CalcpadCE window, or opens it in a new window. Drop it on the top or bottom third of an editor to [split the editor](#splitting-the-editor).
 
 ## Opening files
 
@@ -77,6 +78,29 @@ There are several ways to open documents:
 
 Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type.
 See [UI Mode](new-ui-mode.md#compiled-cpdz-worksheets).
+
+### The Files tab
+
+Click **Open Folder** to browse a folder, and **Open Another Folder** to show a second one below it.
+Each folder has its own **Collapse**, **Refresh**, **Collapse All** and **Close Folder** buttons.
+Every window shares the same opened folders.
+
+Right-click a file to insert a reference to it at the cursor, with a relative or absolute path:
+
+| File type | Menu items |
+| --------- | ---------- |
+| `.cpd`, `.txt` | **Insert #include** |
+| `.csv`, `.tsv`, `.xlsx`, `.xlsm`, `.xls`, `.txt` | **Insert #read** |
+| `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg` | **Insert Image** |
+
+### Files changed by other programs
+
+When another program changes an open file, the tab reloads it.
+If the tab has unsaved edits, saving it asks which version to keep:
+
+- **Keep Mine** — keep your edits and overwrite the file on disk.
+- **Keep Theirs** — discard your edits and load the file from disk.
+- **Keep Both** — save each version as a copy next to the file.
 
 ## The editor
 
@@ -122,6 +146,50 @@ The **Split ⬓** button beside the result modes opens a second editor group sta
 Each group has its own tabs, tab strip, preview, and Problems markers.
 Click **Unsplit** (same button) to close the bottom group; any unsaved tabs in it are walked through the save prompt first.
 The active group drives the sidebar.
+
+You can also split by dragging a tab onto the top or bottom third of an editor.
+
+## Agent chat
+
+The agent chat panel lets an AI coding agent read, check, and edit your CalcpadCE files.
+It drives an agent CLI you already have installed: **Claude Code**, **Codex**, **GitHub Copilot**, **Gemini CLI**, **opencode** or **pi**.
+
+Toggle the panel with the sparkle button at the right end of the status bar.
+
+### Setting up
+
+Click the panel's **Settings** button to choose the **Agent** and, where the agent offers more than one, the **Model**.
+Installed agents are found automatically.
+If one is not found, you can enter the full path to its executable.
+
+### How the agent works with your files
+
+The agent works through a local MCP server.
+It can read the open CalcpadCE files, check them for errors, and propose edits.
+It can also open files that aren't open yet and create new files as unsaved tabs.
+
+Pick a permission mode below the message box, or press **Shift+Tab** in it to cycle through them:
+
+| Mode | What the agent can do |
+| ---- | --------------------- |
+| **Manual** | Asks before running commands or editing. Each edit shows a diff to **Accept** or **Reject**. |
+| **Edit automatically** | Applies edits to CalcpadCE files without review. Commands and other file writes are blocked. |
+| **Plan mode** | Reads and proposes a plan, with **Approve plan** and **Keep planning** buttons. No edits are made. Not available for pi. |
+| **Auto mode** | Works without asking, changing only CalcpadCE files. Claude Code and pi only. |
+
+Each file is backed up before the agent first changes it.
+The **Changes** button lists every file changed in the conversation, with a diff against the backup and buttons to keep or revert each change, or **Keep all** and **Revert all**.
+
+Edits the agent makes with its own file tools instead of the CalcpadCE edit tool are not tracked.
+Manual mode asks before allowing them, and the automatic modes block them.
+
+### Conversations
+
+Each conversation opens in its own tab.
+Use **New conversation** to start one and **Conversation history** to reopen a saved one.
+The agent can show a plan, ask questions with answer cards, and keep a todo checklist in the chat.
+
+Claude Code and pi get a bundled `calcpad-generator` skill that teaches them CalcpadCE syntax.
 
 ## Errors
 

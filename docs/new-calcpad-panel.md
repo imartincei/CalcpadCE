@@ -33,6 +33,27 @@ Typing filters the list; clicking an item inserts it at the cursor.
 Function entries insert with placeholders.
 The **Symbol Palette** section is a condensed version of the symbols dropdown that allows inserting symbols by how they appear in the text.
 An **Insert Image** button opens a file picker and inserts an `<img>` tag with the selected path.
+Press **Alt+I** to jump to the search field.
+
+Click the ☆ beside an item to add it to the **Favorites** section at the top of the tab.
+Favorites are also listed first in autocomplete, marked with ★.
+
+Click the **~** beside an item to add or remove its [quick-type](new-calcpadce-editor.md#quick-type-symbols) keys.
+A key that is already used by another item can't be saved.
+
+#### Custom snippets
+
+**Custom Snippets** is the last category in the tab, and its items also show in autocomplete.
+Click **Add custom snippet** to create one, or use **Save as Custom Snippet** from the [Variables](#variables) tab or the editor's right-click menu.
+
+Like built-in items, each custom snippet has:
+
+* **Name**, **Description** and **Example**
+* **Type** — Text, Function, Macro, Variable or Unit
+* **Inserted text** — `§` marks where each parameter goes
+* **Parameters** — a name, type and description for each, filling the `§` placeholders in order
+* **Return type** (functions) or **Value type**
+* **Quick type** keys
 
 ### Variables
 
@@ -45,6 +66,7 @@ Lists everything the current document defines, grouped and counted:
 
 Entries are from the active document (and its `#include` files).  
 Click any entry to insert its name at the cursor.
+Right-click an entry and choose **Save as Custom Snippet** to add it to the Insert tab's [custom snippets](#custom-snippets).
 
 ### Properties
 
@@ -84,7 +106,8 @@ See [Exports](new-exports.md) for what each rendering captures, which formats it
 
 ## Settings
 
-The **Settings** tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Linter, Diagnostics, and named configurations.  
+The **Settings** tab is the single place to control the calculation engine and the editor — Math, Plot, Units, Server, themes, Editor features, Keyboard Shortcuts, Linter, Diagnostics, and named configurations.  
+Starred settings are pinned to a **Favorites** section at the top, and any setting can be given a hotkey.
 See [Settings](new-settings.md) for the full reference.
 
 ## See also

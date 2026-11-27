@@ -125,8 +125,10 @@ The **Export** tab of the panel holds every export, and these are also reachable
 
 ## Settings
 
-All CalcpadCE settings — math, plot, units, preview and color themes, editor features, linter severity, and named configurations — live in the **Settings** tab of the CalcpadCE panel, **not** in VS Code's normal settings editor.
+All CalcpadCE settings live in the **Settings** tab of the CalcpadCE panel, **not** in VS Code's normal settings editor.
 Editing them there keeps them in sync with the extension and the server.
+
+Hotkeys changed in **Settings → [Keyboard Shortcuts](new-settings.md#keyboard-shortcuts)** are copied into your VS Code `keybindings.json`.
 
 See **[The CalcpadCE Panel & Settings → Settings](new-calcpad-panel.md#settings)** for the full list.
 

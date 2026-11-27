@@ -20,6 +20,12 @@ A custom function body is checked at its first call: every variable the body use
 If one is not, the linter marks both the call and the variable in the function body.
 A function that is never called is checked at the end of the document.
 
+## Errors inside included files
+
+An error in an included file is marked across the whole `#include` line, with the file and line number at the start of the message.
+If the included file is open in another tab, the error is also marked there, linked back to the file that includes it.
+Hover over an error and click the **Source:** file to jump to the error in that file.
+
 ## Diagnostic codes
 
 Every diagnostic has a `CPD-` code.
