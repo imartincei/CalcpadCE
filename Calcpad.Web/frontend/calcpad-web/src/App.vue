@@ -475,8 +475,8 @@
         summary=""
         :original="agentChat.reviewChange.baseline"
         :modified="agentChat.reviewChange.current"
-        @revert="revertChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
-        @keep="keepChange(agentChat.reviewChange.conversationId, agentChat.reviewChange.key)"
+        @revert="revertChange(agentChat.reviewChange.key)"
+        @keep="keepChange(agentChat.reviewChange.key)"
         @close="closeChangeDiff"
       />
     </template>

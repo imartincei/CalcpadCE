@@ -293,12 +293,15 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
             await until(() => app.evaluate(main, `(() => {
                 const frame = document.querySelector('.preview-frame:not(.preview-frame-back)');
                 if (!frame?.srcdoc) return null;
+                document.querySelector('[data-history-target]')?.removeAttribute('data-history-target');
+                frame.setAttribute('data-history-target', '');
                 frame.focus();
                 return true;
             })()`), 'history preview ready');
+            // A re-render may swap the focused frame to the back; only it may forward the input.
             const {root} = await app.cdp(main, 'DOM.getDocument', {depth: -1, pierce: true});
             const findPreview = node => {
-                if (node.nodeName === 'IFRAME' && node.attributes.includes('preview-frame')) return node.frameId;
+                if (node.nodeName === 'IFRAME' && node.attributes.includes('data-history-target')) return node.frameId;
                 for (const child of node.children ?? []) {
                     const frameId = findPreview(child);
                     if (frameId) return frameId;
@@ -470,10 +473,10 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         await app.stop(main, 'main');
     });
 
-    test('dropping a tab onto a different open version preserves both documents', {timeout: 90000}, async t => {
+    test('a file open in two windows stays in sync and dropping its tab joins the other copy', {timeout: 90000}, async t => {
         const app = new TestApp();
         t.after(() => app.dispose());
-        const file = app.fixture('conflicting worksheet.cpd', 'saved = 1');
+        const file = app.fixture('synced worksheet.cpd', 'saved = 1');
         const main = await app.start([file]);
         await app.fileOpen(main, file);
         const second = await app.newWindow(main);
@@ -481,18 +484,20 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
             detail: {path: ${JSON.stringify(file)}}
         }))`);
         await app.fileOpen(second.page, file);
+        const value = page => app.evaluate(page, 'window.calcpadActiveEditor.getValue()');
         await app.evaluate(main, "window.calcpadActiveEditor.setValue('source = 2')");
+        await until(async () => await value(second.page) === 'source = 2', 'edit synced to second window');
         await app.evaluate(second.page, "window.calcpadActiveEditor.setValue('destination = 3')");
+        await until(async () => await value(main) === 'destination = 3', 'edit synced to main window');
+        assert.equal(await app.evaluate(main, 'window.calcpadTabs.isDirty()'), true);
         const tabId = await app.evaluate(main, 'window.calcpadTabs.activeId');
         await dragTab(app, main, tabId, second.page, null);
-        await until(() => app.evaluate(second.page, "document.body.textContent.includes('already has a different version open')"), 'conflict reported');
-        assert.equal(await app.evaluate(main, 'window.calcpadActiveEditor.getValue()'), 'source = 2');
-        assert.equal(await app.evaluate(second.page, 'window.calcpadActiveEditor.getValue()'), 'destination = 3');
-        for (const page of [main, second.page]) {
-            assert.equal(await app.evaluate(page, 'window.calcpadTabs.count'), 1);
-            assert.equal(await app.evaluate(page, 'window.calcpadTabs.activeTab.filePath'), file);
-            assert.equal(await app.evaluate(page, 'window.calcpadTabs.isDirty()'), true);
-        }
+        await until(async () => !(await app.evaluate(main, 'window.calcpadTabs.all')).some(tab => tab.filePath === file), 'source tab removed');
+        assert.equal(await app.evaluate(second.page, 'window.calcpadTabs.count'), 1);
+        assert.equal(await app.evaluate(second.page, 'window.calcpadTabs.activeTab.filePath'), file);
+        assert.equal(await app.evaluate(second.page, 'window.calcpadTabs.isDirty()'), true);
+        assert.equal(await value(second.page), 'destination = 3');
+        assert.equal(await app.evaluate(second.page, "document.body.textContent.includes('already has a different version open')"), false);
         assert.equal(readFileSync(file, 'utf8'), 'saved = 1');
         for (const page of [main, second.page]) await app.evaluate(page, "window.calcpadBridge.confirmThreeWay = async () => 'no'");
         await app.closeAndWait(main, 'main');
