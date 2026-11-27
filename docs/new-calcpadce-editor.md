@@ -26,6 +26,8 @@ As you type, the completion list offers:
 - **Setting keys** (`decimals`, `degrees`, `complex`, `units`, `colorScale`, …) where a setting is expected.
 - **[Metadata keys](new-metadata-comments.md)** inside an HTML-comment block placed directly above a definition.
   The **Properties** panel tab also edits these through a form.
+- **[Favorites](new-calcpad-panel.md#insert)** first, marked with ★.
+- **[Custom snippets](new-calcpad-panel.md#custom-snippets)** alongside the built-in ones.
 
 ## Quick-type symbols
 
@@ -33,6 +35,14 @@ Type `~` followed by a key and press **space** to insert a Greek letter or math 
 For example `~a` + space → `α`, `~p` + space → `π`, `~S` + space → `Σ`.
 The full set is shown in the **Insert** tab's Symbol Palette.
 Toggle this with the `quickTyping` setting in the CalcpadCE **Settings** tab.
+
+Any Insert tab item can have quick-type keys: click the **~** beside it to add or remove them.
+
+## Custom Snippets
+
+You can right-click variables, custom units, custom functions, or macros and save it as a custom snippet.
+Metadata comments for these items will be inserted into the custom snippet form where they exist.
+See **[Custom snippets](new-calcpad-panel.md#custom-snippets)** for more information.
 
 ## Operator replacement and auto-indent
 
@@ -61,7 +71,7 @@ Whether HTML or Markdown is emitted depends on the `commentFormat` setting (`aut
 | **Ctrl+Shift+V** | Paste as comment (each line prefixed with `'`) |
 
 On macOS use **Cmd** instead of **Ctrl**.
-Turn the whole set off with the `enableFormattingHotkeys` setting if it conflicts with your other bindings.
+Rebind any of them in **Settings → [Keyboard Shortcuts](new-settings.md#keyboard-shortcuts)**, or turn the whole set off with the `enableFormattingHotkeys` setting if it conflicts with your other bindings.
 
 ## Navigating symbols
 

@@ -3,6 +3,15 @@
 The [Settings](new-calcpad-panel.md#settings) tab is the single place to control the calculation engine and the editor.
 In VS Code, do not use VS Code's own settings editor.
 
+## Favorites and setting hotkeys
+
+Click the ☆ beside a setting to pin it to the **Favorites** section at the top of the tab.
+
+Click the ⌨ beside a setting to give it a hotkey.
+For an on/off setting, the hotkey turns it on and off.
+For any other setting, the hotkey opens it in the Settings tab.
+See [Keyboard Shortcuts](#keyboard-shortcuts) for more information.
+
 ## Math
 
 | Setting | Values | Meaning |
@@ -94,6 +103,14 @@ Pick the Monaco editor's font family from:
 - **Show File Metadata** *(default off)* — show the [metadata footer](new-metadata-comments.md#file-metadata-footer) at the end of the file. Edit it in the [Properties tab](new-calcpad-panel.md#properties).
 - **Show UI Override Hints** *(default off)* — show [saved input values](new-ui-mode.md#saving-what-was-entered) above the lines they apply to. Click one to edit it in the [Properties tab](new-calcpad-panel.md#properties).
 - **Auto-Sync #UI Values** *(default off)* — keep `#UI` line defaults and the input form in sync. See [Auto-syncing values with the CalcpadCE file](new-ui-mode.md#auto-syncing-values-with-the-calcpadce-file).
+
+## Keyboard Shortcuts
+
+Lists every CalcpadCE hotkey, including defaults and customized ones.
+Click a row's hotkey and press the new key combination.
+A hotkey needs Ctrl, Alt, or Meta (Cmd on macOS) or a function key, and one that is already used can't be saved.
+
+In VS Code, changes are also written to your `keybindings.json`.
 
 ## Data output
 

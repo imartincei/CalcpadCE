@@ -318,6 +318,13 @@ A grid is a third-party widget, so a `style` class reaches its outer container b
 
 There is limited customization available using the datagrid properties, and more customization is planned.
 
+## Undo and redo
+
+Press **Ctrl+Z** to undo a value entered into the input form, and **Ctrl+Y** or **Ctrl+Shift+Z** to redo it.
+**Undo** and **Redo** are also in the form's right-click menu and the datagrid menu.
+While you are still typing in a box, Ctrl+Z undoes the typing in that box first.
+The form's history is kept per tab, apart from the editor's own undo history.
+
 ## Saving what was entered
 
 Saving input values writes them into a metadata comment at the end of the document, which is what restores them the next time you open it:
@@ -441,7 +448,7 @@ Inside a loop each pass renders its own control, and each is entered separately:
 
 ## `#pause` in UI mode
 
-The input form recalculates the whole document every time a value changes. 
+The input form recalculates the whole document every time a value changes.
 Put `#pause` after inputs that come before something slow such as a long loop, a large matrix solve, heavy JavaScript, etc. 
 The form stops there, so editing values stays responsive, and the slow part runs only once the user presses Next.
 
