@@ -47,8 +47,8 @@ export class TestApp {
         mkdirSync(this.fixtures, {recursive: true});
     }
 
-    async start(args = []) {
-        const deadline = Date.now() + 60000;
+    async start(args = [], timeoutMs = 60000) {
+        const deadline = Date.now() + timeoutMs;
         this.windowStates = [];
         this.port = await unusedPort();
         this.endpoint = `http://127.0.0.1:${this.port}`;

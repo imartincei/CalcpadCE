@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { describe, test } from 'node:test';
+import { before, describe, test } from 'node:test';
 import { TestApp, invoke, pause, until } from './test-app.mjs';
 
 async function dragTab(app, source, tabId, target, beforeId, {cancel = false, outside = false} = {}) {
@@ -27,6 +27,18 @@ async function dragTab(app, source, tabId, target, beforeId, {cancel = false, ou
 }
 
 describe('desktop windows', {skip: process.platform !== 'win32', concurrency: false}, () => {
+    // First launch on a fresh runner can exceed a test's budget (cold WebView2, .NET and AV scans).
+    before(async () => {
+        const app = new TestApp();
+        try {
+            const main = await app.start([], 180000);
+            await until(() => app.evaluate(main, invoke('server_url')), 'warm-up server', 60000).catch(() => {});
+            await app.stop(main, 'main');
+        } finally {
+            app.dispose();
+        }
+    }, {timeout: 300000});
+
     test('Ctrl-click reuses includes and definitions in another window', {timeout: 90000}, async t => {
         const app = new TestApp();
         t.after(() => app.dispose());
