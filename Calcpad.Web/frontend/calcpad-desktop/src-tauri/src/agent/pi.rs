@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use serde_json::{json, Value};
 
-use super::harness::{Launch, RESTRICTED_PROMPT, SKILL_PROMPT, SYSTEM_PROMPT};
+use super::harness::{Launch, RESTRICTED_PROMPT, SYSTEM_PROMPT};
 use super::mcp::auto_approved_tools;
 use super::process::{self, truncate, Link};
 use super::{AgentBackend, AgentEvent, ModelOption};
@@ -53,10 +53,6 @@ pub fn build_args(launch: &Launch, extension: &std::path::Path) -> Vec<String> {
     let restricted = launch.is_restricted();
     let mut excluded = ALWAYS_EXCLUDED.to_vec();
     let mut prompt = SYSTEM_PROMPT.to_string();
-    let skill = launch.skill_dir();
-    if skill.is_some() {
-        prompt.push_str(SKILL_PROMPT);
-    }
     if restricted {
         excluded.extend_from_slice(RESTRICTED_EXCLUDED);
         prompt.push_str(RESTRICTED_PROMPT);
@@ -85,10 +81,6 @@ pub fn build_args(launch: &Launch, extension: &std::path::Path) -> Vec<String> {
         "--append-system-prompt".into(),
         prompt,
     ];
-    if let Some(dir) = skill {
-        args.push("--skill".into());
-        args.push(dir.to_string_lossy().into_owned());
-    }
     if let Some(model) = launch
         .options
         .model

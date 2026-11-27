@@ -41,8 +41,7 @@
       "binaries/Fonts/**/*": "./Fonts/",
       "binaries/bg/**/*": "./bg/",
       "binaries/zh/**/*": "./zh/",
-      "../../../../.claude/skills/calcpad-generator/SKILL.md": "agent-plugins/calcpadce/skills/calcpad-generator/SKILL.md",
-      "../../../../.claude/skills/calcpad-generator/reference/*": "agent-plugins/calcpadce/skills/calcpad-generator/reference/"
+      "agent-docs/*": "agent-docs/"
     },
     "icon": [
       "icons/32x32.png",

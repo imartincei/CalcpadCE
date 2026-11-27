@@ -1,6 +1,8 @@
 import * as monaco from 'monaco-editor';
 import type { EditorGroup } from '../editor/editor-group';
 import type { TabState } from '../tabs/tab-manager';
+import type { ConvertResult, LintResponse } from 'calcpad-frontend/types/api';
+import { checkResult, renderResult } from './agent-report';
 
 /** What the agent tools need from main.ts's editor groups. */
 export interface AgentEditorContext {
@@ -12,6 +14,9 @@ export interface AgentEditorContext {
     /** Closes a worksheet's tab without saving. */
     closeDocument(path: string): void;
     pathExists(path: string): Promise<boolean>;
+    lint(content: string, sourceFilePath?: string): Promise<LintResponse | null>;
+    /** Runs a worksheet as a print report with line anchors, never firing `#write`. */
+    run(content: string, sourceFilePath?: string): Promise<ConvertResult | null>;
 }
 
 export interface DocRef {
@@ -25,6 +30,22 @@ export interface PreparedEdit {
     original: string;
     modified: string;
     summary: string;
+    /** The worksheet changed since this conversation last read it. */
+    stale?: boolean;
+}
+
+/** Text a conversation last read or wrote, per editor model. */
+export type ReadLog = WeakMap<monaco.editor.ITextModel, string>;
+
+export const STALE_NOTE = 'This worksheet changed since you last read it, by the user or another conversation. Call get_document before relying on its text or line numbers.';
+
+function changedSinceRead(log: ReadLog, doc: DocRef): boolean {
+    const seen = log.get(doc.model);
+    return seen !== undefined && seen !== doc.model.getValue();
+}
+
+function withStaleNote<T extends object>(log: ReadLog, doc: DocRef, result: T): T | T & { stale: string } {
+    return changedSinceRead(log, doc) ? { ...result, stale: STALE_NOTE } : result;
 }
 
 /** A new worksheet; its tab is opened only once the edit is accepted. */
@@ -130,13 +151,14 @@ function getDiagnostics(doc: DocRef) {
     return {
         path: doc.tab.filePath ?? doc.tab.title,
         diagnostics: markers.map(m => ({
+            source: m.owner === 'calcpad-run' ? 'runtime' : 'linter',
             severity: SEVERITY[m.severity] ?? 'info',
             line: m.startLineNumber,
             column: m.startColumn,
             endLine: m.endLineNumber,
             endColumn: m.endColumn,
             code: typeof m.code === 'string' ? m.code : m.code?.value,
-            message: m.message.replace(/^\[Linter\] /, ''),
+            message: m.message.replace(/^\[(Linter|Runtime)\] /, ''),
         })),
     };
 }
@@ -164,7 +186,7 @@ function countOccurrences(haystack: string, needle: string): number {
 }
 
 /** Builds the proposed text without changing the editor (it may open the worksheet). Throws a message the agent can act on. */
-export async function prepareEdit(ctx: AgentEditorContext, args: Args): Promise<ProposedEdit> {
+export async function prepareEdit(ctx: AgentEditorContext, args: Args, log: ReadLog): Promise<ProposedEdit> {
     const summary = typeof args.summary === 'string' ? args.summary : '';
     const path = typeof args.path === 'string' ? args.path.trim() : '';
     if (path && isAbsolutePath(path) && !isOpen(ctx, path) && !await ctx.pathExists(path)) {
@@ -177,6 +199,9 @@ export async function prepareEdit(ctx: AgentEditorContext, args: Args): Promise<
     const original = doc.model.getValue();
     let modified: string;
     if (typeof args.text === 'string') {
+        if (original.trim() && log.get(doc.model) !== original) {
+            throw new Error('The worksheet changed since you last read it, or you have not read it with get_document. Call get_document and redo the edit on the current text, so changes by the user or another conversation are kept.');
+        }
         modified = args.text;
     } else if (Array.isArray(args.edits) && args.edits.length) {
         modified = original;
@@ -196,7 +221,7 @@ export async function prepareEdit(ctx: AgentEditorContext, args: Args): Promise<
         throw new Error('Provide either `edits` or the full `text`.');
     }
     if (modified === original) throw new Error('The proposed edit does not change the document.');
-    return { doc, original, modified, summary };
+    return { doc, original, modified, summary, stale: changedSinceRead(log, doc) };
 }
 
 function isOpen(ctx: AgentEditorContext, path: string): boolean {
@@ -240,18 +265,34 @@ export function applyEdit(edit: PreparedEdit): void {
     model.pushStackElement();
 }
 
-export async function runEditorTool(ctx: AgentEditorContext, tool: string, args: Args): Promise<unknown> {
+export async function runEditorTool(ctx: AgentEditorContext, tool: string, args: Args, log: ReadLog): Promise<unknown> {
     switch (tool) {
         case 'list_open_documents':
             return listOpenDocuments(ctx);
         case 'get_document': {
             const doc = await resolveDoc(ctx, args.path);
-            return { ...describe(doc), text: doc.model.getValue() };
+            const text = doc.model.getValue();
+            log.set(doc.model, text);
+            return { ...describe(doc), text };
         }
         case 'get_selection':
             return getSelection(ctx);
-        case 'get_diagnostics':
-            return getDiagnostics(await resolveDoc(ctx, args.path));
+        case 'get_diagnostics': {
+            const doc = await resolveDoc(ctx, args.path);
+            return withStaleNote(log, doc, getDiagnostics(doc));
+        }
+        case 'check_worksheet': {
+            const doc = await resolveDoc(ctx, args.path);
+            const text = doc.model.getValue();
+            const source = doc.tab.filePath ?? undefined;
+            const [lint, run] = await Promise.all([ctx.lint(text, source), ctx.run(text, source)]);
+            return withStaleNote(log, doc, checkResult(doc.tab.filePath ?? doc.tab.title, lint, run));
+        }
+        case 'render_worksheet': {
+            const doc = await resolveDoc(ctx, args.path);
+            const run = await ctx.run(doc.model.getValue(), doc.tab.filePath ?? undefined);
+            return withStaleNote(log, doc, renderResult(doc.tab.filePath ?? doc.tab.title, run));
+        }
         case 'open_document': {
             if (typeof args.path !== 'string' || !args.path) throw new Error('`path` is required.');
             await ctx.openFile(args.path);

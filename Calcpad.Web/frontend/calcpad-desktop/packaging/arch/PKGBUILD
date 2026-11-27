@@ -60,6 +60,8 @@ package() {
     install -Dm644 -t "$libdir/bg" "$bindir"/bg/*
     install -Dm644 -t "$libdir/zh" "$bindir"/zh/*
 
+    install -Dm644 -t "$libdir/agent-docs" "$_srcroot/src-tauri/agent-docs"/*
+
     install -Dm644 "$srcdir/CalcpadCE.desktop" \
         "$pkgdir/usr/share/applications/CalcpadCE.desktop"
 
