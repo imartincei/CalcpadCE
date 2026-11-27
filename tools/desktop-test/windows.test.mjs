@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { describe, test } from 'node:test';
+import { before, describe, test } from 'node:test';
 import { TestApp, invoke, pause, until } from './test-app.mjs';
 
 async function dragTab(app, source, tabId, target, beforeId, {cancel = false, outside = false} = {}) {
@@ -27,6 +27,18 @@ async function dragTab(app, source, tabId, target, beforeId, {cancel = false, ou
 }
 
 describe('desktop windows', {skip: process.platform !== 'win32', concurrency: false}, () => {
+    // First launch on a fresh runner can exceed a test's budget (cold WebView2, .NET and AV scans).
+    before(async () => {
+        const app = new TestApp();
+        try {
+            const main = await app.start([], 180000);
+            await until(() => app.evaluate(main, invoke('server_url')), 'warm-up server', 60000).catch(() => {});
+            await app.stop(main, 'main');
+        } finally {
+            app.dispose();
+        }
+    }, {timeout: 300000});
+
     test('Ctrl-click reuses includes and definitions in another window', {timeout: 90000}, async t => {
         const app = new TestApp();
         t.after(() => app.dispose());
@@ -487,7 +499,7 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         await app.stop(second.page, second.label);
     });
 
-    test('title bar actions use the active document and temporary exports open after writing', {timeout: 90000}, async t => {
+    test('title bar actions use the active document and temporary exports open after writing', {timeout: 180000}, async t => {
         const app = new TestApp();
         t.after(() => app.dispose());
         const main = await app.start();
@@ -505,6 +517,10 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
                 const bytes = await window.__TAURI_INTERNALS__.invoke('plugin:fs|read_file', {path, options: {}});
                 window.exportOpened.push({path, size: new Uint8Array(bytes).byteLength});
             };
+            window.calcpadBridge.onPdfError = async err => {
+                window.testErrors.push(String(err?.message ?? err));
+                return false;
+            };
             document.querySelector('[aria-label="Open document"]').click();
         `);
         await app.fileOpen(main, file);
@@ -520,7 +536,12 @@ describe('desktop windows', {skip: process.platform !== 'win32', concurrency: fa
         await until(() => app.evaluate(main, `document.querySelector('[aria-label="Save document"]').disabled`), 'saved changes disable Save');
         for (const [label, extension, signature] of [['Export to PDF', '.pdf', '%PDF-'], ['Export to Word', '.docx', 'PK']]) {
             await app.evaluate(main, `document.querySelector('[aria-label="${label}"]').click()`);
-            const opened = await until(async () => (await app.evaluate(main, 'window.exportOpened')).find(entry => entry.path.endsWith(extension)), `${label} opened`);
+            // Matches the client's 60 s PDF timeout; a cold headless browser launch can be slow on CI.
+            const opened = await until(async () => {
+                const errors = await app.evaluate(main, 'window.testErrors');
+                if (errors.length) throw new Error(`${label} failed: ${errors.join('; ')}`);
+                return (await app.evaluate(main, 'window.exportOpened')).find(entry => entry.path.endsWith(extension));
+            }, `${label} opened`, 60000);
             assert.equal(path.basename(opened.path), `toolbar worksheet${extension}`);
             assert.ok(path.resolve(opened.path).startsWith(path.resolve(os.tmpdir()) + path.sep));
             assert.ok(opened.size > 0);
