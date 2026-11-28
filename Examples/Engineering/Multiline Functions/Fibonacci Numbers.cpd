@@ -11,7 +11,8 @@ fib(n) = if(n ≡ 1; 1;
      @ k = 1 : n - 1} _
   } _
 )
+#UI 'Number of terms -'n_t = 9
 'Results:
-#for i = 1 : 9
+#for i = 1 : n_t
 	fib(i)
 #loop

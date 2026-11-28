@@ -1,5 +1,5 @@
 '<!-- Reference for the $round$, $format$ and $scale$ directives, covering decimal rounding, significant figures, scientific notation and unit-aware display. -->
-"Rounding and formatting numbers in CalcpadCE
+'<h1>Rounding and formatting numbers in CalcpadCE</h1>
 #round 6
 'Custom rounding -'a = 100*sqr(2)' (to 6 digits)
 #round default

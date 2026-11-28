@@ -9,44 +9,43 @@
   <img alt="torsion.png" src="Images/structures/rc/design/torsion.png" style="width:400pt;"/>
   <h4>Cross section dimensions</h4>
   <p>
+   Web -
    <span class="eq">
     <var>b</var>
     <sub>w</sub>
-    =
-    <u class="input-6">250</u>
+    = 250
+    <i>mm</i>
    </span>
-   mm,
+   ,
    <span class="eq">
     <var>h</var>
     <sub>w</sub>
-    =
-    <u class="input-6">500</u>
+    = 500
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
+   Flange -
    <span class="eq">
     <var>b</var>
     <sub>f</sub>
-    =
-    <u class="input-7">1200</u>
+    = 1200
+    <i>mm</i>
    </span>
-   mm,
+   ,
    <span class="eq">
     <var>h</var>
     <sub>f</sub>
-    =
-    <u class="input-7">120</u>
+    = 120
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Shear link legs count -
    <span class="eq">
     <var>n</var>
     <sub>w</sub>
-    =
-    <u class="input-8">2</u>
+    = 2
    </span>
   </p>
   <p>
@@ -54,40 +53,36 @@
    <span class="eq">
     <var>Φ</var>
     <sub>b</sub>
-    =
-    <u class="input-9">20</u>
+    = 20
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Top and middle bars diameter:
    <span class="eq">
     <var>Φ</var>
     <sub>t</sub>
-    =
-    <u class="input-10">12</u>
+    = 12
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Links diameter (closed and anchored):
    <span class="eq">
     <var>Φ</var>
     <sub>s</sub>
-    =
-    <u class="input-11">8</u>
+    = 8
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Concrete cover -
    <span class="eq">
     <var>c</var>
     <sub>nom</sub>
-    =
-    <u class="input-12">25</u>
+    = 25
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>Effective cross section depth</p>
   <p>
@@ -110,24 +105,30 @@
      </span>
      2
     </span>
-    = 500 − 25 − 8 −
+    = 500
+    <i>mm</i>
+    − 25
+    <i>mm</i>
+    − 8
+    <i>mm</i>
+    −
     <span class="dvc">
      20
+     <i>mm</i>
      <span class="dvl">
      </span>
      2
     </span>
     = 457
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Number of middle rows of bars -
    <span class="eq">
     <var>n</var>
     <sub>ef</sub>
-    =
-    <u class="input-17">2</u>
+    = 2
    </span>
   </p>
   <p class="ref">[EN 1992-1-1, § 9.2.3 (4)]</p>
@@ -138,30 +139,27 @@
    <span class="eq">
     <var>T</var>
     <sub>Ed</sub>
-    =
-    <u class="input-33">20</u>
+    = 20
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    Bending moment -
    <span class="eq">
     <var>M</var>
     <sub>Ed</sub>
-    =
-    <u class="input-34">200</u>
+    = 200
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    Shear force -
    <span class="eq">
     <var>V</var>
     <sub>Ed</sub>
-    =
-    <u class="input-35">120</u>
+    = 120
+    <i>kN</i>
    </span>
-   kN
   </p>
   <h4>Material properties</h4>
   <p>
@@ -173,24 +171,24 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-38">20</u>
+    = 20
+    <i>MPa</i>
    </span>
-   MPa,
   </p>
   <p>
-   Partial safety factors for concrete -
+   Partial safety factor for concrete -
    <span class="eq">
     <var>γ</var>
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Coefficient for long-term effects -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-39">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -213,13 +211,14 @@
     =
     <span class="dvc">
      0.85 · 20
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 11.33
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Mean value of axial tensile strength -
@@ -227,9 +226,17 @@
     <var>f</var>
     <sub>ctm</sub>
     = 0.3 ·
-    <var>f</var>
-    <sub>ck</sub>
-    <sup>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -237,8 +244,20 @@
       3
      </span>
     </sup>
-    = 0.3 · 20
-    <sup>
+    · 1
+    <i>MPa</i>
+    = 0.3 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     20
+     <i>MPa</i>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -246,9 +265,11 @@
       3
      </span>
     </sup>
+    · 1
+    <i>MPa</i>
     = 2.21
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Characteristic axial tensile strength -
@@ -258,9 +279,11 @@
     = 0.7 ·
     <var>f</var>
     <sub>ctm</sub>
-    = 0.7 · 2.21 = 1.55
+    = 0.7 · 2.21
+    <i>MPa</i>
+    = 1.55
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Design axial tensile strength -
@@ -279,13 +302,14 @@
     =
     <span class="dvc">
      1.55
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 1.03
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    <b>Steel</b>
@@ -295,10 +319,9 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-47">500</u>
+    = 500
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for steel -
@@ -325,13 +348,14 @@
     =
     <span class="dvc">
      500
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.15
     </span>
     = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Modulus of elasticity -
@@ -339,8 +363,8 @@
     <var>E</var>
     <sub>s</sub>
     = 200000
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <div class="fold">
    <h4>Bending design</h4>
@@ -380,9 +404,16 @@
      )  ·
      <var>h</var>
      <sub>f</sub>
-     =  ( 1200 − 250 )  · 120 = 114000
+     =  ( 1200
+     <i>mm</i>
+     − 250
+     <i>mm</i>
+     )  · 120
+     <i>mm</i>
+     = 114000
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
-    mm²
    </p>
    <p>
     Flange first moment of area -
@@ -404,17 +435,25 @@
       2
      </span>
      <span class="b1">)</span>
-     = 114000 ·
+     = 114000
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     ·
      <span class="b1">(</span>
-     457 −
+     457
+     <i>mm</i>
+     −
      <span class="dvc">
       120
+      <i>mm</i>
       <span class="dvl">
       </span>
       2
      </span>
      <span class="b1">)</span>
      = 45258000
+     <i>mm</i>
+     <sup class="unit">3</sup>
     </span>
     mm³
    </p>
@@ -446,23 +485,28 @@
       2
      </span>
      <span class="b1">)</span>
-     · 10
-     <sup>-6</sup>
-     = 1200 · 120 · 1 · 11.33 ·
+     = 1200
+     <i>mm</i>
+     · 120
+     <i>mm</i>
+     · 1 · 11.33
+     <i>MPa</i>
+     ·
      <span class="b1">(</span>
-     457 −
+     457
+     <i>mm</i>
+     −
      <span class="dvc">
       120
+      <i>mm</i>
       <span class="dvl">
       </span>
       2
      </span>
      <span class="b1">)</span>
-     · 10
-     <sup>-6</sup>
      = 647.9
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p>
     The neutral line is within the flange - design of rectangular section with
@@ -470,8 +514,8 @@
      <var>b</var>
      <sub>f</sub>
      = 1200
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>
     Relative design bending moment -
@@ -482,8 +526,6 @@
      <span class="dvc">
       <var>M</var>
       <sub>Ed</sub>
-      · 10
-      <sup>6</sup>
       <span class="dvl">
       </span>
       <var>b</var>
@@ -499,13 +541,18 @@
      </span>
      =
      <span class="dvc">
-      200 · 10
-      <sup>6</sup>
+      200
+      <i>kNm</i>
       <span class="dvl">
       </span>
-      1200 · 457
+      1200
+      <i>mm</i>
+      ·  ( 457
+      <i>mm</i>
+      )
       <sup>2</sup>
       · 1 · 11.33
+      <i>MPa</i>
      </span>
      = 0.0704
     </span>
@@ -531,6 +578,7 @@
      )  =
      <span class="dvc">
       457
+      <i>mm</i>
       <span class="dvl">
       </span>
       0.8
@@ -541,8 +589,8 @@
       1 − 2 · 0.0704
      </span>
      )  = 41.75
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>
     Lever arm of internal forces -
@@ -554,9 +602,13 @@
      <var>λ</var>
      ·
      <var>x</var>
-     = 457 − 0.5 · 0.8 · 41.75 = 440.3
+     = 457
+     <i>mm</i>
+     − 0.5 · 0.8 · 41.75
+     <i>mm</i>
+     = 440.3
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>
     Required tensile reinforcement area -
@@ -567,8 +619,6 @@
      <span class="dvc">
       <var>M</var>
       <sub>Ed</sub>
-      · 10
-      <sup>6</sup>
       <span class="dvl">
       </span>
       <var>z</var>
@@ -578,15 +628,19 @@
      </span>
      =
      <span class="dvc">
-      200 · 10
-      <sup>6</sup>
+      200
+      <i>kNm</i>
       <span class="dvl">
       </span>
-      440.3 · 434.78
+      440.3
+      <i>mm</i>
+      · 434.78
+      <i>MPa</i>
      </span>
      = 1044.74
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
-    mm²
    </p>
    <p>
     Reinforcement ratio -
@@ -607,14 +661,19 @@
      =
      <span class="dvc">
       1044.74
+      <i>mm</i>
+      <sup class="unit">2</sup>
       <span class="dvl">
       </span>
-      250 · 457
+      250
+      <i>mm</i>
+      · 457
+      <i>mm</i>
      </span>
      = 0.00914
     </span>
    </p>
-   <!-- <span class="eq"><var>A</var><sub>s2</sub> = 0</span> , <span class="eq"><var>ρ</var><sub>2</sub> = 0</span> -->
+   <!-- <span class="eq"><var>A</var><sub>s2</sub> = 0 <i>mm</i><sup class="unit">2</sup></span> , <span class="eq"><var>ρ</var><sub>2</sub> = 0</span> -->
    <p class="ref">[EN 1992-1-1, § 9.2.1.1]</p>
    <p>Minimum tensile reinforcement ratio</p>
    <p>
@@ -640,9 +699,11 @@
      <span class="b1">(</span>
      <span class="dvc">
       0.26 · 2.21
+      <i>MPa</i>
       <span class="dvl">
       </span>
       500
+      <i>MPa</i>
      </span>
      ; 0.0013
      <span class="b1">)</span>
@@ -662,9 +723,14 @@
      <sub>w</sub>
      ·
      <var>d</var>
-     = 0.0013 · 250 · 457 = 148.53
+     = 0.0013 · 250
+     <i>mm</i>
+     · 457
+     <i>mm</i>
+     = 148.53
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
-    mm²
    </p>
   </div>
   <div class="fold">
@@ -691,6 +757,7 @@
       </span>
       <span class="dvc">
        200
+       <i>mm</i>
        <span class="dvl">
        </span>
        <var>d</var>
@@ -707,9 +774,11 @@
       </span>
       <span class="dvc">
        200
+       <i>mm</i>
        <span class="dvl">
        </span>
        457
+       <i>mm</i>
       </span>
      </span>
      ; 2
@@ -775,11 +844,20 @@
       </span>
      </sup>
      ·
-     <span class="o0">
-      <span class="r">√</span>
-      <var>f</var>
-      <sub>ck</sub>
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       <var>f</var>
+       <sub>ck</sub>
+       <span class="dvl">
+       </span>
+       1
+       <i>MPa</i>
+      </span>
      </span>
+     · 1
+     <i>MPa</i>
      = 0.035 · 1.66
      <sup>
       <span class="dvc">
@@ -790,11 +868,22 @@
       </span>
      </sup>
      ·
-     <span class="o0">
-      <span class="r">√</span>
-      20
+     <span class="o1">
+      <span class="r1">
+      </span>
+      <span class="dvc">
+       20
+       <i>MPa</i>
+       <span class="dvl">
+       </span>
+       1
+       <i>MPa</i>
+      </span>
      </span>
+     · 1
+     <i>MPa</i>
      = 0.335
+     <i>MPa</i>
     </span>
    </p>
    <p>
@@ -806,14 +895,22 @@
      <sub>Rd_c</sub>
      ·
      <var>k</var>
-     ·  ( 100 ·
-     <var>ρ</var>
-     <sub>L</sub>
      ·
-     <var>f</var>
-     <sub>ck</sub>
-     )
-     <sup>
+     <span class="b1">(</span>
+     <span class="dvc">
+      100 ·
+      <var>ρ</var>
+      <sub>L</sub>
+      ·
+      <var>f</var>
+      <sub>ck</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>MPa</i>
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">
       <span class="dvc">
        1
        <span class="dvl">
@@ -821,15 +918,25 @@
        3
       </span>
      </sup>
+     · 1
+     <i>MPa</i>
      ·
      <var>b</var>
      <sub>w</sub>
      ·
      <var>d</var>
-     · 10
-     <sup>-3</sup>
-     = 0.12 · 1.66 ·  ( 100 · 0.00914 · 20 )
-     <sup>
+     = 0.12 · 1.66 ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      100 · 0.00914 · 20
+      <i>MPa</i>
+      <span class="dvl">
+      </span>
+      1
+      <i>MPa</i>
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">
       <span class="dvc">
        1
        <span class="dvl">
@@ -837,11 +944,15 @@
        3
       </span>
      </sup>
-     · 250 · 457 · 10
-     <sup>-3</sup>
+     · 1
+     <i>MPa</i>
+     · 250
+     <i>mm</i>
+     · 457
+     <i>mm</i>
      = 60.02
+     <i>kN</i>
     </span>
-    kN
    </p>
    <p>
     <span class="eq">
@@ -855,13 +966,15 @@
      <sub>w</sub>
      ·
      <var>d</var>
-     · 10
-     <sup>-3</sup>
-     = 0.335 · 250 · 457 · 10
-     <sup>-3</sup>
+     = 0.335
+     <i>MPa</i>
+     · 250
+     <i>mm</i>
+     · 457
+     <i>mm</i>
      = 38.3
+     <i>kN</i>
     </span>
-    kN
    </p>
    <p>
     <span class="eq">
@@ -877,9 +990,13 @@
      <sub>Rd,c_</sub>
      )  =
      <b>max</b>
-     ( 38.3; 60.02 )  = 60.02
+     ( 38.3
+     <i>kN</i>
+     ; 60.02
+     <i>kN</i>
+     )  = 60.02
+     <i>kN</i>
     </span>
-    kN
    </p>
    <p>Effective wall thickness</p>
    <p>
@@ -913,16 +1030,24 @@
      <b>max</b>
      <span class="b1">(</span>
      <span class="dvc">
-      250 · 500
+      250
+      <i>mm</i>
+      · 500
+      <i>mm</i>
       <span class="dvl">
       </span>
-      2 ·  ( 250 + 500 )
+      2 ·  ( 250
+      <i>mm</i>
+      + 500
+      <i>mm</i>
+      )
      </span>
      ; 2 · 25
+     <i>mm</i>
      <span class="b1">)</span>
      = 83.33
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>Total area of the cross section within the outer perimeter</p>
    <p>
@@ -941,9 +1066,18 @@
      −
      <var>t</var>
      <sub>ef</sub>
-     )  =  ( 250 − 83.33 )  ·  ( 500 − 83.33 )  = 69444.4
+     )  =  ( 250
+     <i>mm</i>
+     − 83.33
+     <i>mm</i>
+     )  ·  ( 500
+     <i>mm</i>
+     − 83.33
+     <i>mm</i>
+     )  = 69444.4
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
-    mm²
    </p>
    <p>Outer perimeter of the cross section</p>
    <p>
@@ -959,9 +1093,15 @@
      − 2 ·
      <var>t</var>
      <sub>ef</sub>
-     )  = 2 ·  ( 250 + 500 − 2 · 83.33 )  = 1166.67
+     )  = 2 ·  ( 250
+     <i>mm</i>
+     + 500
+     <i>mm</i>
+     − 2 · 83.33
+     <i>mm</i>
+     )  = 1166.67
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>Section subjected to pure torsion</p>
    <p>
@@ -977,13 +1117,16 @@
      ·
      <var>f</var>
      <sub>ctd</sub>
-     · 10
-     <sup>-6</sup>
-     = 2 · 69444.4 · 83.33 · 1.03 · 10
-     <sup>-6</sup>
+     = 2 · 69444.4
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     · 83.33
+     <i>mm</i>
+     · 1.03
+     <i>MPa</i>
      = 11.94
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p class="ref">[EN 1992-1-1, § 6.3.2 (5)]</p>
    <p>
@@ -1008,16 +1151,20 @@
      =
      <span class="dvc">
       20
+      <i>kNm</i>
       <span class="dvl">
       </span>
       11.94
+      <i>kNm</i>
      </span>
      +
      <span class="dvc">
       120
+      <i>kN</i>
       <span class="dvl">
       </span>
       60.02
+      <i>kN</i>
      </span>
      = 3.67
     </span>
@@ -1034,9 +1181,11 @@
      <var>z</var>
      = 0.9 ·
      <var>d</var>
-     = 0.9 · 457 = 411.3
+     = 0.9 · 457
+     <i>mm</i>
+     = 411.3
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>
     <span class="eq">
@@ -1062,6 +1211,7 @@
       <span class="dvl">
       </span>
       250
+      <i>MPa</i>
      </span>
      <span class="b1">)</span>
      = 0.6 ·
@@ -1069,9 +1219,11 @@
      1 −
      <span class="dvc">
       20
+      <i>MPa</i>
       <span class="dvl">
       </span>
       250
+      <i>MPa</i>
      </span>
      <span class="b1">)</span>
      = 0.552
@@ -1102,20 +1254,21 @@
       </span>
       2
      </span>
-     · 10
-     <sup>-3</sup>
      =
      <span class="dvc">
-      1 · 250 · 411.3 · 0.552 · 11.33
+      1 · 250
+      <i>mm</i>
+      · 411.3
+      <i>mm</i>
+      · 0.552 · 11.33
+      <i>MPa</i>
       <span class="dvl">
       </span>
       2
      </span>
-     · 10
-     <sup>-3</sup>
      = 321.64
+     <i>kN</i>
     </span>
-    kN
    </p>
    <p>
     <span class="eq">
@@ -1136,13 +1289,16 @@
      ·
      <var>t</var>
      <sub>ef</sub>
-     · 10
-     <sup>-6</sup>
-     = 0.552 · 1 · 11.33 · 69444.4 · 83.33 · 10
-     <sup>-6</sup>
+     = 0.552 · 1 · 11.33
+     <i>MPa</i>
+     · 69444.4
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     · 83.33
+     <i>mm</i>
      = 36.2
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p class="ref">[(6.29) from EN 1992-1-1]</p>
    <p>Maximum bearing capacity check</p>
@@ -1168,16 +1324,20 @@
      =
      <span class="dvc">
       20
+      <i>kNm</i>
       <span class="dvl">
       </span>
       36.2
+      <i>kNm</i>
      </span>
      +
      <span class="dvc">
       120
+      <i>kN</i>
       <span class="dvl">
       </span>
       321.64
+      <i>kN</i>
      </span>
      = 0.926
     </span>
@@ -1215,16 +1375,20 @@
      <span class="b1">(</span>
      <span class="dvc">
       20
+      <i>kNm</i>
       <span class="dvl">
       </span>
       36.2
+      <i>kNm</i>
      </span>
      +
      <span class="dvc">
       120
+      <i>kN</i>
       <span class="dvl">
       </span>
       321.64
+      <i>kN</i>
      </span>
      <span class="b1">)</span>
      = 33.87°
@@ -1288,11 +1452,15 @@
       )
       <sup>2</sup>
      </span>
-     · 10
-     <sup>-3</sup>
      =
      <span class="dvc">
-      1 · 250 · 411.3 · 0.552 · 11.33 ·
+      1 · 250
+      <i>mm</i>
+      · 411.3
+      <i>mm</i>
+      · 0.552 · 11.33
+      <i>MPa</i>
+      ·
       <b>cot</b>
       ( 33.87° )
       <span class="dvl">
@@ -1302,11 +1470,9 @@
       ( 33.87° )
       <sup>2</sup>
      </span>
-     · 10
-     <sup>-3</sup>
      = 297.68
+     <i>kN</i>
     </span>
-    kN
    </p>
    <p>
     <span class="eq">
@@ -1335,17 +1501,20 @@
      <b>cos</b>
      (
      <var>θ</var>
-     )  · 10
-     <sup>-6</sup>
-     = 2 · 0.552 · 1 · 11.33 · 69444.4 · 83.33 ·
+     )  = 2 · 0.552 · 1 · 11.33
+     <i>MPa</i>
+     · 69444.4
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     · 83.33
+     <i>mm</i>
+     ·
      <b>sin</b>
      ( 33.87° )  ·
      <b>cos</b>
-     ( 33.87° )  · 10
-     <sup>-6</sup>
-     = 33.51
+     ( 33.87° )  = 33.51
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p>
     <span class="eq">
@@ -1369,16 +1538,20 @@
      =
      <span class="dvc">
       20
+      <i>kNm</i>
       <span class="dvl">
       </span>
       33.51
+      <i>kNm</i>
      </span>
      +
      <span class="dvc">
       120
+      <i>kN</i>
       <span class="dvl">
       </span>
       297.68
+      <i>kN</i>
      </span>
      = 1
     </span>
@@ -1393,8 +1566,6 @@
      <span class="dvc">
       <var>V</var>
       <sub>Ed</sub>
-      · 10
-      <sup>3</sup>
       <span class="dvl">
       </span>
       <var>z</var>
@@ -1409,17 +1580,24 @@
      </span>
      =
      <span class="dvc">
-      120 · 10
-      <sup>3</sup>
+      120
+      <i>kN</i>
       <span class="dvl">
       </span>
-      411.3 · 434.78 ·
+      411.3
+      <i>mm</i>
+      · 434.78
+      <i>MPa</i>
+      ·
       <b>cot</b>
       ( 33.87° )
      </span>
      = 0.45
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
     </span>
-    mm²/mm
    </p>
    <p>Torsion reinforcement area</p>
    <p>
@@ -1430,8 +1608,6 @@
      <span class="dvc">
       <var>T</var>
       <sub>Ed</sub>
-      · 10
-      <sup>6</sup>
       ·
       <b>tan</b>
       (
@@ -1448,18 +1624,25 @@
      </span>
      =
      <span class="dvc">
-      20 · 10
-      <sup>6</sup>
+      20
+      <i>kNm</i>
       ·
       <b>tan</b>
       ( 33.87° )
       <span class="dvl">
       </span>
-      2 · 69444.4 · 434.78
+      2 · 69444.4
+      <i>mm</i>
+      <sup class="unit">2</sup>
+      · 434.78
+      <i>MPa</i>
      </span>
      = 0.222
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
     </span>
-    mm²/mm
    </p>
    <p class="ref">[EN 1992-1-1, § 9.2.2 (5)]</p>
    <p>Minimum area of shear reinforcement</p>
@@ -1468,13 +1651,22 @@
      <var>A</var>
      <sub>sw,min</sub>
      =
-     <span class="dvc">
+     <span class="dvc up">
       0.08 ·
-      <span class="o0">
-       <span class="r">√</span>
-       <var>f</var>
-       <sub>ck</sub>
+      <span class="o1">
+       <span class="r1">
+       </span>
+       <span class="dvc">
+        <var>f</var>
+        <sub>ck</sub>
+        <span class="dvl">
+        </span>
+        1
+        <i>MPa</i>
+       </span>
       </span>
+      · 1
+      <i>MPa</i>
       <span class="dvl">
       </span>
       <var>f</var>
@@ -1484,19 +1676,35 @@
      <var>b</var>
      <sub>w</sub>
      =
-     <span class="dvc">
+     <span class="dvc up">
       0.08 ·
-      <span class="o0">
-       <span class="r">√</span>
-       20
+      <span class="o1">
+       <span class="r1">
+       </span>
+       <span class="dvc">
+        20
+        <i>MPa</i>
+        <span class="dvl">
+        </span>
+        1
+        <i>MPa</i>
+       </span>
       </span>
+      · 1
+      <i>MPa</i>
       <span class="dvl">
       </span>
       500
+      <i>MPa</i>
      </span>
-     · 250 = 0.179
+     · 250
+     <i>mm</i>
+     = 0.179
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
     </span>
-    mm²/mm
    </p>
    <p>
     <b>Total reinforcement required for shear and torsion</b>
@@ -1518,9 +1726,27 @@
      <sub>sw,min</sub>
      )  =
      <b>max</b>
-     ( 0.45 + 0.222; 0.179 )  = 0.673
+     ( 0.45
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
+     + 0.222
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
+     ; 0.179
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
+     )  = 0.673
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>mm</i>
     </span>
-    mm²/mm
    </p>
    <p>
     Area of one leg -
@@ -1545,11 +1771,14 @@
       </span>
       4
      </span>
-     · 8
+     ·  ( 8
+     <i>mm</i>
+     )
      <sup>2</sup>
      = 50.27
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
-    mm²
    </p>
    <p>Calculation of shear link spacing</p>
    <p>
@@ -1571,13 +1800,19 @@
      =
      <span class="dvc">
       2 · 50.27
+      <i>mm</i>
+      <sup class="unit">2</sup>
       <span class="dvl">
       </span>
       0.673
+      <i>mm</i>
+      <sup class="unit">2</sup>
+      <i class="unit">∕</i>
+      <i>mm</i>
      </span>
      = 149.42
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>Maximum shear link spacing</p>
    <p class="ref">[EN 1992-1-1, §9.2.2]</p>
@@ -1589,11 +1824,17 @@
      <b>min</b>
      ( 0.75 ·
      <var>d</var>
-     ; 300 )  =
+     ; 300
+     <i>mm</i>
+     )  =
      <b>min</b>
-     ( 0.75 · 457; 300 )  = 300
+     ( 0.75 · 457
+     <i>mm</i>
+     ; 300
+     <i>mm</i>
+     )  = 300
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p class="ref">[EN 1992-1-1, § 9.2.3]</p>
    <p>
@@ -1619,15 +1860,17 @@
      <span class="b1">(</span>
      <span class="dvc">
       1166.67
+      <i>mm</i>
       <span class="dvl">
       </span>
       8
      </span>
      ; 250
+     <i>mm</i>
      <span class="b1">)</span>
      = 145.83
+     <i>mm</i>
     </span>
-    mm
    </p>
   </div>
   Provide
@@ -1647,8 +1890,6 @@
     <span class="dvc">
      <var>T</var>
      <sub>Ed</sub>
-     · 10
-     <sup>6</sup>
      ·
      <var>u</var>
      <sub>k</sub>
@@ -1668,18 +1909,25 @@
     </span>
     =
     <span class="dvc">
-     20 · 10
-     <sup>6</sup>
-     · 1166.67 ·
+     20
+     <i>kNm</i>
+     · 1166.67
+     <i>mm</i>
+     ·
      <b>cot</b>
      ( 33.87° )
      <span class="dvl">
      </span>
-     2 · 69444.4 · 434.78
+     2 · 69444.4
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     · 434.78
+     <i>MPa</i>
     </span>
     = 575.6
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>
    <b>Total longitudinal reinforcement for bending and torsion</b>

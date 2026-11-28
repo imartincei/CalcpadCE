@@ -2,32 +2,31 @@
 '<div style = "max-width:180mm;">
 '<img style="width:190pt;" alt = "simply-supported-beam-concentrated-force.png" class="side" src = "../../Images/mechanics/beams/simply-supported-beam-concentrated-force.png">
 '<p><b>Input data</b></p>
-'Beam length -'l = ? {5}'m
-'Load -'F = ? {10}'kN
-'Distance -'a = ? {2}'m
+#UI 'Beam length -'l = 5m
+#UI 'Load -'F = 10kN
+#UI 'Distance -'a = 2m
 #post
 '<p><b>Internal forces</b></p>
 'Bending
-M_max = F*(l - a)*a/l'kN·m
+M_max = F*(l - a)*a/l|kNm
 'Shear
-V_A = F*(l - a)/l'kN
-V_B = -F*a/l'kN
+V_A = F*(l - a)/l|kN
+V_B = -F*a/l|kN
 '<p><b>Diagrams</b></p>
 #hide
 PlotWidth = 600
 PlotHeight = 150
-#show
-'Calculate internal forces at'x_1 = ? {1}'m
-#pre
-
+#end hide
+#end post
+#UI 'Calculate internal forces at'x_1 = 1m
 #post
 'Bending
 M(x) = V_A*x - F*(x - a)*(x > a)
-$Plot{-M(x) @ x = 0 : l}
-M(x_1)'kN·m
+$Plot{-M(x) @ x = 0m : l}
+M(x_1)|kNm
 'Shear
 V(x) = V_A - F*(x > a)
-$Plot{V(x) @ x = 0 : l}
-V(x_1)'kN
-#show
+$Plot{V(x) @ x = 0m : l}
+V(x_1)|kN
+#end post
 '</div>

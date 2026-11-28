@@ -13,5 +13,5 @@
 MiB|byte
 TiB|byte
 '<p><b>Usage</b></p>
-v = 10000000byte/s
+#UI 'Data rate -'v = 10000000byte/s
 v|TiB/h

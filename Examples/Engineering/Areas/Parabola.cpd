@@ -1,9 +1,8 @@
 '<!-- Area of a parabolic segment $A = \tfrac{2}{3} a\, h$ from chord length and height. -->
-"Area and Arc Length of Parabolic Segment
+'<h1>Area and Arc Length of Parabolic Segment</h1>
 '<div style="max-width:120mm;"><img style="height:60pt;" class="side" alt="parabola.png" src="../../Images/math/area/parabola.png"></div>
-'Dimensions
-'Length -'a = ? {4}
-'Height -'b = ? {2}
+#UI 'Length -'a = 4m
+#UI 'Height -'b = 2m
 'Area
 A = 2/3*a*b
 'Arc length

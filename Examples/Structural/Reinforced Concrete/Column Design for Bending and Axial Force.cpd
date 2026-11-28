@@ -3,103 +3,105 @@
 '<div style="max-width:180mm">
 '<img class="side" style="width:150pt;"src="../../Images/structures/rc/design/column-design.png" alt="column-design.png">
 '<h4>Cross section dimensions</h4>
-'Width -'b = ? {300}'mm, Height -'h = ? {700}'mm
+#UI 'Width -'b = 300mm', Height -'h = 700mm
 #post
-'Cross section area -'A_c = b*h'mm²
-#show
+'Cross section area -'A_c = b*h|mm^2
+#end post
 '<p><b>Reinforcement area</b></p>
-'Left -'A_s1 = ? {800}'mm², Right -'A_s2 = A_s1'mm²
+#UI 'Left -'A_s1 = 800mm^2
+'Right -'A_s2 = A_s1|mm^2
 #post
 'Reinforcement ratio -'ρ = (A_s1 + A_s2)/A_c
-#show
+#end post
 '<p><b>Concrete cover to the center of reinforcement</b></p>
-'Left -'d_1 = ? {50}'mm, Right -'d_2 = d_1'mm
+#UI 'Left -'d_1 = 50mm
+'Right -'d_2 = d_1|mm
 #post
-'Effective cross section depth -'d = h - d_1'mm
-#show
+'Effective cross section depth -'d = h - d_1|mm
+#end post
 '<h4>Section design loads</h4>
-'<table>
-'<tr><td>№ 1 - </td><td>'M_Ed_1 = ? {100}'kN·m, </td><td>'N_Ed_1 = ? {500}'kN</td></tr>
-'<tr><td>№ 2 - </td><td>'M_Ed_2 = ? {100}'kN·m, </td><td>'N_Ed_2 = ? {1000}'kN</td></tr>
-'<tr><td>№ 3 - </td><td>'M_Ed_3 = ? {100}'kN·m, </td><td>'N_Ed_3 = ? {1500}'kN</td></tr>
-'<tr><td>№ 4 - </td><td>'M_Ed_4 = ? {100}'kN·m, </td><td>'N_Ed_4 = ? {2000}'kN</td></tr>
-'<tr><td>№ 5 - </td><td>'M_Ed_5 = ? {100}'kN·m, </td><td>'N_Ed_5 = ? {2500}'kN</td></tr>
-'</table>
+#UI '№ 1 -'M_Ed_1 = 100kNm','N_Ed_1 = 500kN
+#UI '№ 2 -'M_Ed_2 = 100kNm','N_Ed_2 = 1000kN
+#UI '№ 3 -'M_Ed_3 = 100kNm','N_Ed_3 = 1500kN
+#UI '№ 4 -'M_Ed_4 = 100kNm','N_Ed_4 = 2000kN
+#UI '№ 5 -'M_Ed_5 = 100kNm','N_Ed_5 = 2500kN
 #pre
 'All input values for M<sub>Ed</sub> and N<sub>Ed</sub> must be positive!
-#show
+#end pre
 'Positive axial force is compressive!
 '<h4>Material properties</h4>
 '<p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
 '<p><b>Concrete</b></p>
-'Characteristic compressive cylinder strength -'f_ck = ? {20}'MPa
-'Partial safety factor for concrete -'γ_c = 1.5','α_cc = ? {0.85}
+#UI 'Characteristic compressive cylinder strength -'f_ck = 20MPa
+'Partial safety factor for concrete -'γ_c = 1.5
+#UI 'Coefficient for long-term effects -'α_cc = 0.85
 #post
-'Mean value of cylinder compressive strength -'f_cm = f_ck + 8'MPa
-'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c'MPa
+'Mean value of cylinder compressive strength -'f_cm = f_ck + 8MPa|MPa
+'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c|MPa
 'Ultimate compressive strain -'ε_cu2 = 0.0035'('ε_c2 = 0.002','n = 2')'
-'Secant modulus of elasticity -'E_cm = 22*(f_cm/10)^0.3'GPa
-#show
+'Secant modulus of elasticity -'E_cm = 22GPa*(f_cm/10MPa)^0.3|GPa
+#end post
 '<p><b>Steel</b></p>
-'Characteristic yield strength -'f_yk = ? {500}'MPa
+#UI 'Characteristic yield strength -'f_yk = 500MPa
 #post
 'Partial safety factor for steel -'γ_s = 1.15
-'Design yield strength -'f_yd = f_yk/γ_s'MPa
-'Modulus of elasticity -'E_s = 200'GPa
+'Design yield strength -'f_yd = f_yk/γ_s|MPa
+'Modulus of elasticity -'E_s = 200GPa
 '<p><b>Strain-stress diagrams</b>, MPa:</p>
 '<!--'PlotWidth = 250','PlotHeight = 125'-->
 '<table><tr><td>
 #hide
 σ_c(ε) = f_cd*((1 - (1 - ε/ε_c2)^n)*(ε < ε_c2) + (ε ≥ ε_c2))
-#post
+#end hide
 $Plot{σ_c(ε/1000) @ ε = 0 : ε_cu2*1000}
 '</td><td>
 #hide
-σ_s(ε) = max(-f_yd; min(ε*E_s*1000; f_yd))
-#post
+σ_s(ε) = max(-f_yd; min(ε*E_s; f_yd))
+#end hide
 $Plot{σ_s(ε/1000) @ ε = -10 : 10}
 '</td></tr></table>
-#show
+#end post
 '<h4>Imperfections and second order effects</h4>
-'Ratio of quasi-permanent bending moment: M<sub>0Eqp</sub>/M<sub>0Ed</sub> ='K_G = ? {0.75}
+#UI 'Ratio of quasi-permanent bending moment: M<sub>0Eqp</sub>/M<sub>0Ed</sub> ='K_G = 0.75
 #post
 'M<sub>0Eqp</sub> is the first order bending moment in quasi-permanent load combination (SLS)
 'M<sub>0Ed</sub> is the first order bending moment in design load combination (ULS)
-#show
-'Long term creep factor - φ(∞,t<sub>0</sub>) ='φ = ? {2.5}
-'Column height -'L = ? {4000}'mm
-'Effective column  height -'L_o = ? {2}*L'mm
-'Number of vertical elements -'m = ? {1}
+#end post
+#UI 'Long term creep factor - φ(∞,t<sub>0</sub>) ='φ = 2.5
+#UI 'Column height -'L = 4000mm
+#UI 'Effective length factor -'β_L = 2
+'Effective column height -'L_o = β_L*L|mm
+#UI 'Number of vertical elements -'m = 1
 #hide
-α_n_ = 2/sqr(L/1000)
+α_n_ = 2/sqr(L/1m)
 α_n = max(2/3; min(α_n_; 1))
 α_m = sqr(0.5*(1 + 1/m))
 θ_o = 1/200
 θ_i = θ_o*α_n*α_m
 e_i_ = θ_i*L_o/2
-e_o = max(h/30; 20)
+e_o = max(h/30; 20mm)
 e_i = max(e_i_; e_o)
 I_c = (b*h^3)/12
 i = sqr(I_c/A_c)
 λ = L_o/i
-k_1 = sqr(f_ck/20)
+k_1 = sqr(f_ck/20MPa)
 φ_ef = φ*K_G
 K_s = 1
 γ_cE = 1.3
 E_cd = E_cm/γ_cE
 I_s = A_s1*(h/2 - d_1)^2 + A_s2*(h/2 - d_2)^2
-n(N) = N/(A_c*f_cd/1000)
+n(N) = N/(A_c*f_cd)
 k_2_(N) = n(N)*λ/170
 k_2(N) = min(k_2_(N); 0.2)
 K_c(N) = k_1*k_2(N)/(1 + φ_ef)
 EI_e(N) = (K_c(N)*E_cd*I_c + K_s*E_s*I_s)
 N_B(N) = π^2*EI_e(N)/(L_o)^2
-#if L > 0
-	M_II_1 = (M_Ed_1 + N_Ed_1*e_i/1000)/(1 - N_Ed_1/N_B(N_Ed_1))
-	M_II_2 = (M_Ed_2 + N_Ed_2*e_i/1000)/(1 - N_Ed_2/N_B(N_Ed_2))
-	M_II_3 = (M_Ed_3 + N_Ed_3*e_i/1000)/(1 - N_Ed_3/N_B(N_Ed_3))
-	M_II_4 = (M_Ed_4 + N_Ed_4*e_i/1000)/(1 - N_Ed_4/N_B(N_Ed_4))
-	M_II_5 = (M_Ed_5 + N_Ed_5*e_i/1000)/(1 - N_Ed_5/N_B(N_Ed_5))
+#if L > 0mm
+	M_II_1 = (M_Ed_1 + N_Ed_1*e_i)/(1 - N_Ed_1/N_B(N_Ed_1))|kNm
+	M_II_2 = (M_Ed_2 + N_Ed_2*e_i)/(1 - N_Ed_2/N_B(N_Ed_2))|kNm
+	M_II_3 = (M_Ed_3 + N_Ed_3*e_i)/(1 - N_Ed_3/N_B(N_Ed_3))|kNm
+	M_II_4 = (M_Ed_4 + N_Ed_4*e_i)/(1 - N_Ed_4/N_B(N_Ed_4))|kNm
+	M_II_5 = (M_Ed_5 + N_Ed_5*e_i)/(1 - N_Ed_5/N_B(N_Ed_5))|kNm
 #else
 	M_II_1 = M_Ed_1
 	M_II_2 = M_Ed_2
@@ -118,69 +120,69 @@ A_s_min = 0.002*A_c
 
 ε_s1,a(x) = ε_cu2*(d - x)/x
 ε_s2,a(x) = ε_cu2*(d_2 - x)/x
-N_c,a(x) = 17/21*x*b*f_cd/1000
-N_s1,a(x) = σ_s(ε_s1,a(x))*A_s1/1000
-N_s2,a(x) = σ_s(ε_s2,a(x))*A_s2/1000
+N_c,a(x) = 17/21*x*b*f_cd
+N_s1,a(x) = σ_s(ε_s1,a(x))*A_s1
+N_s2,a(x) = σ_s(ε_s2,a(x))*A_s2
 N_Rd,a(x) = N_c,a(x) - N_s1,a(x) - N_s2,a(x)
 z_c,a(x) = h/2 - 99/238*x
-M_Rd,a(x) = (N_c,a(x)*z_c,a(x) + N_s1,a(x)*(h/2 - d_1) - N_s2,a(x)*(h/2 - d_2))/1000
+M_Rd,a(x) = (N_c,a(x)*z_c,a(x) + N_s1,a(x)*(h/2 - d_1) - N_s2,a(x)*(h/2 - d_2))
 
 x(ε) = h*ε_cu2/(ε_cu2 + ε)
 h_c = h*ε_c2/ε_cu2
 ε_s1,b(ε) = ε + (ε_c2 - ε)*d_1/h_c
 ε_s2,b(ε) = ε + (ε_c2 - ε)*(h - d_2)/h_c
-N_c,b(ε) = (h_c/6*(σ_c(ε) + 4*σ_c((ε + ε_c2)/2) + σ_c(ε_c2)) + (h - h_c)*f_cd)*b/1000
-N_s1,b(ε) = σ_s(ε_s1,b(ε))*A_s1/1000
-N_s2,b(ε) = σ_s(ε_s2,b(ε))*A_s2/1000
+N_c,b(ε) = (h_c/6*(σ_c(ε) + 4*σ_c((ε + ε_c2)/2) + σ_c(ε_c2)) + (h - h_c)*f_cd)*b
+N_s1,b(ε) = σ_s(ε_s1,b(ε))*A_s1
+N_s2,b(ε) = σ_s(ε_s2,b(ε))*A_s2
 N_Rd,b(ε) = N_c,b(ε) + N_s1,b(ε) + N_s2,b(ε)
-M_c0(ε) = (h_c^2/6*(2*σ_c((ε + ε_c2)/2) + σ_c(ε_c2)) + (h^2 - h_c^2)/2*f_cd)*b/1000
+M_c0(ε) = (h_c^2/6*(2*σ_c((ε + ε_c2)/2) + σ_c(ε_c2)) + (h^2 - h_c^2)/2*f_cd)*b
 z_c,b(ε) = M_c0(ε)/N_c,b(ε) - h/2
-M_Rd,b(ε) = (N_c,b(ε)*z_c,b(ε) - N_s1,b(ε)*(h/2 - d_1) + N_s2,b(ε)*(h/2 - d_2))/1000
+M_Rd,b(ε) = (N_c,b(ε)*z_c,b(ε) - N_s1,b(ε)*(h/2 - d_1) + N_s2,b(ε)*(h/2 - d_2))
 
 N_Rd(ε) = N_Rd,a(x(ε))*(ε ≥ 0) + N_Rd,b(abs(ε))*(ε < 0)
 M_Rd(ε) = M_Rd,a(x(ε))*(ε ≥ 0) + M_Rd,b(abs(ε))*(ε < 0)
 
-ε_max = $Root{N_Rd(ε) - 1 @ ε = 0 : 2}
+ε_max = $Root{N_Rd(ε) - 1kN @ ε = 0 : 2}
 #if ε_max > 0.1
 	ε_max = 0.1
 #end if
-N_Rd_max = A_c*f_cd/1000 + σ_s(ε_max)*(A_s1 + A_s2)/1000
+N_Rd_max = A_c*f_cd + σ_s(ε_max)*(A_s1 + A_s2)|kN
 #if N_Ed_1 > N_Rd_max
-	M_Rd_1 = 0
+	M_Rd_1 = 0kNm
 #else
 	ε_1 = $Root{N_Rd(ε) - N_Ed_1 @ ε = -ε_c2 : 2}
-	M_Rd_1 = M_Rd(ε_1)
+	M_Rd_1 = M_Rd(ε_1)|kNm
 #end if
 #if N_Ed_2 > N_Rd_max
-	M_Rd_2 = 0
+	M_Rd_2 = 0kNm
 #else
 	ε_2 = $Root{N_Rd(ε) - N_Ed_2 @ ε = -ε_c2 : 2}
-	M_Rd_2 = M_Rd(ε_2)
+	M_Rd_2 = M_Rd(ε_2)|kNm
 #end if
 #if N_Ed_3 > N_Rd_max
-	M_Rd_3 = 0
+	M_Rd_3 = 0kNm
 #else
 	ε_3 = $Root{N_Rd(ε) - N_Ed_3 @ ε = -ε_c2 : 2}
-	M_Rd_3 = M_Rd(ε_3)
+	M_Rd_3 = M_Rd(ε_3)|kNm
 #end if
 #if N_Ed_4 > N_Rd_max
-	M_Rd_4 = 0
+	M_Rd_4 = 0kNm
 #else
 	ε_4 = $Root{N_Rd(ε) - N_Ed_4 @ ε = -ε_c2 : 2}
-	M_Rd_4 = M_Rd(ε_4)
+	M_Rd_4 = M_Rd(ε_4)|kNm
 #end if
 #if N_Ed_5 > N_Rd_max
-	M_Rd_5 = 0
+	M_Rd_5 = 0kNm
 #else
 	ε_5 = $Root{N_Rd(ε) - N_Ed_5 @ ε = -ε_c2 : 2}
-	M_Rd_5 = M_Rd(ε_5)
+	M_Rd_5 = M_Rd(ε_5)|kNm
 #end if
 
-M_Rd_ei(ε) = N_Rd(ε)*e_i/1000
+M_Rd_ei(ε) = N_Rd(ε)*e_i
 M_Rd_II(ε) = M_Rd_ei(ε)/(1 - N_Rd(ε)/N_B(N_Rd(ε)))/(N_Rd(ε) < 0.95*N_B(N_Rd(ε)))
 ε_ei = $Root{M_Rd_ei(ε) - M_Rd(ε) @ ε = -ε_c2 : ε_max}
 M_Rd_ei = M_Rd(ε_ei)
-N_Rd_ei = N_Rd(ε_ei)
+N_Rd_ei = N_Rd(ε_ei)|kN
 #if N_Rd_max < N_B(N_Rd_max)
 	ε_NB = ε_ei
 #else
@@ -189,13 +191,14 @@ N_Rd_ei = N_Rd(ε_ei)
 ε_II = ε_NB
 ε_II = $Root{M_Rd_ei(ε)/(1 - N_Rd(ε)/N_B(N_Rd(ε))) - M_Rd(ε) @ ε = ε_NB : ε_max}
 M_Rd_II = M_Rd(ε_II)
-N_Rd_II = N_Rd(ε_II)
+N_Rd_II = N_Rd(ε_II)|kN
 PlotWidth = 600
 PlotHeight = 600
+#end hide
 #post
 '<h4>Interaction diagram</h4>
 '<p><i>N</i><sub>Rd</sub></p>
-$Plot{M_Rd(ε)|N_Rd(ε) & M_Rd_ei(ε)|N_Rd(ε) & M_Rd_II(ε)|N_Rd(ε) & M_Rd_ei|N_Rd_ei & M_Rd_II|N_Rd_II & M_II_1|N_Ed_1 & M_II_2|N_Ed_2 & M_II_3|N_Ed_3 & M_II_4|N_Ed_4 & M_II_5|N_Ed_5 @ ε = ε_max : -ε_c2}
+$Plot{M_Rd(ε)/1kNm|N_Rd(ε)/1kN & M_Rd_ei(ε)/1kNm|N_Rd(ε)/1kN & M_Rd_II(ε)/1kNm|N_Rd(ε)/1kN & M_Rd_ei/1kNm|N_Rd_ei/1kN & M_Rd_II/1kNm|N_Rd_II/1kN & M_II_1/1kNm|N_Ed_1/1kN & M_II_2/1kNm|N_Ed_2/1kN & M_II_3/1kNm|N_Ed_3/1kN & M_II_4/1kNm|N_Ed_4/1kN & M_II_5/1kNm|N_Ed_5/1kN @ ε = ε_max : -ε_c2}
 '<i>M</i><sub>Rd</sub>
 '<p><b>Legend:</b></p>
 '<p><b style="color:Tomato">━━</b> Interaction diagram</p>
@@ -245,11 +248,11 @@ $Plot{M_Rd(ε)|N_Rd(ε) & M_Rd_ei(ε)|N_Rd(ε) & M_Rd_II(ε)|N_Rd(ε) & M_Rd_ei|
 	'<tr class="err"><td>5</td><td>'N_Ed_5'</td><td>&lt;</td><td>'N_B(N_Ed_5)'</td><td>'M_Ed_5'</td><td>'M_II_5'</td><td>&gt;</td><td>'M_Rd_5'</td></tr>
 #end if
 '</table>
-#equ
+#end val
 '<p><b>Ultimate capacity for axial force:</b></p>
-'- cross section only -'N_Rd_max'kN
-'- column with geometric imperfections -'N_Rd_ei'kN
-'- column with imperfections and II order effects -'N_Rd_II'kN
+'- cross section only -'N_Rd_max
+'- column with geometric imperfections -'N_Rd_ei
+'- column with imperfections and II order effects -'N_Rd_II
 'Buckling factor -'φ = N_Rd_II/N_Rd_max
-#show
+#end post
 '</div>

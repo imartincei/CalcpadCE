@@ -6,35 +6,35 @@
  </div>
  <p>Dimensions</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-5">20</u>
+   = 20
+   <i>m</i>
   </span>
-  m,
+  , Web thickness -
   <span class="eq">
    <var>t</var>
    <sub>w</sub>
-   =
-   <u class="input-5">2</u>
+   = 2
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
+  Flange width -
   <span class="eq">
    <var>b</var>
    <sub>f</sub>
-   =
-   <u class="input-6">10</u>
+   = 10
+   <i>m</i>
   </span>
-  m,
+  , Flange thickness -
   <span class="eq">
    <var>t</var>
    <sub>f</sub>
-   =
-   <u class="input-6">5</u>
+   = 5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -46,10 +46,14 @@
    ·
    <var>t</var>
    <sub>w</sub>
-   = 20 · 2 = 40
+   = 20
+   <i>m</i>
+   · 2
+   <i>m</i>
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>
   <span class="eq">
@@ -64,10 +68,16 @@
    )  ·
    <var>t</var>
    <sub>f</sub>
-   =  ( 10 − 2 )  · 5 = 40
+   =  ( 10
+   <i>m</i>
+   − 2
+   <i>m</i>
+   )  · 5
+   <i>m</i>
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>
   <span class="eq">
@@ -78,10 +88,16 @@
    +
    <var>A</var>
    <sub>f</sub>
-   = 40 + 40 = 80
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 80
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -116,22 +132,33 @@
    </span>
    =
    <span class="dvc">
-    40 · 2
+    40
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 2
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    +
    <span class="dvc">
-    40 ·  ( 10 + 2 )
+    40
+    <i>m</i>
+    <sup class="unit">2</sup>
+    ·  ( 10
+    <i>m</i>
+    + 2
+    <i>m</i>
+    )
     <span class="dvl">
     </span>
     2
    </span>
    = 280
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>
   <span class="eq">
@@ -148,13 +175,17 @@
    =
    <span class="dvc">
     280
+    <i>m</i>
+    <sup class="unit">3</sup>
     <span class="dvl">
     </span>
     80
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
    = 3.5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -183,22 +214,30 @@
    </span>
    =
    <span class="dvc">
-    40 · 20
+    40
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 20
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    +
    <span class="dvc">
-    40 · 5
+    40
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 5
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 500
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>
   <span class="eq">
@@ -215,13 +254,17 @@
    =
    <span class="dvc">
     500
+    <i>m</i>
+    <sup class="unit">3</sup>
     <span class="dvl">
     </span>
     80
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
    = 6.25
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter</p>
  <p>
@@ -232,9 +275,13 @@
    +
    <var>b</var>
    <sub>f</sub>
-   )  = 2 ·  ( 20 + 10 )  = 60
+   )  = 2 ·  ( 20
+   <i>m</i>
+   + 10
+   <i>m</i>
+   )  = 60
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -267,10 +314,15 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   = 40 ·
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
-    20
+    ( 20
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -278,9 +330,12 @@
    </span>
    +
    <span class="b1">(</span>
-   6.25 −
+   6.25
+   <i>m</i>
+   −
    <span class="dvc">
     20
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -289,9 +344,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 1895.83
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -325,10 +380,15 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   = 40 ·
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
-    5
+    ( 5
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -336,9 +396,12 @@
    </span>
    +
    <span class="b1">(</span>
-   6.25 −
+   6.25
+   <i>m</i>
+   −
    <span class="dvc">
     5
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -347,9 +410,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 645.83
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -361,10 +424,16 @@
    +
    <var>I</var>
    <sub>y_f</sub>
-   = 1895.83 + 645.83 = 2541.67
+   = 1895.83
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 645.83
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 2541.67
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -403,10 +472,18 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   =  ( 20 − 5 )  · 2 ·
+   =  ( 20
+   <i>m</i>
+   − 5
+   <i>m</i>
+   )  · 2
+   <i>m</i>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
-    2
+    ( 2
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -414,9 +491,12 @@
    </span>
    +
    <span class="b1">(</span>
-   3.5 −
+   3.5
+   <i>m</i>
+   −
    <span class="dvc">
     2
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -425,9 +505,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 197.5
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -464,10 +544,16 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   = 5 · 10 ·
+   = 5
+   <i>m</i>
+   · 10
+   <i>m</i>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
-    10
+    ( 10
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -475,9 +561,12 @@
    </span>
    +
    <span class="b1">(</span>
-   3.5 −
+   3.5
+   <i>m</i>
+   −
    <span class="dvc">
     10
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -486,9 +575,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 529.17
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -500,10 +589,16 @@
    +
    <var>I</var>
    <sub>z_f</sub>
-   = 197.5 + 529.17 = 726.67
+   = 197.5
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 529.17
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 726.67
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -569,50 +664,66 @@
    <var>y</var>
    <sub>c</sub>
    <span class="b1">)</span>
-   = 40 ·
+   = 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
     20
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    − 6.25
+   <i>m</i>
    <span class="b1">)</span>
    ·
    <span class="b1">(</span>
    <span class="dvc">
     2
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    − 3.5
+   <i>m</i>
    <span class="b1">)</span>
-   + 40 ·
+   + 40
+   <i>m</i>
+   <sup class="unit">2</sup>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
     5
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    − 6.25
+   <i>m</i>
    <span class="b1">)</span>
    ·
    <span class="b1">(</span>
    <span class="dvc">
-    10 + 2
+    10
+    <i>m</i>
+    + 2
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    − 3.5
+   <i>m</i>
    <span class="b1">)</span>
    = -750
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Principal moments of area</p>
  <p>
@@ -654,7 +765,12 @@
    </span>
    =
    <span class="dvc">
-    2541.67 + 726.67
+    2541.67
+    <i>m</i>
+    <sup class="unit">4</sup>
+    + 726.67
+    <i>m</i>
+    <sup class="unit">4</sup>
     <span class="dvl">
     </span>
     2
@@ -664,19 +780,28 @@
     <span class="r1">
     </span>
     <span class="dvc">
-     ( 2541.67 − 726.67 )
+     ( 2541.67
+     <i>m</i>
+     <sup class="unit">4</sup>
+     − 726.67
+     <i>m</i>
+     <sup class="unit">4</sup>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
      4
     </span>
-    +  ( -750 )
+    +  ( -750
+    <i>m</i>
+    <sup class="unit">4</sup>
+    )
     <sup>2</sup>
    </span>
    = 2811.48
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -717,7 +842,12 @@
    </span>
    =
    <span class="dvc">
-    2541.67 + 726.67
+    2541.67
+    <i>m</i>
+    <sup class="unit">4</sup>
+    + 726.67
+    <i>m</i>
+    <sup class="unit">4</sup>
     <span class="dvl">
     </span>
     2
@@ -727,19 +857,28 @@
     <span class="r1">
     </span>
     <span class="dvc">
-     ( 2541.67 − 726.67 )
+     ( 2541.67
+     <i>m</i>
+     <sup class="unit">4</sup>
+     − 726.67
+     <i>m</i>
+     <sup class="unit">4</sup>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
      4
     </span>
-    +  ( -750 )
+    +  ( -750
+    <i>m</i>
+    <sup class="unit">4</sup>
+    )
     <sup>2</sup>
    </span>
    = 456.86
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Angle of principal axis</p>
  <p>
@@ -765,10 +904,17 @@
    <b>atan</b>
    <span class="b1">(</span>
    <span class="dvc">
-    2541.67 − 2811.48
+    2541.67
+    <i>m</i>
+    <sup class="unit">4</sup>
+    − 2811.48
+    <i>m</i>
+    <sup class="unit">4</sup>
     <span class="dvl">
     </span>
     -750
+    <i>m</i>
+    <sup class="unit">4</sup>
    </span>
    <span class="b1">)</span>
    = 19.79°
@@ -785,10 +931,16 @@
    +
    <var>I</var>
    <sub>2</sub>
-   = 2811.48 + 456.86 = 3268.33
+   = 2811.48
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 456.86
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 3268.33
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -813,14 +965,18 @@
     </span>
     <span class="dvc">
      2541.67
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      80
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 5.64
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -844,14 +1000,18 @@
     </span>
     <span class="dvc">
      726.67
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      80
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 3.01
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -875,14 +1035,18 @@
     </span>
     <span class="dvc">
      2811.48
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      80
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 5.93
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -906,14 +1070,18 @@
     </span>
     <span class="dvc">
      456.86
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      80
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 2.39
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -937,13 +1105,17 @@
     </span>
     <span class="dvc">
      3268.33
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      80
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 6.39
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

@@ -2,12 +2,22 @@
  <!-- Combined material and geometric nonlinear analysis of a prestressed three-joint truss with a bilinear elastic-plastic stress-strain law, solved by a global Newton-Raphson iteration that updates the Jacobi matrix and the axial stiffness $E A$ at each step. -->
  <h4>Input data</h4>
  <p>
+  Joint x coordinates -
   <span class="eq">
    <var>
     <span class="vec">⃗</span>
     x
    </var>
    <sub>J</sub>
+   =
+   <span class="b0">[</span>
+   0
+   <i>m</i>
+   ; 3
+   <i>m</i>
+   ; 9
+   <i>m</i>
+   <span class="b0">]</span>
    =
    <b class="b0">[</b>
    0
@@ -18,13 +28,24 @@
    <i>m</i>
    <b class="b0">]</b>
   </span>
-  ,
+ </p>
+ <p>
+  Joint y coordinates -
   <span class="eq">
    <var>
     <span class="vec">⃗</span>
     y
    </var>
    <sub>J</sub>
+   =
+   <span class="b0">[</span>
+   0
+   <i>m</i>
+   ; 0
+   <i>m</i>
+   ; 0
+   <i>m</i>
+   <span class="b0">]</span>
    =
    <b class="b0">[</b>
    0
@@ -35,7 +56,8 @@
    <i>m</i>
    <b class="b0">]</b>
   </span>
-  ,
+ </p>
+ <p>
   <span class="eq">
    <var>n</var>
    <sub>J</sub>
@@ -53,13 +75,17 @@
  <h4>Elements - [J1; J2]</h4>
  <p>
   <span class="eq">
-   <b>transp</b>
-   (
    <b>
     <var>E</var>
    </b>
    <sub>J</sub>
-   )  =
+   =
+   <span class="b0">[</span>
+   1; 2
+   <span class="b0">|</span>
+   2; 3
+   <span class="b0">]</span>
+   =
    <span class="matrix">
     <span class="tr">
      <span class="td">
@@ -79,7 +105,8 @@
     </span>
    </span>
   </span>
-  ,
+ </p>
+ <p>
   <span class="eq">
    <var>n</var>
    <sub>E</sub>
@@ -636,6 +663,14 @@ circle.Series1 {fill:Tomato;}
    </polygon>
   </g>
  </svg>
+ <p>
+  Cross section diameter -
+  <span class="eq">
+   <var>Φ</var>
+   = 20
+   <i>mm</i>
+  </span>
+ </p>
  <h4>
   Cross section – circular with diameter
   <span class="eq">
@@ -723,12 +758,62 @@ circle.Series1 {fill:Tomato;}
  </p>
  <h4>Load - [Joint, Fx, Fy]</h4>
  <p>
+  Load applied at joint -
+  <span class="eq">
+   <var>j</var>
+   <sub>F</sub>
+   = 2
+  </span>
+ </p>
+ <p>
+  Horizontal load -
+  <span class="eq">
+   <var>F</var>
+   <sub>xJ</sub>
+   = 0
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Vertical load -
+  <span class="eq">
+   <var>F</var>
+   <sub>yJ</sub>
+   = -70
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
   <span class="eq">
    <b>
     <var>F</var>
    </b>
    <sub>J</sub>
    =
+   <b>join</b>
+   <sub>rows</sub>
+   (
+   <span class="b0">[</span>
+   <var>j</var>
+   <sub>F</sub>
+   ;
+   <var>F</var>
+   <sub>xJ</sub>
+   ;
+   <var>F</var>
+   <sub>yJ</sub>
+   <span class="b0">]</span>
+   )  =
+   <b>join</b>
+   <sub>rows</sub>
+   (
+   <span class="b0">[</span>
+   2; 0
+   <i>kN</i>
+   ; -70
+   <i>kN</i>
+   <span class="b0">]</span>
+   )  =
    <span class="matrix">
     <span class="tr">
      <span class="td">
@@ -747,7 +832,8 @@ circle.Series1 {fill:Tomato;}
     </span>
    </span>
   </span>
-  ,
+ </p>
+ <p>
   <span class="eq">
    <var>n</var>
    <sub>F</sub>
@@ -768,6 +854,15 @@ circle.Series1 {fill:Tomato;}
    <var>P</var>
    = 20
    <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Initial deflection at the intermediate joint -
+  <span class="eq">
+   <var>z</var>
+   <sub>i</sub>
+   = 100
+   <i>mm</i>
   </span>
  </p>
  <p>
@@ -1273,6 +1368,9 @@ circle.Series1 {fill:Tomato;}
     Z
    </var>
    <sub>4</sub>
+   =
+   <var>z</var>
+   <sub>i</sub>
    = 100
    <i>mm</i>
   </span>

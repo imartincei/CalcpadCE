@@ -12,59 +12,57 @@
    <span class="eq">
     <var>s</var>
     <sub>k</sub>
-    =
-    <u class="input-5">1.5</u>
+    = 1.5
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+     <sup class="unit">2</sup>
+    </span>
    </span>
-   kN/m
-   <sup>2</sup>
   </p>
   <p>
    Higher roof width -
    <span class="eq">
     <var>b</var>
     <sub>1</sub>
-    =
-    <u class="input-6">18</u>
+    = 18
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Sliding surface width -
    <span class="eq">
     <var>b</var>
     <sub>s</sub>
-    =
-    <u class="input-7">9</u>
+    = 9
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Lower roof width -
    <span class="eq">
     <var>b</var>
     <sub>2</sub>
-    =
-    <u class="input-8">36</u>
+    = 36
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    height difference -
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-9">6.2</u>
+    = 6.2
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Pitch angle of the higher roof -
    <span class="eq">
     <var>α</var>
-    =
-    <u class="input-10">3</u>
+    = 3°
    </span>
-   <sup>o</sup>
   </p>
   <p>Shape coefficient for the higher roof</p>
   <p>
@@ -85,17 +83,27 @@
     <sub>s</sub>
     =
     <b>max</b>
-    ( 5;
+    ( 5
+    <i>m</i>
+    ;
     <b>min</b>
     ( 2 ·
     <var>h</var>
-    ; 15 )  )  =
+    ; 15
+    <i>m</i>
+    )  )  =
     <b>max</b>
-    ( 5;
+    ( 5
+    <i>m</i>
+    ;
     <b>min</b>
-    ( 2 · 6.2; 15 )  )  = 12.4
+    ( 2 · 6.2
+    <i>m</i>
+    ; 15
+    <i>m</i>
+    )  )  = 12.4
+    <i>m</i>
    </span>
-   m
   </p>
   <p>Shape coefficient due to sliding</p>
   <p class="ref">EN 1991-1-3, § 5.3.6 (1)</p>
@@ -118,9 +126,11 @@
     =
     <span class="dvc">
      0 · 9
+     <i>m</i>
      <span class="dvl">
      </span>
      12.4
+     <i>m</i>
     </span>
     = 0
    </span>
@@ -133,45 +143,74 @@
     <sub>w_</sub>
     =
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     <var>b</var>
-     <sub>1</sub>
-     +
-     <var>b</var>
-     <sub>2</sub>
-     <span class="dvl">
+    <span class="b2">(</span>
+    <span class="dvc down">
+     <span class="dvc">
+      <var>b</var>
+      <sub>1</sub>
+      +
+      <var>b</var>
+      <sub>2</sub>
+      <span class="dvl">
+      </span>
+      2 ·
+      <var>h</var>
      </span>
-     2 ·
-     <var>h</var>
-    </span>
-    ;
-    <span class="dvc">
-     2 ·
-     <var>h</var>
-     <span class="dvl">
+     ;
+     <span class="dvc up">
+      2
+      <span class="dvc">
+       <i>kN</i>
+       <span class="dvl">
+       </span>
+       <i>m</i>
+       <sup class="unit">3</sup>
+      </span>
+      ·
+      <var>h</var>
+      <span class="dvl">
+      </span>
+      <var>s</var>
+      <sub>k</sub>
      </span>
-     <var>s</var>
-     <sub>k</sub>
     </span>
-    <span class="b1">)</span>
+    <span class="b2">)</span>
     =
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     18 + 36
-     <span class="dvl">
+    <span class="b2">(</span>
+    <span class="dvc down">
+     <span class="dvc">
+      18
+      <i>m</i>
+      + 36
+      <i>m</i>
+      <span class="dvl">
+      </span>
+      2 · 6.2
+      <i>m</i>
      </span>
-     2 · 6.2
-    </span>
-    ;
-    <span class="dvc">
-     2 · 6.2
-     <span class="dvl">
+     ;
+     <span class="dvc up">
+      2
+      <span class="dvc">
+       <i>kN</i>
+       <span class="dvl">
+       </span>
+       <i>m</i>
+       <sup class="unit">3</sup>
+      </span>
+      · 6.2
+      <i>m</i>
+      <span class="dvl">
+      </span>
+      1.5
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
      </span>
-     1.5
     </span>
-    <span class="b1">)</span>
+    <span class="b2">)</span>
     = 4.35
    </span>
   </p>

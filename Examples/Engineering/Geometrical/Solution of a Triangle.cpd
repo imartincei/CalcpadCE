@@ -1,9 +1,8 @@
 '<!-- Recovers all six elements of a triangle from three given side lengths via the law of cosines, plus area and the three heights. -->
-"Solution of triangle, defined by three sides
+'<h1>Solution of triangle, defined by three sides</h1>
 #deg
 'Lengths of sides:
-a = ? {5}', 'b = ? {4}', 'c = ? {6}
-#hide
+#UI 'Side a -'a = 5m', Side b -'b = 4m', Side c -'c = 6m
 #if (a + b > c)*(b + c > a)*(c + a > b)
 	#post
 	'Perimeter
@@ -34,28 +33,31 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 		'<!-- -->scalene.</p>
 	#end if
 	#pre
-	'<svg viewbox="-20 -20 440 232" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 20px; width: 220pt; height: 116pt">
-	'<path d="M40 192 A 40 40 0 0 0 32 168" style="stroke:goldenrod; stroke-width:1; fill: none"/>
-	'<path d="M360 192 A 40 40 0 0 1 376 160" style="stroke:goldenrod; stroke-width:1; fill: none"/>
-	'<path d="M280 32 A 40 40 0 0 1 224 24" style="stroke:goldenrod; stroke-width:1; fill: none"/>
-	'<polyline points="0,192 400,192 256,0 0,192" style="stroke:black; stroke-width:2; fill:yellow; fill-opacity:0.2"/>
-	'<circle cx="0" cy="192" r="4" style="fill:red"/>
-	'<circle cx="400" cy="192" r="4" style="fill:red"/>
-	'<circle cx="256" cy="0" r="4" style="fill:red"/>
-	'<text x="0" y="212" text-anchor="end">A</text>
-	'<text x="400" y="212">B</text>
-	'<text x="256" y="-5">C</text>
-	'<text x="200" y="212" text-anchor="middle">c</text>
-	'<text x="328" y="86" text-anchor="start">a</text>
-	'<text x="128" y="86" text-anchor="end">b</text>
-	'<text x="50" y="182">α</text>
-	'<text x="350" y="182" text-anchor="end">β</text>
-	'<text x="256" y="60" text-anchor="middle">γ</text>
-	'</svg>
+	#html
+	<svg viewbox="-20 -20 440 232" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 20px; width: 220pt; height: 116pt">
+	<path d="M40 192 A 40 40 0 0 0 32 168" style="stroke:goldenrod; stroke-width:1; fill: none"/>
+	<path d="M360 192 A 40 40 0 0 1 376 160" style="stroke:goldenrod; stroke-width:1; fill: none"/>
+	<path d="M280 32 A 40 40 0 0 1 224 24" style="stroke:goldenrod; stroke-width:1; fill: none"/>
+	<polyline points="0,192 400,192 256,0 0,192" style="stroke:black; stroke-width:2; fill:yellow; fill-opacity:0.2"/>
+	<circle cx="0" cy="192" r="4" style="fill:red"/>
+	<circle cx="400" cy="192" r="4" style="fill:red"/>
+	<circle cx="256" cy="0" r="4" style="fill:red"/>
+	<text x="0" y="212" text-anchor="end">A</text>
+	<text x="400" y="212">B</text>
+	<text x="256" y="-5">C</text>
+	<text x="200" y="212" text-anchor="middle">c</text>
+	<text x="328" y="86" text-anchor="start">a</text>
+	<text x="128" y="86" text-anchor="end">b</text>
+	<text x="50" y="182">α</text>
+	<text x="350" y="182" text-anchor="end">β</text>
+	<text x="256" y="60" text-anchor="middle">γ</text>
+	</svg>
+	#end html
+	#end pre
 	#hide
 	h_c = a*sin(β)
 	c_1 = b*cos(α)
-	x_min = min(0; c_1)
+	x_min = min(0m; c_1)
 	x_max = max(c; c_1)
 	dx = x_max - x_min
 	k = 400/max(dx; h_c)
@@ -67,7 +69,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	y_B = y_A
 	x_C = x_A + c_1*k
 	y_C = y_A - h_c*k
-	#post
+	#end hide
 	#val
 	'<svg viewbox="'x_min*k - 20' -20 'w + 40' 'h + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 18px; width: 'w/2 + 20'pt; height: 'h/2 + 20'pt">
 	'<path d="M'x_A + 40' 'y_A' A 40 40 0 0 0 'x_A + 40*cos(α)' 'y_A - 40*sin(α)'" style="stroke:goldenrod; stroke-width:1; fill: none"/>
@@ -87,7 +89,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	'<text x="'x_B - 50'" y="'y_B - 10'" text-anchor="end">'β'&deg;</text>
 	'<text x="'x_C'" y="'y_C + 60'" text-anchor="middle">'γ'&deg;</text>
 	'</svg>
-	#equ
+	#end val
 	'Medians:
 	m_a = sqrt((b^2 + c^2 - 0.5*a^2)/2)
 	m_b = sqrt((a^2 + c^2 - 0.5*b^2)/2)
@@ -107,7 +109,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	y_mc = (2*y_C + y_mC)/3 - 10
 	x_M = (x_C + 2*x_mC)/3
 	y_M = (y_C + 2*y_mC)/3
-	#post
+	#end hide
 	#val
 	'<svg viewbox="'x_min*k - 20' -20 'w + 40' 'h + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 18px; width: 'w/2 + 20'pt; height: 'h/2 + 20'pt">
 	'<line x1="'x_A'" y1="'y_A'" x2="'x_mA'" y2="'y_mA'" style="stroke:orange; stroke-width:1"/>
@@ -128,7 +130,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	'<text x="'x_mb + 15'" y="'y_mb + 6'">b</text>
 	'<text x="'x_mc + 15'" y="'y_mc + 6'">c</text>
 	'</svg>
-	#equ
+	#end val
 	'Angle bisectors:
 	l_a = sqrt(b*c*(1 - a^2/(b + c)^2))
 	l_b = sqrt(a*c*(1 - b^2/(a + c)^2))
@@ -165,7 +167,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	y_L = y_A - r*k
 	x_O = x_A + x_o*k
 	y_O = y_A - y_o*k
-	#post
+	#end hide
 	#val
 	'<svg viewbox="'x_min*k - 20' -20 'w + 40' 'h + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 18px; width: 'w/2 + 20'pt; height: 'h/2 + 20'pt">
 	'<circle cx="'x_O'" cy="'y_O'" r="'R*k'" style="stroke:red; fill:none "/>
@@ -193,14 +195,14 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	'<text x="'x_lb + 6'" y="'y_lb + 6'">b</text>
 	'<text x="'x_lc + 6'" y="'y_lc + 6'">c</text>
 	'</svg>
-	#equ
+	#end val
 	'Altitudes:
 	h_a = b*sin(γ)
 	h_b = c*sin(α)
 	h_c = a*sin(β)
 	#hide
 	y_h = c_1*cot(β)
-	y_min = min(0; y_h)
+	y_min = min(0m; y_h)
 	y_max = max(h_c; y_h)
 	dy = y_max - y_min
 	k = 400/max(dx; dy)
@@ -219,7 +221,7 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	y_hb = y_B - h_b*k*cos(α)/2 - 5
 	x_hc = x_C + 5
 	y_hc = y_C + h_c*k/2 - 10
-	#post
+	#end hide
 	#val
 	'<svg viewbox="'x_min*k - 20' '-y_min*k - 20' 'w + 40' 'h + 40'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size: 18px; width: 'w/2 + 20'pt; height: 'h/2 + 20'pt">
 	'<line x1="'x_C'" y1="'y_H'" x2="'x_A + h_a*k*sin(β)'" y2="'y_A - h_a*k*cos(β)'" style="stroke:red; stroke-width:1; stroke-dasharray: 5,5; stroke-opacity:0.4"/>
@@ -249,7 +251,8 @@ a = ? {5}', 'b = ? {4}', 'c = ? {6}
 	'<text x="'x_hb + 12'" y="'y_hb + 6'">b</text>
 	'<text x="'x_hc + 12'" y="'y_hc + 6'">c</text>
 	'</svg>
-	#equ
+	#end val
+	#end post
 #else
 	'The triangle is not properly defined.
 	'The sum of each two sides, must be greater than the length of the third side.

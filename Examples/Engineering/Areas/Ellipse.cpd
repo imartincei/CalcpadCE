@@ -1,7 +1,7 @@
 '<!-- Area $A = \pi\, a\, b$ and approximate circumference of an ellipse from its two semi-axes. -->
 '<div style="max-width:110mm;"><img style="height:65pt;" class="side" alt="ellipse.png" src="../../Images/math/area/ellipse.png"></div>
 'Dimensions
-a = ? {2}','b = ? {1}
+#UI 'Semi-axis -'a = 2m', Semi-axis -'b = 1m
 'Area
 A = π*a*b/4
 'Circumference

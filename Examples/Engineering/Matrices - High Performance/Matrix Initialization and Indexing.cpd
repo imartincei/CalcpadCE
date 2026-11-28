@@ -9,7 +9,7 @@ A(x) = transp(hp([x^0|x|x^2|x^3|x^4]))
 x = hp([1; 2; 3; 4])
 A = A(x)','isHp(A)
 
-"Indexing
+'<h1>Indexing</h1>
 '<hr/>
 A.(3; 2)'- simple dot operator (constant index)
 i = 2', 'j = 3

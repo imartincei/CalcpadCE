@@ -12,10 +12,9 @@
    梁跨度 —
    <span class="eq">
     <var>L</var>
-    =
-    <u class="input-9">7.5</u>
+    = 7.5
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
   </p>
@@ -27,10 +26,14 @@
    <span class="eq">
     <var>q</var>
     <sub>k</sub>
-    =
-    <u class="input-12">10</u>
+    = 10
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m
   </p>
   <p>
    荷载分项系数 —
@@ -44,10 +47,9 @@
    弹性模量 —
    <span class="eq">
     <var>E</var>
-    =
-    <u class="input-14">206</u>
+    = 206
+    <i>GPa</i>
    </span>
-   GPa
   </p>
   <p>
   </p>
@@ -59,19 +61,18 @@
    <span class="eq">
     <var>I</var>
     <sub>y</sub>
-    =
-    <u class="input-17">23170</u>
+    = 23170
+    <i>cm</i>
+    <sup class="unit">4</sup>
    </span>
-   cm⁴
   </p>
   <p>
    截面高度 —
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-18">300</u>
+    = 300
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    截面塑性发展系数 —
@@ -85,10 +86,9 @@
    钢材抗弯强度设计值 —
    <span class="eq">
     <var>f</var>
-    =
-    <u class="input-20">215</u>
+    = 215
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
   </p>
@@ -99,6 +99,7 @@
     <var>R</var>
     <sub>A</sub>
     = 48.75
+    <i>kN</i>
    </span>
   </p>
   <p>
@@ -107,6 +108,7 @@
     <var>M</var>
     <sub>max</sub>
     = 91.41
+    <i>kNm</i>
    </span>
   </p>
   <p>
@@ -115,6 +117,7 @@
     <var>d</var>
     <sub>max</sub>
     = 8.63
+    <i>mm</i>
    </span>
   </p>
   <p>
@@ -122,6 +125,7 @@
    <span class="eq">
     <var>σ</var>
     = 56.36
+    <i>MPa</i>
    </span>
   </p>
   <p>
@@ -129,6 +133,7 @@
    <span class="eq">
     <var>f</var>
     = 215
+    <i>MPa</i>
    </span>
   </p>
   <p>
@@ -524,10 +529,9 @@ circle.Series1 {fill:Tomato;}
    <span class="eq">
     <var>x</var>
     <sub>chk</sub>
-    =
-    <u class="input-85">1.875</u>
+    = 1.875
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <span class="eq">
@@ -551,14 +555,24 @@ circle.Series1 {fill:Tomato;}
     </span>
     =
     <span class="dvc">
-     13 · 1.88 ·  ( 7.5 − 1.88 )
+     13
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     · 1.88
+     <i>m</i>
+     ·  ( 7.5
+     <i>m</i>
+     − 1.88
+     <i>m</i>
+     )
      <span class="dvl">
      </span>
      2
     </span>
     = 68.55
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    <span class="eq">
@@ -578,19 +592,25 @@ circle.Series1 {fill:Tomato;}
     <var>x</var>
     <sub>chk</sub>
     <span class="b1">)</span>
-    = 13 ·
+    = 13
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    ·
     <span class="b1">(</span>
     <span class="dvc">
      7.5
+     <i>m</i>
      <span class="dvl">
      </span>
      2
     </span>
     − 1.88
+    <i>m</i>
     <span class="b1">)</span>
     = 24.38
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <span class="eq">
@@ -622,58 +642,69 @@ circle.Series1 {fill:Tomato;}
      24 ·
      <var>EI</var>
     </span>
-    · 1000 =
+    =
     <span class="dvc">
-     10 · 1.88 ·  ( 7.5
+     10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     · 1.88
+     <i>m</i>
+     ·  (  ( 7.5
+     <i>m</i>
+     )
      <sup>3</sup>
-     − 2 · 7.5 · 1.88
+     − 2 · 7.5
+     <i>m</i>
+     ·  ( 1.88
+     <i>m</i>
+     )
      <sup>2</sup>
-     + 1.88
+     +  ( 1.88
+     <i>m</i>
+     )
      <sup>3</sup>
      )
      <span class="dvl">
      </span>
      24 · 47730.2
+     <i>kN</i>
+     <i>·</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    · 1000 = 6.15
+    = 6.15
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    <span class="eq">
     <var>σ</var>
     <sub>chk</sub>
     =
-    <span class="dvc up">
-     <span class="dvc">
-      <var>M</var>
-      <sub>chk</sub>
-      <span class="dvl">
-      </span>
-      <var>γ</var>
-      <sub>x</sub>
-      ·
-      <var>W</var>
-     </span>
+    <span class="dvc">
+     <var>M</var>
+     <sub>chk</sub>
      <span class="dvl">
      </span>
-     1000
+     <var>γ</var>
+     <sub>x</sub>
+     ·
+     <var>W</var>
     </span>
     =
-    <span class="dvc up">
-     <span class="dvc">
-      68.55
-      <span class="dvl">
-      </span>
-      1.05 · 0.00154
-     </span>
+    <span class="dvc">
+     68.55
+     <i>kNm</i>
      <span class="dvl">
      </span>
-     1000
+     1.05 · 1544.67
+     <i>cm</i>
+     <sup class="unit">3</sup>
     </span>
     = 42.27
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    截面弯矩
@@ -681,6 +712,7 @@ circle.Series1 {fill:Tomato;}
     <var>M</var>
     <sub>chk</sub>
     = 68.55
+    <i>kNm</i>
    </span>
   </p>
   <p>
@@ -689,6 +721,7 @@ circle.Series1 {fill:Tomato;}
     <var>V</var>
     <sub>chk</sub>
     = 24.38
+    <i>kN</i>
    </span>
   </p>
   <p>
@@ -697,6 +730,7 @@ circle.Series1 {fill:Tomato;}
     <var>d</var>
     <sub>chk</sub>
     = 6.15
+    <i>mm</i>
    </span>
   </p>
   <p>
@@ -705,6 +739,7 @@ circle.Series1 {fill:Tomato;}
     <var>σ</var>
     <sub>chk</sub>
     = 42.27
+    <i>MPa</i>
    </span>
   </p>
  </div>

@@ -31,9 +31,27 @@
    </span>
   </span>
  </p>
+ <p>
+  First number -
+  <span class="eq">
+   <var>a</var>
+   = 1071
+  </span>
+  , Second number -
+  <span class="eq">
+   <var>b</var>
+   = 462
+  </span>
+ </p>
  <p>Example:</p>
  <p>
   <span class="eq">
+   <var>mygcd</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
    <var>mygcd</var>
    ( 1071; 462 )  = 21
   </span>
@@ -41,6 +59,12 @@
  <p>Internal gcd function:</p>
  <p>
   <span class="eq">
+   <b>gcd</b>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   )  =
    <b>gcd</b>
    ( 1071; 462 )  = 21
   </span>

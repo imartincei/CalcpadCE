@@ -5,10 +5,27 @@
  </p>
  <p>Interferencja światła z czterech szczelin - widok przestrzenny</p>
  <p>
+  Wavelength -
   <span class="eq">
    <var>λ</var>
    = 500
    <i>nm</i>
+  </span>
+ </p>
+ <p>
+  Slit spacing -
+  <span class="eq">
+   <var>d</var>
+   = 3
+   <i>μm</i>
+  </span>
+ </p>
+ <p>
+  Time -
+  <span class="eq">
+   <var>t</var>
+   = 0
+   <i>s</i>
   </span>
  </p>
  <p>
@@ -51,13 +68,6 @@
     <var>y</var>
     <sup>2</sup>
    </span>
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>d</var>
-   = 3
-   <i>μm</i>
   </span>
  </p>
  <p>
@@ -168,13 +178,6 @@
    <i class="unit">∕</i>
    <i>s</i>
    <sup class="unit">1.5</sup>
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>t</var>
-   = 0
-   <i>s</i>
   </span>
  </p>
  <p>

@@ -62,7 +62,9 @@
    <sub>0</sub>
    = 4
   </span>
-  , target precision -
+ </p>
+ <p>
+  Target precision -
   <span class="eq">
    <var>δ</var>
    = 10

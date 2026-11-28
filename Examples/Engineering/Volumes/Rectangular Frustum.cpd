@@ -1,11 +1,9 @@
 '<!-- Volume and surface area of a rectangular frustum (obelisk) from the two parallel rectangular faces and height. -->
 '<div style = "max-width:130mm"><img style="height:70pt;" class="side" alt="rectangular-frustum.png" src = "../../Images/math/volume/rectangular-frustum.png"></div>
 'Dimensions
-'<table>
-'<tr><td>Bottom base -</td><td>'A = ? {8}'</td><td>'B = ? {2}'</td></tr>
-'<tr><td>Top base -</td><td>'a = ? {6}'</td><td>'b = ? {4}'</td></tr>
-'<tr><td><p>Height -</p></td><td>'h = ? {5}'</td><td> </td></tr>
-'</table>
+#UI 'Bottom base -'A = 8m', Bottom base -'B = 2m
+#UI 'Top base -'a = 6m', Top base -'b = 4m
+#UI 'Height -'h = 5m
 'Heights of side faces
 h_a = sqr(h^2 + (B - b)^2/4)
 h_b = sqr(h^2 + (A - a)^2/4)

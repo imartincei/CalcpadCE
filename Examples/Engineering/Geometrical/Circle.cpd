@@ -1,22 +1,21 @@
 '<!-- Section properties of a solid circle: area, $I_x = I_y = \pi d^4 / 64$, section modulus and radius of gyration. -->
-"Geometrical Properties of Circle
+'<h1>Geometrical Properties of Circle</h1>
 '<div style="max-width:120mm"><img style="height:135pt;" alt="circle.png" class="side" src="../../Images/mechanics/sections/circle.png"></div>
-'Diameter
-d = ? {1}'m
+#UI 'Diameter -'d = 1m
 'Area
-A = π*d^2/4'm<sup>2</sup>
+A = π*d^2/4
 'Centroid
-'<p><i>z</i><sub>c</sub> ='y_c = d/2'm</p>
+'<p><i>z</i><sub>c</sub> ='y_c = d/2'</p>
 'Perimeter
-P = π*d'm
+P = π*d
 'Second moments of area
-'<p><i>I</i><sub>z</sub> ='I_y = π*d^4/64'm<sup>4</sup></p>
+'<p><i>I</i><sub>z</sub> ='I_y = π*d^4/64'</p>
 'Polar moment of area
-I_x = 2*I_y'm<sup>4</sup>
+I_x = 2*I_y
 'Radii of gyration
-'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'m</p>
-r_x = sqr(I_x/A)'m
+'<p><i>r</i><sub>z</sub> ='r_y = sqrt(I_y/A)'</p>
+r_x = sqr(I_x/A)
 'Torsional constant
-I_t = π*d^4/32'm<sup>4</sup>
+I_t = π*d^4/32
 'Torsional section modulus
-W_t = 2*I_t/d'm<sup>3</sup>
+W_t = 2*I_t/d

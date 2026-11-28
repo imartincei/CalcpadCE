@@ -3,11 +3,12 @@
 #rad
 '<table><tr><td>
 '<h4>Input parameters</h4>
-'Gravitational acceleration (m/s²) - 'g = 9.80665m/s^2
-'Pendulum length -'l = 1m
-'Pendulum mass -'m = 1kg
-'Initial angle -'θ_0 = -60°|rad
-'Maximum simulation time -'t_max = 10s
+#UI 'Gravitational acceleration -'g = 9.80665m/s^2
+#UI 'Pendulum length -'l = 1m
+#UI 'Pendulum mass -'m = 1kg
+#UI 'Initial angle -'θ_0 = -60°
+#UI 'Maximum simulation time -'t_max = 10s
+#UI 'Step size -'h = 0.05s
 '<h4>Analytical solution for small rotations</h4>
 '<p class="eq"><var>θ</var> ≪ 1 or <b>sin</b>(<var>θ</var>) ≈ <var>θ</var></p>
 '</td><td>
@@ -32,14 +33,14 @@ y_g = y - δ_y + R
 #def solid_style$ = style="stroke:black; stroke-width:1; fill:#eee"
 #def load_style$ = style="stroke:steelblue; stroke-width:1; fill:steelblue;"
 #include svg_drawing.cpd
-#show
+#end hide
 #val
 svg$
 '<defs><radialGradient id="ball" cx="35%" cy="35%"><stop offset="0%" stop-color="lightcyan"/><stop offset="100%" stop-color="lightblue"/></radialGradient><pattern id="concrete" x="4" y="4" width="8" height="8" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="8" height="8" fill="#eae9e8" /><circle cx="1" cy="1" r="1.2" fill="#ccb" /><circle cx="5" cy="2" r="1.6" fill="#dadad0" /><circle cx="4" cy="6" r="0.8" fill="#aa9" /><circle cx="3" cy="4" r="0.4" fill="#884" /><circle cx="7" cy="5" r="1.2" fill="#cacaba" /><circle cx="5" cy="3" r="0.9" fill="#fffded" /></pattern></defs>
 '<polygon points="0,0 '-δ','-δ' 'δ','-δ'" solid_style$/>
 line$(0; 0; 0; l*k; thin_style$)
 '<path d="M 0 '0.2*L' A '0.2*L' '0.2*L' 0 0 'θ_0 < 0°' '0.2*x' '0.2*y'" thin_style$/>
-texth$(-1.2*δ*sign(θ_0);0.25*L;'θ_0*180/π'°)
+texth$(-1.2*δ*sign(θ_0);0.25*L;'θ_0'°)
 line$(0; 0; x; y; thick_style$)
 text$(x/2-δ_x*y/L; y/2+δ_x*x/L;if(θ_0<0°;450°+θ_0;450°-θ_0);'l'm)
 circle$(0; 0; R/2; solid_style$)
@@ -50,6 +51,7 @@ texth$(x+3*δ_x; y_g-δ;g)
 '</svg>
 #equ
 '</td></tr></table>
+#pause
 #noc
 'Differential equation -'θ″ + g/l*θ = 0
 #equ
@@ -86,7 +88,7 @@ $Plot{δ_T(θ_0) @ θ_0 = 0.01° : 90°}
 θ′ = ω'and'ω′ = (g/l)*sin(-θ)
 #equ
 'The solution will be performed iteratively
-'Step size -'h = 0.05s
+'Step size -'h
 'Number of steps -'n = t_max/h
 'For each time step'n'the values for the next step will be obtained by using the following equstions
 #noc
@@ -185,7 +187,9 @@ t(i) = i*h - h
 r2d = 180/π
 #show
 '. . .
-'<style>.Series3{stroke-dasharray: 10, 15;} .Series4{stroke-dasharray: 20, 10;} .Series5{stroke-dasharray: 10, 20, 40, 20;}</style>
+#html
+<style>.Series3{stroke-dasharray: 10, 15;} .Series4{stroke-dasharray: 20, 10;} .Series5{stroke-dasharray: 10, 20, 40, 20;}</style>
+#end html
 '<h4>Plot results</h4>
  '<table><tr><td>
 'Rotation <var>θ</var> [deg] versus time <var>t</var> [s] plot
@@ -200,7 +204,9 @@ $Plot{t(i)|θ(t(i))/deg & t(i)|θ_e(t(i))/deg & t(i)|if(abs(θ_fwE.i*r2d) < 150;
 'Energy <var>E</var> [J] versus time <var>t</var> [s] plot
 $Plot{0s|0J & t(i)|E_0 & t(i)|E_fwE.i & t(i)|E_bwE.i & t(i)|E_CN.i @ i = 1 : n}
 '<h4>Comparison of Crank–Nicolson and Runge-Kutta 4 methods</h4>
-'<style>.Series2{stroke-dasharray: 30, 10;}</style>
+#html
+<style>.Series2{stroke-dasharray: 30, 10;}</style>
+#end html
 '<table><tr><td>
 'Rotation <var>θ</var> [deg] versus time <var>t</var> [s] plot
 $Plot{t(i)|θ_e(t(i))/deg & t(i)|θ_CN.i*r2d & t(i)|θ_RK4.i*r2d @ i = 1 : n}

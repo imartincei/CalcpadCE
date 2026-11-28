@@ -1,15 +1,12 @@
 '<!-- Computes the dominant eigenpair of a $3\times 3$ symmetric matrix via Rayleigh-quotient iteration.
 'Each step solves a shifted linear system, normalises the iterate and rebuilds the eigenvalue from the quotient, achieving cubic convergence within a handful of steps. -->
 'Input matrix
-A = copy( _
-    [4; 12; -16| _
-    12; 37; -43| _
-    - 16; -43; 98]; _
-    symmetric(3); 1; 1)
+#UI A_in = [4; 12; -16| 12; 37; -43| -16; -43; 98]
+A = copy(A_in; symmetric(3); 1; 1)
 #hide
 A_1 = A
 n = n_rows(A)', 'I = identity(n)', 'o = vector(n)', 'λ_0 = 1', 'x = [1; 0; 0]
-#show
+#end hide
 'Initial guess: eigenvalue -'λ_0', eigenvector -'x
 #def rqi$
 	#for i = 1 : 10
@@ -34,7 +31,7 @@ rqi$
 λ_0 = 10', 'x = [0; 1; 0]
 rqi$
 λ_2 = λ', 'x_2 = x
-#show
+#end hide
 'Eigenvalue 2 -'λ_2
 'Eigenvector 2 -'x_2
 'Deflation -'A = A - λ*x*transp(x)
@@ -42,7 +39,7 @@ rqi$
 λ_0 = 100', 'x = [0; 0; 1]
 rqi$
 λ_3 = λ', 'x_3 = x
-#show
+#end hide
 'Eigenvalue 3 -'λ_3
 'Eigenvector 3 -'x_3
 'Solution with CalcpadCE -'E = eigen(A_1)

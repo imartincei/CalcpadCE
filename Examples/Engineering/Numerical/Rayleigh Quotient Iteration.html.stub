@@ -7,9 +7,8 @@
    <b>
     <var>A</var>
    </b>
+   <sub>in</sub>
    =
-   <b>copy</b>
-   (
    <span class="b0">[</span>
    4; 12; -16
    <span class="b0">|</span>
@@ -17,6 +16,50 @@
    <span class="b0">|</span>
    -16; -43; 98
    <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">4</span>
+     <span class="td">12</span>
+     <span class="td">-16</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">12</span>
+     <span class="td">37</span>
+     <span class="td">-43</span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">-16</span>
+     <span class="td">-43</span>
+     <span class="td">98</span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <b>
+    <var>A</var>
+   </b>
+   =
+   <b>copy</b>
+   (
+   <b>
+    <var>A</var>
+   </b>
+   <sub>in</sub>
    ;
    <b>symmetric</b>
    ( 3 ) ; 1; 1 )  =

@@ -10,37 +10,44 @@
      <span class="eq">
       <var>a</var>
       = 6
+      <i>m</i>
      </span>
-     m,
+     ,
      <span class="eq">
       <var>b</var>
       = 4
+      <i>m</i>
      </span>
-     m
     </p>
     <p>
      Thickness -
      <span class="eq">
       <var>t</var>
       = 0.1
+      <i>m</i>
      </span>
-     m
     </p>
     <p>
      Load -
      <span class="eq">
       <var>q</var>
       = 10
+      <span class="dvc">
+       <i>kN</i>
+       <span class="dvl">
+       </span>
+       <i>m</i>
+       <sup class="unit">2</sup>
+      </span>
      </span>
-     kN/m²
     </p>
     <p>
      Modulus of elasticity -
      <span class="eq">
       <var>E</var>
       = 35000
+      <i>MPa</i>
      </span>
-     MPa
     </p>
     <p>
      Poisson`s ratio -
@@ -113,8 +120,7 @@
  <p>
   Element dimensions -
   <span class="eq">
-   <var>a</var>
-   <sub>1</sub>
+   <var>Δa</var>
    =
    <span class="dvc">
     <var>a</var>
@@ -126,16 +132,17 @@
    =
    <span class="dvc">
     6
+    <i>m</i>
     <span class="dvl">
     </span>
     6
    </span>
    = 1
+   <i>m</i>
   </span>
   ,
   <span class="eq">
-   <var>b</var>
-   <sub>1</sub>
+   <var>Δb</var>
    =
    <span class="dvc">
     <var>b</var>
@@ -147,11 +154,13 @@
    =
    <span class="dvc">
     4
+    <i>m</i>
     <span class="dvl">
     </span>
     4
    </span>
    = 1
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -168,6 +177,7 @@
    )  = 2 ·  ( 6 + 4 )  = 20
   </span>
  </p>
+ <p>The solver below works in m, kN and MPa</p>
  <p>Joint coordinates</p>
  <p>
   <span class="eq">
@@ -176,14 +186,55 @@
     x
    </var>
    <sub>j</sub>
+   · 1
+   <i>m</i>
    =
    <b class="b0">[</b>
-   0 0 0 0 0 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   0
+   <i>m</i>
+   1
+   <i>m</i>
+   1
+   <i>m</i>
+   1
+   <i>m</i>
+   1
+   <i>m</i>
+   1
+   <i>m</i>
+   2
+   <i>m</i>
+   2
+   <i>m</i>
+   2
+   <i>m</i>
+   2
+   <i>m</i>
+   2
+   <i>m</i>
+   3
+   <i>m</i>
+   3
+   <i>m</i>
+   3
+   <i>m</i>
+   3
+   <i>m</i>
+   3
+   <i>m</i>
    <span title="14 elements skipped.">...</span>
    6
+   <i>m</i>
    <b class="b0">]</b>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -192,14 +243,55 @@
     y
    </var>
    <sub>j</sub>
+   · 1
+   <i>m</i>
    =
    <b class="b0">[</b>
-   0 1 2 3 4 0 1 2 3 4 0 1 2 3 4 0 1 2 3 4
+   0
+   <i>m</i>
+   1
+   <i>m</i>
+   2
+   <i>m</i>
+   3
+   <i>m</i>
+   4
+   <i>m</i>
+   0
+   <i>m</i>
+   1
+   <i>m</i>
+   2
+   <i>m</i>
+   3
+   <i>m</i>
+   4
+   <i>m</i>
+   0
+   <i>m</i>
+   1
+   <i>m</i>
+   2
+   <i>m</i>
+   3
+   <i>m</i>
+   4
+   <i>m</i>
+   0
+   <i>m</i>
+   1
+   <i>m</i>
+   2
+   <i>m</i>
+   3
+   <i>m</i>
+   4
+   <i>m</i>
    <span title="14 elements skipped.">...</span>
    4
+   <i>m</i>
    <b class="b0">]</b>
   </span>
-  m
  </p>
  <p>Numbers of elements joints</p>
  <p>
@@ -1650,11 +1742,25 @@
      <var>D</var>
     </b>
     =
-    <span class="dvc">
-     <var>E</var>
+    <span class="dvc up">
+     <span class="dvc">
+      <var>E</var>
+      <span class="dvl">
+      </span>
+      1
+      <i>MPa</i>
+     </span>
      ·
-     <var>t</var>
-     <sup>3</sup>
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>t</var>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">3</sup>
      <span class="dvl">
      </span>
      12 ·  ( 1 −
@@ -1681,9 +1787,27 @@
     </span>
     <span class="b1">]</span>
     =
-    <span class="dvc">
-     35000 · 0.1
-     <sup>3</sup>
+    <span class="dvc up">
+     <span class="dvc">
+      35000
+      <i>MPa</i>
+      <span class="dvl">
+      </span>
+      1
+      <i>MPa</i>
+     </span>
+     ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      0.1
+      <i>m</i>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+     </span>
+     <span class="b1">)</span>
+     <sup class="raised">3</sup>
      <span class="dvl">
      </span>
      12 ·  ( 1 − 0.15
@@ -2951,7 +3075,6 @@
     2.5 0.417 0.417 0.0694 2.5 -0.417 0.417 -0.0694 2.5 -0.417 -0.417 0.0694 2.5 0.417 -0.417 -0.0694
     <b class="b0">]</b>
    </span>
-   kN
   </p>
   <h4>Solution</h4>
   <p>Global stiffness matrix</p>
@@ -3631,7 +3754,6 @@
     0.0694
     <b class="b0">]</b>
    </span>
-   kN
   </p>
   <p>Solution of the system of equations</p>
   <p>
@@ -3658,7 +3780,6 @@
     3.3
     <b class="b0">]</b>
    </span>
-   mm
   </p>
   <h4>Results</h4>
   <p>Joint displacements</p>
@@ -3670,76 +3791,182 @@
      <var>W</var>
     </b>
     <sub>z</sub>
-    )  =
+    )  · 1
+    <i>mm</i>
+    =
     <span class="matrix">
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">2.58</span>
-      <span class="td">4.21</span>
-      <span class="td">4.75</span>
-      <span class="td">4.21</span>
-      <span class="td">2.58</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       2.58
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.21
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.75
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.21
+       <i>mm</i>
+      </span>
+      <span class="td">
+       2.58
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">3.59</span>
-      <span class="td">5.87</span>
-      <span class="td">6.63</span>
-      <span class="td">5.87</span>
-      <span class="td">3.59</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       3.59
+       <i>mm</i>
+      </span>
+      <span class="td">
+       5.87
+       <i>mm</i>
+      </span>
+      <span class="td">
+       6.63
+       <i>mm</i>
+      </span>
+      <span class="td">
+       5.87
+       <i>mm</i>
+      </span>
+      <span class="td">
+       3.59
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">2.58</span>
-      <span class="td">4.21</span>
-      <span class="td">4.75</span>
-      <span class="td">4.21</span>
-      <span class="td">2.58</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       2.58
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.21
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.75
+       <i>mm</i>
+      </span>
+      <span class="td">
+       4.21
+       <i>mm</i>
+      </span>
+      <span class="td">
+       2.58
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
+      <span class="td">
+       0
+       <i>mm</i>
+      </span>
       <span class="td">
       </span>
      </span>
     </span>
    </span>
-   mm
   </p>
   <div class="plot" style="width:315pt; height:195pt;">
    <svg data-plot="svg" height="1040px" style="width:311.11pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1680 1040" width="1680px" xmlns="http://www.w3.org/2000/svg">
@@ -3908,6 +4135,7 @@
     <span class="b1">(</span>
     <span class="dvc">
      <var>a</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -3915,6 +4143,7 @@
     ;
     <span class="dvc">
      <var>b</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -3938,8 +4167,8 @@
     </span>
     <span class="b1">)</span>
     = 6.63
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>Bending moments</p>
   <p>
@@ -4048,7 +4277,6 @@
     6.63 0 0 0 5.87 -1.52 0 0 4.21 -1.08 -3.2 0.84 4.75 0 -3.62 0
     <b class="b0">]</b>
    </span>
-   mm
   </p>
   <p>
    <span class="eq">
@@ -4099,103 +4327,442 @@
     =
     <var>M</var>
     <sub>e</sub>
-    ( 0; 0 )  =
+    ( 0; 0 )  · 1
+    <span class="dvc">
+     <i>kNm</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
+    =
     <b class="b0">[</b>
-    6.28 12.74 0
+    6.28
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    12.74
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    0
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
     <b class="b0">]</b>
    </span>
-   kNm/m
   </p>
-  <p>Average bending moments at joints, kNm/m</p>
+  <p>Average bending moments at joints</p>
   <p>
    <span class="eq">
     <b>
      <var>M</var>
     </b>
     <sub>j</sub>
+    · 1
+    <span class="dvc">
+     <i>kNm</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
     =
     <span class="matrix">
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">0.528</span>
-      <span class="td">0.594</span>
-      <span class="td">0.528</span>
-      <span class="td">0</span>
-      <span class="td">0.0845</span>
-      <span class="td">4.11</span>
-      <span class="td">5.45</span>
-      <span class="td">4.11</span>
-      <span class="td">0.0845</span>
-      <span class="td">0.101</span>
-      <span class="td">4.6</span>
-      <span class="td">6.25</span>
-      <span class="td">4.6</span>
-      <span class="td">0.101</span>
-      <span class="td">0.105</span>
-      <span class="td">4.6</span>
-      <span class="td">6.28</span>
-      <span class="td">4.6</span>
-      <span class="td">0.105</span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.528
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.594
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.528
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.0845
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.11
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       5.45
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.11
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.0845
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.101
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.6
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       6.25
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.6
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.101
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.105
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.6
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       6.28
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.6
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.105
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">⋯</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">0</span>
-      <span class="td">0.0792</span>
-      <span class="td">0.0892</span>
-      <span class="td">0.0792</span>
-      <span class="td">0</span>
-      <span class="td">0.563</span>
-      <span class="td">5.84</span>
-      <span class="td">7.04</span>
-      <span class="td">5.84</span>
-      <span class="td">0.563</span>
-      <span class="td">0.675</span>
-      <span class="td">9.08</span>
-      <span class="td">11.33</span>
-      <span class="td">9.08</span>
-      <span class="td">0.675</span>
-      <span class="td">0.702</span>
-      <span class="td">10.1</span>
-      <span class="td">12.74</span>
-      <span class="td">10.1</span>
-      <span class="td">0.702</span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.0792
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.0892
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.0792
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.563
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       5.84
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       7.04
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       5.84
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.563
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.675
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       9.08
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       11.33
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       9.08
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.675
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.702
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       10.1
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       12.74
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       10.1
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0.702
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">⋯</span>
-      <span class="td">0</span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">
       </span>
      </span>
      <span class="tr">
       <span class="td">
       </span>
-      <span class="td">-8.38</span>
-      <span class="td">-5.31</span>
-      <span class="td">0</span>
-      <span class="td">5.31</span>
-      <span class="td">8.38</span>
-      <span class="td">-6.18</span>
-      <span class="td">-4.22</span>
-      <span class="td">0</span>
-      <span class="td">4.22</span>
-      <span class="td">6.18</span>
-      <span class="td">-3.05</span>
-      <span class="td">-2.13</span>
-      <span class="td">0</span>
-      <span class="td">2.13</span>
-      <span class="td">3.05</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
-      <span class="td">0</span>
+      <span class="td">
+       -8.38
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       -5.31
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       5.31
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       8.38
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       -6.18
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       -4.22
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       4.22
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       6.18
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       -3.05
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       -2.13
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       2.13
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       3.05
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
+      <span class="td">
+       0
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">⋯</span>
-      <span class="td">-8.38</span>
+      <span class="td">
+       -8.38
+       <i>kNm</i>
+       <i class="unit">∕</i>
+       <i>m</i>
+      </span>
       <span class="td">
       </span>
      </span>
@@ -4284,7 +4851,6 @@
      </span>
     </span>
    </span>
-   kNm/m
   </p>
   <div class="plot" style="width:315pt; height:195pt;">
    <svg data-plot="svg" height="1040px" style="width:311.11pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1680 1040" width="1680px" xmlns="http://www.w3.org/2000/svg">
@@ -4455,6 +5021,7 @@
     <span class="b1">(</span>
     <span class="dvc">
      <var>a</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -4462,6 +5029,7 @@
     ;
     <span class="dvc">
      <var>b</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -4486,8 +5054,10 @@
     </span>
     <span class="b1">)</span>
     = 6.28
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
    </span>
-   kNm/m
   </p>
   <p>
    Bending moments
@@ -4570,7 +5140,6 @@
      </span>
     </span>
    </span>
-   kNm/m
   </p>
   <div class="plot" style="width:315pt; height:195pt;">
    <svg data-plot="svg" height="1040px" style="width:311.11pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1680 1040" width="1680px" xmlns="http://www.w3.org/2000/svg">
@@ -4741,6 +5310,7 @@
     <span class="b1">(</span>
     <span class="dvc">
      <var>a</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -4748,6 +5318,7 @@
     ;
     <span class="dvc">
      <var>b</var>
+     <sub>n</sub>
      <span class="dvl">
      </span>
      2
@@ -4772,8 +5343,10 @@
     </span>
     <span class="b1">)</span>
     = 12.74
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
    </span>
-   kNm/m
   </p>
   <p>
    Bending moments
@@ -4856,7 +5429,6 @@
      </span>
     </span>
    </span>
-   kNm/m
   </p>
   <div class="plot" style="width:315pt; height:195pt;">
    <svg data-plot="svg" height="1040px" style="width:311.11pt; height:192.59pt;" version="1.1" viewbox=" 0 0 1680 1040" width="1680px" xmlns="http://www.w3.org/2000/svg">
@@ -5025,8 +5597,10 @@
     <var>M</var>
     <sub>xy</sub>
     ( 0; 0 )  = -8.38
+    <i>kNm</i>
+    <i class="unit">∕</i>
+    <i>m</i>
    </span>
-   kNm/m
   </p>
  </img>
 </div>

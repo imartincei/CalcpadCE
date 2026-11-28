@@ -5,24 +5,25 @@
  </div>
  <p>Dimensions of base</p>
  <p>
+  Base length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">3</u>
+   = 3
+   <i>m</i>
   </span>
-  ,
+  , Base width -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
- <p>Height</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-6">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -49,7 +50,15 @@
     </span>
     3
    </span>
-   · 3 · 2 · 1 = 2
+   · 3
+   <i>m</i>
+   · 2
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 2
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Area of side faces</p>
@@ -91,30 +100,40 @@
      4
     </span>
    </span>
-   = 3 ·
+   = 3
+   <i>m</i>
+   ·
    <span class="o1">
     <span class="r1">
     </span>
     1
+    <i>m</i>
     <sup>2</sup>
     +
     <span class="dvc">
-     2
+     ( 2
+     <i>m</i>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
      4
     </span>
    </span>
-   + 2 ·
+   + 2
+   <i>m</i>
+   ·
    <span class="o1">
     <span class="r1">
     </span>
     1
+    <i>m</i>
     <sup>2</sup>
     +
     <span class="dvc">
-     3
+     ( 3
+     <i>m</i>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
@@ -122,6 +141,8 @@
     </span>
    </span>
    = 7.85
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Area of base</p>
@@ -132,7 +153,13 @@
    <var>a</var>
    ·
    <var>b</var>
-   = 3 · 2 = 6
+   = 3
+   <i>m</i>
+   · 2
+   <i>m</i>
+   = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Total surface area</p>
@@ -144,7 +171,15 @@
    <sub>o</sub>
    +
    <var>A</var>
-   = 7.85 + 6 = 13.85
+   = 7.85
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 6
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 13.85
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

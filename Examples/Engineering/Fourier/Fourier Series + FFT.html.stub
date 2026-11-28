@@ -17,6 +17,14 @@
   </span>
  </p>
  <p>
+  Number of samples -
+  <span class="eq">
+   <var>n</var>
+   <sub>s</sub>
+   = 32
+  </span>
+ </p>
+ <p>
   Function -
   <span class="eq">
    <var>f</var>
@@ -329,13 +337,6 @@ circle.Series2 {fill:YellowGreen;}
  <h1>Fourier series expansion (FFT)</h1>
  <hr/>
  <p>
-  Number of samples -
-  <span class="eq">
-   <var>n</var>
-   = 32
-  </span>
- </p>
- <p>
   Sampling step -
   <span class="eq">
    <var>dx</var>
@@ -345,6 +346,7 @@ circle.Series2 {fill:YellowGreen;}
     <span class="dvl">
     </span>
     <var>n</var>
+    <sub>s</sub>
    </span>
    =
    <span class="dvc">
@@ -367,6 +369,7 @@ circle.Series2 {fill:YellowGreen;}
    <b>range</b>
    ( 0;
    <var>n</var>
+   <sub>s</sub>
    ; 1 )  ·
    <var>dx</var>
    =
@@ -476,6 +479,7 @@ circle.Series2 {fill:YellowGreen;}
     <span class="dvl">
     </span>
     <var>n</var>
+    <sub>s</sub>
    </span>
    =
    <span class="dvc">
@@ -506,6 +510,7 @@ circle.Series2 {fill:YellowGreen;}
     <span class="dvl">
     </span>
     <var>n</var>
+    <sub>s</sub>
    </span>
   </span>
   - cosine coefficients,
@@ -526,6 +531,7 @@ circle.Series2 {fill:YellowGreen;}
     <span class="dvl">
     </span>
     <var>n</var>
+    <sub>s</sub>
    </span>
   </span>
   -sine coefficients
@@ -567,6 +573,7 @@ circle.Series2 {fill:YellowGreen;}
    <span class="dvr">
     <small>
      <var>n</var>
+     <sub>s</sub>
     </small>
     <span class="nary">∑</span>
     <small>

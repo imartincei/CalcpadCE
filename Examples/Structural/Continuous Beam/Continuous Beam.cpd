@@ -1,22 +1,23 @@
 '<!-- Force-method analysis of a multi-span continuous beam under a uniform load $q$, building the flexibility matrix from bending and shear integrals and solving for the redundant reactions, internal forces and deflections. -->
 '<h4>Input data</h4>
-'Span lengths -'l = [4; 7; 3; 5]*m
+#UI {"columnHeaders": ["l, m"]} 'Span lengths -'l = [4m; 7m; 3m; 5m]
 'Number of spans -'n = len(l)
 #hide
 x = vector(n)', '$Repeat{x.k = sum(first(l; k)) @ k = 1 : n}
-#show
+#end hide
 'Coordinates of supports -'x
 'Total beam length -'L = x.n
-'Load -'q = 10kN/m
+#UI 'Load -'q = 10kN/m
 '<h5>Material</h5>
-'Elastic modulus -'E = 30GPa
-'Poisson′s ratio - 'ν = 0.2
+#UI 'Elastic modulus -'E = 30GPa
+#UI 'Poisson′s ratio - 'ν = 0.2
 'Shear modulus -'G = E/(2*(1 + ν))
 '<h5>Cross section</h5>
-'Rectangular with dimensions:'b = 250mm', 'h = 500mm
+#UI 'Rectangular with dimensions:'b = 250mm', 'h = 500mm
 'Area -'A = b*h
 'Moment of inertia -'I = b*h^3/12
 'Shear area -'A_Q = 5/6*b*h
+#pause
 '<h4>Solution</h4>
 'The solution will be performed by the force method with a primary system - simply supported beam with internal supports removed and replaced by unknown forces <em>X</em><sub>i</sub>
 'Bending moments
@@ -27,7 +28,7 @@ M_1,a(a; x) = M_1,max(x)*switch(a < x; a/x; a ≡ x; 1; (L - a)/(L - x))
 M_1(a; i) = M_1,a(a; x.i)
 #hide
 PlotHeight = 100', 'PlotWidth = 600
-#show
+#end hide
 $Plot{-M_1(x; 1) & -M_1(x; 2) & -M_1(x; 3) @ x = 0m : L}
 '- due to external loads in primary system:
 M_F(x) = q*x/2*(L - x)
@@ -58,7 +59,7 @@ $Plot{-M(x) @ x = 0m : L}
 M_min = vector(n_1)', 'M_max = vector(n)
 $Repeat{M_min.i = M(x.i) @ i = 1 : n_1}
 $Repeat{M_max.i = $Sup{M(x) @ x = x.i : x.i - l.i} @ i = 1 : n}
-#show
+#end hide
 M_max
 M_min
 'Shear force diagram -'V(x) = V_F(x) + $Sum{V_1(x; i)*X.i @ i = 1 : n_1}
@@ -67,7 +68,7 @@ $Plot{V(x) @ x = 0m : L}
 V_min = vector(n)', 'V_max = vector(n)
 $Repeat{V_min.i = $Inf{V(x) @ x = x.i : x.i - l.i} @ i = 1 : n}
 $Repeat{V_max.i = $Sup{V(x) @ x = x.i : x.i - l.i} @ i = 1 : n}
-#show
+#end hide
 V_max
 V_min
 'Deflections

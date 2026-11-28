@@ -9,37 +9,40 @@
    Beam length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-5">10</u>
+    = 10
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>M</var>
-    =
-    <u class="input-6">10</u>
+    = 10
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
-   Distances -
+   Distance -
    <span class="eq">
     <var>a</var>
-    =
-    <u class="input-7">4</u>
+    = 4
+    <i>m</i>
    </span>
-   m,
+  </p>
+  <p>
    <span class="eq">
     <var>b</var>
     =
     <var>l</var>
     −
     <var>a</var>
-    = 10 − 4 = 6
+    = 10
+    <i>m</i>
+    − 4
+    <i>m</i>
+    = 6
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <b>Internal forces</b>
@@ -71,23 +74,30 @@
     </span>
     =
     <span class="dvc up">
-     10 · 6 ·
+     10
+     <i>kNm</i>
+     · 6
+     <i>m</i>
+     ·
      <span class="b1">(</span>
      2 −
      <span class="dvc">
       3 · 6
+      <i>m</i>
       <span class="dvl">
       </span>
       10
+      <i>m</i>
      </span>
      <span class="b1">)</span>
      <span class="dvl">
      </span>
      10
+     <i>m</i>
     </span>
     = 1.2
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    <span class="eq">
@@ -115,23 +125,30 @@
     </span>
     =
     <span class="dvc up">
-     10 · 4 ·
+     10
+     <i>kNm</i>
+     · 4
+     <i>m</i>
+     ·
      <span class="b1">(</span>
      2 −
      <span class="dvc">
       3 · 4
+      <i>m</i>
       <span class="dvl">
       </span>
       10
+      <i>m</i>
      </span>
      <span class="b1">)</span>
      <span class="dvl">
      </span>
      10
+     <i>m</i>
     </span>
     = 3.2
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -152,15 +169,22 @@
     </span>
     =
     <span class="dvc">
-     6 · 10 · 4 · 6
+     6 · 10
+     <i>kNm</i>
+     · 4
+     <i>m</i>
+     · 6
+     <i>m</i>
      <span class="dvl">
      </span>
-     10
+     ( 10
+     <i>m</i>
+     )
      <sup>3</sup>
     </span>
     = 1.44
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>Bending at mid-span</p>
   <p>
@@ -174,9 +198,15 @@
     −
     <var>M</var>
     <sub>A</sub>
-    = 1.44 · 4 − 1.2 = 4.56
+    = 1.44
+    <i>kN</i>
+    · 4
+    <i>m</i>
+    − 1.2
+    <i>kNm</i>
+    = 4.56
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    <span class="eq">
@@ -189,9 +219,15 @@
     −
     <var>M</var>
     <sub>B</sub>
-    = 1.44 · 6 − 3.2 = 5.44
+    = 1.44
+    <i>kN</i>
+    · 6
+    <i>m</i>
+    − 3.2
+    <i>kNm</i>
+    = 5.44
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    <b>Diagrams</b>
@@ -201,12 +237,9 @@
    <span class="eq">
     <var>x</var>
     <sub>1</sub>
-    =
-    <u class="input-23">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
-  </p>
-  <p>
   </p>
   <p>Bending</p>
   <p>
@@ -348,9 +381,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>M</var>
-    ( 1 )  = -0.24
+    ( 1
+    <i>m</i>
+    )  = -0.24
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -486,9 +521,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>V</var>
-    ( 1 )  = -1.44
+    ( 1
+    <i>m</i>
+    )  = -1.44
+    <i>kN</i>
    </span>
-   kN
   </p>
  </div>
 </div>

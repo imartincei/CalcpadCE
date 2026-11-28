@@ -6,35 +6,35 @@
  </div>
  <p>Dimensions</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-5">20</u>
+   = 20
+   <i>m</i>
   </span>
-  m,
+  , Web thickness -
   <span class="eq">
    <var>t</var>
    <sub>w</sub>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
+  Flange width -
   <span class="eq">
    <var>b</var>
    <sub>f</sub>
-   =
-   <u class="input-6">10</u>
+   = 10
+   <i>m</i>
   </span>
-  m,
+  , Flange thickness -
   <span class="eq">
    <var>t</var>
    <sub>f</sub>
-   =
-   <u class="input-6">2</u>
+   = 2
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -46,10 +46,14 @@
    ·
    <var>t</var>
    <sub>w</sub>
-   = 20 · 1 = 20
+   = 20
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 20
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>
   <span class="eq">
@@ -64,10 +68,16 @@
    )  ·
    <var>t</var>
    <sub>f</sub>
-   =  ( 10 − 1 )  · 2 = 18
+   =  ( 10
+   <i>m</i>
+   − 1
+   <i>m</i>
+   )  · 2
+   <i>m</i>
+   = 18
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>
   <span class="eq">
@@ -78,10 +88,16 @@
    + 2 ·
    <var>A</var>
    <sub>f</sub>
-   = 20 + 2 · 18 = 56
+   = 20
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 2 · 18
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 56
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -110,15 +126,26 @@
    <sub>w</sub>
    )  =
    <span class="dvc">
-    20 · 1
+    20
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
-   + 18 ·  ( 10 + 1 )  = 208
+   + 18
+   <i>m</i>
+   <sup class="unit">2</sup>
+   ·  ( 10
+   <i>m</i>
+   + 1
+   <i>m</i>
+   )  = 208
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>
   <span class="eq">
@@ -135,13 +162,17 @@
    =
    <span class="dvc">
     208
+    <i>m</i>
+    <sup class="unit">3</sup>
     <span class="dvl">
     </span>
     56
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
    = 3.71
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -157,13 +188,14 @@
    =
    <span class="dvc">
     20
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 10
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter</p>
  <p>
@@ -177,9 +209,15 @@
    −
    <var>t</var>
    <sub>w</sub>
-   )  = 2 ·  ( 20 + 2 · 10 − 1 )  = 78
+   )  = 2 ·  ( 20
+   <i>m</i>
+   + 2 · 10
+   <i>m</i>
+   − 1
+   <i>m</i>
+   )  = 78
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -212,18 +250,30 @@
    </span>
    =
    <span class="dvc">
-    10 · 20
+    10
+    <i>m</i>
+    ·  ( 20
+    <i>m</i>
+    )
     <sup>3</sup>
-    −  ( 10 − 1 )  ·  ( 20 − 2 · 2 )
+    −  ( 10
+    <i>m</i>
+    − 1
+    <i>m</i>
+    )  ·  ( 20
+    <i>m</i>
+    − 2 · 2
+    <i>m</i>
+    )
     <sup>3</sup>
     <span class="dvl">
     </span>
     12
    </span>
    = 3594.67
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -262,10 +312,17 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   =  ( 20 − 2 · 2 )  · 1 ·
+   =  ( 20
+   <i>m</i>
+   − 2 · 2
+   <i>m</i>
+   )  · 1
+   <i>m</i>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
     1
+    <i>m</i>
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -273,9 +330,12 @@
    </span>
    +
    <span class="b1">(</span>
-   3.71 −
+   3.71
+   <i>m</i>
+   −
    <span class="dvc">
     1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -284,9 +344,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 166.64
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -323,10 +383,16 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   = 2 · 10 ·
+   = 2
+   <i>m</i>
+   · 10
+   <i>m</i>
+   ·
    <span class="b1">(</span>
    <span class="dvc">
-    10
+    ( 10
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -334,9 +400,12 @@
    </span>
    +
    <span class="b1">(</span>
-   3.71 −
+   3.71
+   <i>m</i>
+   −
    <span class="dvc">
     10
+    <i>m</i>
     <span class="dvl">
     </span>
     2
@@ -345,9 +414,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 199.73
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -359,10 +428,16 @@
    + 2 ·
    <var>I</var>
    <sub>z_f</sub>
-   = 166.64 + 2 · 199.73 = 566.1
+   = 166.64
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 2 · 199.73
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 566.1
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -375,10 +450,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 3594.67 + 566.1 = 4160.76
+   = 3594.67
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 566.1
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 4160.76
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -403,14 +484,18 @@
     </span>
     <span class="dvc">
      3594.67
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      56
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 8.01
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -434,14 +519,18 @@
     </span>
     <span class="dvc">
      566.1
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      56
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 3.18
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -465,13 +554,17 @@
     </span>
     <span class="dvc">
      4160.76
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      56
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 8.62
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

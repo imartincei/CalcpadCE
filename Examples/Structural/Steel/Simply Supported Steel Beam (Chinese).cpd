@@ -6,45 +6,43 @@
 
 '## 一、输入参数
 '**几何参数**
-'梁跨度 — 'L = ? {7.5}'m
+#UI '梁跨度 — 'L = 7.5m
 
 '**荷载参数**
-'均布荷载标准值 — 'q_k = ? {10}'kN/m
+#UI '均布荷载标准值 — 'q_k = 10kN/m
 '荷载分项系数 — 'γ_G = 1.3
-'弹性模量 — 'E = ? {206}'GPa
+#UI '弹性模量 — 'E = 206GPa
 
 '**截面参数**
-'截面惯性矩 — 'I_y = ? {23170}'cm⁴
-'截面高度 — 'h = ? {300}'mm
+#UI '截面惯性矩 — 'I_y = 23170cm^4
+#UI '截面高度 — 'h = 300mm
 '截面塑性发展系数 — 'γ_x = 1.05
-'钢材抗弯强度设计值 — 'f = ? {215}'MPa
+#UI '钢材抗弯强度设计值 — 'f = 215MPa
 #hide
 
 '## 二、计算
 '荷载设计值
-q = q_k * γ_G'kN/m
+q = q_k * γ_G|kN/m
 
 '支座反力
-R_A = q * L / 2'kN
+R_A = q * L / 2|kN
 
 '跨中最大弯矩
-M_max = q * L^2 / 8'kN·m
+M_max = q * L^2 / 8|kNm
 
-'抗弯刚度（E·I_y：GPa·cm⁴ → kN·m²）
-EI = E * I_y * 0.01
+'抗弯刚度
+EI = E * I_y|kN*m^2
 
 '跨中最大挠度（按荷载标准值）
-d_max = 5 * q_k * L^4 / (384 * EI) * 1000'mm
+d_max = 5 * q_k * L^4 / (384 * EI)|mm
 
-'截面模量（I_y：cm⁴，h：mm → m³）
-I = I_y * 10^-8
-H = h / 1000
-W = I / (H / 2)
+'截面模量
+W = I_y / (h / 2)|cm^3
 
-'弯曲应力（kN·m / m³ = kPa → MPa）
-σ = M_max / (γ_x * W) / 1000'MPa
+'弯曲应力
+σ = M_max / (γ_x * W)|MPa
 η = σ / f
-#show
+#end hide
 
 '## 三、计算结果
 '支座反力 'R_A
@@ -64,29 +62,29 @@ W = I / (H / 2)
 PlotWidth = 500
 PlotHeight = 150
 PlotSVG = 1
-#show
+#end hide
 
 '### 4.1 剪力简图
 V(x) = q * (L/2 - x)
-$Plot{-V(x) @ x = 0 : L}
+$Plot{-V(x) @ x = 0m : L}
 '图 1 剪力简图（kN）
 
 '### 4.2 弯矩简图
 M(x) = q * x * (L - x) / 2
-$Plot{-M(x) @ x = 0 : L}
+$Plot{-M(x) @ x = 0m : L}
 '图 2 弯矩简图（kN·m）
 
 '### 4.3 挠度简图
-d(x) = q_k * x * (L^3 - 2 * L * x^2 + x^3) / (24 * EI)
-$Plot{-d(x) * 1000 @ x = 0 : L}
+d(x) = q_k * x * (L^3 - 2 * L * x^2 + x^3) / (24 * EI)|mm
+$Plot{-d(x) @ x = 0m : L}
 '图 3 挠度简图（mm）
 
 '## 五、任意截面验算
-'验算位置 — 'x_chk = ? {1.875}'m
-M_chk = q * x_chk * (L - x_chk) / 2'kN·m
-V_chk = q * (L/2 - x_chk)'kN
-d_chk = q_k * x_chk * (L^3 - 2 * L * x_chk^2 + x_chk^3) / (24 * EI) * 1000'mm
-σ_chk = M_chk / (γ_x * W) / 1000'MPa
+#UI '验算位置 — 'x_chk = 1.875m
+M_chk = q * x_chk * (L - x_chk) / 2|kNm
+V_chk = q * (L/2 - x_chk)|kN
+d_chk = q_k * x_chk * (L^3 - 2 * L * x_chk^2 + x_chk^3) / (24 * EI)|mm
+σ_chk = M_chk / (γ_x * W)|MPa
 '截面弯矩 'M_chk
 '截面剪力 'V_chk
 '截面挠度 'd_chk

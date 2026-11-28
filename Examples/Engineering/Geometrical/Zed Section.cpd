@@ -1,30 +1,30 @@
 '<!-- Section properties of a Zed (Z) profile: area, centroid, $I_x$, $I_y$, principal axes and radii of gyration. -->
-"Geometrical Properties of Zed Section
+'<h1>Geometrical Properties of Zed Section</h1>
 '<div style="max-width:120mm"><img style="height:150pt;" alt="zed.png" class="side" src="../../Images/mechanics/sections/zed.png"></div>
 'Dimensions
-h = ? {20}'m,'t_w = ? {2}'m
-b_f = ? {10}'m,'t_f = ? {5}'m
+#UI 'Height -'h = 20m', Web thickness -'t_w = 2m
+#UI 'Flange width -'b_f = 10m', Flange thickness -'t_f = 5m
 'Area
-A_w = h*t_w'm<sup>2</sup>
-A_f = (b_f - t_w)*t_f'm<sup>2</sup>
-A = A_w + 2*A_f'm<sup>2</sup>
+A_w = h*t_w
+A_f = (b_f - t_w)*t_f
+A = A_w + 2*A_f
 'Centroid
-y_c = b_f - t_w/2'm
-z_c = h/2'm
+y_c = b_f - t_w/2
+z_c = h/2
 'Perimeter
-P = 2*(h + 2*b_f - t_w)'m
+P = 2*(h + 2*b_f - t_w)
 'Second moments of area
-I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12'm<sup>4</sup>
-I_z = ((h - 2*t_f)*t_w^3 + 2*t_f*b_f*(b_f^2 + 3*(b_f - t_w)^2))/12'm<sup>4</sup>
-I_yz = -b_f*(h - t_f)*A_f/2'm<sup>4</sup>
+I_y = (b_f*h^3 - (b_f - t_w)*(h - 2*t_f)^3)/12
+I_z = ((h - 2*t_f)*t_w^3 + 2*t_f*b_f*(b_f^2 + 3*(b_f - t_w)^2))/12
+I_yz = -b_f*(h - t_f)*A_f/2
 'Principal moments of area
-I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
-I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)'m<sup>4</sup>
+I_1 = (I_y + I_z)/2 + sqrt((I_y - I_z)^2/4 + I_yz^2)
+I_2 = (I_y + I_z)/2 - sqrt((I_y - I_z)^2/4 + I_yz^2)
 'Angle of principal axis
 α_1 = atan((I_y - I_1)/I_yz)
 'Polar moment of area
-I_x=I_1+I_2'm<sup>4</sup>
+I_x=I_1+I_2
 'Radii of gyration
-r_y = sqr(I_y/A)'m
-r_z = sqr(I_z/A)'m
-r_x = sqr(I_x/A)'m
+r_y = sqr(I_y/A)
+r_z = sqr(I_z/A)
+r_x = sqr(I_x/A)

@@ -7,8 +7,8 @@
   <span class="eq">
    <var>N</var>
    = 1000
+   <i>kN</i>
   </span>
-  kN
  </p>
  <p>
   Bending along x-axis -
@@ -16,8 +16,8 @@
    <var>M</var>
    <sub>x</sub>
    = 200
+   <i>kNm</i>
   </span>
-  kNm
  </p>
  <p>
   Bending along y-axis -
@@ -25,8 +25,8 @@
    <var>M</var>
    <sub>y</sub>
    = 400
+   <i>kNm</i>
   </span>
-  kNm
  </p>
  <p>
   Permissible base stress -
@@ -34,8 +34,8 @@
    <var>R</var>
    <sub>0</sub>
    = 200
+   <i>kPa</i>
   </span>
-  kPa
  </p>
  <p>The mean foundation size is determined, using the fixed point method:</p>
  <p>
@@ -50,23 +50,38 @@
   <span class="eq">
    <var>a</var>
    =
-   <span class="dvc">
-    <var>N</var>
+   <span class="dvc up">
+    <span class="dvc">
+     <var>N</var>
+     <span class="dvl">
+     </span>
+     <var>R</var>
+     <sub>0</sub>
+    </span>
     <span class="dvl">
     </span>
-    <var>R</var>
-    <sub>0</sub>
+    1
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
    =
-   <span class="dvc">
-    1000
+   <span class="dvc up">
+    <span class="dvc">
+     1000
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     200
+     <i>kPa</i>
+    </span>
     <span class="dvl">
     </span>
-    200
+    1
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
    = 5
   </span>
-  m
  </p>
  <p>
   Solution -
@@ -77,35 +92,48 @@
    {
    <var>a</var>
    =
-   <small class="nth">3</small>
-   <span class="o1">
-    <span class="r1">
-    </span>
-    <span class="dvc">
-     <var>N</var>
-     ·
-     <var>a</var>
-     +
-     <b class="b0">|</b>
-     <var>M</var>
-     <sub>x</sub>
-     <b class="b0">|</b>
-     +
-     <b class="b0">|</b>
-     <var>M</var>
-     <sub>y</sub>
-     <b class="b0">|</b>
-     <span class="dvl">
+   <span class="dvc up">
+    <small class="nth">3</small>
+    <span class="o1">
+     <span class="r1">
      </span>
-     <var>R</var>
-     <sub>0</sub>
+     <span class="dvc">
+      <var>N</var>
+      ·
+      <var>a</var>
+      · 1
+      <i>m</i>
+      +
+      <b class="b0">|</b>
+      <var>M</var>
+      <sub>x</sub>
+      <b class="b0">|</b>
+      +
+      <b class="b0">|</b>
+      <var>M</var>
+      <sub>y</sub>
+      <b class="b0">|</b>
+      <span class="dvl">
+      </span>
+      <var>R</var>
+      <sub>0</sub>
+     </span>
     </span>
+    <span class="dvl">
+    </span>
+    1
+    <i>m</i>
    </span>
    <span class="cond">for</span>
    <var>k</var>
    = 1...
    <var>n</var>
-   } = 2.49
+   } · 1
+   <i>m</i>
+   = 2.49 · 1
+   <i>m</i>
+   = 2.49
+   <i>m</i>
   </span>
  </p>
  <p>The target function (to be minimized) is the base area:</p>
@@ -155,13 +183,14 @@
    =
    <span class="dvc">
     0.2 · 2.49
+    <i>m</i>
     <span class="dvl">
     </span>
     4
    </span>
    = 0.125
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -172,9 +201,11 @@
    <sub>max</sub>
    ·
    <var>a</var>
-   · 4 = 5 · 2.49 · 4 = 49.82
+   · 4 = 5 · 2.49
+   <i>m</i>
+   · 4 = 49.82
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -226,9 +257,11 @@
    <span class="b1">|</span>
    <span class="dvc">
     400
+    <i>kNm</i>
     <span class="dvl">
     </span>
     200
+    <i>kNm</i>
    </span>
    <span class="b1">|</span>
    ; 5
@@ -253,11 +286,14 @@
    =
    <span class="dvc">
     200
+    <i>kNm</i>
     <span class="dvl">
     </span>
     1000
+    <i>kN</i>
    </span>
    = 0.2
+   <i>m</i>
   </span>
   ,
   <span class="eq">
@@ -274,11 +310,14 @@
    =
    <span class="dvc">
     400
+    <i>kNm</i>
     <span class="dvl">
     </span>
     1000
+    <i>kN</i>
    </span>
    = 0.4
+   <i>m</i>
   </span>
  </p>
  <p>The solution must satisfy the following constraints (resistance criteria):</p>
@@ -496,6 +535,8 @@
    <var>k</var>
    <sub>max</sub>
    ]} = 11.52
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -519,17 +560,20 @@
    )  =
    <var>a</var>
    ( 2 )  = 2.4
+   <i>m</i>
   </span>
-  m,
+  ,
   <span class="eq">
    <var>b</var>
    =
    <var>a</var>
    ·
    <var>k</var>
-   = 2.4 · 2 = 4.8
+   = 2.4
+   <i>m</i>
+   · 2 = 4.8
+   <i>m</i>
   </span>
-  m
  </p>
  <p>The calculated minimal and maximal base stresses are:</p>
  <p>
@@ -543,9 +587,13 @@
    )  =
    <var>p</var>
    <sub>min</sub>
-   ( 2.4; 4.8 )  = 0
+   ( 2.4
+   <i>m</i>
+   ; 4.8
+   <i>m</i>
+   )  = 0
+   <i>kPa</i>
   </span>
-  kPa
  </p>
  <p>
   <span class="eq">
@@ -558,9 +606,13 @@
    )  =
    <var>p</var>
    <sub>max</sub>
-   ( 2.4; 4.8 )  = 173.61
+   ( 2.4
+   <i>m</i>
+   ; 4.8
+   <i>m</i>
+   )  = 173.61
+   <i>kPa</i>
   </span>
-  kPa2
  </p>
  <p>Plot for target function and solution:</p>
  <svg class="plot" data-plot="svg" height="840px" style="width:272.22pt; height:155.56pt;" version="1.1" viewbox=" 0 0 1470 840" width="1470px" xmlns="http://www.w3.org/2000/svg">
@@ -656,18 +708,133 @@ circle.Series3 {fill:CornflowerBlue;}
  <h1>Multiple load cases problem</h1>
  <p>Loads:</p>
  <p>
+  Loads for each case -
+  <span class="eq">
+   <b>
+    <var>Loads</var>
+   </b>
+   =
+   <span class="b0">[</span>
+   500
+   <i>kN</i>
+   ; 100
+   <i>kNm</i>
+   ; 200
+   <i>kNm</i>
+   <span class="b0">|</span>
+   1200
+   <i>kN</i>
+   ; -500
+   <i>kNm</i>
+   ; -200
+   <i>kNm</i>
+   <span class="b0">|</span>
+   1500
+   <i>kN</i>
+   ; 200
+   <i>kNm</i>
+   ; 800
+   <i>kNm</i>
+   <span class="b0">|</span>
+   3000
+   <i>kN</i>
+   ; 100
+   <i>kNm</i>
+   ; 250
+   <i>kNm</i>
+   <span class="b0">]</span>
+   =
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      500
+      <i>kN</i>
+     </span>
+     <span class="td">
+      100
+      <i>kNm</i>
+     </span>
+     <span class="td">
+      200
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1200
+      <i>kN</i>
+     </span>
+     <span class="td">
+      -500
+      <i>kNm</i>
+     </span>
+     <span class="td">
+      -200
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1500
+      <i>kN</i>
+     </span>
+     <span class="td">
+      200
+      <i>kNm</i>
+     </span>
+     <span class="td">
+      800
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      3000
+      <i>kN</i>
+     </span>
+     <span class="td">
+      100
+      <i>kNm</i>
+     </span>
+     <span class="td">
+      250
+      <i>kNm</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
+  </span>
+ </p>
+ <p>
   Compression -
   <span class="eq">
    <var>N</var>
    (
    <var>i</var>
    )  =
-   <b>take</b>
-   (
-   <var>i</var>
-   ; 500; 1200; 1500; 3000 )
+   <b>
+    <var>Loads</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,1
+   </sub>
   </span>
-  kN
  </p>
  <p>
   Bending along x-axis -
@@ -677,12 +844,14 @@ circle.Series3 {fill:CornflowerBlue;}
    (
    <var>i</var>
    )  =
-   <b>take</b>
-   (
-   <var>i</var>
-   ; 100; -500; 200; 100 )
+   <b>
+    <var>Loads</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,2
+   </sub>
   </span>
-  kNm
  </p>
  <p>
   Bending along y-axis -
@@ -692,12 +861,14 @@ circle.Series3 {fill:CornflowerBlue;}
    (
    <var>i</var>
    )  =
-   <b>take</b>
-   (
-   <var>i</var>
-   ; 200; -200; 800; 250 )
+   <b>
+    <var>Loads</var>
+   </b>
+   <sub>
+    <var>i</var>
+    ,3
+   </sub>
   </span>
-  kNm
  </p>
  <p>
   Permissible base stress -
@@ -705,16 +876,17 @@ circle.Series3 {fill:CornflowerBlue;}
    <var>R</var>
    <sub>0</sub>
    = 200
+   <i>kPa</i>
   </span>
-  kPa
  </p>
  <p>
   Mean foundation size -
   <span class="eq">
    <var>a</var>
    = 3.93
+   <i>m</i>
   </span>
-  m (calculated as maximum from all load cases)
+  (calculated as maximum from all load cases)
  </p>
  <p>Limits for the target parameter:</p>
  <p>
@@ -748,13 +920,14 @@ circle.Series3 {fill:CornflowerBlue;}
    =
    <span class="dvc">
     0.2 · 3.93
+    <i>m</i>
     <span class="dvl">
     </span>
     4
    </span>
    = 0.197
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -765,9 +938,11 @@ circle.Series3 {fill:CornflowerBlue;}
    <sub>max</sub>
    ·
    <var>a</var>
-   · 4 = 4 · 3.93 · 4 = 62.88
+   · 4 = 4 · 3.93
+   <i>m</i>
+   · 4 = 62.88
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Load eccentricities:</p>
  <p>
@@ -1113,6 +1288,8 @@ circle.Series3 {fill:CornflowerBlue;}
    <var>k</var>
    <sub>max</sub>
    ]} = 17.3
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -1146,23 +1323,28 @@ circle.Series3 {fill:CornflowerBlue;}
     </span>
     <span class="dvc">
      17.3
+     <i>m</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
      1.88
     </span>
    </span>
    = 3.03
+   <i>m</i>
   </span>
-  m,
+  ,
   <span class="eq">
    <var>b</var>
    =
    <var>a</var>
    ·
    <var>k</var>
-   = 3.03 · 1.88 = 5.71
+   = 3.03
+   <i>m</i>
+   · 1.88 = 5.71
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Calculated base stresses:</p>
  <table class="bordered data">
@@ -1171,10 +1353,12 @@ circle.Series3 {fill:CornflowerBlue;}
    <th>
     p
     <sub>min</sub>
+    , kPa
    </th>
    <th>
     p
     <sub>max</sub>
+    , kPa
    </th>
   </tr>
   <tr>

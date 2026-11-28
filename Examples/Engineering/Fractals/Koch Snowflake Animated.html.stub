@@ -56,8 +56,6 @@
    = 6
   </span>
  </p>
- <p>
- </p>
  <style>#kochAnim polygon{display:none; stroke:#08a; stroke-width:0.1}</style>
  <center>
   <svg id="kochAnim" style="width:300pt; height:360pt;" viewbox="0 10 100 100">

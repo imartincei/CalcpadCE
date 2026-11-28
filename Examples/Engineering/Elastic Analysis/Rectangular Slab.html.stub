@@ -2,80 +2,67 @@
  <!-- [Navier double-trig-series solution](https://en.wikipedia.org/wiki/Bending_of_plates#Bending_of_rectangular_plates) for a thin rectangular plate on simple supports under uniform load.
 <p>Returns maximum deflection and bending moments $M_x$, $M_y$ for arbitrary plan dimensions, thickness and elastic constants — a quick parametric check against slab FEA. -->
  <h3>Input data</h3>
+ <div style="max-width:145mm">
+  <img class="side" src="Images/mechanics/elastic/slab.png" style="height:110pt; width:145pt;"/>
+ </div>
  <p>
-  Dimensions in plan -
+  Dimension in plan -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">6</u>
+   = 6
    <i>m</i>
   </span>
-  ,
+  , Dimension in plan -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">4</u>
+   = 4
    <i>m</i>
   </span>
  </p>
- <table>
-  <tr>
-   <td>
-    <p>
-     Slab thickness -
-     <span class="eq">
-      <var>t</var>
-      =
-      <u class="input-6">0.1</u>
-      <i>m</i>
-     </span>
-    </p>
-    <p>
-     Distributed load -
-     <span class="eq">
-      <var>q</var>
-      =
-      <u class="input-7">10</u>
-      <span class="dvc">
-       <i>kN</i>
-       <span class="dvl">
-       </span>
-       <i>m</i>
-       <sup class="unit">2</sup>
-      </span>
-     </span>
-    </p>
-    <p>
-     Elastic modulus -
-     <span class="eq">
-      <var>E</var>
-      =
-      <u class="input-8">35000</u>
-      <i>MPa</i>
-     </span>
-    </p>
-    <p>
-     Poisson`s ratio -
-     <span class="eq">
-      <var>ν</var>
-      =
-      <u class="input-9">0.15</u>
-     </span>
-    </p>
-    <p>
-     Number of iterations -
-     <span class="eq">
-      <var>N</var>
-      =
-      <u class="input-10">5</u>
-     </span>
-    </p>
-   </td>
-   <td>
-    <img src="Images/mechanics/elastic/slab.png" style="height:110pt; width:145pt; margin-left:40pt;"/>
-   </td>
-  </tr>
- </table>
+ <p>
+  Slab thickness -
+  <span class="eq">
+   <var>t</var>
+   = 0.1
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  Distributed load -
+  <span class="eq">
+   <var>q</var>
+   = 10
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">2</sup>
+   </span>
+  </span>
+ </p>
+ <p>
+  Elastic modulus -
+  <span class="eq">
+   <var>E</var>
+   = 35000
+   <i>MPa</i>
+  </span>
+ </p>
+ <p>
+  Poisson`s ratio -
+  <span class="eq">
+   <var>ν</var>
+   = 0.15
+  </span>
+ </p>
+ <p>
+  Number of iterations -
+  <span class="eq">
+   <var>N</var>
+   = 5
+  </span>
+ </p>
  <h3>Analysis</h3>
  <p>
   Cylindrical stiffness -

@@ -1,14 +1,14 @@
 '<!-- [Navier double-trig-series solution](https://en.wikipedia.org/wiki/Bending_of_plates#Bending_of_rectangular_plates) for a thin rectangular plate on simple supports under uniform load.
 'Returns maximum deflection and bending moments $M_x$, $M_y$ for arbitrary plan dimensions, thickness and elastic constants — a quick parametric check against slab FEA. -->
 '<h3>Input data</h3>
-'Dimensions in plan -'a = ? {6}m','b = ? {4}m
-'<table><tr><td>
-'Slab thickness -'t = ? {0.1}m
-'Distributed load -'q = ? {10}*(kN/m^2)
-'Elastic modulus -'E = ? {35000}MPa
-'Poisson`s ratio -'ν = ? {0.15}
-'Number of iterations -'N = ? {5}
-'</td><td><img src="../../Images/mechanics/elastic/slab.png" style="height:110pt; width:145pt; margin-left:40pt;"></td></tr></table>
+'<div style="max-width:145mm"><img class="side" src="../../Images/mechanics/elastic/slab.png" style="height:110pt; width:145pt;"></div>
+#UI 'Dimension in plan -'a = 6m', Dimension in plan -'b = 4m
+#UI 'Slab thickness -'t = 0.1m
+#UI 'Distributed load -'q = 10kN/m^2
+#UI 'Elastic modulus -'E = 35000MPa
+#UI 'Poisson`s ratio -'ν = 0.15
+#UI 'Number of iterations -'N = 5
+#pause
 #rad
 #post
 '<h3>Analysis</h3>
@@ -27,7 +27,7 @@ S_a(m; x) = sin(k(m)*π/a*x)/k(m)', 'S_b(n; y) = sin(k(n)*π/b*y)/k(n)
 PlotWidth = 50*a
 PlotHeight = 50*b
 PlotStep = 10
-#post
+#end hide
 'Deflections
 w(x; y) = q_0*(a/π)^4/D*$Sum{S_a(m; x)*$Sum{A_1(m; n)*S_b(n; y) @ n = 0 : N} @ m = 0 : N}|mm
 'Bending moments
@@ -58,3 +58,4 @@ $Map{M_min(x; y) @ x = 0m : a & y = 0m : b}
 $Map{M_min(x; y) @ x = 0m : a & y = 0m : b}
 'Maximum value -'M_min(b/2; b/2)|kNm/m
 'Minimum value -'M_min(0m; 0m)|kNm/m
+#end post

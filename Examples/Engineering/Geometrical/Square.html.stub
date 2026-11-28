@@ -4,14 +4,13 @@
  <div style="max-width:100mm">
   <img alt="square.png" class="side" src="Images/mechanics/sections/square.png" style="height:135pt;"/>
  </div>
- <p>Side length</p>
  <p>
+  Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -21,11 +20,12 @@
    <var>a</var>
    <sup>2</sup>
    = 1
+   <i>m</i>
    <sup>2</sup>
    = 1
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -45,13 +45,14 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 0.5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter</p>
  <p>
@@ -59,9 +60,11 @@
    <var>P</var>
    = 4 ·
    <var>a</var>
-   = 4 · 1 = 4
+   = 4 · 1
+   <i>m</i>
+   = 4
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -82,15 +85,16 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>4</sup>
     <span class="dvl">
     </span>
     12
    </span>
    = 0.0833
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -100,10 +104,13 @@
    = 2 ·
    <var>I</var>
    <sub>y</sub>
-   = 2 · 0.0833 = 0.167
+   = 2 · 0.0833
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 0.167
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -131,14 +138,18 @@
     </span>
     <span class="dvc">
      0.0833
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      1
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.289
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -162,13 +173,17 @@
     </span>
     <span class="dvc">
      0.167
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      1
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.408
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

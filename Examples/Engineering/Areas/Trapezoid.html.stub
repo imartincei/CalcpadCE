@@ -6,24 +6,25 @@
  </div>
  <p>Base lengths</p>
  <p>
+  Bottom base -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-5">2</u>
+   = 2
+   <i>m</i>
   </span>
-  ,
+  , Top base -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
- <p>Height</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-7">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -44,12 +45,19 @@
    </span>
    =
    <span class="dvc">
-    ( 2 + 1 )  · 1
+    ( 2
+    <i>m</i>
+    + 1
+    <i>m</i>
+    )  · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 1.5
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Perimeter (symmetrical figure only)</p>
@@ -80,10 +88,15 @@
     <span class="r1">
     </span>
     1
+    <i>m</i>
     <sup>2</sup>
     +
     <span class="dvc">
-     ( 2 − 1 )
+     ( 2
+     <i>m</i>
+     − 1
+     <i>m</i>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
@@ -91,6 +104,7 @@
     </span>
    </span>
    = 1.12
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -102,7 +116,14 @@
    <var>b</var>
    + 2 ·
    <var>c</var>
-   = 2 + 1 + 2 · 1.12 = 5.24
+   = 2
+   <i>m</i>
+   + 1
+   <i>m</i>
+   + 2 · 1.12
+   <i>m</i>
+   = 5.24
+   <i>m</i>
   </span>
  </p>
  <p>

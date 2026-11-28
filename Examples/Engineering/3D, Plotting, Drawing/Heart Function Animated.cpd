@@ -1,9 +1,12 @@
-#val
-'<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-#equ
+#html
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+#end html
 '<!-- Animate a parametric CalcpadCE plot frame by frame: a `#for` loop emits one hidden `<div>` per frame, and a tiny `setInterval` script cycles through them in the browser.
 'The same pattern works for any time- or parameter-dependent function. -->
-'<!--'n = 100','PlotWidth = 400','PlotHeight = 350','k = 4','PlotSVG = 1','PlotAdaptive = 0'-->
+#UI 'Number of frames -'n = 100
+#UI 'Frequency -'k = 4
+'<!--'PlotWidth = 400','PlotHeight = 350','PlotSVG = 1','PlotAdaptive = 0'-->
+#pause
 f(x) = root(x; 3)^2 + 1.1*sin(k*x)*sqrt(4 - x^2)
 #val
 #rad
@@ -13,3 +16,4 @@ f(x) = root(x; 3)^2 + 1.1*sin(k*x)*sqrt(4 - x^2)
 	'</div><!--'k = k + 2'-->
 #loop
 '<script>var i = 1;setInterval(function(){++i; if(i>'n') i=1; $(".frame").hide(); $("#frame-"+i).show();}, 100);</script>
+#end val

@@ -12,7 +12,7 @@ a = vector(5)'- creates an empty vector with 5 elements
 fill(a; 5)'- fills the vector with a value of 5
 a = range(0; 10; 2)'- creates a vector from a range of values, starting from 0 to 10 with step 2
 
-"Indexing
+'<h1>Indexing</h1>
 '<hr/>
 a = [2; 4; 6; 8; 10]
 a.2'- simple dot operator (constant index)
@@ -31,7 +31,7 @@ a
 $Repeat{b.k = a.(k - 1) @ k = 2 : len(b)}
 b
 
-"Vector operators
+'<h1>Vector operators</h1>
 '<h4>Vector-vector</h4>
 a = [1; 2; 3; 0]', 'b = [0; 4; 5; 6; 7]
 'Arithmetic:

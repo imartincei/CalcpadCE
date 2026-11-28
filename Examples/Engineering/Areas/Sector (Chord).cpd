@@ -1,9 +1,8 @@
 '<!-- Area and arc length of a circular sector specified by its chord and height instead of the central angle. -->
-"Area and Arch Length of Circular Sector
+'<h1>Area and Arch Length of Circular Sector</h1>
 '<div style="max-width:110mm;"><img style="height:60pt;" class="side" alt="sector-chord.png" src="../../Images/math/area/sector-chord.png"></div>
-'Dimensions
-'Radius -'r = ? {1}
-'Chord -'a = ? {1}
+#UI 'Radius -'r = 1m
+#UI 'Chord -'a = 1m
 '<!--
 #if a ≤ 2*r
 	'<-->

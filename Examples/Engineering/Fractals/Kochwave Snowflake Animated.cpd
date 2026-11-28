@@ -2,20 +2,23 @@
 'Initial coordinates
 #def a$ = sqrt(3)/2
 x = hp([0; 1; 0.5; 0])', 'y = hp([0; 0; -a$; 0])
-'Number of iterations -'n = 7
+#UI 'Number of iterations -'n = 7
+#pause
 '<h4>Animation</h4>
 #val
-'<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-'<style>#kochwaveAnim polygon{display:none; stroke:Teal; stroke-width:0.1; stroke-linejoin:round;fill:Turquoise;}</style>
-#hide 8
+#html
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<style>#kochwaveAnim polygon{display:none; stroke:Teal; stroke-width:0.1; stroke-linejoin:round;fill:Turquoise;}</style>
+#end html
+#hide
 w = 360', 'h = w', 'k = 100
 #round 12
-#show
+#end hide
 '<svg id="kochwaveAnim" viewBox="0 '0' 'k' 'k'" style="width:'w'pt; height:'h'pt">
 #for i = 1 : n
 	#hide
 	n_p = len(x)
-	#show
+	#end hide
 	'<polygon id="kochwaveAnim-fr-'i'" points="
 	#for j = 1 : n_p
 		x.j*k','(a$ + y.j)*k' '
@@ -39,7 +42,7 @@ w = 360', 'h = w', 'k = 100
 	'Reassign to the original vectors
 	x = join(x1; p2.1)
 	y = join(y1; p2.2)
-	#show
+	#end hide
 #loop
 '</svg><br/>
 'Number of points - 'n_p
@@ -58,3 +61,4 @@ w = 360', 'h = w', 'k = 100
 ',500);
 '})();
 '</script>
+#end val

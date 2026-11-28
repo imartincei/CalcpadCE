@@ -3,7 +3,21 @@
  </script>
  <!-- Animate a parametric CalcpadCE plot frame by frame: a `#for` loop emits one hidden `<div>` per frame, and a tiny `setInterval` script cycles through them in the browser.
 <p>The same pattern works for any time- or parameter-dependent function. -->
- <!-- <span class="eq"><var>n</var> = 100</span> , <span class="eq"><var>PlotWidth</var> = 400</span> , <span class="eq"><var>PlotHeight</var> = 350</span> , <span class="eq"><var>k</var> = 4</span> , <span class="eq"><var>PlotSVG</var> = 1</span> , <span class="eq"><var>PlotAdaptive</var> = 0</span> -->
+ <p>
+  Number of frames -
+  <span class="eq">
+   <var>n</var>
+   = 100
+  </span>
+ </p>
+ <p>
+  Frequency -
+  <span class="eq">
+   <var>k</var>
+   = 4
+  </span>
+ </p>
+ <!-- <span class="eq"><var>PlotWidth</var> = 400</span> , <span class="eq"><var>PlotHeight</var> = 350</span> , <span class="eq"><var>PlotSVG</var> = 1</span> , <span class="eq"><var>PlotAdaptive</var> = 0</span> -->
  <p>
   <span class="eq">
    <var>f</var>

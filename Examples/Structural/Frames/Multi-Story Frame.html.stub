@@ -565,10 +565,13 @@
    <var>γ</var>
    <sub>c</sub>
    = 25
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <p>
@@ -577,10 +580,13 @@
    <var>γ</var>
    <sub>scr</sub>
    = 21
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <p>
@@ -589,10 +595,13 @@
    <var>γ</var>
    <sub>fin</sub>
    = 18
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <p>
@@ -601,10 +610,13 @@
    <var>γ</var>
    <sub>bw</sub>
    = 16
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <p>
@@ -613,10 +625,13 @@
    <var>γ</var>
    <sub>pla</sub>
    = 16
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <p>
@@ -625,17 +640,37 @@
    <var>γ</var>
    <sub>ins</sub>
    = 0.5
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
-   <sup class="unit">3</sup>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">3</sup>
+   </span>
   </span>
  </p>
  <h4>Loads</h4>
  <p>
+  Adjacent plate span -
+  <span class="eq">
+   <var>l</var>
+   <sub>p</sub>
+   = 5
+   <i>m</i>
+  </span>
+ </p>
+ <p>
   Total halfwidth of adjacent plate spans -
   <span class="eq">
    <var>a</var>
+   =
+   <span class="dvc">
+    <var>l</var>
+    <sub>p</sub>
+    <span class="dvl">
+    </span>
+    2
+   </span>
    =
    <span class="dvc">
     5
@@ -994,30 +1029,37 @@
   </span>
  </p>
  <p>
+  Live load intensity -
+  <span class="eq">
+   <var>q</var>
+   <sub>ll</sub>
+   = 2
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+    <sup class="unit">2</sup>
+   </span>
+  </span>
+ </p>
+ <p>
   <b>Live load</b>
   -
   <span class="eq">
    <var>ll</var>
    =
    <var>a</var>
-   · 2
-   <span class="dvc">
-    <i>kN</i>
-    <span class="dvl">
-    </span>
-    <i>m</i>
-    <sup class="unit">2</sup>
-   </span>
+   ·
+   <var>q</var>
+   <sub>ll</sub>
    = 2.5
    <i>m</i>
    · 2
-   <span class="dvc">
-    <i>kN</i>
-    <span class="dvl">
-    </span>
-    <i>m</i>
-    <sup class="unit">2</sup>
-   </span>
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   <sup class="unit">2</sup>
    = 5
    <i>kN</i>
    <i class="unit">∕</i>
@@ -1566,11 +1608,26 @@
  <p>
   Modules of elasticity -
   <span class="eq">
+   <var>E</var>
+   <sub>c</sub>
+   = 35
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>
+  <span class="eq">
    <var>
     <span class="vec">⃗</span>
     E
    </var>
    =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   <var>E</var>
+   <sub>c</sub>
+   <span class="b0">]</span>
+   )  =
    <b>hp</b>
    (
    <span class="b0">[</span>
@@ -1587,11 +1644,25 @@
  <p>
   Poisson coefficients -
   <span class="eq">
+   <var>ν</var>
+   <sub>c</sub>
+   = 0.2
+  </span>
+ </p>
+ <p>
+  <span class="eq">
    <var>
     <span class="vec">⃗</span>
     ν
    </var>
    =
+   <b>hp</b>
+   (
+   <span class="b0">[</span>
+   <var>ν</var>
+   <sub>c</sub>
+   <span class="b0">]</span>
+   )  =
    <b>hp</b>
    (
    <span class="b0">[</span>

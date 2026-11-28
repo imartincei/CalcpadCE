@@ -3,35 +3,39 @@
 'Using analytical formulation of Bogner-Fox-Schmit (BFS)  plate element
 '<h4>Input data</h4>
 'Span lengths
-a = hp([3.6; 4.2; 4.2; 3.6])'m
-b = hp([3; 3.6; 3])'m
+#UI {"columnHeaders": ["Span a, m"]} a = [3.6m; 4.2m; 4.2m; 3.6m]
+#UI {"columnHeaders": ["Span b, m"]} b = [3m; 3.6m; 3m]
 'Number of axes -'n_sa = len(a) + 1', 'n_sb = len(b) + 1
 '<img src="./flat-slab.png" width="360">
 #hide
-x_s = vector_hp(n_sa)','y_s = vector_hp(n_sb)
+x_s = vector_hp(n_sa)*1m','y_s = vector_hp(n_sb)*1m
 $Repeat{x_s.(k + 1) = x_s.k + a.k @ k = 1 : n_sa - 1}
 $Repeat{y_s.(k + 1) = y_s.k + b.k @ k = 1 : n_sb - 1}
-#show
-'Axis coordinates -'x_s'm, 'y_s'm
-'Slab dimensions -'l_a = x_s.n_sa'm, 'l_b = y_s.n_sb'm
-'Thickness -'t = 0.2'm
-'Load -'q = 10'kN/m²
-'Modulus of elasticity -'E = 35000'MPa
-'Poisson`s ratio -'ν = 0.2
+#end hide
+'Axis coordinates -'x_s', 'y_s
+'Slab dimensions -'l_a = x_s.n_sa', 'l_b = y_s.n_sb
+#UI 'Thickness -'t = 0.2m
+#UI 'Load -'q = 10kN/m^2
+#UI 'Modulus of elasticity -'E = 35000MPa
+#UI 'Poisson`s ratio -'ν = 0.2
 '<h4>Finite element mesh</h4>
 'We will use BFS rectangular finite element with'n_DOFs = 16
-'Element dimensions -'a_1 = 0.6'm, 'b_1 = 0.6'm
+#UI 'Element dimensions -'Δa = 0.6m', 'Δb = 0.6m
 'Number of elements and joints along <var>a</var> and <var>b</var> -'
-n_a = ceiling(a/a_1)', 'n_ea = sum(n_a)', 'n_ja = n_ea + 1
-n_b = ceiling(b/b_1)', 'n_eb = sum(n_b)', 'n_jb = n_eb + 1
-#if count(a ≡ a_1*n_a; 0; 1) + count(b ≡ b_1*n_b; 0; 1) > 0
+n_a = ceiling(a/Δa)', 'n_ea = sum(n_a)', 'n_ja = n_ea + 1
+n_b = ceiling(b/Δb)', 'n_eb = sum(n_b)', 'n_jb = n_eb + 1
+#if count(a ≡ Δa*n_a; 0; 1) + count(b ≡ Δb*n_b; 0; 1) > 0
 	'<p class="err">Error! All span lengts must be multiples of element size.</p>
 	#break
 #end if
 'Total number of elements -'n_e = n_ea*n_eb
 'Total number of joints -'n_j = n_ja*n_jb
 'Supported joints count -'n_s = n_sa*n_sb
+#pause
+'The solver below works in m, kN and MPa
 #hide
+a_1 = Δa/1m', 'b_1 = Δb/1m
+L_a = l_a/1m', 'L_b = l_b/1m
 x_j = vector_hp(n_j)','y_j = vector_hp(n_j)
 x = 0', 'y = 0', 'j = 0
 #for j_a = 1 : n_ja
@@ -40,7 +44,7 @@ x = 0', 'y = 0', 'j = 0
 		x_j.j = x
 		y_j.j = y
 		y = y + b_1
-		#if y > l_b
+		#if y > L_b
 			y = 0
 			i_b = 1
 			x = x + a_1
@@ -74,10 +78,10 @@ s_j = vector(n_s)', 'j_s = 0', 'j = 1', 's_a = 0
 		j = j + (s_a - 1)*n_jb + 1
 	#end if
 #loop
-#show
+#end hide
 'Joint coordinates
-x_j'm
-y_j'm
+x_j*1m
+y_j*1m
 'Numbers of joints at elements'' corners
 transp(e_j)
 'Supported joints
@@ -86,11 +90,11 @@ s_j
 #val
 #hide
 w = 400
-k = w/l_a
+k = w/L_a
 d = 10
 h = l_b/l_a*w
 r = 0.04*k
-#show
+#end hide
 '<svg viewbox="'-d' '-d' 'w + 2*d' 'h + 2*d'" xmlns="http://www.w3.org/2000/svg" version="1.1" style=" font-family: Segoe UI; font-size:5px; width:'w'pt; height:'h'pt">
 '<style>.joint{fill:orangeRed;} .support{stroke:red; stroke-width:1; fill:lightpink;} .element{stroke:seaGreen; stroke-width:1; fill:lime; fill-opacity:0.1; stroke-opacity:0.5}</style>
 '<rect x="'0'" y="'0'" width="'w'" height="'h'" style="fill:yellow; fill-opacity:0.2" />
@@ -105,7 +109,7 @@ r = 0.04*k
 	y2 = y_j.j2*k
 	x = (x1 + x2)/2
 	y = (y1 + y2)/2
-	#show
+	#end hide
 	'<text x="'x'" y="'h - y'" text-anchor="middle">'e'</text>
 	'<rect x="'x1'" y="'h - y2'" width="'x2 - x1'" height="'y2 - y1'" class="element" />
 #loop
@@ -114,14 +118,14 @@ r = 0.04*k
 	#hide
 	x = x_j.j*k
 	y = h - y_j.j*k
-	#show
+	#end hide
 	'<circle cx="'x'" cy="'y'" r="'2*r'" class="support"/>
 #loop
 #for j = 1 : n_j
 	#hide
 	x = x_j.j*k
 	y = h - y_j.j*k
-	#show
+	#end hide
 	'<circle cx="'x'" cy="'y'" r="'r'" class="joint" />
 	'<text x="'x + 2*r'" y="'y - r'" text-anchor="start">'j'</text>
 #loop
@@ -189,8 +193,8 @@ $Plot{N_1,w(ξ; 0) @ ξ = 0 : 1}
 $Plot{N_1,θₓ(ξ; 0) @ ξ = 0 : 1}
 '</td></tr></table>
 '<p><b>Constitutive matrix</b> (stress - strain relationship)</p>
-D_1,1 = E*t^3/(12*(1 - ν^2))'kNm
-D = D_1,1*hp([1; ν; 0|ν; 1; 0|0; 0; (1 - ν)/2])'kNm
+D_1,1 = E/1MPa*(t/1m)^3/(12*(1 - ν^2))
+D = D_1,1*hp([1; ν; 0|ν; 1; 0|0; 0; (1 - ν)/2])
 #hide
 '<p><b>Strain-displacement matrix</b></p>
 B_1(j; ξ; η) = take(j; _
@@ -210,14 +214,14 @@ B_3(j; ξ; η) = 2*take(j; _
 Φ′_1a(ξ)*Φ′_3b(η); Φ′_2a(ξ)*Φ′_3b(η); Φ′_1a(ξ)*Φ′_4b(η); Φ′_2a(ξ)*Φ′_4b(η))
 n = n_DOFs
 K_e = utriang_hp(n)
-#show
+#end hide
 '<div class="fold">
 '<h5>Element stiffness matrix calculation</h5>
 α = b_1/a_1
 #hide
 α² = α^2
 A_1 = a_1*b_1
-#show
+#end hide
 K_e.(1; 1) = 156/35*(α/a_1^2 + 1/(α*b_1^2)) + 72/(25*A_1)
 K_e.(5; 5) = K_e.(1; 1)', ' _
 K_e.(9; 9) = K_e.(1; 1)', ' _
@@ -358,7 +362,7 @@ K_e.(7; 11) = K_e.(3; 15)
 'Element stiffness matrix coefficients (above the main diagonal only)
 K_e = D_1,1*K_e
 '<p><strong>Element load vector</strong></p>
-F_e = q*A_1/24*hp([6; a_1; b_1; A_1/6; 6; -a_1; b_1; -A_1/6; 6; -a_1; -b_1; A_1/6; 6; a_1; -b_1; -A_1/6])'kN
+F_e = q/1kPa*A_1/24*hp([6; a_1; b_1; A_1/6; 6; -a_1; b_1; -A_1/6; 6; -a_1; -b_1; A_1/6; 6; a_1; -b_1; -A_1/6])
 '<h4>Solution</h4>
 'Global stiffness matrix
 #hide
@@ -424,7 +428,7 @@ k_s = 10^20
 	j = k_1*(s_j.i - 1) + 1
 	K.(j; j) = K.(j; j) + k_s
 #loop
-#show
+#end hide
 K
 'Global load vector
 #hide
@@ -438,23 +442,23 @@ F = vector_hp(n)
 		#loop
 	#loop
 #loop
-#show
-F'kN
+#end hide
+F
 'Solution of the system of equations<!--'Tol = 10^-2'-->
-Z = slsolve(K; F)'mm
+Z = slsolve(K; F)
 '<h4>Results</h4>
 'Joint displacements
 #hide
 W_z = matrix_hp(n_ja; n_jb)
 w(j) = Z.(4*j - 3)
 $Repeat{$Repeat{W_z.(i; j) = round(w((i - 1)*n_jb + j)*1000)/1000 @ j = 1 : n_jb} @ i = 1 : n_ja}
-w(x; y) = spline(1 + x/a_1; 1 + y/b_1; W_z)
+w(x; y) = spline(1 + x/(a_1*1m); 1 + y/(b_1*1m); W_z)*1mm
 PlotWidth = 450', 'PlotHeight = PlotWidth*l_b/l_a
 PlotPalette = 2', 'PlotShadows = 1
 PlotLightDir = 7', 'PlotStep = 5
-#show
-transp(W_z)'mm
-$Map{-w(x; y) @ x = 0 : l_a & y = 0 : l_b}
+#end hide
+transp(W_z)*1mm
+$Map{-w(x; y) @ x = 0m : l_a & y = 0m : l_b}
 'Bending moments
 Z_j(j) = slice(Z; k_1*(j - 1) + 1; k_1*j)
 Z_e(e) = hp([Z_j(e_j.(e; 1)); Z_j(e_j.(e; 2)); Z_j(e_j.(e; 3)); Z_j(e_j.(e; 4))])
@@ -507,20 +511,20 @@ Mxy = matrix_hp(n_ja; n_jb)
 		Mxy.(i; k) = M_j.(3; j)
 	#loop
 #loop
-M_x(x; y) = spline(1 + x/a_1; 1 + y/b_1; Mx)
-M_y(x; y) = spline(1 + x/a_1; 1 + y/b_1; My)
-M_xy(x; y) = spline(1 + x/a_1; 1 + y/b_1; Mxy)
+M_x(x; y) = spline(1 + x/(a_1*1m); 1 + y/(b_1*1m); Mx)*1kNm/m
+M_y(x; y) = spline(1 + x/(a_1*1m); 1 + y/(b_1*1m); My)*1kNm/m
+M_xy(x; y) = spline(1 + x/(a_1*1m); 1 + y/(b_1*1m); Mxy)*1kNm/m
 PlotShadows = 0
-#show
-'Average bending moments at joints, kNm/m
-M_j
+#end hide
+'Average bending moments at joints
+M_j*1kNm/m
 'Bending moments for the plate
 'Bending moments - <var>M</var><sub>x</sub>
-transp(Mx)'kNm/m
-$Map{M_x(x; y) @ x = 0 : l_a & y = 0 : l_b}
+transp(Mx)*1kNm/m
+$Map{M_x(x; y) @ x = 0m : l_a & y = 0m : l_b}
 'Bending moments <var>M</var><sub>y</sub>
-transp(My)'kNm/m
-$Map{M_y(x; y) @ x = 0 : l_a & y = 0 : l_b}
+transp(My)*1kNm/m
+$Map{M_y(x; y) @ x = 0m : l_a & y = 0m : l_b}
 'Bending moments <var>M</var><sub>xy</sub>
-transp(Mxy)'kNm/m
-$Map{M_xy(x; y) @ x = 0 : l_a & y = 0 : l_b}
+transp(Mxy)*1kNm/m
+$Map{M_xy(x; y) @ x = 0m : l_a & y = 0m : l_b}

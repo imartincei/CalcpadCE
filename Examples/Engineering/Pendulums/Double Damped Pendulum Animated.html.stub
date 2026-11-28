@@ -22,14 +22,16 @@
      </span>
     </p>
     <p>
-     Pendulum lengths -
+     Upper pendulum length -
      <span class="eq">
       <var>l</var>
       <sub>1</sub>
       = 1.5
       <i>m</i>
      </span>
-     ,
+    </p>
+    <p>
+     Lower pendulum length -
      <span class="eq">
       <var>l</var>
       <sub>2</sub>
@@ -56,14 +58,16 @@
      </span>
     </p>
     <p>
-     Pendulum masses -
+     Upper pendulum mass -
      <span class="eq">
       <var>m</var>
       <sub>1</sub>
       = 2
       <i>kg</i>
      </span>
-     ,
+    </p>
+    <p>
+     Lower pendulum mass -
      <span class="eq">
       <var>m</var>
       <sub>2</sub>
@@ -89,24 +93,24 @@
       <i>kg</i>
      </span>
     </p>
-    <p>Initial angles</p>
     <p>
+     Initial angle of the upper pendulum -
      <span class="eq">
       <var>θ</var>
       <sub>01</sub>
-      = -90° = -1.57
-      <i>rad</i>
+      = -90°
      </span>
-     ,
+    </p>
+    <p>
+     Initial angle of the lower pendulum -
      <span class="eq">
       <var>θ</var>
       <sub>02</sub>
-      = -120° = -2.09
-      <i>rad</i>
+      = -120°
      </span>
     </p>
-    <p>Initial angular velocities</p>
     <p>
+     Initial angular velocity of the upper pendulum -
      <span class="eq">
       <var>ω</var>
       <sub>01</sub>
@@ -118,7 +122,9 @@
        <i>s</i>
       </span>
      </span>
-     ,
+    </p>
+    <p>
+     Initial angular velocity of the lower pendulum -
      <span class="eq">
       <var>ω</var>
       <sub>02</sub>
@@ -136,6 +142,23 @@
      <span class="eq">
       <var>β</var>
       = 0.01
+     </span>
+    </p>
+    <p>
+     Maximum simulation time -
+     <span class="eq">
+      <var>t</var>
+      <sub>max</sub>
+      = 20
+      <i>s</i>
+     </span>
+    </p>
+    <p>
+     Step size -
+     <span class="eq">
+      <var>h</var>
+      = 0.001
+      <i>s</i>
      </span>
     </p>
    </td>
@@ -802,8 +825,7 @@
    </span>
    =
    <span class="dvc">
-    -1.57
-    <i>rad</i>
+    -90°
     <span class="dvl">
     </span>
     1
@@ -861,8 +883,7 @@
    </span>
    =
    <span class="dvc">
-    -2.09
-    <i>rad</i>
+    -120°
     <span class="dvl">
     </span>
     1

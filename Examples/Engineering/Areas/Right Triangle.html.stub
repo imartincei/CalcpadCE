@@ -5,16 +5,17 @@
  </div>
  <p>Dimensions</p>
  <p>
+  Leg -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">4</u>
+   = 4
+   <i>m</i>
   </span>
-  ,
+  , Leg -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">3</u>
+   = 3
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -32,12 +33,17 @@
    =
    <span class="o0">
     <span class="r">√</span>
-    4
+    ( 4
+    <i>m</i>
+    )
     <sup>2</sup>
-    + 3
+    +  ( 3
+    <i>m</i>
+    )
     <sup>2</sup>
    </span>
    = 5
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -55,12 +61,17 @@
    </span>
    =
    <span class="dvc">
-    4 · 3
+    4
+    <i>m</i>
+    · 3
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Perimeter</p>
@@ -73,7 +84,14 @@
    <var>b</var>
    +
    <var>c</var>
-   = 4 + 3 + 5 = 12
+   = 4
+   <i>m</i>
+   + 3
+   <i>m</i>
+   + 5
+   <i>m</i>
+   = 12
+   <i>m</i>
   </span>
  </p>
  <p>

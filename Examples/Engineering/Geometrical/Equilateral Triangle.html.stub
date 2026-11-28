@@ -4,14 +4,13 @@
  <div style="max-width:120mm">
   <img alt="equilateral-triangle.png" class="side" src="Images/mechanics/sections/equilateral-triangle.png" style="height:135pt;"/>
  </div>
- <p>Side length</p>
  <p>
+  Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Height</p>
  <p>
@@ -39,9 +38,11 @@
     </span>
     2
    </span>
-   · 1 = 0.866
+   · 1
+   <i>m</i>
+   = 0.866
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -58,15 +59,18 @@
    </span>
    =
    <span class="dvc">
-    1 · 0.866
+    1
+    <i>m</i>
+    · 0.866
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 0.433
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Perimeter</p>
  <p>
@@ -74,9 +78,11 @@
    <var>P</var>
    = 3 ·
    <var>a</var>
-   = 3 · 1 = 3
+   = 3 · 1
+   <i>m</i>
+   = 3
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Centroid</p>
  <p>
@@ -93,13 +99,14 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 0.5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -115,13 +122,14 @@
    =
    <span class="dvc">
     0.866
+    <i>m</i>
     <span class="dvl">
     </span>
     3
    </span>
    = 0.289
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -140,16 +148,20 @@
    </span>
    =
    <span class="dvc">
-    1 · 0.866
+    1
+    <i>m</i>
+    ·  ( 0.866
+    <i>m</i>
+    )
     <sup>3</sup>
     <span class="dvl">
     </span>
     36
    </span>
    = 0.018
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -168,16 +180,18 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>3</sup>
     · 0.866
+    <i>m</i>
     <span class="dvl">
     </span>
     48
    </span>
    = 0.018
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -190,10 +204,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 0.018 + 0.018 = 0.0361
+   = 0.018
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 0.018
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 0.0361
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional constant</p>
  <p>
@@ -216,6 +236,7 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>4</sup>
     ·
     <span class="o0">
@@ -227,9 +248,9 @@
     80
    </span>
    = 0.0217
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional section modulus</p>
  <p>
@@ -247,15 +268,16 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>3</sup>
     <span class="dvl">
     </span>
     20
    </span>
    = 0.05
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -280,14 +302,18 @@
     </span>
     <span class="dvc">
      0.018
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.433
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.204
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -311,14 +337,18 @@
     </span>
     <span class="dvc">
      0.018
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.433
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.204
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -342,13 +372,17 @@
     </span>
     <span class="dvc">
      0.0361
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.433
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.289
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

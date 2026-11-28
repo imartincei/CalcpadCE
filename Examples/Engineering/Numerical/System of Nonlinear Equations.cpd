@@ -20,8 +20,9 @@ x.1^2 - x.2 + 2*x.3 - sqrt(x.4) - 3'='0
 '  'g_1(x) = sqrt(abs(x.2 - 2*x.3 + sqrt(abs(x.4)) + 3))
 '  'g_2(x) = cbrt((3*x.1^3 + 3*x.3 + 2*x.4 - 4)/2)
 '  'g_3(x) = sqrt(abs(-4*x.1 + 3*x.2 - x.4 + 11))
-'Select an initial guess -'x = [2; 2; 2; 2]
+#UI 'Select an initial guess -'x = [2; 2; 2; 2]
 'Set the relative precision -'ε_max = 10^-15
+#pause
 #hide
 #for n = 1 : 1000
 	x⁰ = join(x)
@@ -33,7 +34,7 @@ x.1^2 - x.2 + 2*x.3 - sqrt(x.4) - 3'='0
 		#break
 	#end if
 #loop
-#show
+#end hide
 'Calculate the following expressions iteratively (the last results are displayed only):
 '  'x⁰ = join(x)' - store a copy of the previous vector <var>x</var>
 '  Update the solution vector with a new approximation
@@ -83,7 +84,7 @@ J(x) = [5; 4; 1; -2*x.4| _
 	#end if
 	x = x⁰ - δx
 #loop
-#show
+#end hide
 'Calculate the following expressions iteratively (the last results are displayed only):
 '  'x⁰ = x' - store the previous vector <var>x</var>
 '  'δx = inverse(J(x⁰))*f(x⁰)'- difference
@@ -124,7 +125,7 @@ y¹ = f(x¹)
 	x⁰ = x¹','y⁰ = y¹
 	x¹ = x²','y¹ = y²
 #loop
-#show
+#end hide
 'Calculate the following expressions iteratively (the last results are displayed only):
 '  'y⁰ = f(x⁰)'- function values at prev. step
 '  'x¹ = x⁰ - J_inv*y⁰'- current step approximation

@@ -11,29 +11,35 @@
    = 2
    <i>m</i>
   </span>
-  , 'Height -
+ </p>
+ <p>
+  Height -
   <span class="eq">
    <var>h</var>
    = -0.5
    <i>m</i>
   </span>
  </p>
+ <p>Cross section - circular pipe</p>
  <p>
-  Cross section - circular pipe with diameter
+  Diameter -
   <span class="eq">
    <var>Φ</var>
    = 100
    <i>mm</i>
   </span>
-  and thickness
+ </p>
+ <p>
+  Thickness -
   <span class="eq">
    <var>t</var>
    = 4
    <i>mm</i>
   </span>
  </p>
+ <p>Material - steel</p>
  <p>
-  Material - steel. Modulus of elasticity -
+  Modulus of elasticity -
   <span class="eq">
    <var>E</var>
    = 210

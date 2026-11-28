@@ -6,48 +6,53 @@
    Beam length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-4">6</u>
+    = 6
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>F</var>
-    =
-    <u class="input-5">100</u>
+    = 100
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    Second moment of area -
    <span class="eq">
     <var>I</var>
-    =
-    <u class="input-6">160000</u>
+    = 160000
+    <i>cm</i>
+    <sup class="unit">4</sup>
    </span>
-   cm
-   <sup>4</sup>
   </p>
   <p>
    Modulus of elasticity -
    <span class="eq">
     <var>E</var>
-    =
-    <u class="input-7">30</u>
+    = 30
+    <i>GPa</i>
    </span>
-   GPa
   </p>
   <p>Functions of rotation and deflection along the beam</p>
   <p>
    <span class="eq">
     <var>EI</var>
-    = 0.01 ·
+    =
     <var>E</var>
     ·
     <var>I</var>
-    = 0.01 · 30 · 160000 = 48000
+    = 30
+    <i>GPa</i>
+    · 160000
+    <i>cm</i>
+    <sup class="unit">4</sup>
+    = 48000
+    <i>kN</i>
+    <i>·</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
   </p>
   <p>
@@ -264,23 +269,20 @@ circle.Series1 {fill:Tomato;}
      2
     </span>
     <span class="b1">)</span>
-    · 10
-    <sup>3</sup>
     =
     <var>d</var>
     <span class="b1">(</span>
     <span class="dvc">
      6
+     <i>m</i>
      <span class="dvl">
      </span>
      2
     </span>
     <span class="b1">)</span>
-    · 10
-    <sup>3</sup>
     = 9.38
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>Maximum rotation</p>
   <p>
@@ -289,35 +291,34 @@ circle.Series1 {fill:Tomato;}
     <sub>max</sub>
     =
     <var>φ</var>
-    ( 0 )  · 10
-    <sup>3</sup>
-    = 4.69
+    ( 0
+    <i>m</i>
+    )  · 1
+    <i>rad</i>
+    = 0.00469
+    <i>rad</i>
    </span>
-   rad·10³
   </p>
   <p>
    Calculate deflection at
    <span class="eq">
     <var>x</var>
-    =
-    <u class="input-21">3</u>
+    = 3
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <span class="eq">
     <var>d</var>
     (
     <var>x</var>
-    )  · 10
-    <sup>3</sup>
-    =
+    )  =
     <var>d</var>
-    ( 3 )  · 10
-    <sup>3</sup>
-    = 9.38
+    ( 3
+    <i>m</i>
+    )  = 9.38
+    <i>mm</i>
    </span>
-   mm
   </p>
  </div>
 </div>

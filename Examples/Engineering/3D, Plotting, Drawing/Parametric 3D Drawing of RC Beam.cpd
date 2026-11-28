@@ -1,13 +1,15 @@
 '<!-- Build a fully parametric 3D model of a reinforced-concrete T-beam (concrete prism plus longitudinal rebars) using [three.js](https://threejs.org) inside CalcpadCE.
 'Change the geometry inputs and the WebGL view, the calculations, and the report all update together. -->
-'Beam length -'l = 6m
-'Web width -'b = 0.25m', height -'h = 0.8m
-'Flange width -'b_f = 1.0m', height -'h_f = 0.14m
-'Rebar diameter -'Ø = 22mm|m', Concrete cover -'a = 5cm
+#UI 'Beam length -'l = 6m
+#UI 'Web width -'b = 0.25m', height -'h = 0.8m
+#UI 'Flange width -'b_f = 1.0m', height -'h_f = 0.14m
+#UI 'Rebar diameter -'Ø = 22mm', Concrete cover -'a = 5cm
+#html
+<script src="https://cdn.jsdelivr.net/npm/three@0.145/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.145/examples/js/controls/OrbitControls.js"></script>
+<div id="beam-3d-canvas"></div>
+#end html
 #val
-'<script src="https://cdn.jsdelivr.net/npm/three@0.145/build/three.min.js"></script>
-'<script src="https://cdn.jsdelivr.net/npm/three@0.145/examples/js/controls/OrbitControls.js"></script>
-'<div id="beam-3d-canvas"></div>
 '<script>
 '(function() {
 'if (typeof THREE === "undefined"|| typeof THREE.OrbitControls === "undefined") {
@@ -53,7 +55,7 @@
 'map: concreteTexture, roughness: 1, metalness: 0.1, transparent: true, opacity:0.9});
 'const beam = new THREE.Mesh(extrude, concreteMaterial);
 'scene.add(beam);
-'const r = 'Ø/2';
+'const r = 'Ø/2/m';
 'const geometry = new THREE.CylinderGeometry(r, r, 1.04*l, 32);
 'geometry.rotateX(Math.PI / 2);
 'const steelMaterial = new THREE.MeshStandardMaterial({
@@ -79,3 +81,4 @@
 'animate();
 '})();
 '</script>
+#end val

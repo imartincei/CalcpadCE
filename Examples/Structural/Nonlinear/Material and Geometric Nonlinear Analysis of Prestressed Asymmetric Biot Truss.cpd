@@ -4,15 +4,13 @@
 #hide
 δz = 10^-12
 Precision = 10^-9
-x_J = [0; 3; 9]*m
-y_J = [0; 0; 0]*m
-#show
-x_J','y_J', 'n_J = len(x_J)
+#end hide
+#UI {"columnHeaders": ["J1", "J2", "J3"], "rowHeaders": ["x"]} 'Joint x coordinates -'x_J = [0m; 3m; 9m]
+#UI {"columnHeaders": ["J1", "J2", "J3"], "rowHeaders": ["y"]} 'Joint y coordinates -'y_J = [0m; 0m; 0m]
+n_J = len(x_J)
 '<h4>Elements - [J1; J2]</h4>
-#hide
-E_J = [1; 2|2; 3]
-#show
-transp(E_J)', 'n_E = n_rows(E_J)', 'J_1(e) = E_J.(e; 1)', 'J_2(e) = E_J.(e; 2)
+#UI {"columnHeaders": ["J1", "J2"], "rowHeaders": ["E1", "E2"]} E_J = [1; 2 | 2; 3]
+n_E = n_rows(E_J)', 'J_1(e) = E_J.(e; 1)', 'J_2(e) = E_J.(e; 2)
 'Element endpoint coordinates
 x_1(e) = x_J.J_1(e)','y_1(e) = y_J.J_1(e)', 'x_2(e) = x_J.J_2(e)','y_2(e) = y_J.J_2(e)
 'Element lengths - 'l(e) = sqrt((x_2(e) - x_1(e))^2 + (y_2(e) - y_1(e))^2)
@@ -28,26 +26,29 @@ c_J
 n_c = n_rows(c_J)
 '<h4>Material - steel</h4>
 'We assume bi-linear material model
-'Initial modulus of elasticity -'E_0 = 206GPa
-'Yield stress -'f_y = 500MPa
-'Ultimate tensile stress -'f_u = 600MPa
+#UI 'Initial modulus of elasticity -'E_0 = 206GPa
+#UI 'Yield stress -'f_y = 500MPa
+#UI 'Ultimate tensile stress -'f_u = 600MPa
 'Yield strain -'ε_y = f_y/E_0|‰
-'Ultimate  strain -'ε_u = 20‰
+#UI 'Ultimate  strain -'ε_u = 20‰
 'Modulus of elasticity after yield -'E_1 = (f_u - f_y)/(ε_u - ε_y)|GPa
 'Idealized stress-strain curve -'σ(ε) = if(ε < ε_y; E_0*ε; f_y + E_1*(ε - ε_y))
 '<!--'PlotWidth = 200','PlotHeight = 150'-->
 $Plot{σ(ε) @ ε = 0‰ : ε_u}
-'<h4>Cross section – circular with diameter'Φ = 20mm'</h4>
+#UI 'Cross section diameter -'Φ = 20mm
+'<h4>Cross section – circular with diameter'Φ'</h4>
 'Area -'A = π*Φ^2/4|cm^2
 'Stiffness
 'Initial -'EA_0 = E_0*A', 'EA = EA_0
 'After yield -'EA_1 = E_1*A
 '<h4>Load - [Joint, Fx, Fy]</h4>
-#hide
-F_J = join_rows([2; 0kN; -70kN])
-#show
-F_J', 'n_F = n_rows(F_J)
-'Prestressing force -'P = 20kN
+#UI 'Load applied at joint -'j_F = 2
+#UI 'Horizontal load -'F_xJ = 0kN
+#UI 'Vertical load -'F_yJ = -70kN
+F_J = join_rows([j_F; F_xJ; F_yJ])
+n_F = n_rows(F_J)
+#UI 'Prestressing force -'P = 20kN
+#UI 'Initial deflection at the intermediate joint -'z_i = 100mm
 'Initial stress -'σ_P = P/A|MPa
 'Initial strain -'ε_P = σ_P/E_0
 #include svg_drawing.cpd
@@ -66,7 +67,7 @@ y1(j) = (h - y_J.j + Z.(2*j))*k
 #def pin_style$ = style="stroke:red; stroke-width:1; fill:white"
 #def thick_style$ = style="stroke:darkcyan; stroke-width:3; fill:none"
 #def load_style$ = style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;"
-#show
+#end hide
 #val
 svg$
 #def frame$
@@ -90,7 +91,7 @@ svg$
 		y2 = y1 - abs(δ)
 		x3 = x1 + δ
 		y3 = y1 + abs(δ)
-		#show
+		#end hide
 		line$(x2; y3; x3; y3; thick_style$)
 		line$(x2; y3; x1; y1; thin_style$)
 		line$(x3; y3; x1; y1; thin_style$)
@@ -101,14 +102,14 @@ svg$
 		j = F_J.(i; 1)
 		F_x = F_J.(i; 2)/kN
 		F_y = F_J.(i; 3)/kN
-		#show
+		#end hide
 		#if F_x ≠ 0
 			#hide
 			δ_x = 3*δ*sign(F_x)
 			δ_y = 0.2*δ
 			x1 = x1(j) + r*sign(F_x)
 			y1 = y1(j)
-			#show
+			#end hide
 			'<polygon points="'x1 - δ_x','y1' 'x1','y1' 'x1 - δ_x/5','y1 - δ_y' 'x1 - δ_x/5','y1 + δ_y' 'x1','y1'" load_style$ />
 			texth$(x1-2*δ_x/3;y1-2*δ_y;Fx='F_x'kN)
 		#end if
@@ -118,7 +119,7 @@ svg$
 			δ_y = 3*δ*sign(F_y)
 			x1 = x1(j)
 			y1 = y1(j) + r*sign(F_y)
-			#show
+			#end hide
 			'<polygon points="'x1','y1 + δ_y' 'x1','y1' 'x1 - δ_x','y1 + δ_y/5' 'x1 + δ_x','y1 + δ_y/5' 'x1','y1'" load_style$ />
 			textv$(x1-2*δ_x;y1+2*δ_y/3;Fy='F_y'kN)
 		#end if
@@ -136,6 +137,7 @@ svg$
 frame$
 '</svg>
 #equ
+#pause
 '<h4>Finite element formulation</h4>
 '<!--'u = 0','v = 0','z = [0; 0]'-->
 'We will formulate a 2D truss element with 3rd order geometric nonlinearity. The equilibrium equations will be derived in local CS, for the deformed state of the structure, assuming large displacements, as follows:
@@ -159,7 +161,7 @@ F′_y2(e; z) = (1/l(e) - (l(e) + z.1)^2/l′(e; z)^3)
 '<h4>Solution by Newton-Raphson’s method</h4>
 'We will express the parameters of the system as a function of the vector of t he unknown displacements:
 Z = vector(2*n_J)*mm
-'Initial deflection at the intermediate joint -'Z.(n_J + 1) = 100mm
+'Initial deflection at the intermediate joint -'Z.(n_J + 1) = z_i
 'Extracting displacements for joint <var>j</var> -'z_J(j) = [Z.(2*j - 1); Z.(2*j)]
 'Relative displacements for element <var>e</var> -' _
 z_e(e) = t(e)*(z_J(J_2(e)) - z_J(J_1(e)))

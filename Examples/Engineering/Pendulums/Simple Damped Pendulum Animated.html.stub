@@ -42,8 +42,7 @@
      <span class="eq">
       <var>θ</var>
       <sub>0</sub>
-      = -179° = -3.12
-      <i>rad</i>
+      = -179°
      </span>
     </p>
     <p>
@@ -70,7 +69,15 @@
      </span>
     </p>
     <p>
-     Damping factor (normaized) -
+     Step size -
+     <span class="eq">
+      <var>h</var>
+      = 0.02
+      <i>s</i>
+     </span>
+    </p>
+    <p>
+     Damping factor (normalized) -
      <span class="eq">
       <var>β</var>
       = 0.005
@@ -601,8 +608,7 @@
    </span>
    =
    <span class="dvc">
-    -3.12
-    <i>rad</i>
+    -179°
     <span class="dvl">
     </span>
     1

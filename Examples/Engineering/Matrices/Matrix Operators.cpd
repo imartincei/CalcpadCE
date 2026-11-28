@@ -1,6 +1,7 @@
 '<!-- Reference for matrix and matrix-vector operators: element-wise vs. algebraic multiplication, comparison and logical operators broadcast across whole grids. -->
 '<h4>Matrix-matrix</h4>
-A = [0; 1; 2|3; 4; 5]', 'B = [11; 10; 9|8; 7; 6]
+#UI {"columnHeaders": ["1", "2", "3"]} A = [0; 1; 2|3; 4; 5]
+#UI {"columnHeaders": ["1", "2", "3"]} B = [11; 10; 9|8; 7; 6]
 'Arithmetic:
 A!'- factorial
 A^B'- exponentiation

@@ -4,21 +4,20 @@
  <div style="max-width:120mm;">
   <img alt="parabola.png" class="side" src="Images/math/area/parabola.png" style="height:60pt;"/>
  </div>
- <p>Dimensions</p>
  <p>
   Length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-5">4</u>
+   = 4
+   <i>m</i>
   </span>
  </p>
  <p>
   Height -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-6">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -43,7 +42,13 @@
     </span>
     3
    </span>
-   · 4 · 2 = 5.33
+   · 4
+   <i>m</i>
+   · 2
+   <i>m</i>
+   = 5.33
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Arc length</p>
@@ -62,9 +67,11 @@
    =
    <span class="dvc">
     4 · 2
+    <i>m</i>
     <span class="dvl">
     </span>
     4
+    <i>m</i>
    </span>
    = 2
   </span>
@@ -110,7 +117,9 @@
     <var>h</var>
    </span>
    <span class="b1">)</span>
-   = 0.5 · 4 ·
+   = 0.5 · 4
+   <i>m</i>
+   ·
    <span class="b1">(</span>
    2.24 +
    <span class="dvc">
@@ -122,6 +131,7 @@
    </span>
    <span class="b1">)</span>
    = 5.92
+   <i>m</i>
   </span>
  </p>
  <p>

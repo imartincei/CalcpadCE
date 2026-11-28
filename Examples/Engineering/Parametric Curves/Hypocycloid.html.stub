@@ -51,19 +51,15 @@
    </span>
   </p>
   <p>
-   Outer radius:
+   Outer radius -
    <span class="eq">
     <var>R</var>
-    =
-    <u class="input-8">22</u>
+    = 22
    </span>
-  </p>
-  <p>
-   Inner radius:
+   , Inner radius -
    <span class="eq">
     <var>r</var>
-    =
-    <u class="input-9">3</u>
+    = 3
    </span>
   </p>
   <p>
@@ -86,13 +82,6 @@
     </span>
     = 7.33
    </span>
-  </p>
-  <p>
-  </p>
-  <p>
-   Tip: Click "
-   <b>Calculate</b>
-   " to see the respective plot.
   </p>
   <svg class="plot" data-plot="svg" height="1840px" style="width:346.3pt; height:340.74pt;" version="1.1" viewbox=" 0 0 1870 1840" width="1870px" xmlns="http://www.w3.org/2000/svg">
    <style type="text/css">

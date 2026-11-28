@@ -6,34 +6,35 @@
  <p>
   <b>Dimensions:</b>
  </p>
- <p>Bottom base</p>
  <p>
+  Bottom side -
   <span class="eq">
    <var>A</var>
-   =
-   <u class="input-5">10</u>
+   = 10
+   <i>m</i>
   </span>
-  ,
+  , Bottom side -
   <span class="eq">
    <var>B</var>
-   =
-   <u class="input-5">8</u>
+   = 8
+   <i>m</i>
   </span>
-  ,
+  , Bottom side -
   <span class="eq">
    <var>C</var>
-   =
-   <u class="input-5">6</u>
+   = 6
+   <i>m</i>
   </span>
  </p>
- <p>Top base</p>
  <p>
+  Top side -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-7">5</u>
+   = 5
+   <i>m</i>
   </span>
-  ,
+ </p>
+ <p>
   <span class="eq">
    <var>b</var>
    =
@@ -47,14 +48,20 @@
    </span>
    =
    <span class="dvc">
-    8 · 5
+    8
+    <i>m</i>
+    · 5
+    <i>m</i>
     <span class="dvl">
     </span>
     10
+    <i>m</i>
    </span>
    = 4
+   <i>m</i>
   </span>
-  ,
+ </p>
+ <p>
   <span class="eq">
    <var>c</var>
    =
@@ -68,20 +75,25 @@
    </span>
    =
    <span class="dvc">
-    6 · 5
+    6
+    <i>m</i>
+    · 5
+    <i>m</i>
     <span class="dvl">
     </span>
     10
+    <i>m</i>
    </span>
    = 3
+   <i>m</i>
   </span>
  </p>
  <p>
   Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-8">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <!--
@@ -99,7 +111,14 @@
    <var>B</var>
    +
    <var>C</var>
-   )  = 0.5 ·  ( 10 + 8 + 6 )  = 12
+   )  = 0.5 ·  ( 10
+   <i>m</i>
+   + 8
+   <i>m</i>
+   + 6
+   <i>m</i>
+   )  = 12
+   <i>m</i>
   </span>
  </p>
  <p>Area (Heron equation)</p>
@@ -128,9 +147,25 @@
    =
    <span class="o0">
     <span class="r">√</span>
-    12 ·  ( 12 − 10 )  ·  ( 12 − 8 )  ·  ( 12 − 6 )
+    12
+    <i>m</i>
+    ·  ( 12
+    <i>m</i>
+    − 10
+    <i>m</i>
+    )  ·  ( 12
+    <i>m</i>
+    − 8
+    <i>m</i>
+    )  ·  ( 12
+    <i>m</i>
+    − 6
+    <i>m</i>
+    )
    </span>
    = 24
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -146,7 +181,14 @@
    <var>b</var>
    +
    <var>c</var>
-   )  = 0.5 ·  ( 5 + 4 + 3 )  = 6
+   )  = 0.5 ·  ( 5
+   <i>m</i>
+   + 4
+   <i>m</i>
+   + 3
+   <i>m</i>
+   )  = 6
+   <i>m</i>
   </span>
  </p>
  <p>Area (Heron equation)</p>
@@ -175,9 +217,25 @@
    =
    <span class="o0">
     <span class="r">√</span>
-    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+    6
+    <i>m</i>
+    ·  ( 6
+    <i>m</i>
+    − 5
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 4
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 3
+    <i>m</i>
+    )
    </span>
    = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -211,16 +269,30 @@
    )  =
    <span class="dvc">
     2
+    <i>m</i>
     <span class="dvl">
     </span>
     3
    </span>
-   ·  ( 24 +
+   ·  ( 24
+   <i>m</i>
+   <sup class="unit">2</sup>
+   +
    <span class="o0">
     <span class="r">√</span>
-    24 · 6
+    24
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 6
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   + 6 )  = 28
+   + 6
+   <i>m</i>
+   <sup class="unit">2</sup>
+   )  = 28
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <!--

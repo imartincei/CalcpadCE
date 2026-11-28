@@ -9,6 +9,13 @@
   </span>
  </p>
  <p>
+  Number of terms -
+  <span class="eq">
+   <var>n</var>
+   = 20
+  </span>
+ </p>
+ <p>
   Function -
   <span class="eq">
    <var>f</var>

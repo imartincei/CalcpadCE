@@ -5,19 +5,22 @@
   Beam Length -
   <span class="eq">
    <var>l</var>
-   =
-   <u class="input-3">5</u>
+   = 5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   Load-
   <span class="eq">
    <var>q</var>
-   =
-   <u class="input-4">5</u>
+   = 5
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
   </span>
-  kN/m
  </p>
  <p>
   <b>Internal forces</b>
@@ -38,15 +41,21 @@
    </span>
    =
    <span class="dvc">
-    5 · 5
+    5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    ·  ( 5
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
     2
    </span>
    = 62.5
+   <i>kNm</i>
   </span>
-  kN·m
  </p>
  <p>
   Shear  -
@@ -56,8 +65,14 @@
    <var>q</var>
    ·
    <var>l</var>
-   = 5 · 5 = 25
+   = 5
+   <i>kN</i>
+   <i class="unit">∕</i>
+   <i>m</i>
+   · 5
+   <i>m</i>
+   = 25
+   <i>kN</i>
   </span>
-  kN
  </p>
 </div>

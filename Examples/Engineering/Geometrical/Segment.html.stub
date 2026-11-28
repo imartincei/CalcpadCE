@@ -8,38 +8,15 @@
   Radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   Angle -
   <span class="eq">
    <var>α</var>
-   =
-   <u class="input-5">90</u>
-  </span>
-  °
- </p>
- <p>
-  <span class="eq">
-   <var>k</var>
-   =
-   <span class="dvc">
-    <var>π</var>
-    <span class="dvl">
-    </span>
-    180
-   </span>
-   =
-   <span class="dvc">
-    3.14
-    <span class="dvl">
-    </span>
-    180
-   </span>
-   = 0.0175
+   = 90°
   </span>
  </p>
  <p>
@@ -61,14 +38,15 @@
    <span class="o0">
     <span class="r">√</span>
     2 · 1
+    <i>m</i>
     <sup>2</sup>
     ·  ( 1 −
     <b>cos</b>
-    ( 90 )  )
+    ( 90° )  )
    </span>
    = 1.41
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -93,10 +71,13 @@
     <span class="r1">
     </span>
     1
+    <i>m</i>
     <sup>2</sup>
     −
     <span class="dvc">
-     1.41
+     ( 1.41
+     <i>m</i>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
@@ -104,8 +85,8 @@
     </span>
    </span>
    = 0.707
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -119,28 +100,47 @@
     </span>
     2
    </span>
-   ·  (
-   <var>α</var>
    ·
-   <var>k</var>
+   <span class="b1">(</span>
+   <span class="dvc">
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
    −
    <b>sin</b>
    (
    <var>α</var>
-   )  )  =
+   )
+   <span class="b1">)</span>
+   =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>2</sup>
     <span class="dvl">
     </span>
     2
    </span>
-   ·  ( 90 · 0.0175 −
+   ·
+   <span class="b1">(</span>
+   <span class="dvc">
+    90°
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   −
    <b>sin</b>
-   ( 90 )  )  = 0.285
+   ( 90° )
+   <span class="b1">)</span>
+   = 0.285
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -157,13 +157,14 @@
    =
    <span class="dvc">
     1.41
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 0.707
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -178,7 +179,7 @@
     3
    </span>
    ·
-   <span class="dvc up">
+   <span class="dvc">
     <b>sin</b>
     <span class="b1">(</span>
     <span class="dvc">
@@ -191,9 +192,13 @@
     <sup class="raised">3</sup>
     <span class="dvl">
     </span>
-    <var>α</var>
-    ·
-    <var>k</var>
+    <span class="dvc">
+     <var>α</var>
+     <span class="dvl">
+     </span>
+     1
+     <i>rad</i>
+    </span>
     −
     <b>sin</b>
     (
@@ -205,16 +210,17 @@
    =
    <span class="dvc">
     4 · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     3
    </span>
    ·
-   <span class="dvc up">
+   <span class="dvc">
     <b>sin</b>
     <span class="b1">(</span>
     <span class="dvc">
-     90
+     90°
      <span class="dvl">
      </span>
      2
@@ -223,29 +229,54 @@
     <sup class="raised">3</sup>
     <span class="dvl">
     </span>
-    90 · 0.0175 −
+    <span class="dvc">
+     90°
+     <span class="dvl">
+     </span>
+     1
+     <i>rad</i>
+    </span>
+    −
     <b>sin</b>
-    ( 90 )
+    ( 90° )
    </span>
-   − 0.707 = 0.119
+   − 0.707
+   <i>m</i>
+   = 0.119
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter</p>
  <p>
   <span class="eq">
    <var>P</var>
    =
-   <var>α</var>
-   ·
-   <var>k</var>
+   <span class="dvc">
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
    ·
    <var>r</var>
    +
    <var>a</var>
-   = 90 · 0.0175 · 1 + 1.41 = 2.99
+   =
+   <span class="dvc">
+    90°
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   · 1
+   <i>m</i>
+   + 1.41
+   <i>m</i>
+   = 2.99
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -262,9 +293,13 @@
    </span>
    ·
    <span class="b1">(</span>
-   <var>α</var>
-   ·
-   <var>k</var>
+   <span class="dvc">
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
    −
    <b>sin</b>
    (
@@ -297,6 +332,7 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>4</sup>
     <span class="dvl">
     </span>
@@ -304,15 +340,22 @@
    </span>
    ·
    <span class="b1">(</span>
-   90 · 0.0175 −
+   <span class="dvc">
+    90°
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   −
    <b>sin</b>
-   ( 90 )  + 2 ·
+   ( 90° )  + 2 ·
    <b>sin</b>
-   ( 90 )  ·
+   ( 90° )  ·
    <b>sin</b>
    <span class="b1">(</span>
    <span class="dvc">
-    90
+    90°
     <span class="dvl">
     </span>
     2
@@ -320,12 +363,19 @@
    <span class="b1">)</span>
    <sup class="raised">2</sup>
    <span class="b1">)</span>
-   −  ( 0.707 + 0.119 )
+   −  ( 0.707
+   <i>m</i>
+   + 0.119
+   <i>m</i>
+   )
    <sup>2</sup>
-   · 0.285 = 0.00169
+   · 0.285
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 0.00169
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -341,10 +391,14 @@
    </span>
    ·
    <span class="b1">(</span>
-   3 ·
-   <var>α</var>
-   ·
-   <var>k</var>
+   <span class="dvc">
+    3 ·
+    <var>α</var>
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
    − 3 ·
    <b>sin</b>
    (
@@ -368,6 +422,7 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>4</sup>
     <span class="dvl">
     </span>
@@ -375,15 +430,22 @@
    </span>
    ·
    <span class="b1">(</span>
-   3 · 90 · 0.0175 − 3 ·
+   <span class="dvc">
+    3 · 90°
+    <span class="dvl">
+    </span>
+    1
+    <i>rad</i>
+   </span>
+   − 3 ·
    <b>sin</b>
-   ( 90 )  − 2 ·
+   ( 90° )  − 2 ·
    <b>sin</b>
-   ( 90 )  ·
+   ( 90° )  ·
    <b>sin</b>
    <span class="b1">(</span>
    <span class="dvc">
-    90
+    90°
     <span class="dvl">
     </span>
     2
@@ -392,9 +454,9 @@
    <sup class="raised">2</sup>
    <span class="b1">)</span>
    = 0.0297
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -407,10 +469,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 0.00169 + 0.0297 = 0.0314
+   = 0.00169
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 0.0297
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 0.0314
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -435,14 +503,18 @@
     </span>
     <span class="dvc">
      0.00169
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.285
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.0769
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -466,14 +538,18 @@
     </span>
     <span class="dvc">
      0.0297
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.285
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.322
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -497,13 +573,17 @@
     </span>
     <span class="dvc">
      0.0314
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.285
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.332
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

@@ -16,39 +16,35 @@
    Width -
    <span class="eq">
     <var>B</var>
-    =
-    <u class="input-8">12</u>
+    = 12
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Length -
    <span class="eq">
     <var>L</var>
-    =
-    <u class="input-9">30</u>
+    = 30
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Height at roof ridge -
    <span class="eq">
     <var>h</var>
     <sub>1</sub>
-    =
-    <u class="input-10">9</u>
+    = 9
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Height at roof eaves -
    <span class="eq">
     <var>h</var>
     <sub>2</sub>
-    =
-    <u class="input-11">8</u>
+    = 8
+    <i>m</i>
    </span>
-   m
   </p>
   <p>Pitch angle</p>
   <p>
@@ -74,10 +70,15 @@
     <b>atan</b>
     <span class="b1">(</span>
     <span class="dvc">
-     ( 9 − 8 )  · 2
+     ( 9
+     <i>m</i>
+     − 8
+     <i>m</i>
+     )  · 2
      <span class="dvl">
      </span>
      12
+     <i>m</i>
     </span>
     <span class="b1">)</span>
     = 9.46°
@@ -88,39 +89,35 @@
    - frames -
    <span class="eq">
     <var>a</var>
-    =
-    <u class="input-15">6</u>
+    = 6
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    - wind columns -
    <span class="eq">
     <var>b</var>
-    =
-    <u class="input-16">4</u>
+    = 4
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    - side beams -
    <span class="eq">
     <var>c</var>
     <sub>s</sub>
-    =
-    <u class="input-17">2</u>
+    = 2
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    - purlins -
    <span class="eq">
     <var>c</var>
     <sub>p</sub>
-    =
-    <u class="input-18">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
   </p>
   <p>(If the above distances are ≤ 0, the corresponding loads will not be calculated)</p>
   <p>
@@ -133,9 +130,15 @@
     <sub>s</sub>
     ·
     <var>a</var>
-    = 2 · 6 = 12
+    = 2
+    <i>m</i>
+    · 6
+    <i>m</i>
+    = 12
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   m²,
+   ,
    <span class="eq">
     <var>A</var>
     <sub>sb</sub>
@@ -144,9 +147,14 @@
     <sub>s</sub>
     ·
     <var>b</var>
-    = 2 · 4 = 8
+    = 2
+    <i>m</i>
+    · 4
+    <i>m</i>
+    = 8
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   m²
   </p>
   <p>
    Reference area for purlins -
@@ -158,9 +166,14 @@
     <sub>p</sub>
     ·
     <var>a</var>
-    = 1 · 6 = 6
+    = 1
+    <i>m</i>
+    · 6
+    <i>m</i>
+    = 6
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   m²
   </p>
   <p>
   </p>
@@ -172,10 +185,14 @@
    <span class="eq">
     <var>v</var>
     <sub>b_0</sub>
-    =
-    <u class="input-31">26</u>
+    = 26
+    <span class="dvc">
+     <i>m</i>
+     <span class="dvl">
+     </span>
+     <i>s</i>
+    </span>
    </span>
-   kN/m²
   </p>
   <p>
    Directional factor -
@@ -208,9 +225,15 @@
     ·
     <var>v</var>
     <sub>b_0</sub>
-    = 1 · 1 · 26 = 26
+    = 1 · 1 · 26
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    = 26
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
    </span>
-   m/s
   </p>
   <p>
    Orography factor -
@@ -220,23 +243,13 @@
     = 1
    </span>
   </p>
-  <p id="C" style="display:none;">
+  <p class="ref">[EN 1991-1-4, Table 4.1]</p>
+  <p>
+   Terrain category -
    <span class="eq">
     <var>C</var>
-    =
-    <u class="input-39">4</u>
+    = 4
    </span>
-  </p>
-  <p class="ref">[EN 1991-1-4, Table 4.1]</p>
-  <p>Terrain categories</p>
-  <p>
-   <select data-target="C">
-    <option value="0">0. Sea or coastal area...</option>
-    <option value="1">I. Lakes or flat and horizontal area...</option>
-    <option value="2">II. Area with low vegetation...</option>
-    <option value="3">III. Area with regular cover of vegetation or buildings...</option>
-    <option value="4">IV. Area in which at least 15 % of the surface is covered with buildings with h &gt; 15 m</option>
-   </select>
   </p>
   <p class="ref">[EN 1991-1-4, Table 4.1]</p>
   <p>
@@ -245,20 +258,22 @@
     <var>z</var>
     <sub>0</sub>
     = 1
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <var>z</var>
     <sub>min</sub>
     = 10
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <var>z</var>
     <sub>max</sub>
     = 200
+    <i>m</i>
    </span>
-   m
   </p>
   <p>Area in which at least 15 % of the surface is covered with buildings and their average height exceeds 15 m.</p>
   <p>
@@ -269,8 +284,8 @@
     <var>h</var>
     <sub>1</sub>
     = 9
+    <i>m</i>
    </span>
-   m
   </p>
   <p class="ref">[EN 1991-1-4 (4.5)]</p>
   <p>
@@ -286,6 +301,7 @@
      <span class="dvl">
      </span>
      0.05
+     <i>m</i>
     </span>
     <span class="b1">)</span>
     <sup class="raised">0.07</sup>
@@ -293,9 +309,11 @@
     <span class="b1">(</span>
     <span class="dvc">
      1
+     <i>m</i>
      <span class="dvl">
      </span>
      0.05
+     <i>m</i>
     </span>
     <span class="b1">)</span>
     <sup class="raised">0.07</sup>
@@ -328,9 +346,11 @@
     <span class="b1">(</span>
     <span class="dvc">
      10
+     <i>m</i>
      <span class="dvl">
      </span>
      1
+     <i>m</i>
     </span>
     <span class="b1">)</span>
     = 0.54
@@ -381,9 +401,11 @@
      <span class="b1">(</span>
      <span class="dvc">
       10
+      <i>m</i>
       <span class="dvl">
       </span>
       1
+      <i>m</i>
      </span>
      <span class="b1">)</span>
     </span>
@@ -397,8 +419,15 @@
     <var>q</var>
     <sub>b</sub>
     =
-    <span class="dvc">
+    <span class="dvc up">
      1.25
+     <span class="dvc">
+      <i>kg</i>
+      <span class="dvl">
+      </span>
+      <i>m</i>
+      <sup class="unit">3</sup>
+     </span>
      <span class="dvl">
      </span>
      2
@@ -407,22 +436,32 @@
     <var>v</var>
     <sub>b</sub>
     <sup>2</sup>
-    · 10
-    <sup>-3</sup>
     =
-    <span class="dvc">
+    <span class="dvc up">
      1.25
+     <span class="dvc">
+      <i>kg</i>
+      <span class="dvl">
+      </span>
+      <i>m</i>
+      <sup class="unit">3</sup>
+     </span>
      <span class="dvl">
      </span>
      2
     </span>
-    · 26
+    ·  ( 26
+    <i>m</i>
+    <i class="unit">∕</i>
+    <i>s</i>
+    )
     <sup>2</sup>
-    · 10
-    <sup>-3</sup>
     = 0.422
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   kN/m²
   </p>
   <p>Exposure factor</p>
   <p>
@@ -461,9 +500,17 @@
     ·
     <var>q</var>
     <sub>b</sub>
-    = 1.18 · 0.422 = 0.497
+    = 1.18 · 0.422
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
+    = 0.497
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   kN/m²
   </p>
   <p>
    Building height -
@@ -471,6 +518,7 @@
     <var>h</var>
     <sub>1</sub>
     = 9
+    <i>m</i>
    </span>
    &lt; 15 m
   </p>
@@ -505,8 +553,7 @@
    <span class="eq">
     <var>C</var>
     <sub>pi</sub>
-    =
-    <u class="input-98">-0.3</u>
+    = -0.3
    </span>
   </p>
   <p class="ref">[EN 1991-1-4 Fig.7.13, Note 2]</p>
@@ -536,9 +583,13 @@
     <sub>1</sub>
     )  =
     <b>min</b>
-    ( 30; 2 · 9 )  = 18
+    ( 30
+    <i>m</i>
+    ; 2 · 9
+    <i>m</i>
+    )  = 18
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
   </p>
@@ -550,14 +601,17 @@
    <span class="eq">
     <var>e</var>
     = 18
+    <i>m</i>
    </span>
-   m &lt;
+   &lt;
    <span class="eq">
     5 ·
     <var>B</var>
-    = 5 · 12 = 60
+    = 5 · 12
+    <i>m</i>
+    = 60
+    <i>m</i>
    </span>
-   m
   </p>
   <img alt="wind-0-wall-2.png" src="Images/structures/loads/wind-0-wall-2.png" style="width:200pt;"/>
   <p>
@@ -571,13 +625,15 @@
     =
     <span class="dvc">
      18
+     <i>m</i>
      <span class="dvl">
      </span>
      5
     </span>
     = 3.6
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <var>B</var>
     −
@@ -587,16 +643,19 @@
      </span>
      5
     </span>
-    = 12 −
+    = 12
+    <i>m</i>
+    −
     <span class="dvc">
      18
+     <i>m</i>
      <span class="dvl">
      </span>
      5
     </span>
     = 8.4
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <span class="eq">
@@ -610,9 +669,11 @@
     =
     <span class="dvc">
      9
+     <i>m</i>
      <span class="dvl">
      </span>
      12
+     <i>m</i>
     </span>
     = 0.75
    </span>
@@ -680,9 +741,11 @@
       <span class="b1">(</span>
       <span class="dvc">
        9
+       <i>m</i>
        <span class="dvl">
        </span>
        12
+       <i>m</i>
       </span>
       − 0.25
       <span class="b1">)</span>
@@ -727,9 +790,11 @@
       <span class="b1">(</span>
       <span class="dvc">
        9
+       <i>m</i>
        <span class="dvl">
        </span>
        12
+       <i>m</i>
       </span>
       − 0.25
       <span class="b1">)</span>
@@ -772,9 +837,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 1 · 1 · 0.767 −  ( -0.3 )  )  · 0.497 = 0.53
+     =  ( 1 · 1 · 0.767 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.53
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone E -
@@ -790,9 +863,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.433 −  ( -0.3 )  )  · 0.497 = -0.0663
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.0663
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone A -
@@ -808,9 +889,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.2 −  ( -0.3 )  )  · 0.497 = -0.447
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.447
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone B -
@@ -826,9 +915,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.8 −  ( -0.3 )  )  · 0.497 = -0.248
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.248
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Loads on main columns</b>
@@ -849,9 +946,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( 0.767 −  ( -0.3 )  )  · 0.497 · 6 = 3.18
+     =  ( 0.767 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = 3.18
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Leeward side -
@@ -869,9 +975,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.433 −  ( -0.3 )  )  · 0.497 · 6 = -0.398
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.398
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Loads on wind columns</b>
@@ -892,9 +1007,18 @@
      <sub>p</sub>
      ·
      <var>b</var>
-     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 4 = -1.79
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4
+     <i>m</i>
+     = -1.79
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone B -
@@ -912,9 +1036,18 @@
      <sub>p</sub>
      ·
      <var>b</var>
-     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 4 = -0.994
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4
+     <i>m</i>
+     = -0.994
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Coefficients for side beams</b>
@@ -935,12 +1068,32 @@
      <sub>pe,10,A</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>sb</sub>
-     )  = -1.4 −  ( -1.4 −  ( -1.2 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>sb</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.4 −  ( -1.4 −  ( -1.2 )  )  ·
      <b>log</b>
-     ( 8 )  = -1.22
+     <span class="b1">(</span>
+     <span class="dvc">
+      8
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.22
     </span>
    </p>
    <p>
@@ -959,12 +1112,32 @@
      <sub>pe,10,B</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>sb</sub>
-     )  = -1.1 −  ( -1.1 −  ( -0.8 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>sb</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.1 −  ( -1.1 −  ( -0.8 )  )  ·
      <b>log</b>
-     ( 8 )  = -0.829
+     <span class="b1">(</span>
+     <span class="dvc">
+      8
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.829
     </span>
    </p>
    <p>
@@ -1009,9 +1182,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -1.22 −  ( -0.3 )  )  · 0.497 · 2 = -0.914
+     =  ( -1.22 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.914
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone B -
@@ -1030,9 +1212,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -0.829 −  ( -0.3 )  )  · 0.497 · 2 = -0.526
+     =  ( -0.829 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.526
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone D -
@@ -1051,9 +1242,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( 0.767 −  ( -0.3 )  )  · 0.497 · 2 = 1.06
+     =  ( 0.767 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = 1.06
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone E -
@@ -1072,9 +1272,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -0.433 −  ( -0.3 )  )  · 0.497 · 2 = -0.133
+     =  ( -0.433 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.133
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Table</b>
@@ -1179,8 +1388,9 @@
    <span class="eq">
     <var>e</var>
     = 18
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <span class="dvc">
      <var>e</var>
@@ -1191,13 +1401,15 @@
     =
     <span class="dvc">
      18
+     <i>m</i>
      <span class="dvl">
      </span>
      4
     </span>
     = 4.5
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <span class="dvc">
      <var>e</var>
@@ -1208,13 +1420,14 @@
     =
     <span class="dvc">
      18
+     <i>m</i>
      <span class="dvl">
      </span>
      10
     </span>
     = 1.8
+    <i>m</i>
    </span>
-   m
   </p>
   <p>(Four possible combinations for minimum and maximum loads on both slopes are required: { + , + }; { + , – }; { – , + }; { – , – })</p>
   <div class="fold">
@@ -1352,9 +1565,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.34 −  ( -0.3 )  )  · 0.497 = -0.518
+     =  ( -1.34 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.518
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone G -
@@ -1370,9 +1591,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.02 −  ( -0.3 )  )  · 0.497 = -0.359
+     =  ( -1.02 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.359
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone H -
@@ -1388,9 +1617,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.466 −  ( -0.3 )  )  · 0.497 = -0.0826
+     =  ( -0.466 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.0826
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone I -
@@ -1406,9 +1643,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.511 −  ( -0.3 )  )  · 0.497 = -0.105
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.105
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone J -
@@ -1424,9 +1669,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.778 −  ( -0.3 )  )  · 0.497 = -0.238
+     =  ( -0.778 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.238
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Loads on girders</b>
@@ -1447,9 +1700,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -1.34 −  ( -0.3 )  )  · 0.497 · 6 = -3.11
+     =  ( -1.34 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -3.11
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -1467,9 +1729,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -1.02 −  ( -0.3 )  )  · 0.497 · 6 = -2.15
+     =  ( -1.02 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -2.15
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -1487,9 +1758,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.466 −  ( -0.3 )  )  · 0.497 · 6 = -0.495
+     =  ( -0.466 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.495
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -1507,9 +1787,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.511 −  ( -0.3 )  )  · 0.497 · 6 = -0.628
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.628
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone J -
@@ -1527,9 +1816,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.778 −  ( -0.3 )  )  · 0.497 · 6 = -1.43
+     =  ( -0.778 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -1.43
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Coefficients for purlins</b>
@@ -1550,12 +1848,32 @@
      <sub>pe,10,F</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -2.28 −  ( -2.28 −  ( -1.34 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -2.28 −  ( -2.28 −  ( -1.34 )  )  ·
      <b>log</b>
-     ( 6 )  = -1.55
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.55
     </span>
    </p>
    <p>
@@ -1574,12 +1892,32 @@
      <sub>pe,10,G</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -1.78 −  ( -1.78 −  ( -1.02 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.78 −  ( -1.78 −  ( -1.02 )  )  ·
      <b>log</b>
-     ( 6 )  = -1.19
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.19
     </span>
    </p>
    <p>
@@ -1598,12 +1936,32 @@
      <sub>pe,10,H</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -0.798 −  ( -0.798 −  ( -0.466 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.798 −  ( -0.798 −  ( -0.466 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.54
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.54
     </span>
    </p>
    <p>
@@ -1622,12 +1980,32 @@
      <sub>pe,10,I</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -0.511 −  ( -0.511 −  ( -0.511 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.511 −  ( -0.511 −  ( -0.511 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.511
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.511
     </span>
    </p>
    <p>
@@ -1646,12 +2024,32 @@
      <sub>pe,10,J</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -1 −  ( -1 −  ( -0.778 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1 −  ( -1 −  ( -0.778 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.828
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.828
     </span>
    </p>
    <p>
@@ -1675,9 +2073,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -1.55 −  ( -0.3 )  )  · 0.497 · 1 = -0.621
+     =  ( -1.55 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.621
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -1696,9 +2103,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -1.19 −  ( -0.3 )  )  · 0.497 · 1 = -0.442
+     =  ( -1.19 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.442
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -1717,9 +2133,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.54 −  ( -0.3 )  )  · 0.497 · 1 = -0.119
+     =  ( -0.54 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.119
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -1738,9 +2163,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.511 −  ( -0.3 )  )  · 0.497 · 1 = -0.105
+     =  ( -0.511 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.105
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone J -
@@ -1759,9 +2193,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.828 −  ( -0.3 )  )  · 0.497 · 1 = -0.262
+     =  ( -0.828 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.262
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Table</b>
@@ -2004,9 +2447,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone G -
@@ -2022,9 +2473,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone H -
@@ -2040,9 +2499,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone I -
@@ -2058,9 +2525,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.332 −  ( -0.3 )  )  · 0.497 = -0.016
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.016
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone J -
@@ -2076,9 +2551,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 0.111 −  ( -0.3 )  )  · 0.497 = 0.204
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.204
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Loads on girders</b>
@@ -2099,9 +2582,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = 1.16
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -2119,9 +2611,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = 1.16
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -2139,9 +2640,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 6 = 1.16
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = 1.16
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -2159,9 +2669,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.332 −  ( -0.3 )  )  · 0.497 · 6 = -0.0962
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.0962
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone J -
@@ -2179,9 +2698,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( 0.111 −  ( -0.3 )  )  · 0.497 · 6 = 1.22
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = 1.22
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Coefficients for purlins</b>
@@ -2202,12 +2730,32 @@
      <sub>pe,10,F</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892 −  ( 0.0892 − 0.0892 )  ·
      <b>log</b>
-     ( 6 )  = 0.0892
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892
     </span>
    </p>
    <p>
@@ -2226,12 +2774,32 @@
      <sub>pe,10,G</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892 −  ( 0.0892 − 0.0892 )  ·
      <b>log</b>
-     ( 6 )  = 0.0892
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892
     </span>
    </p>
    <p>
@@ -2250,12 +2818,32 @@
      <sub>pe,10,H</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = 0.0892 −  ( 0.0892 − 0.0892 )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892 −  ( 0.0892 − 0.0892 )  ·
      <b>log</b>
-     ( 6 )  = 0.0892
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.0892
     </span>
    </p>
    <p>
@@ -2274,12 +2862,32 @@
      <sub>pe,10,I</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -0.332 −  ( -0.332 −  ( -0.332 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.332 −  ( -0.332 −  ( -0.332 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.332
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.332
     </span>
    </p>
    <p>
@@ -2298,12 +2906,32 @@
      <sub>pe,10,J</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = 0.111 −  ( 0.111 − 0.111 )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.111 −  ( 0.111 − 0.111 )  ·
      <b>log</b>
-     ( 6 )  = 0.111
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.111
     </span>
    </p>
    <p>
@@ -2326,9 +2954,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -2347,9 +2984,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -2368,9 +3014,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( 0.0892 −  ( -0.3 )  )  · 0.497 · 1 = 0.193
+     =  ( 0.0892 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = 0.193
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -2389,9 +3044,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.332 −  ( -0.3 )  )  · 0.497 · 1 = -0.016
+     =  ( -0.332 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.016
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone J -
@@ -2410,9 +3074,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( 0.111 −  ( -0.3 )  )  · 0.497 · 1 = 0.204
+     =  ( 0.111 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = 0.204
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Table</b>
@@ -2534,7 +3207,12 @@
     <sub>1</sub>
     )  =
     <b>min</b>
-    ( 12; 2 · 9 )  = 12
+    ( 12
+    <i>m</i>
+    ; 2 · 9
+    <i>m</i>
+    )  = 12
+    <i>m</i>
    </span>
   </p>
   <p>
@@ -2547,13 +3225,14 @@
    <span class="eq">
     <var>e</var>
     = 12
+    <i>m</i>
    </span>
-   m ≤
+   ≤
    <span class="eq">
     <var>L</var>
     = 30
+    <i>m</i>
    </span>
-   m
   </p>
   <img alt="wind-90-wall-1.png" src="Images/structures/loads/wind-90-wall-1.png" style="width:200pt;"/>
   <p>
@@ -2567,13 +3246,15 @@
     =
     <span class="dvc">
      12
+     <i>m</i>
      <span class="dvl">
      </span>
      5
     </span>
     = 2.4
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <span class="dvc">
      4
@@ -2590,16 +3271,23 @@
      </span>
      5
     </span>
-    · 12 = 9.6
+    · 12
+    <i>m</i>
+    = 9.6
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <var>L</var>
     −
     <var>e</var>
-    = 30 − 12 = 18
+    = 30
+    <i>m</i>
+    − 12
+    <i>m</i>
+    = 18
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <span class="eq">
@@ -2613,9 +3301,11 @@
     =
     <span class="dvc">
      9
+     <i>m</i>
      <span class="dvl">
      </span>
      30
+     <i>m</i>
     </span>
     = 0.3
    </span>
@@ -2697,9 +3387,11 @@
       <span class="b1">(</span>
       <span class="dvc">
        9
+       <i>m</i>
        <span class="dvl">
        </span>
        30
+       <i>m</i>
       </span>
       − 0.25
       <span class="b1">)</span>
@@ -2744,9 +3436,11 @@
       <span class="b1">(</span>
       <span class="dvc">
        9
+       <i>m</i>
        <span class="dvl">
        </span>
        30
+       <i>m</i>
       </span>
       − 0.25
       <span class="b1">)</span>
@@ -2783,9 +3477,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.2 −  ( -0.3 )  )  · 0.497 = -0.447
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.447
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone B -
@@ -2801,9 +3503,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.8 −  ( -0.3 )  )  · 0.497 = -0.248
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.248
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone C -
@@ -2819,9 +3529,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.5 −  ( -0.3 )  )  · 0.497 = -0.0994
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.0994
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone D -
@@ -2837,9 +3555,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( 0.707 −  ( -0.3 )  )  · 0.497 = 0.5
+     =  ( 0.707 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = 0.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone E -
@@ -2855,9 +3581,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.313 −  ( -0.3 )  )  · 0.497 = -0.00663
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.00663
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Loads on main columns</b>
@@ -2878,9 +3612,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 6 = -2.68
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -2.68
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone B -
@@ -2898,9 +3641,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 6 = -1.49
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -1.49
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone C -
@@ -2918,9 +3670,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.5 −  ( -0.3 )  )  · 0.497 · 6 = -0.596
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.596
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Loads on wind columns</b>
@@ -2941,9 +3702,18 @@
      <sub>p</sub>
      ·
      <var>b</var>
-     =  ( 0.707 −  ( -0.3 )  )  · 0.497 · 4 = 2
+     =  ( 0.707 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4
+     <i>m</i>
+     = 2
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Leeward side -
@@ -2961,9 +3731,18 @@
      <sub>p</sub>
      ·
      <var>b</var>
-     =  ( -0.313 −  ( -0.3 )  )  · 0.497 · 4 = -0.0265
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4
+     <i>m</i>
+     = -0.0265
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Coefficients for side beams</b>
@@ -3017,12 +3796,32 @@
      <sub>pe,10,D</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>sb</sub>
-     )  = 1 −  ( 1 − 0.707 )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>sb</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 1 −  ( 1 − 0.707 )  ·
      <b>log</b>
-     ( 8 )  = 0.735
+     <span class="b1">(</span>
+     <span class="dvc">
+      8
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = 0.735
     </span>
    </p>
    <p>
@@ -3041,12 +3840,32 @@
      <sub>pe,10,E</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>sb</sub>
-     )  = -0.313 −  ( -0.313 −  ( -0.313 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>sb</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.313 −  ( -0.313 −  ( -0.313 )  )  ·
      <b>log</b>
-     ( 8 )  = -0.313
+     <span class="b1">(</span>
+     <span class="dvc">
+      8
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.313
     </span>
    </p>
    <p>
@@ -3069,9 +3888,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -1.2 −  ( -0.3 )  )  · 0.497 · 2 = -0.894
+     =  ( -1.2 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.894
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone B -
@@ -3090,9 +3918,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -0.8 −  ( -0.3 )  )  · 0.497 · 2 = -0.497
+     =  ( -0.8 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone C -
@@ -3111,9 +3948,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -0.5 −  ( -0.3 )  )  · 0.497 · 2 = -0.199
+     =  ( -0.5 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.199
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone D -
@@ -3132,9 +3978,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( 0.735 −  ( -0.3 )  )  · 0.497 · 2 = 1.03
+     =  ( 0.735 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = 1.03
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone E -
@@ -3153,9 +4008,18 @@
      ·
      <var>c</var>
      <sub>s</sub>
-     =  ( -0.313 −  ( -0.3 )  )  · 0.497 · 2 = -0.0133
+     =  ( -0.313 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 2
+     <i>m</i>
+     = -0.0133
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Table</b>
@@ -3269,8 +4133,9 @@
    <span class="eq">
     <var>e</var>
     = 12
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <span class="dvc">
      <var>e</var>
@@ -3281,13 +4146,15 @@
     =
     <span class="dvc">
      12
+     <i>m</i>
      <span class="dvl">
      </span>
      4
     </span>
     = 3
+    <i>m</i>
    </span>
-   m,
+   ,
    <span class="eq">
     <span class="dvc">
      <var>e</var>
@@ -3298,13 +4165,14 @@
     =
     <span class="dvc">
      12
+     <i>m</i>
      <span class="dvl">
      </span>
      10
     </span>
     = 1.2
+    <i>m</i>
    </span>
-   m
   </p>
   <div class="fold">
    <p>
@@ -3417,9 +4285,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.47 −  ( -0.3 )  )  · 0.497 = -0.579
+     =  ( -1.47 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.579
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone G -
@@ -3435,9 +4311,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -1.3 −  ( -0.3 )  )  · 0.497 = -0.497
+     =  ( -1.3 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone H -
@@ -3453,9 +4337,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.655 −  ( -0.3 )  )  · 0.497 = -0.177
+     =  ( -0.655 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.177
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     Zone I -
@@ -3471,9 +4363,17 @@
      )  ·
      <var>q</var>
      <sub>p</sub>
-     =  ( -0.555 −  ( -0.3 )  )  · 0.497 = -0.127
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     = -0.127
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Loads on girders</b>
@@ -3494,9 +4394,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -1.47 −  ( -0.3 )  )  · 0.497 · 6 = -3.48
+     =  ( -1.47 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -3.48
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -3514,9 +4423,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -1.3 −  ( -0.3 )  )  · 0.497 · 6 = -2.98
+     =  ( -1.3 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -2.98
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -3534,9 +4452,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.655 −  ( -0.3 )  )  · 0.497 · 6 = -1.06
+     =  ( -0.655 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -1.06
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -3554,9 +4481,18 @@
      <sub>p</sub>
      ·
      <var>a</var>
-     =  ( -0.555 −  ( -0.3 )  )  · 0.497 · 6 = -0.761
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 6
+     <i>m</i>
+     = -0.761
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Coefficients for purlins</b>
@@ -3577,12 +4513,32 @@
      <sub>pe,10,F</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -2.11 −  ( -2.11 −  ( -1.47 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -2.11 −  ( -2.11 −  ( -1.47 )  )  ·
      <b>log</b>
-     ( 6 )  = -1.61
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.61
     </span>
    </p>
    <p>
@@ -3601,12 +4557,32 @@
      <sub>pe,10,G</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -2 −  ( -2 −  ( -1.3 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -2 −  ( -2 −  ( -1.3 )  )  ·
      <b>log</b>
-     ( 6 )  = -1.46
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.46
     </span>
    </p>
    <p>
@@ -3625,12 +4601,32 @@
      <sub>pe,10,H</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -1.2 −  ( -1.2 −  ( -0.655 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -1.2 −  ( -1.2 −  ( -0.655 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.776
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.776
     </span>
    </p>
    <p>
@@ -3649,12 +4645,32 @@
      <sub>pe,10,I</sub>
      )  ·
      <b>log</b>
-     (
-     <var>A</var>
-     <sub>p</sub>
-     )  = -0.555 −  ( -0.555 −  ( -0.555 )  )  ·
+     <span class="b1">(</span>
+     <span class="dvc">
+      <var>A</var>
+      <sub>p</sub>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.555 −  ( -0.555 −  ( -0.555 )  )  ·
      <b>log</b>
-     ( 6 )  = -0.555
+     <span class="b1">(</span>
+     <span class="dvc">
+      6
+      <i>m</i>
+      <sup class="unit">2</sup>
+      <span class="dvl">
+      </span>
+      1
+      <i>m</i>
+      <sup class="unit">2</sup>
+     </span>
+     <span class="b1">)</span>
+     = -0.555
     </span>
    </p>
    <p>
@@ -3677,9 +4693,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -1.61 −  ( -0.3 )  )  · 0.497 · 1 = -0.651
+     =  ( -1.61 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.651
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone G -
@@ -3698,9 +4723,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -1.46 −  ( -0.3 )  )  · 0.497 · 1 = -0.574
+     =  ( -1.46 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.574
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone H -
@@ -3719,9 +4753,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.776 −  ( -0.3 )  )  · 0.497 · 1 = -0.237
+     =  ( -0.776 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.237
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     Zone I -
@@ -3740,9 +4783,18 @@
      ·
      <var>c</var>
      <sub>p</sub>
-     =  ( -0.555 −  ( -0.3 )  )  · 0.497 · 1 = -0.127
+     =  ( -0.555 −  ( -0.3 )  )  · 0.497
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 1
+     <i>m</i>
+     = -0.127
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Table</b>

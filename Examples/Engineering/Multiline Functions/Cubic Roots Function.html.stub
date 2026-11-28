@@ -27,6 +27,23 @@
  <p>
  </p>
  <p>
+  Coefficient a -
+  <span class="eq">
+   <var>a</var>
+   = -6
+  </span>
+  , Coefficient b -
+  <span class="eq">
+   <var>b</var>
+   = 11
+  </span>
+  , Coefficient c -
+  <span class="eq">
+   <var>c</var>
+   = -6
+  </span>
+ </p>
+ <p>
   <span class="eq">
    <var>cubicRoots</var>
    <sub>1</sub>
@@ -339,6 +356,14 @@
     x
    </var>
    =
+   <var>cubicRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
    <var>cubicRoots</var>
    ( -6; 11; -6 )  =
    <b class="b0">[</b>

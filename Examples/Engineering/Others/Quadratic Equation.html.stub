@@ -23,20 +23,17 @@
  <p>
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">2</u>
+   = 2
   </span>
   ,
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">3</u>
+   = 3
   </span>
   ,
   <span class="eq">
    <var>c</var>
-   =
-   <u class="input-4">-5</u>
+   = -5
   </span>
  </p>
  <p>Discriminant:</p>

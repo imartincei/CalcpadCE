@@ -9,19 +9,17 @@
    Beam Length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-5">5</u>
+    = 5
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>M</var>
-    =
-    <u class="input-6">10</u>
+    = 10
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    <b>Internal forces</b>
@@ -33,16 +31,16 @@
     =
     <var>M</var>
     = 10
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    Shear -
    <span class="eq">
     <var>V</var>
     = 0
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <b>Diagrams</b>
@@ -52,12 +50,9 @@
    <span class="eq">
     <var>x</var>
     <sub>1</sub>
-    =
-    <u class="input-16">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
-  </p>
-  <p>
   </p>
   <p>Bending</p>
   <p>
@@ -164,9 +159,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>M</var>
-    ( 1 )  = -10
+    ( 1
+    <i>m</i>
+    )  = -10
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -175,6 +172,7 @@ circle.Series1 {fill:Tomato;}
     (
     <var>x</var>
     )  = 0
+    <i>kN</i>
    </span>
   </p>
   <svg class="plot" data-plot="svg" height="840px" style="width:494.44pt; height:155.56pt;" version="1.1" viewbox=" 0 0 2670 840" width="2670px" xmlns="http://www.w3.org/2000/svg">
@@ -277,9 +275,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>V</var>
-    ( 1 )  = 0
+    ( 1
+    <i>m</i>
+    )  = 0
+    <i>kN</i>
    </span>
-   kN
   </p>
  </div>
 </div>

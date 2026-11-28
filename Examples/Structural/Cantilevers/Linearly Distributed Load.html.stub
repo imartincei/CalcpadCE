@@ -9,27 +9,35 @@
    Beam Length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-5">5</u>
+    = 5
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>q</var>
     <sub>1</sub>
-    =
-    <u class="input-6">10</u>
+    = 10
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m,
+   ,
    <span class="eq">
     <var>q</var>
     <sub>2</sub>
-    =
-    <u class="input-6">5</u>
+    = 5
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m
   </p>
   <p>
    <b>Internal forces</b>
@@ -55,16 +63,26 @@
     </span>
     =
     <span class="dvc">
-     5
+     ( 5
+     <i>m</i>
+     )
      <sup>2</sup>
-     ·  ( 10 + 2 · 5 )
+     ·  ( 10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     + 2 · 5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     )
      <span class="dvl">
      </span>
      6
     </span>
     = 83.33
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    Shear -
@@ -86,14 +104,23 @@
     </span>
     =
     <span class="dvc">
-     ( 10 + 5 )  · 5
+     ( 10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     + 5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     )  · 5
+     <i>m</i>
      <span class="dvl">
      </span>
      2
     </span>
     = 37.5
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <b>Diagrams</b>
@@ -103,10 +130,9 @@
    <span class="eq">
     <var>x</var>
     <sub>1</sub>
-    =
-    <u class="input-16">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
   </p>
@@ -254,9 +280,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>M</var>
-    ( 1 )  = -50.67
+    ( 1
+    <i>m</i>
+    )  = -50.67
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -380,9 +408,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>V</var>
-    ( 1 )  = 28
+    ( 1
+    <i>m</i>
+    )  = 28
+    <i>kN</i>
    </span>
-   kN
   </p>
  </div>
 </div>

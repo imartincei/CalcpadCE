@@ -1,5 +1,5 @@
 '<!-- Plots the four-minimum [Himmelblau test surface](https://en.wikipedia.org/wiki/Himmelblau%27s_function) $f(x, y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2$, a standard optimisation benchmark. -->
-"Himmelblau's function
+'<h1>Himmelblau''s function</h1>
 f(x; y) = (x^2 + y - 11)^2 + (x + y^2 - 7)^2
 '<!--'PlotHeight = 300''PlotWidth = 300'-->
 $Map{min(f(x; y); 500) @ x = -5 : 5 & y = -5 : 5}

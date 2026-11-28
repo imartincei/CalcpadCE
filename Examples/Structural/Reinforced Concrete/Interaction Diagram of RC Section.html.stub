@@ -12,16 +12,15 @@
    Width -
    <span class="eq">
     <var>b</var>
-    =
-    <u class="input-6">300</u>
+    = 300
+    <i>mm</i>
    </span>
-   mm, Height -
+   , Height -
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-6">700</u>
+    = 700
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Cross section area -
@@ -32,9 +31,14 @@
     <var>b</var>
     ·
     <var>h</var>
-    = 300 · 700 = 210000
+    = 300
+    <i>mm</i>
+    · 700
+    <i>mm</i>
+    = 210000
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>
    <b>Reinforcement</b>
@@ -44,10 +48,13 @@
    <span class="eq">
     <var>A</var>
     <sub>s1</sub>
-    =
-    <u class="input-11">800</u>
+    = 800
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm², Right -
+  </p>
+  <p>
+   Right -
    <span class="eq">
     <var>A</var>
     <sub>s2</sub>
@@ -55,8 +62,9 @@
     <var>A</var>
     <sub>s1</sub>
     = 800
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>
    Reinforcement ratio -
@@ -76,10 +84,17 @@
     </span>
     =
     <span class="dvc">
-     800 + 800
+     800
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     + 800
+     <i>mm</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
      210000
+     <i>mm</i>
+     <sup class="unit">2</sup>
     </span>
     = 0.00762
    </span>
@@ -93,10 +108,12 @@
    <span class="eq">
     <var>d</var>
     <sub>1</sub>
-    =
-    <u class="input-16">80</u>
+    = 80
+    <i>mm</i>
    </span>
-   mm, Right -
+  </p>
+  <p>
+   Right -
    <span class="eq">
     <var>d</var>
     <sub>2</sub>
@@ -104,8 +121,8 @@
     <var>d</var>
     <sub>1</sub>
     = 80
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Effective cross section depth -
@@ -116,9 +133,13 @@
     −
     <var>d</var>
     <sub>1</sub>
-    = 700 − 80 = 620
+    = 700
+    <i>mm</i>
+    − 80
+    <i>mm</i>
+    = 620
+    <i>mm</i>
    </span>
-   mm
   </p>
   <h4>Material properties</h4>
   <!-- <span class="eq"><var>PlotWidth</var> = 250</span> , <span class="eq"><var>PlotHeight</var> = 125</span> -->
@@ -131,24 +152,24 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-23">20</u>
+    = 20
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
-   Partial safety factors for concrete -
+   Partial safety factor for concrete -
    <span class="eq">
     <var>γ</var>
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Coefficient for long-term effects -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-24">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -159,9 +180,15 @@
     =
     <var>f</var>
     <sub>ck</sub>
-    + 8 = 20 + 8 = 28
+    + 8
+    <i>MPa</i>
+    = 20
+    <i>MPa</i>
+    + 8
+    <i>MPa</i>
+    = 28
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Design compressive cylinder strength -
@@ -183,13 +210,14 @@
     =
     <span class="dvc">
      0.85 · 20
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 11.33
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Ultimate compressive strain -
@@ -216,7 +244,9 @@
    <span class="eq">
     <var>E</var>
     <sub>cm</sub>
-    = 22 ·
+    = 22
+    <i>GPa</i>
+    ·
     <span class="b1">(</span>
     <span class="dvc">
      <var>f</var>
@@ -224,22 +254,27 @@
      <span class="dvl">
      </span>
      10
+     <i>MPa</i>
     </span>
     <span class="b1">)</span>
     <sup class="raised">0.3</sup>
-    = 22 ·
+    = 22
+    <i>GPa</i>
+    ·
     <span class="b1">(</span>
     <span class="dvc">
      28
+     <i>MPa</i>
      <span class="dvl">
      </span>
      10
+     <i>MPa</i>
     </span>
     <span class="b1">)</span>
     <sup class="raised">0.3</sup>
     = 29.96
+    <i>GPa</i>
    </span>
-   GPa
   </p>
   <p>
    <b>Steel</b>
@@ -249,10 +284,9 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-32">500</u>
+    = 500
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for steel -
@@ -279,13 +313,14 @@
     =
     <span class="dvc">
      500
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.15
     </span>
     = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Modulus of elasticity -
@@ -293,8 +328,8 @@
     <var>E</var>
     <sub>s</sub>
     = 200
+    <i>GPa</i>
    </span>
-   GPa
   </p>
   <p>
    <b>Strain-stress diagrams</b>

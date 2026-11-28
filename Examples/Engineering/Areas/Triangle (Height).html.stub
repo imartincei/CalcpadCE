@@ -7,8 +7,8 @@
   Base -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-3">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -16,8 +16,8 @@
   <span class="eq">
    <var>h</var>
    <sub>a</sub>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -36,12 +36,17 @@
    </span>
    =
    <span class="dvc">
-    2 · 1
+    2
+    <i>m</i>
+    · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 1
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

@@ -3,37 +3,38 @@
 '<div style="max-width:180mm">
 '<img class="side" style="width:150pt;" src="../../Images/structures/rc/design/column-design.png" alt="Column_Design.png">
 '<h4>Cross section dimensions</h4>
-'Width -'b = ?{300}mm', Height - 'h = ?{700}mm
+#UI 'Width -'b = 300mm', Height - 'h = 700mm
 #post
 'Cross section area -'A_c = b*h|cm^2
-#show
+#end post
 '<p><b>Reinforcement</b></p>
-'Left -'A_s1 = ?{8}*cm^2', Right -'A_s2 = ?{8}*cm^2
+#UI 'Left -'A_s1 = 8cm^2', Right -'A_s2 = 8cm^2
 #post
 'Reinforcement ratio -'ρ = (A_s1 + A_s2)/A_c
-#show
+#end post
 '<p><b>Concrete cover to the center of reinforcement</b></p>
-'Left -'d_1 = ?{50}mm', Right -'d_2 = ?{50}mm
+#UI 'Left -'d_1 = 50mm', Right -'d_2 = 50mm
 #post
 'Effective cross section depth -'d = h - d_1
-#show
+#end post
 '<p><b>Section design loads</b></p>
-'Axial force -'N_Ed = ?{1200}kN' (positive for compression)
-'Bending moment -'M_Ed = ?{200}kNm
+#UI 'Axial force -'N_Ed = 1200kN' (positive for compression)
+#UI 'Bending moment -'M_Ed = 200kNm
 '<h4>Material properties</h4>
 '<p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
 '<p><b>Concrete</b></p>
-'Characteristic compressive cylinder strength -'f_ck = ?{20}MPa
-'Partial safety factor for concrete -'γ_c = 1.5','α_cc = ? {0.85}
+#UI 'Characteristic compressive cylinder strength -'f_ck = 20MPa
+'Partial safety factor for concrete -'γ_c = 1.5
+#UI 'Coefficient for long-term effects -'α_cc = 0.85
 #post
 'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c
 'Mean value of cylinder compressive strength -'f_cm = f_ck + 8MPa
 'Secant modulus of elasticity -'E_cm = 22GPa*(f_cm/10MPa)^0.3
 'Ultimate compressive strain -'ε_cu2 = 0.0035
 'Strain  at the end of parabolic part of the diagram -'ε_c2 = 0.002
-#show
+#end post
 '<p><b>Steel</b></p>
-'Characteristic yield strength -'f_yk = ?{500}MPa
+#UI 'Characteristic yield strength -'f_yk = 500MPa
 #post
 'Partial safety factor for steel -'γ_s = 1.15
 'Design yield strength -'f_yd = f_yk/γ_s
@@ -44,30 +45,31 @@
 #hide
 n = 2
 σ_c(ε) = f_cd*((1 - (1 - ε/ε_c2)^n)*(ε < ε_c2) + (ε ≥ ε_c2))
-#post
+#end hide
 $Plot{σ_c(ε/1000) @ ε = 0 : ε_cu2*1000}
 '</td><td>
 #hide
 σ_s(ε) = max(-f_yd;min(ε*E_s;f_yd))
-#post
+#end hide
 $Plot{σ_s(ε/1000) @ ε = -10 : 10}
 '</td></tr></table>
-#show
+#end post
 max(-f_yd;min(0.01*E_s;f_yd))
 '<h4>Imperfections and second order effects</h4>
-'Ratio of quasi-permanent bending moment: M<sub>0Eqp</sub>/M<sub>0Ed</sub> ='K_G = ? {0.75}
+#UI 'Ratio of quasi-permanent bending moment: M<sub>0Eqp</sub>/M<sub>0Ed</sub> ='K_G = 0.75
 #post
 'M<sub>0Eqp</sub> is the first order bending moment in quasi-permanent load combination (SLS)
 'M<sub>0Ed</sub> is the first order bending moment in design load combination (ULS)
-#show
-'Long term creep factor - φ(∞,t<sub>0</sub>) ='φ = ? {2.5}
-'Column height -'L = ?{4}m
-'Effective column height -'L_o = ?{1}*L
+#end post
+#UI 'Long term creep factor - φ(∞,t<sub>0</sub>) ='φ = 2.5
+#UI 'Column height -'L = 4m
+#UI 'Effective length factor -'β_L = 1
+'Effective column height -'L_o = β_L*L
 #post
 '<div class="fold">
-#show
+#end post
 '<p><b>Geometric imperfections and accidental eccentricity</b></p>
-'Number of vertical members contributing to the total effect -'m = ? {1}
+#UI 'Number of vertical members contributing to the total effect -'m = 1
 #post
 'Reduction factor for height:
 α_h_ = 2/sqr(L/1m)
@@ -187,13 +189,16 @@ N_Rd_max = A_c*f_cd + σ_s(ε)*(A_s1 + A_s2)|kN
 		'Bending moment is less than moment resistance:
 		M_Ed'≤'M_Rd
 		'The design check is satisfied.
+		#end post
 		#pre
 		'<img class="side" style="width:190pt;" src="../../Images/structures/rc/design/column-biaxial.png" alt="Column_Biaxial.png">
 		'<h4>Biaxial bending design</h4>
 		'For the other direction:
-		'Design moment -'M_Edy = ?{50}kNm
-		'Bending resistance -'M_Rdy = ?{100}kNm
-		'Effective length -'L_oy = ?{1}*L
+		#UI 'Design moment -'M_Edy = 50kNm
+		#UI 'Bending resistance -'M_Rdy = 100kNm
+		#UI 'Effective length factor -'β_y = 1
+		'Effective length -'L_oy = β_y*L
+		#end pre
 		#post
 		#if M_Edy > 0kNm
 			'<img class="side" style="width:190pt;" src="../../Images/structures/rc/design/column-biaxial.png" alt="Column_Biaxial.png">
@@ -228,7 +233,7 @@ N_Rd_max = A_c*f_cd + σ_s(ε)*(A_s1 + A_s2)|kN
 					e_y/h*(b/e_z)'&gt; 0.2 and'e_z/b*(h/e_y)'&gt; 0.2
 				#end if
 				'The condition is NOT satisfied. Biaxial bending design is required.
-				'Ultimate axial force resistance-'N_Rd = N_Rd_max'kN
+				'Ultimate axial force resistance-'N_Rd = N_Rd_max|kN
 				N_Ed/N_Rd
 				'Calculation of the exponent factor <i>a</i>
 				#if N_Ed/N_Rd ≤ 0.1
@@ -250,5 +255,5 @@ N_Rd_max = A_c*f_cd + σ_s(ε)*(A_s1 + A_s2)|kN
 		#end if
 	#end if
 #end if
-#show
+#end post
 '</div>

@@ -4,20 +4,20 @@
 '<img alt="sssf-span-cl.png" class="side" style="height:180pt;" src="../../Images/structures/rc/spans/sssf-span-cl.png">
 '<h4>Dimensions</h4>
 'Clear spans (<i>l</i><sub>x</sub> &lt; <i>l</i><sub>y</sub>)
-l_x_cl = ? {4}'m,'l_y_cl = ? {6}'m
-'Beam width along <i>x</i> -'b_y = ? {25}'cm
-'Beam width along <i>y</i> -'b_x = ? {25}'cm
-'Slab thickness -'h = ? {14}'cm
-'Concrete cover -'c = ? {2}'cm
+#UI 'Along <i>x</i> -'l_x_cl = 4m', along <i>y</i> -'l_y_cl = 6m
+#UI 'Beam width along <i>x</i> -'b_y = 25cm
+#UI 'Beam width along <i>y</i> -'b_x = 25cm
+#UI 'Slab thickness -'h = 14cm
+#UI 'Concrete cover -'c = 2cm
 #post
 'Design span lengths
-l_x = l_x_cl + min(b_x/100;h/100)'m
-l_y = l_y_cl + min(b_y/100;h/100)'m
+l_x = l_x_cl + min(b_x;h)|m
+l_y = l_y_cl + min(b_y;h)|m
 'Span ratio -'k = l_y/l_x
 #if k < 1
 	'Span length <i>l</i><sub>y</sub> should be greater than <i>l</i><sub>x</sub>
 #else
-	#show
+	#end post
 	'Design spans lengths and edge moments in adjacent panels
 	'<img alt="sssf-span.png" class="side" style="height:140pt;" src="../../Images/structures/rc/spans/sssf-span.png">
 	'<!--
@@ -26,9 +26,9 @@ l_y = l_y_cl + min(b_y/100;h/100)'m
 		'<table><tr><td>
 		'Along <i>y</i> -
 		'</td><td>
-		l_y1 = ? {0}'m;
+		#UI l_y1 = 0m
 		'</td><td>
-		M_Ed_yt1_ = ? {0}'kN·m/m
+		#UI M_Ed_yt1_ = 0kNm/m
 		'</td></tr></table>
 		'<!--
 	#end if
@@ -36,13 +36,13 @@ l_y = l_y_cl + min(b_y/100;h/100)'m
 	'(in absence of contiguous span - <i>l</i> = 0)
 	'<h4>Loads</h4>
 	'Characteristic uniform loads
-	'Self weight -'g_sw = 0.25*h'kN/m²
-	'Permanent -'g_k = ? {2.5}'kN/m²
-	'Variable -'q_k = ? {2}'kN/m²
+	'Self weight -'g_sw = 25kN/m^3*h|kN/m^2
+	#UI 'Permanent -'g_k = 2.5kN/m^2
+	#UI 'Variable -'q_k = 2kN/m^2
 	'Partial safety factor -'γ_G = 1.35';'γ_Q = 1.5
 	#post
 	'Design uniform loads
-	p = (g_sw + g_k)*γ_G + q_k*γ_Q'kN/m²
+	p = (g_sw + g_k)*γ_G + q_k*γ_Q|kN/m^2
 	'<div class="fold">
 	'<p><b>Beam loads</b></p>
 	'(as uniform loads)
@@ -50,41 +50,42 @@ l_y = l_y_cl + min(b_y/100;h/100)'m
 		'<table><tr><td rowspan="2">
 		'Parallel to <i>x</i> - <br />
 		'</td><td>
-		g_k_x = (g_sw + g_k)*l_x_cl/4'kN/m
+		g_k_x = (g_sw + g_k)*l_x_cl/4|kN/m
 		'</td></tr><tr><td>
-		q_k_x = q_k*l_x_cl/4'kN/m
+		q_k_x = q_k*l_x_cl/4|kN/m
 		'</td></tr><tr><td rowspan="2">
 		'Parallel to <i>y</i> - <br />
 		'</td><td>
-		g_k_y = (g_sw + g_k)*l_x_cl*(l_y_cl - l_x_cl/2)/(2*l_y_cl)'kN/m
+		g_k_y = (g_sw + g_k)*l_x_cl*(l_y_cl - l_x_cl/2)/(2*l_y_cl)|kN/m
 		'</td></tr><tr><td>
-		q_k_y = q_k*l_x_cl*(l_y_cl - l_x_cl/2)/(2*l_y_cl)'kN/m
+		q_k_y = q_k*l_x_cl*(l_y_cl - l_x_cl/2)/(2*l_y_cl)|kN/m
 		'</td></tr></table>
 	#else
-		'Parallel to <i>y</i> -'q_y = p*l_x_cl/2'kN/m
+		'Parallel to <i>y</i> -'q_y = p*l_x_cl/2|kN/m
 	#end if
 	'</div>
-	#show
+	#end post
 	'<h4>Material properties</h4>
 	'<p><b>Concrete</b> &nbsp;&nbsp;[EN 1992-1-1, EN 1992-1-1, Table 3.1]</p>
-	'Characteristic compressive cylinder strength -'f_ck = ? {25}'MPa
-	'Partial safety factors for concrete -'γ_c = 1.5','α_cc = ? {0.85}
+	#UI 'Characteristic compressive cylinder strength -'f_ck = 25MPa
+	'Partial safety factor for concrete -'γ_c = 1.5
+	#UI 'Long-term effects coefficient -'α_cc = 0.85
 	#post
-	'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c'MPa
+	'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c|MPa
 	'Factor defining the effective height of the compression zone -'λ = 0.8'
 	'Factor defining the effective strength - 'η = 1.0
-	'Mean value of axial tensile strength -'f_ctm = 0.30*f_ck^(2/3)'MPa
-	#show
+	'Mean value of axial tensile strength -'f_ctm = 0.30*(f_ck/1MPa)^(2/3)*1MPa|MPa
+	#end post
 	'<p><b>Steel</b></p>
-	'Characteristic yield strength -'f_yk = ? {500}'MPa
+	#UI 'Characteristic yield strength -'f_yk = 500MPa
 	#post
 	'Partial safety factor for steel - 'γ_s = 1.15
-	'Design yield strength - 'f_yd = f_yk/γ_s'MPa
+	'Design yield strength - 'f_yd = f_yk/γ_s|MPa
 	'Limit relative compressive zone depth -'ξ_lim = 0.45
-	#show
+	#end post
 	'<p><b>Bar diameters</b></p>
-	'- Bottom parallel to <i>x</i> -'d_bxb = ? {8}'mm, parallel to <i>y</i> -'d_byb = ? {8}'mm
-	'- Top parallel to <i>y</i> -'d_byt = ? {6}'mm
+	#UI '- Bottom parallel to <i>x</i> -'d_bxb = 8mm', parallel to <i>y</i> -'d_byb = 8mm
+	#UI '- Top parallel to <i>y</i> -'d_byt = 6mm
 	#post
 	'<div class="fold">
 	'<h4>Static calculations</h4>
@@ -175,71 +176,71 @@ l_y = l_y_cl + min(b_y/100;h/100)'m
 		#end if
 	#end if
 	'<p><b>Loads for accounting alternation in adjacent spans</b></p>
-	p_1 = γ_G*(g_sw + g_k) + γ_Q*q_k/2'kN/m²
-	p_2 = γ_Q*q_k/2'kN/m²
+	p_1 = γ_G*(g_sw + g_k) + γ_Q*q_k/2|kN/m^2
+	p_2 = γ_Q*q_k/2|kN/m^2
 	'<p><b>Bending moments</b></p>
 	'Span moment (including load alternation)
-	M_Ed_xb = β_xb1*p_1*l_x^2 + β_xb2*p_2*l_x^2'kN·m/m
+	M_Ed_xb = β_xb1*p_1*l_x^2 + β_xb2*p_2*l_x^2|kNm/m
 	#if k ≤ 2
-		M_Ed_yb = β_yb1*p_1*l_x^2 + β_yb2*p_2*l_x^2'kN·m/m
+		M_Ed_yb = β_yb1*p_1*l_x^2 + β_yb2*p_2*l_x^2|kNm/m
 		'Support moment
-		M_Ed_yt = β_yt*p*l_x^2'kN·m/m
+		M_Ed_yt = β_yt*p*l_x^2|kNm/m
 	#end if
 	#if k ≤ 2
 		'<p><b>Average moments at supports from the adjacent spans</b></p>
-		M_Ed_yt1 = (M_Ed_yt1_*l_y1 + M_Ed_yt*l_y)/(l_y1 + l_y)'kN·m/m
+		M_Ed_yt1 = (M_Ed_yt1_*l_y1 + M_Ed_yt*l_y)/(l_y1 + l_y)|kNm/m
 	#end if
 	'<p><b>Shear forces</b></p>
 	#if k ≤ 2
-		V_Ed_x = β_vx*p*l_x'kN/m
-		V_Ed_y1 = β_vy1*p*l_x'kN/m
-		V_Ed_y2 = β_vy2*p*l_x'kN/m
+		V_Ed_x = β_vx*p*l_x|kN/m
+		V_Ed_y1 = β_vy1*p*l_x|kN/m
+		V_Ed_y2 = β_vy2*p*l_x|kN/m
 	#else
-		V_Ed_x = β_vx*p*l_x'kN/m
+		V_Ed_x = β_vx*p*l_x|kN/m
 	#end if
 	#if k ≤ 2
 		'<p><b>Edge support moments</b></p>
-		M_Ed_yte1 = M_Ed_yt1 - V_Ed_y1*min(b_y/200;h/200)'kN·m/m
+		M_Ed_yte1 = M_Ed_yt1 - V_Ed_y1*min(b_y/2;h/2)|kNm/m
 	#end if
 	'</div><div class="fold">
 	'<h4>Bending design</h4>
 	'<p><b>Bottom reinforcement parallel to <i>x</i></b></p>
-	'Effective cross section depth -'d_xb = h - c - d_bxb/20'cm
-	'Relative design bending moment -'m_Ed = 10*M_Ed_xb/(d_xb^2*η*f_cd)
-	'Compression zone depth -'x = d_xb/λ*(1 - sqr(1 - 2*m_Ed))'cm
+	'Effective cross section depth -'d_xb = h - c - d_bxb/2|cm
+	'Relative design bending moment -'m_Ed = M_Ed_xb/(d_xb^2*η*f_cd)
+	'Compression zone depth -'x = d_xb/λ*(1 - sqr(1 - 2*m_Ed))|cm
 	'Relative compression zone depth -'ξ = x/d_xb
-	'Lever arm of internal forces -'z = d_xb - 0.5*λ*x'cm
-	'Area of required reinforcement -'A_sxb = M_Ed_xb*10^3/(z*f_yd)'cm²/m
-	'Reinforcement ratio -'ρ_xb = A_sxb/(d_xb*100)
+	'Lever arm of internal forces -'z = d_xb - 0.5*λ*x|cm
+	'Area of required reinforcement -'A_sxb = M_Ed_xb/(z*f_yd)|cm^2/m
+	'Reinforcement ratio -'ρ_xb = A_sxb/d_xb
 	#if ξ > ξ_lim
 		'<p class="err">'ξ'&gt;'ξ_lim'- Reinforcement in compression zone is required.</p>
 	#end if
 	#hide
 	#if k ≤ 2
 		'<p><b>Bottom reinforcement parallel to <i>y</i></b></p>
-		'Effective cross section depth -'d_yb = h - c - d_bxb/10 - d_byb/20'cm
-		'Relative design bending moment -'m_Ed = 10*M_Ed_yb/(d_yb^2*η*f_cd)
-		'Compression zone depth -'x = d_yb/λ*(1 - sqr(1 - 2*m_Ed))'cm
+		'Effective cross section depth -'d_yb = h - c - d_bxb - d_byb/2|cm
+		'Relative design bending moment -'m_Ed = M_Ed_yb/(d_yb^2*η*f_cd)
+		'Compression zone depth -'x = d_yb/λ*(1 - sqr(1 - 2*m_Ed))|cm
 		'Relative compression zone depth -'ξ = x/d_yb
-		'Lever arm of internal forces -'z = d_yb - 0.5*λ*x'cm
-		'Area of required reinforcement -'A_syb = M_Ed_yb*10^3/(z*f_yd)'cm²/m
-		'Reinforcement ratio -'ρ_yb = A_syb/(d_yb*100)
+		'Lever arm of internal forces -'z = d_yb - 0.5*λ*x|cm
+		'Area of required reinforcement -'A_syb = M_Ed_yb/(z*f_yd)|cm^2/m
+		'Reinforcement ratio -'ρ_yb = A_syb/d_yb
 		#if ξ > ξ_lim
 			'<p class="err">'ξ'&gt;'ξ_lim'- Reinforcement in compression zone is required.</p>
 		#end if
 		'<p><b>Горна армировка Along <i>y</i> за <i>M</i><sub>Ed_yte1</sub></b></p>
-		'Effective cross section depth -'d_yt1 = h - c - d_byt/10'cm
-		'Relative design bending moment -'m_Ed = 10*M_Ed_yte1/(d_yt1^2*η*f_cd)
-		'Compression zone depth -'x = d_yt1/λ*(1 - sqr(1 - 2*m_Ed))'cm
+		'Effective cross section depth -'d_yt1 = h - c - d_byt|cm
+		'Relative design bending moment -'m_Ed = M_Ed_yte1/(d_yt1^2*η*f_cd)
+		'Compression zone depth -'x = d_yt1/λ*(1 - sqr(1 - 2*m_Ed))|cm
 		'Relative compression zone depth -'ξ = x/d_yt1
-		'Lever arm of internal forces -'z = d_yt1 - 0.5*λ*x'cm
-		'Area of required reinforcement -'A_syt1 = M_Ed_yte1*10^3/(z*f_yd)'cm²/m
-		'Reinforcement ratio -'ρ_yt1 = A_syt1/(d_yt1*100)
+		'Lever arm of internal forces -'z = d_yt1 - 0.5*λ*x|cm
+		'Area of required reinforcement -'A_syt1 = M_Ed_yte1/(z*f_yd)|cm^2/m
+		'Reinforcement ratio -'ρ_yt1 = A_syt1/d_yt1
 		#if ξ > ξ_lim
 			'<p class="err">'ξ'&gt;'ξ_lim'- Reinforcement in compression zone is required.</p>
 		#end if
 	#end if
-	#post
+	#end hide
 	'<p><b>The rest of the reinforcement is calculated similarly.</b></p>
 	'</div><div class="fold">
 	'<h4>Reinforcement detailing</h4>
@@ -250,79 +251,80 @@ l_y = l_y_cl + min(b_y/100;h/100)'m
 	'<p class="ref">[EN 1992-1-1, § 9.2.1.1 (3)]</p>
 	'Maximum reinforcement ratio -'ρ_max = 0.04
 	#if ρ_xb < ρ_min
-		'<p><i>ρ</i><sub>xb</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_sxb = ρ_min*d_xb*100'cm<sup>2</sup>/m</p>
+		'<p><i>ρ</i><sub>xb</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_sxb = ρ_min*d_xb|cm^2/m'</p>
 	#else if ρ_xb > ρ_max
 		'<p class="err">Reinforcement ratio is greater than maximum:'ρ_xb'&gt;'ρ_max'</p>
 	#end if
 	#if k > 2
 		'<p class="ref">[EN 1992-1-1, § 9.3.1.1 (2)]</p>
 		'Minimum bottom reinforcement parallel to y
-		A_syb = 0.2*A_sxb'cm²/m
+		A_syb = 0.2*A_sxb|cm^2/m
 	#else
 		'<!--'
 		#if ρ_yb < ρ_min
-			'<p><i>ρ</i><sub>yb</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_syb = ρ_min*d_yb*100'cm²/m</p>
+			'<p><i>ρ</i><sub>yb</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_syb = ρ_min*d_yb|cm^2/m'</p>
 		#else if ρ_yb > ρ_max
 			'<p class="err">Reinforcement ratio is greater than maximum:'ρ_yb'&gt;'ρ_max'</p>
 		#end if
 		'<-->
 	#end if
 	'Required bar spacing
-	s_xb = floor(π*d_bxb^2/(4*A_sxb))'cm
+	s_xb = floor(π*d_bxb^2/(4*A_sxb)/1cm)*1cm|cm
 	#if k > 2
 		'<p class="ref">[EN 1992-1-1, § 9.3.1.1 (3)]</p>
 		'Minimum bottom reinforcement parallel to y
-		s_yb = min(3*h;40)'cm
+		s_yb = min(3*h;40cm)|cm
 		'Required bar diameter for bottom reinforcement parallel to y
-		d_byb = max(ceiling(sqr(4*A_syb*s_yb/π));6)'mm
+		d_byb = max(ceiling(sqr(4*A_syb*s_yb/π)/1mm)*1mm;6mm)|mm
 	#else
-		'<!--'s_yb = floor(π*d_byb^2/(4*A_syb))'cm-->
+		'<!--'s_yb = floor(π*d_byb^2/(4*A_syb)/1cm)*1cm|cm'-->
 	#end if
 	'<p class="ref">[EN 1992-1-1, § 9.3.1.1 (3)]</p>
 	'Maximum bar spacing
-	s_max = min(2*h;25)'cm
+	s_max = min(2*h;25cm)|cm
 	#if s_xb > s_max
-		'<p><i>s</i><sub>xb</sub> &gt; <i>s</i><sub>max</sub>. Assume's_xb = s_max'cm</p>
+		'<p><i>s</i><sub>xb</sub> &gt; <i>s</i><sub>max</sub>. Assume's_xb = s_max|cm'</p>
 	#end if
 	#if (k ≤ 2)*(s_yb > s_max)
-		'<!--<p><i>s</i><sub>yb</sub> &gt; <i>s</i><sub>max</sub>. Assume's_yb = s_max'cm</p>-->
+		'<!--<p><i>s</i><sub>yb</sub> &gt; <i>s</i><sub>max</sub>. Assume's_yb = s_max|cm'</p>-->
 	#end if
 	#hide
 	'<p><b>Top reinforcement</b></p>
 	#if k ≤ 2
 		#if ρ_yt1 < ρ_min
-			'<p><i>ρ</i><sub>yt1</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_syt1 = ρ_min*d_yt1*100'cm²/m</p>
+			'<p><i>ρ</i><sub>yt1</sub> &lt; <i>ρ</i><sub>min</sub>. Minimum reinforcement is assumed -'A_syt1 = ρ_min*d_yt1|cm^2/m'</p>
 		#else if ρ_yt1 > ρ_max
 			'<p class="err">Reinforcement ratio is greater than maximum:'ρ_yt1'&gt;'ρ_max'</p>
 		#end if
 	#end if
 	'Required bar spacing
 	#if k ≤ 2
-		s_yt1 = floor(π*d_byt^2/(4*A_syt1))'cm
+		s_yt1 = floor(π*d_byt^2/(4*A_syt1)/1cm)*1cm|cm
 	#end if
 	'<p class="ref">[EN 1992-1-1, § 9.3.1.1 (3)]</p>
 	'Maximum bar spacing
-	s_max = min(2*h;25)'cm
+	s_max = min(2*h;25cm)|cm
 	#if (k ≤ 2)*(s_yt1 > s_max)
-		'<p><i>s</i><sub>yt1</sub> &gt; <i>s</i><sub>max</sub>. It is assumed's_yt1 = s_max'cm</p>
+		'<p><i>s</i><sub>yt1</sub> &gt; <i>s</i><sub>max</sub>. It is assumed's_yt1 = s_max|cm'</p>
 	#end if
-	#post
+	#end hide
 	'<p><b>The rest of the reinforcement is detailed similarly.</b></p>
 	'</div>
 	'<h4>Results</h4>
 	#val
 	'<table class="bordered centered">
 	'<tr><th>Reinforcement</th><th>M<sub>Ed</sub><br>kN·m/m</th><th>A<sub>s</sub><br>cm<sup>2</sup>/m</th><th>ρ, %</th><th>Selected</tr>
-	'<tr><td>Bottom parallel to <i>x</i></td><td>'M_Ed_xb'</td><td>'A_sxb'</td><td>'A_sxb/d_xb'%</td><td>Ø'd_bxb'/'s_xb'</td></tr>
+	'<tr><td>Bottom parallel to <i>x</i></td><td>'M_Ed_xb'</td><td>'A_sxb'</td><td>'A_sxb/d_xb*100'%</td><td>Ø'd_bxb'/'s_xb'</td></tr>
 	#if k ≤ 2
-		'<tr><td>Bottom parallel to <i>y</i></td><td>'M_Ed_yb'</td><td>'A_syb'</td><td>'A_syb/d_yb'%</td><td>Ø'd_byb'/'s_yb'</td></tr>
+		'<tr><td>Bottom parallel to <i>y</i></td><td>'M_Ed_yb'</td><td>'A_syb'</td><td>'A_syb/d_yb*100'%</td><td>Ø'd_byb'/'s_yb'</td></tr>
 	#else
 		'<tr><td>Bottom parallel to <i>y</i></td><td></td><td></td><td></td><td>Ø'd_byb'/'s_yb'</td></tr>
 	#end if
 	#if k ≤ 2
-		'<tr><td>Top parallel to <i>y</i> - down side</td><td>'M_Ed_yte1'</td><td>'A_syt1'</td><td>'A_syt1/d_yt1'%</td><td>Ø'd_byt'/'s_yt1'</td></tr>
+		'<tr><td>Top parallel to <i>y</i> - down side</td><td>'M_Ed_yte1'</td><td>'A_syt1'</td><td>'A_syt1/d_yt1*100'%</td><td>Ø'd_byt'/'s_yt1'</td></tr>
 	#end if
 	'</table>
+	#end val
 #end if
-#show
+#end post
 '</div>

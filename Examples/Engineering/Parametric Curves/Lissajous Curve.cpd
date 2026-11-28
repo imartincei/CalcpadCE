@@ -3,13 +3,11 @@
 #rad
 PlotHeight = 400
 PlotWidth = 400
-#show
+#end hide
 'Equation:
 x(θ) = sin(a*θ)
 y(θ) = sin(b*θ)
-'Coefficients:'a = ? {2}','b = ? {3}
-#pre
-
-'Tip: Click "<b>Calculate</b>" to see the respective plot.
+#UI 'Coefficient a -'a = 2', Coefficient b -'b = 3
 #post
 $Plot{x(θ)|y(θ) @ θ = 0 : 2*π}
+#end post

@@ -1,10 +1,9 @@
 '<!-- Area $A = \tfrac{1}{2}(a + b)\, h$ of a trapezoid from its two parallel sides and height. -->
-"Area and Perimeter of Trapezoid
+'<h1>Area and Perimeter of Trapezoid</h1>
 '<div style="max-width:90mm;"><img style="height:60pt;" class="side" alt="trapezoid.png" src="../../Images/math/area/trapezoid.png"></div>
 'Base lengths
-a = ? {2}','b = ? {1}
-'Height
-h = ? {1}
+#UI 'Bottom base -'a = 2m', Top base -'b = 1m
+#UI 'Height -'h = 1m
 'Area
 A = (a+b)*h/2
 'Perimeter (symmetrical figure only)

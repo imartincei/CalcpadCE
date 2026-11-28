@@ -2,16 +2,16 @@
 '<div style="max-width:180mm">
 '<img style="width:210pt;" alt="fixed-beam-distributed-load-uniform.png" class="side" src="../../Images/mechanics/beams/fixed-beam-distributed-load-uniform.png">
 '<p><b>Input data</b></p>
-'Beam Length -'l=? {10}'m
-'Load -'q=? {5}'kN/m
+#UI 'Beam Length -'l = 10m
+#UI 'Load -'q = 5kN/m
 #post
 '<p><b>Internal forces</b></p>
 'Bending at supports
-'<i>M</i><sub>A</sub>='M_B = q*l^2/12'kN·m
+'<i>M</i><sub>A</sub>='M_B = q*l^2/12|kNm
 'Bending at mid-span
-M_max = q*l^2/24'kN·m
+M_max = q*l^2/24|kNm
 'Shear
-'<i>V</i><sub>A</sub>='V_B=q*l/2'kN
+'<i>V</i><sub>A</sub>='V_B=q*l/2|kN
 '<p><b>Diagrams</b></p>
 #hide
 M_A = M_B
@@ -19,18 +19,18 @@ V_A = V_B
 PlotWidth = 600
 PlotHeight = 150
 #show
-'Calculate internal forces at'x_1 = ? {1}'m
+#UI 'Calculate internal forces at'x_1 = 1m
 #pre
 
 
 #post
 'Bending
 M(x) = -M_A + V_A*x - q*x^2/2
-$Plot{-M(x) @ x = 0 : l}
-M(x_1)'kN·m
+$Plot{-M(x) @ x = 0m : l}
+M(x_1)|kNm
 'Shear
 V(x) = V_A - q*x
-$Plot{V(x) @ x = 0 : l}
-V(x_1)'kN
-#show
+$Plot{V(x) @ x = 0m : l}
+V(x_1)|kN
+#end post
 '</div>

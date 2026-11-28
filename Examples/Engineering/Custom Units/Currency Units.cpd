@@ -8,7 +8,7 @@
 20EUR|BGN
 30EUR|USD
 '<p><b>Usage</b></p>
-'Unit price - 'p = 15USD/m
-'Order length -'L = 100m
+#UI 'Unit price -'p = 15USD/m
+#UI 'Order length -'L = 100m
 'Total price in USD -'P = p*L|USD
 'Total price in EUR -'P|EUR

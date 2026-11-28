@@ -1,9 +1,10 @@
 '<!-- Solves $x^3 + a x^2 + b x + c = 0$ with the built-in numerical root finder, recovering all real and complex roots from the user-supplied coefficients. -->
 f(x) = x^3 + a*x^2 + b*x + c'= 0
 'Coefficients:
-a = ? {-6}','b = ? {11}','c = ? {-6}
+#UI a = -6','b = 11','c = -6
 #hide
 PlotWidth = 360''PlotHeight = 240
+#end hide
 #post
 #rad
 'Solution:
@@ -20,7 +21,7 @@ R = (2*a^3 - 9*a*b + 27*c)/54
 	d = max(abs(x_3 - x_1)/4; 0.5)
 	x_min = min(x_1; x_3) - d
 	x_max = max(x_1; x_3) + d
-	#post
+	#end hide
 	$Plot{f(x) & x_1|0 & x_2|0 & x_3|0 @ x = x_min : x_max}
 #else
 	'Check:'R^2'&ge;'Q^3'
@@ -35,6 +36,7 @@ R = (2*a^3 - 9*a*b + 27*c)/54
 	d = max(abs(a); max(abs(b); abs(c)))
 	x_min = x_1 - d
 	x_max = x_1 + d
-	#post
+	#end hide
 	$Plot{x|f(x) & x_1|0 @ x = x_min : x_max}
 #end if
+#end post

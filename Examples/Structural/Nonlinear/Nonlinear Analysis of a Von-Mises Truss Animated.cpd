@@ -4,10 +4,14 @@
 '<!-- Shallow Von-Mises truss with circular pipe section, animated load-displacement curve passing through a limit point, solved by fixed-point iteration, Newton-Raphson, the secant method and the built-in `Root` solver. -->
 '(solved by four different numerical methods)
 '<h4>Input data</h4>
-'Half span -'a = 2m', ''Height -'h = -0.5m
-'Cross section - circular pipe with diameter'Φ = 100mm'and thickness't = 4mm
-'Material - steel. Modulus of elasticity -'E = 210GPa
-'Vertical force -'F_y = 2000kN
+#UI 'Half span -'a = 2m
+#UI 'Height -'h = -0.5m
+'Cross section - circular pipe
+#UI 'Diameter -'Φ = 100mm
+#UI 'Thickness -'t = 4mm
+'Material - steel
+#UI 'Modulus of elasticity -'E = 210GPa
+#UI 'Vertical force -'F_y = 2000kN
 #include svg_drawing.cpd
 #hide
 v = 0mm
@@ -40,7 +44,7 @@ v_max = abs(2.26*h)
 	#hide
 	x1 = 0
 	y1 = k/10
-	#show
+	#end hide
 	#for i = 1 : 2
 		#hide
 		δ = 0.8*k
@@ -48,13 +52,13 @@ v_max = abs(2.26*h)
 		y2 = y1 - abs(δ)
 		x3 = x1 + δ
 		y3 = y1 + abs(δ)
-		#show
+		#end hide
 		line$(x2; y3; x3; y3; thick_style$)
 		line$(x2; y3; x1; y1; thin_style$)
 		line$(x3; y3; x1; y1; thin_style$)
 		#hide
 		x1 = x1 + 2*L
-		#show
+		#end hide
 	#loop
 	'<polygon points="'L','H_nl - 4*δ' 'L','H_nl - 0.32*δ' 'L - 0.32*δ','H_nl - 1.4*δ' 'L + 0.32*δ','H_nl - 1.4*δ' 'L','H_nl - 0.32*δ'" load_style$ />
 	texth$(L+20;H_nl-3.2*δ;Fy='F_y'kN)
@@ -125,7 +129,7 @@ n = 0
 		#break
 	#end if
 #loop
-#show
+#end hide
 'After'n'iterations we get:'v
 'Relative error -'δ = abs(v - v_0)/abs(v)
 '<h4>3. Secant method</h4>
@@ -152,7 +156,7 @@ n = 0
 		#break
 	#end if
 #loop
-#show
+#end hide
 'After'n'iterations we get:'v_2
 'Relative error -'δ = abs(v_2 - v_1)/abs(v_2)
 '<h4>4. Solution with Calcpad <small>(modified Anderson-Bjork′s method)</small></h4>
@@ -166,7 +170,7 @@ v = $Root{2*F_y(v) = F_y @ v = 0mm : 200m}
 	dv = min(2000kN/F′; v_max/6)
 	v_1(v) = min(max(0mm; v_2 + (1 - 2*v/v_max)*dv); v_max)
 	F_1(v) = F_y + F′*(v_1(v) - v_2)
-	#show
+	#end hide
 	$Plot{F_y & 2*F_y(v) & v_1(v)|F_1(v) & v_l(F_y)|F_y & v_2|F_y @ v = 0mm : v_max}
 #end def
 plot$
@@ -180,7 +184,7 @@ plot$
 L = a/2cm
 k = L/10
 δ = 0.7*k
-#show
+#end hide
 #val
 #def results$
 	#hide
@@ -207,15 +211,18 @@ k = L/10
 	'</svg>
 #end def
 results$
+#pause
 #hide
 n = 51
-#show
-'<style>.fr{display:none;}</style>
+#end hide
+#html
+<style>.fr{display:none;}</style>
+#end html
 #for j = 1 : n
 	#hide
 	F_y = F_y,max*(j - 1)/(n - 1)
 	v = $Root{2*F_y(v) = F_y @ v = 0mm : 200m}
-	#show
+	#end hide
 	'<div class="fr" id="fr-'j'">
 	plot$
 	results$

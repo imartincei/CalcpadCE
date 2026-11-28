@@ -3,12 +3,12 @@
  <div style="max-width:80mm;">
   <img alt="square.png" class="side" src="Images/math/area/square.png" style="height:60pt;"/>
  </div>
- <p>Side length</p>
  <p>
+  Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -19,8 +19,11 @@
    <var>a</var>
    <sup>2</sup>
    = 1
+   <i>m</i>
    <sup>2</sup>
    = 1
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Perimeter</p>
@@ -29,7 +32,10 @@
    <var>P</var>
    = 4 ·
    <var>a</var>
-   = 4 · 1 = 4
+   = 4 · 1
+   <i>m</i>
+   = 4
+   <i>m</i>
   </span>
  </p>
  <p>

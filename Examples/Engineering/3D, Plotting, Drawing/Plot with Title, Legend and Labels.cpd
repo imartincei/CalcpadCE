@@ -6,7 +6,7 @@ f_4(x) = 2 - 2*x'; 'f_5(x) = 2 - x'; 'f_6(x) = 2*x - 2
 'Points
 x_7 = 1', 'y_7 = 0.5'; 'x_8 = 1', 'y_8 = 1.5';
 x_9 = 1', 'y_9 = -0.5'; 'x_10 = 1', 'y_10 = -1.5';
-'Interval:'a = 0','b = 2
+#UI 'Interval:'a = 0','b = 2
 #def title$ = Plot Title
 #def series$ = f_1(x) & f_2(x) & x|f_3(x) & x|f_4(x) & x|f_5(x) & x|f_6(x) & x_7|y_7 & x_8|y_8 & x_9|y_9 & x_10|y_10
 #def labelX$ = Label X
@@ -24,7 +24,7 @@ x_9 = 1', 'y_9 = -0.5'; 'x_10 = 1', 'y_10 = -1.5';
 '<div style="width:360pt;">
 #hide
 PlotWidth = 400','PlotHeight = 200','PlotSVG = 1
-#show
+#end hide
 '<p><small style="float:left; position:relative; top:10pt;">labelY$</small><center><strong>title$</strong></center>
 $Plot{series$ @ x = a : b}
 '<small style="float:right;position:relative; top:-10pt;">labelX$</small>

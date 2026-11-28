@@ -2,29 +2,29 @@
 '<div style="max-width:180mm;">
 '<img style="width:165pt;" alt="cantilever-beam-distributed-load-partial.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-distributed-load-partial.png">
 '<p><b>Input data</b></p>
-'Beam Length -'l = ? {5}'m
-'Load -'q = ? {5}'kN/m
-'Distances -'b = ? {3}'m,'a = l - b'm
+#UI 'Beam Length -'l = 5m
+#UI 'Load -'q = 5kN/m
+#UI 'Distance -'b = 3m
+a = l - b
 #post
 '<p><b>Internal forces</b></p>
-'Bending -'M = q*b*(a + b/2)'kN·m
-'Shear -'V = q*b'kN
+'Bending -'M = q*b*(a + b/2)|kNm
+'Shear -'V = q*b|kN
 '<p><b>Diagrams</b></p>
 #hide
 PlotWidth = 600
 PlotHeight = 150
-#show
-'Calculate internal forces at'x_1 = ? {1}'m
-#pre
-
+#end hide
+#end post
+#UI 'Calculate internal forces at'x_1 = 1m
 #post
 'Bending
 M(x) = -M + V*x - q*(x - a)^2/2*(x > a)
-$Plot{-M(x) @ x = 0 : l}
-M(x_1)'kN·m
+$Plot{-M(x) @ x = 0m : l}
+M(x_1)|kNm
 'Shear
 V(x) = V - q*(x - a)*(x > a)
-$Plot{V(x) @ x = 0 : l}
-V(x_1)'kN
-#show
+$Plot{V(x) @ x = 0m : l}
+V(x_1)|kN
+#end post
 '</div>

@@ -1,6 +1,23 @@
 <div class="calcpad-output">
  <!-- Multiline quadratic-roots function returning both roots of $a x^2 + b x + c = 0$ via the discriminant, with real/complex branching. -->
  <h1>Quadratic Equation Roots function</h1>
+ <p>
+  Coefficient a -
+  <span class="eq">
+   <var>a</var>
+   = 2
+  </span>
+  , Coefficient b -
+  <span class="eq">
+   <var>b</var>
+   = 3
+  </span>
+  , Coefficient c -
+  <span class="eq">
+   <var>c</var>
+   = -5
+  </span>
+ </p>
  <p>Multiline code block example:</p>
  <p>
   <span class="eq">
@@ -70,6 +87,14 @@
  </p>
  <p>
   <span class="eq">
+   <var>quadRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
    <var>quadRoots</var>
    ( 2; 3; -5 )  =
    <b class="b0">[</b>
@@ -145,6 +170,14 @@
  </p>
  <p>
   <span class="eq">
+   <var>quadRoots</var>
+   (
+   <var>a</var>
+   ;
+   <var>b</var>
+   ;
+   <var>c</var>
+   )  =
    <var>quadRoots</var>
    ( 2; 3; -5 )  =
    <b class="b0">[</b>

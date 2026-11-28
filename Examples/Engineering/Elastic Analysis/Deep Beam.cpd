@@ -2,15 +2,15 @@
 'Recovers $σ_x$, $σ_y$ and $τ_{xy}$ for arbitrary length, height, load span and support width — an analytical baseline for FE checks. -->
 #rad
 '<h3>Input data</h3>
-'<table><tr><td>
-'Beam length -'l = ? {4}m
-'Height -'h = ? {2}m
-'Load -'q = ? {100}*(kN/m)
-'Length of load -'b = ? {0.8}m
-'Distance to load start -'a = ? {1.6}m
-'Length of support -'d = ? {0.4}m
-'Number of iterations -'N = ? {21}
-'</td><td><img src="../../Images/mechanics/elastic/deep-beam-fea.png" style="height:160pt; width:150pt; margin-left:50pt;"></td></tr></table>
+'<div style="max-width:150mm"><img class="side" src="../../Images/mechanics/elastic/deep-beam-fea.png" style="height:160pt; width:150pt;"></div>
+#UI 'Beam length -'l = 4m
+#UI 'Height -'h = 2m
+#UI 'Load -'q = 100kN/m
+#UI 'Length of load -'b = 0.8m
+#UI 'Distance to load start -'a = 1.6m
+#UI 'Length of support -'d = 0.4m
+#UI 'Number of iterations -'N = 21
+#pause
 #hide
 c = a + b
 q(x) = if((x < a) + (x > c); 0kN/m; q)
@@ -25,6 +25,7 @@ q_series(x) = $Sum{q_n(n)*sin(α(n)*x) @ n = 1 : N}
 r_series(x) = $Sum{r_n(n)*sin(α(n)*x) @ n = 1 : N}
 PlotWidth = 400
 PlotHeight = 150
+#end hide
 #post
 'Original and Fourier functions for the load
 $Plot{q(x) & q_series(x) @ x = 0m : l}
@@ -50,7 +51,7 @@ Y_1(N; h)
 Y(N; h) - q_n(N)/α(N)^2
 PlotStep = 5
 PlotHeight = PlotWidth*h/l
-#post
+#end hide
 '<h3>Calculation of stresses</h3>
 σ_x(x; y) = $Sum{Y_2(n; y)*sin(α(n)*x) @ n = 1 : N}
 '<!--'k = round(abs(σ_x(l/2; h))/20)*50'-->
@@ -71,3 +72,4 @@ $Map{τ_xy(x; y) @ x = 0m : l & y = 0m : h}
 $Map{σ_1(x; y) @ x = 0m : l & y = 0m : h}
 σ_2(x; y) = σ_m(x; y) - Δσ(x; y)
 $Map{σ_2(x; y) @ x = 0m : l & y = 0m : h}
+#end post

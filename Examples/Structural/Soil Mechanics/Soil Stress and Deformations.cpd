@@ -1,9 +1,9 @@
 '<!-- Stresses and settlement in an elastic half-space under a trapezoidal surface pressure on a rectangular footprint, obtained by numerical integration of the Boussinesq point-load kernel for $\sigma_z$, $\tau_{xz}$ and $\tau_{yz}$. -->
 '(by integration of the Boussinesq formula)
-'Dimensions of loaded area -'a = 2m', 'b = 3m
+#UI 'Dimensions of loaded area -'a = 2m', 'b = 3m
 'Surface load -'p(x; y) = 100kPa*(1 + (x/a))
-'Elastic modulus -'E_0 = 20MPa
-'Poisson ratio -'ν = 0.3
+#UI 'Elastic modulus -'E_0 = 20MPa
+#UI 'Poisson ratio -'ν = 0.3
 '<p><strong>Stress equations</strong></p>
 R(x; y; z) = sqrt(x^2 + y^2 + z^2)
 'Vertical -'σ_z(x; y; z) = 3/(2*π)*$Integral{$Integral{p(x_p; y_p)*z^3/R(x - x_p; y - y_p; z)^5 @ x_p = -a/2 : a/2} @ y_p = -b/2 : b/2}|kPa
@@ -12,9 +12,10 @@ R(x; y; z) = sqrt(x^2 + y^2 + z^2)
 '<p><strong>Deformation equations</strong></p>
 d(x; y) = (1 - ν^2)/E_0*$Integral{σ_z(x; y; z) @ z = H_0 : H}|mm
 '<h4>Results</h4>
-'Maximum depth -'H = 6m
+#UI 'Maximum depth -'H = 6m
 '<!--'Precision = 2*10^-4','PlotStep = 5','H_0 = 0.01*H','k = 1.5'-->
-'Plot for plane at'y = 0m
+#UI 'Plot for plane at'y = 0m
+#pause
 '<!--'PlotWidth = 300','PlotHeight = 60'-->
 $Plot{p(x; y)*(abs(x) < a/2) @ x = -k*a : k*a}
 '<table><tr><td>

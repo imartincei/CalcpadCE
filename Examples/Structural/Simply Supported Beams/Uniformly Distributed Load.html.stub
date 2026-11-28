@@ -9,19 +9,22 @@
    Beam length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-5">5</u>
+    = 5
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>q</var>
-    =
-    <u class="input-6">10</u>
+    = 10
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m
   </p>
   <p>
    <b>Internal forces</b>
@@ -43,15 +46,21 @@
     </span>
     =
     <span class="dvc">
-     10 · 5
+     10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     ·  ( 5
+     <i>m</i>
+     )
      <sup>2</sup>
      <span class="dvl">
      </span>
      8
     </span>
     = 31.25
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>
    Shear -
@@ -69,14 +78,19 @@
     </span>
     =
     <span class="dvc">
-     10 · 5
+     10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     · 5
+     <i>m</i>
      <span class="dvl">
      </span>
      2
     </span>
     = 25
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <b>Diagrams</b>
@@ -86,12 +100,9 @@
    <span class="eq">
     <var>x</var>
     <sub>1</sub>
-    =
-    <u class="input-16">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
-  </p>
-  <p>
   </p>
   <p>Bending</p>
   <p>
@@ -215,9 +226,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>M</var>
-    ( 1 )  = 20
+    ( 1
+    <i>m</i>
+    )  = 20
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -328,9 +341,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>V</var>
-    ( 1 )  = 15
+    ( 1
+    <i>m</i>
+    )  = 15
+    <i>kN</i>
    </span>
-   kN
   </p>
  </div>
 </div>

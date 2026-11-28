@@ -5,10 +5,44 @@
  </p>
  <p>Interferencja światła z dwóch szczelin - widok na ekranie</p>
  <p>
+  Wavelength -
   <span class="eq">
    <var>λ</var>
    = 500
    <i>nm</i>
+  </span>
+ </p>
+ <p>
+  Screen distance -
+  <span class="eq">
+   <var>D</var>
+   = 1
+   <i>m</i>
+  </span>
+ </p>
+ <p>
+  Slit spacing -
+  <span class="eq">
+   <var>d</var>
+   = 3
+   <i>μm</i>
+  </span>
+ </p>
+ <p>
+  Time -
+  <span class="eq">
+   <var>t</var>
+   = 0
+   <i>s</i>
+  </span>
+ </p>
+ <p>
+  Half-width of screen view -
+  <span class="eq">
+   <var>x</var>
+   <sub>max</sub>
+   = 75
+   <i>cm</i>
   </span>
  </p>
  <p>
@@ -37,13 +71,6 @@
  </p>
  <p>
   <span class="eq">
-   <var>D</var>
-   = 1
-   <i>m</i>
-  </span>
- </p>
- <p>
-  <span class="eq">
    <var>Δr</var>
    (
    <var>α</var>
@@ -54,13 +81,6 @@
    (
    <var>α</var>
    )
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>d</var>
-   = 3
-   <i>μm</i>
   </span>
  </p>
  <p>
@@ -171,13 +191,6 @@
    <i class="unit">∕</i>
    <i>s</i>
    <sup class="unit">1.5</sup>
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>t</var>
-   = 0
-   <i>s</i>
   </span>
  </p>
  <p>
@@ -357,13 +370,6 @@
   <span class="eq">
    <var>PlotWidth</var>
    = 600
-  </span>
-  ,
-  <span class="eq">
-   <var>x</var>
-   <sub>max</sub>
-   = 75
-   <i>cm</i>
   </span>
  </p>
  <svg class="plot" data-plot="svg" height="640px" style="width:494.44pt; height:118.52pt;" version="1.1" viewbox=" 0 0 2670 640" width="2670px" xmlns="http://www.w3.org/2000/svg">

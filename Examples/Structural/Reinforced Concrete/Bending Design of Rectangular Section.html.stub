@@ -12,36 +12,33 @@
    <span class="eq">
     <var>M</var>
     <sub>Ed</sub>
-    =
-    <u class="input-5">340</u>
+    = 340
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <h4>Cross section dcimensions</h4>
   <p>
    Width -
    <span class="eq">
     <var>b</var>
-    =
-    <u class="input-7">300</u>
+    = 300
+    <i>mm</i>
    </span>
-   mm, Height -
+   , Height -
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-7">500</u>
+    = 500
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Concrete cover to the center of reinforcement -
    <span class="eq">
     <var>d</var>
     <sub>1</sub>
-    =
-    <u class="input-8">50</u>
+    = 50
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Effective cross section depth -
@@ -52,9 +49,13 @@
     −
     <var>d</var>
     <sub>1</sub>
-    = 500 − 50 = 450
+    = 500
+    <i>mm</i>
+    − 50
+    <i>mm</i>
+    = 450
+    <i>mm</i>
    </span>
-   cm
   </p>
   <h4>Material properties</h4>
   <p class="ref" style="float:right">[EN 1992-1-1, Table 3.1]</p>
@@ -66,10 +67,9 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-15">20</u>
+    = 20
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for concrete -
@@ -78,12 +78,13 @@
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Coefficient for long-term effects -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-16">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -106,13 +107,14 @@
     =
     <span class="dvc">
      0.85 · 20
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 11.33
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Factor for effective compression zone depth -
@@ -142,9 +144,17 @@
     <var>f</var>
     <sub>ctm</sub>
     = 0.3 ·
-    <var>f</var>
-    <sub>ck</sub>
-    <sup>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -152,8 +162,20 @@
       3
      </span>
     </sup>
-    = 0.3 · 20
-    <sup>
+    · 1
+    <i>MPa</i>
+    = 0.3 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     20
+     <i>MPa</i>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -161,9 +183,11 @@
       3
      </span>
     </sup>
+    · 1
+    <i>MPa</i>
     = 2.21
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    <b>Steel</b>
@@ -173,10 +197,9 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-25">500</u>
+    = 500
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for steel -
@@ -203,13 +226,14 @@
     =
     <span class="dvc">
      500
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.15
     </span>
     = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Modulus of elasticity -
@@ -217,8 +241,8 @@
     <var>E</var>
     <sub>s</sub>
     = 200000
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <h4>Bending design</h4>
   <p>
@@ -230,8 +254,6 @@
     <span class="dvc">
      <var>M</var>
      <sub>Ed</sub>
-     · 10
-     <sup>6</sup>
      <span class="dvl">
      </span>
      <var>b</var>
@@ -246,13 +268,18 @@
     </span>
     =
     <span class="dvc">
-     340 · 10
-     <sup>6</sup>
+     340
+     <i>kNm</i>
      <span class="dvl">
      </span>
-     300 · 450
+     300
+     <i>mm</i>
+     ·  ( 450
+     <i>mm</i>
+     )
      <sup>2</sup>
      · 1 · 11.33
+     <i>MPa</i>
     </span>
     = 0.494
    </span>
@@ -278,6 +305,7 @@
     )  =
     <span class="dvc">
      450
+     <i>mm</i>
      <span class="dvl">
      </span>
      0.8
@@ -288,8 +316,8 @@
      1 − 2 · 0.494
     </span>
     )  = 500
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Relative compression zone depth -
@@ -305,9 +333,11 @@
     =
     <span class="dvc">
      500
+     <i>mm</i>
      <span class="dvl">
      </span>
      450
+     <i>mm</i>
     </span>
     = 1.11
    </span>
@@ -329,9 +359,11 @@
     =
     <span class="dvc">
      434.78
+     <i>MPa</i>
      <span class="dvl">
      </span>
      200000
+     <i>MPa</i>
     </span>
     = 0.00217
    </span>
@@ -368,8 +400,7 @@
    <span class="eq">
     <var>ξ</var>
     <sub>lim</sub>
-    =
-    <u class="input-39">0.62</u>
+    = 0.62
    </span>
   </p>
   <p>
@@ -410,9 +441,11 @@
     <var>ξ</var>
     ·
     <var>d</var>
-    = 0.62 · 450 = 279
+    = 0.62 · 450
+    <i>mm</i>
+    = 279
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>Distance from the center of compressive reinforcement to the concrete surface</p>
   <p>
@@ -423,9 +456,13 @@
     <var>h</var>
     −
     <var>d</var>
-    = 500 − 450 = 50
+    = 500
+    <i>mm</i>
+    − 450
+    <i>mm</i>
+    = 50
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Distance between tensile and compressive reinforcement -
@@ -437,9 +474,13 @@
     −
     <var>d</var>
     <sub>2</sub>
-    = 450 − 50 = 400
+    = 450
+    <i>mm</i>
+    − 50
+    <i>mm</i>
+    = 400
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>Resultant compression force in concrete</p>
   <p>
@@ -457,13 +498,15 @@
     ·
     <var>f</var>
     <sub>cd</sub>
-    · 10
-    <sup>-3</sup>
-    = 300 · 0.8 · 279 · 1 · 11.33 · 10
-    <sup>-3</sup>
+    = 300
+    <i>mm</i>
+    · 0.8 · 279
+    <i>mm</i>
+    · 1 · 11.33
+    <i>MPa</i>
     = 758.88
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>Required tensile reinforcement area:</p>
   <p>
@@ -474,13 +517,9 @@
     <span class="dvc up">
      <var>M</var>
      <sub>Ed</sub>
-     · 10
-     <sup>6</sup>
      +
      <var>N</var>
      <sub>c</sub>
-     · 10
-     <sup>3</sup>
      ·
      <span class="b1">(</span>
      <span class="dvc">
@@ -505,27 +544,33 @@
     </span>
     =
     <span class="dvc up">
-     340 · 10
-     <sup>6</sup>
-     + 758.88 · 10
-     <sup>3</sup>
+     340
+     <i>kNm</i>
+     + 758.88
+     <i>kN</i>
      ·
      <span class="b1">(</span>
      <span class="dvc">
       0.8 · 279
+      <i>mm</i>
       <span class="dvl">
       </span>
       2
      </span>
      − 50
+     <i>mm</i>
      <span class="b1">)</span>
      <span class="dvl">
      </span>
-     434.78 · 400
+     434.78
+     <i>MPa</i>
+     · 400
+     <i>mm</i>
     </span>
     = 2223.8
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>Compressive reinforcement strain</p>
   <p>
@@ -547,10 +592,14 @@
     <sub>cu3</sub>
     =
     <span class="dvc">
-     279 − 50
+     279
+     <i>mm</i>
+     − 50
+     <i>mm</i>
      <span class="dvl">
      </span>
      279
+     <i>mm</i>
     </span>
     · 0.0035 = 0.00287
    </span>
@@ -573,9 +622,13 @@
     <sub>yd</sub>
     )  =
     <b>min</b>
-    ( 0.00287 · 200000; 434.78 )  = 434.78
+    ( 0.00287 · 200000
+    <i>MPa</i>
+    ; 434.78
+    <i>MPa</i>
+    )  = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>Required compressive reinforcement area:</p>
   <p>
@@ -586,13 +639,9 @@
     <span class="dvc up">
      <var>M</var>
      <sub>Ed</sub>
-     · 10
-     <sup>6</sup>
      −
      <var>N</var>
      <sub>c</sub>
-     · 10
-     <sup>3</sup>
      ·
      <span class="b1">(</span>
      <var>d</var>
@@ -616,15 +665,18 @@
     </span>
     =
     <span class="dvc up">
-     340 · 10
-     <sup>6</sup>
-     − 758.88 · 10
-     <sup>3</sup>
+     340
+     <i>kNm</i>
+     − 758.88
+     <i>kN</i>
      ·
      <span class="b1">(</span>
-     450 −
+     450
+     <i>mm</i>
+     −
      <span class="dvc">
       0.8 · 279
+      <i>mm</i>
       <span class="dvl">
       </span>
       2
@@ -632,11 +684,15 @@
      <span class="b1">)</span>
      <span class="dvl">
      </span>
-     434.78 · 400
+     434.78
+     <i>MPa</i>
+     · 400
+     <i>mm</i>
     </span>
     = 478.37
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>Reinforcement ratio:</p>
   <p>
@@ -657,9 +713,14 @@
     =
     <span class="dvc">
      2223.8
+     <i>mm</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
-     300 · 450
+     300
+     <i>mm</i>
+     · 450
+     <i>mm</i>
     </span>
     = 0.0165
    </span>
@@ -682,9 +743,14 @@
     =
     <span class="dvc">
      478.37
+     <i>mm</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
-     300 · 450
+     300
+     <i>mm</i>
+     · 450
+     <i>mm</i>
     </span>
     = 0.00354
    </span>
@@ -714,9 +780,11 @@
     <span class="b1">(</span>
     <span class="dvc">
      0.26 · 2.21
+     <i>MPa</i>
      <span class="dvl">
      </span>
      500
+     <i>MPa</i>
     </span>
     ; 0.0013
     <span class="b1">)</span>
@@ -735,9 +803,14 @@
     <var>b</var>
     ·
     <var>d</var>
-    = 0.0013 · 300 · 450 = 175.5
+    = 0.0013 · 300
+    <i>mm</i>
+    · 450
+    <i>mm</i>
+    = 175.5
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p class="ref">[EN 1992-1-1, § 9.2.1.1]</p>
   <p>

@@ -2,6 +2,7 @@
  <!-- CalcpadCE handles unit conversion natively with SI and Imperial units. Units are checked for consistency to spot errors early. -->
  <p>Simple unit conversion:</p>
  <p>
+  Area -
   <span class="eq">
    <var>A</var>
    = 0.5
@@ -29,8 +30,30 @@
  </p>
  <p>Using different units within the same equation:</p>
  <p>
+  Pressure 1 -
+  <span class="eq">
+   <var>p</var>
+   <sub>1</sub>
+   = 3
+   <i>bar</i>
+  </span>
+  , Pressure 2 -
+  <span class="eq">
+   <var>p</var>
+   <sub>2</sub>
+   = 100
+   <i>psi</i>
+  </span>
+ </p>
+ <p>
   <span class="eq">
    <var>ρ</var>
+   =
+   <var>p</var>
+   <sub>1</sub>
+   +
+   <var>p</var>
+   <sub>2</sub>
    = 3
    <i>bar</i>
    + 100
@@ -42,6 +65,12 @@
  <p>
   <span class="eq">
    <var>ρ</var>
+   =
+   <var>p</var>
+   <sub>1</sub>
+   +
+   <var>p</var>
+   <sub>2</sub>
    = 3
    <i>bar</i>
    + 100

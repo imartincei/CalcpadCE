@@ -7,16 +7,15 @@
   Number of sides -
   <span class="eq">
    <var>n</var>
-   =
-   <u class="input-3">8</u>
+   = 8
   </span>
  </p>
  <p>
   Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -25,21 +24,20 @@
    <var>α</var>
    =
    <span class="dvc">
-    180
+    180°
     <span class="dvl">
     </span>
     <var>n</var>
    </span>
    =
    <span class="dvc">
-    180
+    180°
     <span class="dvl">
     </span>
     8
    </span>
-   = 22.5
+   = 22.5°
   </span>
-  °
  </p>
  <p>
   <span class="eq">
@@ -61,6 +59,7 @@
    )  =
    <span class="dvc">
     1
+    <i>m</i>
     <sup>2</sup>
     · 8
     <span class="dvl">
@@ -69,7 +68,9 @@
    </span>
    ·
    <b>cot</b>
-   ( 22.5 )  = 4.83
+   ( 22.5° )  = 4.83
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Perimeter</p>
@@ -80,7 +81,10 @@
    <var>n</var>
    ·
    <var>a</var>
-   = 8 · 1 = 8
+   = 8 · 1
+   <i>m</i>
+   = 8
+   <i>m</i>
   </span>
  </p>
  <p>

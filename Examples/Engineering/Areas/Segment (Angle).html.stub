@@ -8,18 +8,16 @@
   Radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>
   Angle -
   <span class="eq">
    <var>α</var>
-   =
-   <u class="input-5">60</u>
+   = 60°
   </span>
-  °
  </p>
  <!--
 <-->
@@ -35,7 +33,7 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    −
    <b>sin</b>
@@ -49,18 +47,21 @@
    = 0.5 ·
    <span class="b1">(</span>
    <span class="dvc">
-    3.14 · 60
+    3.14 · 60°
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    −
    <b>sin</b>
-   ( 60 )
+   ( 60° )
    <span class="b1">)</span>
    · 1
+   <i>m</i>
    <sup>2</sup>
    = 0.0906
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Arch length</p>
@@ -76,16 +77,19 @@
     <var>α</var>
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    =
    <span class="dvc">
-    3.14 · 1 · 60
+    3.14 · 1
+    <i>m</i>
+    · 60°
     <span class="dvl">
     </span>
-    180
+    180°
    </span>
    = 1.05
+   <i>m</i>
   </span>
  </p>
  <!--

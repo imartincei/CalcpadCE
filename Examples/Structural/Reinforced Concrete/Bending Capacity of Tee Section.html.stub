@@ -12,10 +12,9 @@
    <span class="eq">
     <var>M</var>
     <sub>Ed</sub>
-    =
-    <u class="input-5">800</u>
+    = 800
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <h4>Cross section dimensions</h4>
   <p>
@@ -23,34 +22,32 @@
    <span class="eq">
     <var>b</var>
     <sub>w</sub>
-    =
-    <u class="input-7">300</u>
+    = 300
+    <i>mm</i>
    </span>
-   mm,
+   ,
    <span class="eq">
     <var>h</var>
     <sub>w</sub>
-    =
-    <u class="input-7">650</u>
+    = 650
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Flange -
    <span class="eq">
     <var>b</var>
     <sub>f</sub>
-    =
-    <u class="input-8">1200</u>
+    = 1200
+    <i>mm</i>
    </span>
-   mm,
+   ,
    <span class="eq">
     <var>h</var>
     <sub>f</sub>
-    =
-    <u class="input-8">120</u>
+    = 120
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Flange area -
@@ -66,9 +63,16 @@
     )  ·
     <var>h</var>
     <sub>f</sub>
-    =  ( 1200 − 300 )  · 120 = 108000
+    =  ( 1200
+    <i>mm</i>
+    − 300
+    <i>mm</i>
+    )  · 120
+    <i>mm</i>
+    = 108000
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>
    Section area -
@@ -84,9 +88,17 @@
     +
     <var>A</var>
     <sub>f</sub>
-    = 300 · 650 + 108000 = 303000
+    = 300
+    <i>mm</i>
+    · 650
+    <i>mm</i>
+    + 108000
+    <i>mm</i>
+    <sup class="unit">2</sup>
+    = 303000
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>
    <b>Concrete cover to the center of reinforcement</b>
@@ -96,17 +108,16 @@
    <span class="eq">
     <var>d</var>
     <sub>1</sub>
-    =
-    <u class="input-14">50</u>
+    = 50
+    <i>mm</i>
    </span>
-   mm,    Top -
+   ,    Top -
    <span class="eq">
     <var>d</var>
     <sub>2</sub>
-    =
-    <u class="input-14">50</u>
+    = 50
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    Effective cross section depth -
@@ -118,9 +129,13 @@
     −
     <var>d</var>
     <sub>1</sub>
-    = 650 − 50 = 600
+    = 650
+    <i>mm</i>
+    − 50
+    <i>mm</i>
+    = 600
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    <b>Reinforcement</b>
@@ -130,17 +145,18 @@
    <span class="eq">
     <var>A</var>
     <sub>s1</sub>
-    =
-    <u class="input-19">3700</u>
+    = 3700
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²,    Top -
+   ,    Top -
    <span class="eq">
     <var>A</var>
     <sub>s2</sub>
-    =
-    <u class="input-19">0</u>
+    = 0
+    <i>mm</i>
+    <sup class="unit">2</sup>
    </span>
-   mm²
   </p>
   <p>Reinforcement ratios</p>
   <p>
@@ -162,9 +178,14 @@
     =
     <span class="dvc">
      3700
+     <i>mm</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
-     300 · 600
+     300
+     <i>mm</i>
+     · 600
+     <i>mm</i>
     </span>
     = 0.0206
    </span>
@@ -188,9 +209,14 @@
     =
     <span class="dvc">
      0
+     <i>mm</i>
+     <sup class="unit">2</sup>
      <span class="dvl">
      </span>
-     300 · 600
+     300
+     <i>mm</i>
+     · 600
+     <i>mm</i>
     </span>
     = 0
    </span>
@@ -205,10 +231,9 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-28">20</u>
+    = 20
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for concrete -
@@ -217,12 +242,13 @@
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Coefficient for long-term effects -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-29">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -245,13 +271,14 @@
     =
     <span class="dvc">
      0.85 · 20
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 11.33
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Ultimate compressive strain -
@@ -275,9 +302,17 @@
     <var>f</var>
     <sub>ctm</sub>
     = 0.3 ·
-    <var>f</var>
-    <sub>ck</sub>
-    <sup>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -285,8 +320,20 @@
       3
      </span>
     </sup>
-    = 0.3 · 20
-    <sup>
+    · 1
+    <i>MPa</i>
+    = 0.3 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     20
+     <i>MPa</i>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -294,9 +341,11 @@
       3
      </span>
     </sup>
+    · 1
+    <i>MPa</i>
     = 2.21
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    <b>Steel</b>
@@ -306,10 +355,9 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-37">500</u>
+    = 500
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for steel -
@@ -336,13 +384,14 @@
     =
     <span class="dvc">
      500
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.15
     </span>
     = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Modulus of elasticity -
@@ -350,8 +399,8 @@
     <var>E</var>
     <sub>s</sub>
     = 200
+    <i>GPa</i>
    </span>
-   GPa
   </p>
   <p>
    <b>Strain-stress diagrams</b>
@@ -541,9 +590,11 @@ circle.Series1 {fill:Tomato;}
      <span class="b1">(</span>
      <span class="dvc">
       0.26 · 2.21
+      <i>MPa</i>
       <span class="dvl">
       </span>
       500
+      <i>MPa</i>
      </span>
      ; 0.0013
      <span class="b1">)</span>
@@ -642,7 +693,10 @@ circle.Series1 {fill:Tomato;}
      ·
      <var>ε</var>
      <sub>cu2</sub>
-     = 11.33 · 0.0035 = 0.0397
+     = 11.33
+     <i>MPa</i>
+     · 0.0035 = 0.0397
+     <i>MPa</i>
     </span>
    </p>
    <p>
@@ -801,8 +855,6 @@ circle.Series1 {fill:Tomato;}
      )  )  ·
      <var>f</var>
      <sub>cd</sub>
-     · 10
-     <sup>-3</sup>
     </span>
    </p>
    <p>
@@ -823,8 +875,6 @@ circle.Series1 {fill:Tomato;}
      )  )  ·
      <var>A</var>
      <sub>s1</sub>
-     · 10
-     <sup>-3</sup>
     </span>
    </p>
    <p>
@@ -845,8 +895,6 @@ circle.Series1 {fill:Tomato;}
      )  )  ·
      <var>A</var>
      <sub>s2</sub>
-     · 10
-     <sup>-3</sup>
     </span>
    </p>
    <p>Section capacity for axial force</p>
@@ -970,12 +1018,14 @@ circle.Series1 {fill:Tomato;}
      <var>x</var>
      )  = 0;
      <var>x</var>
-     ∈ [0.1;
+     ∈ [0.1
+     <i>mm</i>
+     ;
      <var>h</var>
      <sub>w</sub>
      ]} = 147.5
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>Compression zone depth at reinforcement yield point</p>
    <p>
@@ -1001,39 +1051,41 @@ circle.Series1 {fill:Tomato;}
        <var>E</var>
        <sub>s</sub>
       </span>
-      · 10
-      <sup>-3</sup>
      </span>
      =
      <span class="dvc down">
-      600 · 0.0035
+      600
+      <i>mm</i>
+      · 0.0035
       <span class="dvl">
       </span>
       0.0035 +
       <span class="dvc">
        434.78
+       <i>MPa</i>
        <span class="dvl">
        </span>
        200
+       <i>GPa</i>
       </span>
-      · 10
-      <sup>-3</sup>
      </span>
      = 370.11
+     <i>mm</i>
     </span>
-    cm
    </p>
    <p>
     Check:
     <span class="eq">
      <var>x</var>
      = 147.5
+     <i>mm</i>
     </span>
     ≤
     <span class="eq">
      <var>x</var>
      <sub>lim</sub>
      = 370.11
+     <i>mm</i>
     </span>
     - compressive reinforcement is not required.
    </p>
@@ -1107,30 +1159,58 @@ circle.Series1 {fill:Tomato;}
      </span>
      =
      <span class="dvc">
-      0.473 · 147.5
+      0.473 ·  ( 147.5
+      <i>mm</i>
+      )
       <sup>2</sup>
-      · 1200 −
+      · 1200
+      <i>mm</i>
+      −
       <var>k</var>
       <sub>2</sub>
       (
       <var>ε</var>
       <sub>cf</sub>
-      ( 147.5 )  )  ·  ( 147.5 − 120 )
+      ( 147.5
+      <i>mm</i>
+      )  )  ·  ( 147.5
+      <i>mm</i>
+      − 120
+      <i>mm</i>
+      )
       <sup>2</sup>
-      ·  ( 1200 − 300 )
+      ·  ( 1200
+      <i>mm</i>
+      − 300
+      <i>mm</i>
+      )
       <span class="dvl">
       </span>
-      0.81 · 147.5 · 1200 −
+      0.81 · 147.5
+      <i>mm</i>
+      · 1200
+      <i>mm</i>
+      −
       <var>k</var>
       <sub>1</sub>
       (
       <var>ε</var>
       <sub>cf</sub>
-      ( 147.5 )  )  ·  ( 147.5 − 120 )  ·  ( 1200 − 300 )
+      ( 147.5
+      <i>mm</i>
+      )  )  ·  ( 147.5
+      <i>mm</i>
+      − 120
+      <i>mm</i>
+      )  ·  ( 1200
+      <i>mm</i>
+      − 300
+      <i>mm</i>
+      )
      </span>
      = 86.93
+     <i>mm</i>
     </span>
-    cm
    </p>
    <p>- from the bottom edge of the section</p>
    <p>
@@ -1145,16 +1225,22 @@ circle.Series1 {fill:Tomato;}
      +
      <var>z</var>
      <sub>0</sub>
-     = 650 − 147.5 + 86.93 = 589.43
+     = 650
+     <i>mm</i>
+     − 147.5
+     <i>mm</i>
+     + 86.93
+     <i>mm</i>
+     = 589.43
+     <i>mm</i>
     </span>
-    mm
    </p>
    <p>Bending moment capacity</p>
    <p>
     <span class="eq">
      <var>M</var>
      <sub>Rd</sub>
-     =  (
+     =
      <var>A</var>
      <sub>s1</sub>
      ·
@@ -1191,25 +1277,41 @@ circle.Series1 {fill:Tomato;}
      +
      <var>d</var>
      <sub>2</sub>
-     )  )  · 10
-     <sup>-6</sup>
-     =  ( 3700 ·
+     )  = 3700
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     ·
      <var>σ</var>
      <sub>s</sub>
      (
      <var>ε</var>
      <sub>s1</sub>
-     ( 147.5 )  )  ·  ( 589.43 − 50 )  + 0 ·
+     ( 147.5
+     <i>mm</i>
+     )  )  ·  ( 589.43
+     <i>mm</i>
+     − 50
+     <i>mm</i>
+     )  + 0
+     <i>mm</i>
+     <sup class="unit">2</sup>
+     ·
      <var>σ</var>
      <sub>s</sub>
      (
      <var>ε</var>
      <sub>s2</sub>
-     ( 147.5 )  )  ·  ( 589.43 − 650 + 50 )  )  · 10
-     <sup>-6</sup>
-     = 867.77
+     ( 147.5
+     <i>mm</i>
+     )  )  ·  ( 589.43
+     <i>mm</i>
+     − 650
+     <i>mm</i>
+     + 50
+     <i>mm</i>
+     )  = 867.77
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p>Design bending moment is lower than bending capacity:</p>
    <p>
@@ -1217,14 +1319,15 @@ circle.Series1 {fill:Tomato;}
      <var>M</var>
      <sub>Ed</sub>
      = 800
+     <i>kNm</i>
     </span>
     ≤
     <span class="eq">
      <var>M</var>
      <sub>Rd</sub>
      = 867.77
+     <i>kNm</i>
     </span>
-    kN·m
    </p>
    <p>Design checks are satisfied.</p>
   </p>

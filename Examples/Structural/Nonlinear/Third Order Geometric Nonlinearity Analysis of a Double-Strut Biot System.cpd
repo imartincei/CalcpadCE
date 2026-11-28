@@ -1,12 +1,14 @@
-'<!-- Symmetric two-bar Biot truss in third-order geometric nonlinearity: the deformed length $l'(v) = \sqrt{l^2 + v^2}$ enters the equilibrium directly and the vertical displacement is found by four different numerical methods. -->
+'<!-- Symmetric two-bar Biot truss in third-order geometric nonlinearity: the deformed length $l′(v) = \sqrt{l^2 + v^2}$ enters the equilibrium directly and the vertical displacement is found by four different numerical methods. -->
 '(solved by four different numerical methods)
 '<h4>Input data</h4>
-'Strut length -'l = 2m
-'Material - steel. Modulus of elasticity -'E = 210GPa
-'Cross section - circular with diameter'Φ = 20mm
+#UI 'Strut length -'l = 2m
+'Material - steel
+#UI 'Modulus of elasticity -'E = 210GPa
+'Cross section - circular
+#UI 'Diameter -'Φ = 20mm
 'Area -'A = π*Φ^2/4|cm^2
 'Axial stiffness -'EA = E*A
-'Vertical force -'F_y = 20kN
+#UI 'Vertical force -'F_y = 20kN
 #include svg_drawing.cpd
 #hide
 L = l/2cm
@@ -17,14 +19,14 @@ k = L/10
 #def pin_style$ = style="stroke:red; stroke-width:1; fill:white"
 #def thick_style$ = style="stroke:darkcyan; stroke-width:3; fill:none"
 #def load_style$ = style="stroke:deepskyblue; stroke-width:1; fill:deepskyblue;"
-#show
+#end hide
 #def frame$
 	line$(0; 0; L; H; main_style$)
 	line$(L; H; 2*L; 0; main_style$)
 	#hide
 	x1 = 0
 	y1 = k/10
-	#show
+	#end hide
 	#for i = 1 : 2
 		#hide
 		δ = 0.8*k
@@ -32,13 +34,13 @@ k = L/10
 		y2 = y1 - abs(δ)
 		x3 = x1 + δ
 		y3 = y1 + abs(δ)
-		#show
+		#end hide
 		line$(x2; y3; x3; y3; thick_style$)
 		line$(x2; y3; x1; y1; thin_style$)
 		line$(x3; y3; x1; y1; thin_style$)
 		#hide
 		x1 = x1 + 2*L
-		#show
+		#end hide
 	#loop
 	'<polygon points="'L','H - 4*δ' 'L','H - 0.32*δ' 'L - 0.32*δ','H - 1.4*δ' 'L + 0.32*δ','H - 1.4*δ' 'L','H - 0.32*δ'" load_style$ />
 	texth$(L+20;H-3.2*δ;Fy='F_y'kN)
@@ -98,7 +100,7 @@ n = 0
 		#break
 	#end if
 #loop
-#show
+#end hide
 'After'n'iterations we get:'v
 'Relative error -'δ = abs(v - v_0)/abs(v)
 '<h4>3. Secant method</h4>
@@ -125,7 +127,7 @@ n = 0
 		#break
 	#end if
 #loop
-#show
+#end hide
 'After'n'iterations we get:'v_2
 'Relative error -'δ = abs(v_2 - v_1)/abs(v_2)
 '<h4>4. Solution with Calcpad <small>(modified Anderson-Bjork′s method)</small></h4>
@@ -142,7 +144,7 @@ $Plot{F_y & 2*F_y(v) & v_2|F_y @ v = 0mm : 200mm}
 #hide
 H = v/cm
 δ = 0.8*k
-#show
+#end hide
 #val
 svg$
 '<polygon points="'0','0' '0','-4*δ' '-0.32*δ','-2.8*δ' '0.32*δ','-2.8*δ' '0','-4*δ'" load_style$/>

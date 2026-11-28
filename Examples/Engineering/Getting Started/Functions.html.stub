@@ -114,13 +114,37 @@ circle.Series1 {fill:Tomato;}
  <p>
  </p>
  <p>
+  First point -
   <span class="eq">
+   <var>x</var>
+   <sub>1</sub>
+   = 0.75
+  </span>
+  , Second point -
+  <span class="eq">
+   <var>x</var>
+   <sub>2</sub>
+   = 1.25
+  </span>
+ </p>
+ <p>
+  <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   <sub>1</sub>
+   )  =
    <var>f</var>
    ( 0.75 )  = 2.31
   </span>
  </p>
  <p>
   <span class="eq">
+   <var>f</var>
+   (
+   <var>x</var>
+   <sub>2</sub>
+   )  =
    <var>f</var>
    ( 1.25 )  = 1.81
   </span>

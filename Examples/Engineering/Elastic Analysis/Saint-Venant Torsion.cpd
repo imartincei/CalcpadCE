@@ -1,12 +1,12 @@
 '<!-- Closed-form [Saint-Venant torsion](https://en.wikipedia.org/wiki/Saint-Venant%27s_principle) of a rectangular cross-section, evaluating the shear-stress field $τ_{zx}$, $τ_{zy}$ and torsional rigidity from a single Fourier series.
 'A hand-check baseline for FE torsion models and for simplified rectangular-section design formulas. -->
 '<h3>Input data</h3>
-'<table><tr><td>
+'<div style="max-width:152mm"><img class="side" src="../../Images/mechanics/elastic/torsion.png" style="height:110pt; width:152pt;"></div>
 'Dimensions of cross section
-a = ? {50}cm','b = ? {30}*(cm/2)
-'Torsional moment -'M_t = ? {20}kNm
-'Number of iterations -'n = ? {10}
-'</td><td><img src="../../Images/mechanics/elastic/torsion.png" style="height:110pt; width:152pt; margin-left:50pt;"></td></tr></table>
+#UI 'Width -'a = 50cm', Half-height -'b = 15cm
+#UI 'Torsional moment -'M_t = 20kNm
+#UI 'Number of iterations -'n = 10
+#pause
 #post
 '<h3>Analysis</h3>
 k(i) = 2*i + 1', 'α(i) = k(i)*π/a
@@ -16,7 +16,7 @@ c = 400/a
 PlotWidth = a*c
 PlotHeight = 2*b*c
 PlotStep = 10
-#post
+#end hide
 'Factors for calculation
 C = M_t/(4*a^4*(b/(12*a) - 8/π^5*$Sum{1/k(i)^5*tanh(α(i)*b) @ i = 0 : n}))|MPa/m
 C_1 = 4*C*a/π^2|MPa
@@ -36,6 +36,7 @@ $Map{τ_zy(x; y) @ x = 0cm : a & y = -b : b}
 c = 0.25*b/τ_zx(a/2; b)|cm/kPa
 x(k) = k*a
 y(k) = (2*k - 1)*b
-#post
+#end hide
 'Stress line plots
 $Plot{a/2 + c*τ_zx(a/2; y(k))|y(k) & a/2|y(k) & x(k)|0cm & a + c*τ_zy(a; y(k))|y(k) & x(k)|c*τ_zy(x(k); 0cm) & x(k)|b - c*τ_zx(x(k); b) @ k = 0 : 1}
+#end post

@@ -6,11 +6,12 @@
 #rad
 '<table><tr><td>
 '<h4>Input parameters</h4>
-'Gravitational acceleration (m/s²) - 'g = 9.80665m/s^2
-'Pendulum length -'l = 0.5m
-'Pendulum mass -'m = 1kg
-'Initial angle -'θ_0 = 179°|rad
-'Maximum simulation time -'t_max = 11s
+#UI 'Gravitational acceleration -'g = 9.80665m/s^2
+#UI 'Pendulum length -'l = 0.5m
+#UI 'Pendulum mass -'m = 1kg
+#UI 'Initial angle -'θ_0 = 179°
+#UI 'Maximum simulation time -'t_max = 11s
+#UI 'Step size -'h = 0.02s
 '<h4>Theoretical solution for large rotations</h4>
 '</td><td>
 #hide
@@ -41,7 +42,7 @@ svg$
 '<polygon points="0,0 '-δ','-δ' 'δ','-δ'" solid_style$/>
 line$(0; 0; 0; l*k; thin_style$)
 '<path d="M 0 '0.2*L' A '0.2*L' '0.2*L' 0 0 1 '0.2*x' '0.2*y'" thin_style$/>
-texth$(δ*sign(θ_0);0.35*L;'θ_0*180/π'°)
+texth$(δ*sign(θ_0);0.35*L;'θ_0'°)
 line$(0; 0; x; y; thick_style$)
 text$(x/2-δ_x*y/L; y/2+δ_x*x/L;450°-θ_0;'l'm)
 circle$(0; 0; R/2; solid_style$)
@@ -52,6 +53,7 @@ texth$(x+3*δ_x; y_g-δ;g)
 '</svg>
 #equ
 '</td></tr></table>
+#pause
 #noc
 'Differential equation -'θ″ + g/l*sin(θ) = 0
 #equ
@@ -73,7 +75,7 @@ dn(u; k) = sqrt(1 - k*sn(u; k)^2)','cd(u; k) = cn(u; k)/dn(u; k)
 θ′ = ω'and'ω′ = (g/l)*sin(-θ)
 #equ
 'The solution will be performed iteratively
-'Step size -'h = 0.02s
+'Step size -'h
 'Number of steps -'n = t_max/h
 #hide
 N = min(n; 80)
@@ -118,7 +120,9 @@ t(i) = i*h - h
 r2d = 180/π
 #show
 '. . .
-'<style>.Series2{stroke:Lime!Important; stroke-dasharray: 30, 10;}</style>
+#html
+<style>.Series2{stroke:Lime!Important; stroke-dasharray: 30, 10;}</style>
+#end html
 '<h4>Plot results</h4>
 '<table><tr><td>
 'Rotation - <var>θ</var>(<var>t</var>), [°]<br/>
@@ -138,7 +142,9 @@ $Plot{t(i)|E_0 & t(i)|E_RK4.i & 0s|0.99999*E_0 @ i = 1 : min(1.5*N; n)}
 '<b style="color:Red">━━━</b> Theoretical <br/>
 '<b style="color:Lime">╸╸╸</b> Runge-Kutta 4
 '</td></tr></table>
-'<style>.fr{display:none;} .fr svg{margin-right:64pt; align:center;}</style>
+#html
+<style>.fr{display:none;} .fr svg{margin-right:64pt; align:center;}</style>
+#end html
 '<h4>Animate results</h4>
 #format 0.00
 #hide

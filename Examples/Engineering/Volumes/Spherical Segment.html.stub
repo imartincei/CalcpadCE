@@ -3,26 +3,27 @@
  <div style="max-width:130mm">
   <img alt="segment.png" class="side" src="Images/math/volume/segment.png" style="height:60pt;"/>
  </div>
- <p>Raduses of bases</p>
+ <p>Radii of bases</p>
  <p>
+  Base radius -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">3</u>
+   = 3
+   <i>m</i>
   </span>
-  ,
+  , Base radius -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
- <p>Height</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-6">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Radius of sphere</p>
@@ -62,21 +63,33 @@
    <span class="dvc">
     <span class="o0">
      <span class="r">√</span>
-     (  ( 3 − 2 )
+     (  ( 3
+     <i>m</i>
+     − 2
+     <i>m</i>
+     )
      <sup>2</sup>
      + 1
+     <i>m</i>
      <sup>2</sup>
-     )  ·  (  ( 3 + 2 )
+     )  ·  (  ( 3
+     <i>m</i>
+     + 2
+     <i>m</i>
+     )
      <sup>2</sup>
      + 1
+     <i>m</i>
      <sup>2</sup>
      )
     </span>
     <span class="dvl">
     </span>
     2 · 1
+    <i>m</i>
    </span>
    = 3.61
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -104,17 +117,25 @@
    )  =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     6
    </span>
-   ·  ( 3 · 3
+   ·  ( 3 ·  ( 3
+   <i>m</i>
+   )
    <sup>2</sup>
-   + 3 · 2
+   + 3 ·  ( 2
+   <i>m</i>
+   )
    <sup>2</sup>
    + 1
+   <i>m</i>
    <sup>2</sup>
    )  = 20.94
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Area of side surface</p>
@@ -128,7 +149,13 @@
    <var>R</var>
    ·
    <var>h</var>
-   = 2 · 3.14 · 3.61 · 1 = 22.65
+   = 2 · 3.14 · 3.61
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 22.65
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Base areas</p>
@@ -140,9 +167,13 @@
    ·
    <var>a</var>
    <sup>2</sup>
-   = 3.14 · 3
+   = 3.14 ·  ( 3
+   <i>m</i>
+   )
    <sup>2</sup>
    = 28.27
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
@@ -153,9 +184,13 @@
    ·
    <var>b</var>
    <sup>2</sup>
-   = 3.14 · 2
+   = 3.14 ·  ( 2
+   <i>m</i>
+   )
    <sup>2</sup>
    = 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Total surface area</p>
@@ -169,7 +204,18 @@
    <var>A</var>
    +
    <var>B</var>
-   = 22.65 + 28.27 + 12.57 = 63.5
+   = 22.65
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 28.27
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 63.5
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

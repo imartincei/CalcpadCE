@@ -1,10 +1,11 @@
 '<!-- Verifies the [Collatz (3n + 1) conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture) over a user-chosen range using both inline and recursive iteration. -->
-"Sample Program to Check the Collatz Conjecture
+'<h1>Sample Program to Check the Collatz Conjecture</h1>
 '<p>For more information see <a href="https://en.wikipedia.org/wiki/Collatz_conjecture">https://en.wikipedia.org/wiki/Collatz_conjecture</a></p>
 '<h4>Check by inline loop</h4>
 'Function -'CollatzCheck(k; n) = $Repeat{k = switch(k ≡ 1; 1; k⦼2 ≡ 0; k/2; 3*k + 1) @ i = 1 : n}
-'Number to check -'k = 27
-'Maximum number of steps -'n = 10000
+#UI 'Number to check -'k = 27
+#UI 'Maximum number of steps -'n = 10000
+#pause
 'Check -'CollatzCheck(k; n)
 '<h4>Check by block loop</h4>
 #def Collatz_Check$(k$; n$)

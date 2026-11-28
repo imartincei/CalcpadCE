@@ -2,37 +2,36 @@
 '<div style = "max-width:180mm;">
 '<img style="width:190pt;" alt = "simply-supported-beam-forces.png" class="side" src = "../../Images/mechanics/beams/simply-supported-beam-forces.png">
 '<p><b>Input data</b></p>
-'Beam length -'l = ? {5}'m
-'Load -'F = ? {10}'kN
-'Number of forces -'n = ? {2}
+#UI 'Beam length -'l = 5m
+#UI 'Load -'F = 10kN
+#UI 'Number of forces -'n = 2
 #post
 'Number of spacings -'n_1 = n + 1
 '<p><b>Internal forces</b></p>
-#if '<!--'n%%2 ≡ 0'-->
-	'Bending -'M_max = (n_1^2 - 1)*F*l/(8*n_1)'kN·m
+#if '<!--'n⦼2 ≡ 0'-->
+	'Bending -'M_max = (n_1^2 - 1)*F*l/(8*n_1)|kNm
 #else
-	'Bending -'M_max = n_1*F*l/8'kN·m
+	'Bending -'M_max = n_1*F*l/8|kNm
 #end if
-'Shear -'V_max = n*F/2'kN
+'Shear -'V_max = n*F/2|kN
 '<p><b>Diagrams</b></p>
 #hide
 PlotWidth = 600
 PlotHeight = 150
-#show
-'Calculate internal forces at'x_1 = ? {1}'m
-#pre
-
+#end hide
+#end post
+#UI 'Calculate internal forces at'x_1 = 1m
 #post
-a = l/n_1'm
+a = l/n_1
 n(x) = max(ceiling(x/a) - 1; 0)
 x_F(x) = n(x)*(x  - (n(x) + 1)*a/2)
 'Bending
 M(x) = V_max*x - F*x_F(x)
-$Plot{-M(x) @ x = 0 : l}
-M(x_1)'kN·m
+$Plot{-M(x) @ x = 0m : l}
+M(x_1)|kNm
 'Shear
 V(x) = V_max - F*n(x)
-$Plot{V(x) @ x = 0 : l}
-V(x_1)'kN
-#show
+$Plot{V(x) @ x = 0m : l}
+V(x_1)|kN
+#end post
 '</div>

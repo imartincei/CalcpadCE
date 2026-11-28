@@ -2,29 +2,31 @@
 '<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 #equ
 '<!-- Drop-weight impact of a steel ball on a simply supported reinforced concrete beam: SDOF and 11-node MDOF modal superposition with Rayleigh damping, Hertzian impact contact duration and Duhamel integration of the impulse force. -->
-'Ball mass -'M_s = 2.1045t
+#UI 'Ball mass -'M_s = 2.1045t
 'Ball material - steel
-'Modulus of elasticity -'E_s = 206GPa
-'Poisson′s ratio - 'ν_s = 0.3
-'Mass density -'ρ_s = 7.85t/m^3
+#UI 'Modulus of elasticity -'E_s = 206GPa
+#UI 'Poisson′s ratio - 'ν_s = 0.3
+#UI 'Mass density -'ρ_s = 7.85t/m^3
 'Ball volume -'V_s = M_s/ρ_s' = 4/3πR³
 'Ball radius -'R_s = cbrt(3/4*(V_s/π))|mm
-'Height of bottom above the beam surface -'H = 2m
+#UI 'Height of bottom above the beam surface -'H = 2m
 'Structure type - simply supported beam
-'Beam length -'L = 12m
+#UI 'Beam length -'L = 12m
 'Material - reinforced concrete C20/25
-'Modulus of elasticity -'E = 20GPa
-'Poisson′s ratio -'ν = 0.2
+#UI 'Modulus of elasticity -'E = 20GPa
+#UI 'Poisson′s ratio -'ν = 0.2
 'Shear modulus -'G = E/(2*(1 + ν))
-'Unit weight -'γ_b = 25kN/m^3
+#UI 'Unit weight -'γ_b = 25kN/m^3
 'Cross section - rectangular with dimensions:
-'Width -'b = 350mm
-'Height -'h = 650mm
+#UI 'Width -'b = 350mm
+#UI 'Height -'h = 650mm
 'Area -'A = b*h|cm^2
 'Second moment of area -'I = b*h^3/12
 'Shear area -'A_Q = 5/6*A
 'Self-weight -'g_b = A*γ_b
-'Uniform load -'q = 10kN/m
+#UI 'Uniform load -'q = 10kN/m
+#UI 'Damping factor -'ξ = 0.05
+#UI 'Number of intermediate joints (odd) -'n_J = 11
 'Gravity acceleration -'g = 9.80665m/s^2
 'Uniform mass -'m = (g_b + q)/g
 #hide
@@ -65,7 +67,7 @@ texth$(0.5*(L+2*R_s+2.5m)*k; -R_s*k/2;M='M_s't)
 	line$(x3; y3; x1; y1; thin_style$)
 	#hide
 	x1 = L*k - 0.5
-	#show
+	#end hide
 #loop
 #hide
 δ = 10
@@ -73,11 +75,12 @@ texth$(0.5*(L+2*R_s+2.5m)*k; -R_s*k/2;M='M_s't)
 δ_y = -1.5*δ
 x1 = L/2*k
 y1 = -δ_y
-#show
+#end hide
 '<polygon points="'x1','y1 + δ_y' 'x1','y1' 'x1 - δ_x','y1 + δ_y/3' 'x1 + δ_x','y1 + δ_y/3' 'x1','y1'" load_style$ />
 texth$(x1+4*δ_x;y1;g)
 '</svg>
 #equ
+#pause
 '<h4>Simple analytical solution</h4>
 'The structure is reduced to a SDOF system for simplicity
 'Dynamically equivalent mass -'M_d = 2*L/π*m
@@ -109,7 +112,7 @@ z_0 = 5*(g_b + q)*L^4/(384*E*I)|mm
 'The difference will be smaller for greater heights.
 'Time before impact -'t_0 = sqrt(2*H/g)
 '<h4>Elastic time history response of the structure as an SDOF system</h4>
-'Damped vibration is assumed with factor -'ξ = 0.05
+'Damped vibration is assumed with factor -'ξ
 'Vibration amplitude -'A = z_d - z_st' or
 A = v_1/ω_1|mm
 #rad
@@ -136,7 +139,7 @@ y_0(t) = z_0 + (z_st - z_0)*if(t < T_1/4; sin(2*π*t/T_1); 1)
 '<!--'PlotHeight = 200'-->
 $Plot{t|-y_0(t) - y(t) & t|-y_0(t) - y_D(t) @ t = 0ms : 5s}
 '<h4>Elastic time history response of the structure as an MDOF system</h4>
-'Number of intermediate joints -'n_J = 11'(odd)
+'Number of intermediate joints -'n_J
 'Length of one segment -'Δx = L/(n_J + 1)
 'Coordinate of joint <var>j</var> -'x_J(j) = Δx*j
 'Shear forces due to unit vertical load <var>F</var><sub>j</sub> = 1 at joint <var>j</var>
@@ -170,15 +173,15 @@ d_M = vector(n_J)
 d_M.(j_m) = d_M.(j_m) + M_s/t
 M = vec2diag(d_M)
 #def n$ = 7
-#show
+#end hide
 M
-'Total mass of the structure -'sum(d_M)'t
+'Total mass of the structure -'sum(d_M)*t
 'Eigenvalues
 M_sq = sqrt(M)
 C = copy(M_sq*D*M_sq; symmetric(n_J); 1; 1)
 λ = eigenvals(C*10^-3; -n$)
-'Natural circular frequences -'ω = sqrt(1/λ)'<i>s</i>⁻¹
-'Natural vibration frequences -'f = ω/(2*π)*Hz
+'Natural circular frequences -'ω = sqrt(1/λ)*s^-1
+'Natural vibration frequences -'f = ω/(2*π)|Hz
 'Natural vibration periods -'T = 1/f
 'Eigenvectors
 V = transp(eigenvecs(C*10^-3; -n$))
@@ -192,13 +195,13 @@ $Plot{X$(1) & X$(2) & X$(3) @ i = 0 : n_J + 1}
 ξ(ω) = α/(2*ω) + β*ω/2
 'Modal damping factors -'ξ_Φ = ξ(ω)
 '<!--'PlotWidth = 300'-->
-$Plot{ξ(ω_) & ω.1|ξ_Φ.1 & ω.2|ξ_Φ.2 & 0|0 & ω.3|ξ_Φ.3 & ω.4|ξ_Φ.4 & ω.5|ξ_Φ.5 @ ω_ = ω.1/5 : ω.n$}
+$Plot{ξ(ω_) & ω.1|ξ_Φ.1 & ω.2|ξ_Φ.2 & 0s^-1|0 & ω.3|ξ_Φ.3 & ω.4|ξ_Φ.4 & ω.5|ξ_Φ.5 @ ω_ = ω.1/5 : ω.n$}
 'Damped natural frequences
-ω_D = ω*sqrt(1 - ξ_Φ^2)*s^-1
+ω_D = ω*sqrt(1 - ξ_Φ^2)
 'Dynamic load vector
 F_Φ(i; t) = Φ.(j_m; i)*F(t)
 'The equations of modal dynamic displacements are expressed by the Duhamel′s integral
-y_Φ(i; t) = 1/(m_Φ.i*ω_D.i)*$Area{F_Φ(i; τ)*e^(-ξ_Φ.i*ω.i*s^-1*(t - τ))*sin(ω_D.i*(t - τ)) @ τ = 0ms : min(t; τ_L)}|mm
+y_Φ(i; t) = 1/(m_Φ.i*ω_D.i)*$Area{F_Φ(i; τ)*e^(-ξ_Φ.i*ω.i*(t - τ))*sin(ω_D.i*(t - τ)) @ τ = 0ms : min(t; τ_L)}|mm
 'Joint displacements
 y_J(j; t) = $Sum{Φ.(j; i)*y_Φ(i; t) @ i = 1 : n$}
 '<!--'PlotWidth = 500','PlotHeight = 200','PlotAdaptive = 0'-->
@@ -216,7 +219,7 @@ $Repeat{$Repeat{Y.(i; j + 1) = d(j*Δx/L)*y_0(t(i)) + y_J(j; t(i)) @ j = 1 : n_J
 #def Y$(i$) = j*Δx|-spline(j + 1; row(Y;i$))
 '<!--'PlotHeight = 100','PlotAdaptive = 1'-->
 n_T = 400
-#show
+#end hide
 #val
 '<p>Beam deflections for the first five time steps at Δt = 'Δt' ms</p>
 #equ
@@ -253,7 +256,12 @@ k_R = PlotWidth*mm/L
 #loop
 '<script>(function(){$("#beamimpact-fr-1").show();var i=1;var fr=$("#beamimpact-fr-1");setInterval(function(){fr.hide();if(++i>'N')i=1;fr=$("#beamimpact-fr-"+i);fr.show();}, 20);})();</script>
 #equ
-'[1] Harris C. M., Piersol A.G., HARRIS’ SHOCK AND VIBRATION HANDBOOK, Fifth Edition, McGraw-Hill 2002, ISBN 0-07-137081-1
-'[2] Qing Peng, Xiaoming Liu, Yueguang Wei, Elastic impact of sphere on large plate, Journal of the Mechanics and Physics of Solids, Volume 156, 2021, 104604, ISSN 0022 - 5096, <a href="https://doi.org/10.1016/j.jmps.2021.104604">https://doi.org/10.1016/j.jmps.2021.104604</a>
-'[3] Hong Hao and Thong M. Pham, Performance of RC Beams with or without FRP Strengthening Subjected to Impact Loading, Proceedings of the 2nd World Congress on Civil, Structural, and Environmental Engineering (CSEE’17) Barcelona, Spain – April 3– 4, 2017 ISSN:2371 - 5294 <a href="https://www.researchgate.net/publication/316618143_Performance_of_RC_Beams_with_or_without_FRP_Strengthening_Subjected_to_Impact_Loading">DOI:10.11159/icsenm17.1</a>
-'[4] Gugan, D. “Inelastic collision and the Hertz theory of impact.” American Journal of Physics 68 (2000): 920-924., <a href="http://www.oxfordcroquet.com/tech/gugan/index.asp">http://www.oxfordcroquet.com/tech/gugan/index.asp</a>
+#markdown
+[1] Harris C. M., Piersol A.G., HARRIS’ SHOCK AND VIBRATION HANDBOOK, Fifth Edition, McGraw-Hill 2002, ISBN 0-07-137081-1
+
+[2] Qing Peng, Xiaoming Liu, Yueguang Wei, Elastic impact of sphere on large plate, Journal of the Mechanics and Physics of Solids, Volume 156, 2021, 104604, ISSN 0022 - 5096, <a href="https://doi.org/10.1016/j.jmps.2021.104604">https://doi.org/10.1016/j.jmps.2021.104604</a>
+
+[3] Hong Hao and Thong M. Pham, Performance of RC Beams with or without FRP Strengthening Subjected to Impact Loading, Proceedings of the 2nd World Congress on Civil, Structural, and Environmental Engineering (CSEE’17) Barcelona, Spain – April 3– 4, 2017 ISSN:2371 - 5294 <a href="https://www.researchgate.net/publication/316618143_Performance_of_RC_Beams_with_or_without_FRP_Strengthening_Subjected_to_Impact_Loading">DOI:10.11159/icsenm17.1</a>
+
+[4] Gugan, D. “Inelastic collision and the Hertz theory of impact.” American Journal of Physics 68 (2000): 920-924., <a href="http://www.oxfordcroquet.com/tech/gugan/index.asp">http://www.oxfordcroquet.com/tech/gugan/index.asp</a>
+#end markdown

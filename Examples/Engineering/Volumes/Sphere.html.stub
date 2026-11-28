@@ -3,12 +3,12 @@
  <div style="max-width:100mm">
   <img alt="sphere.png" class="side" src="Images/math/volume/sphere.png" style="height:60pt;"/>
  </div>
- <p>Radius</p>
  <p>
+  Radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -35,8 +35,11 @@
     3
    </span>
    · 3.14 · 1
+   <i>m</i>
    <sup>3</sup>
    = 4.19
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Surface area</p>
@@ -49,8 +52,11 @@
    <var>r</var>
    <sup>2</sup>
    = 4 · 3.14 · 1
+   <i>m</i>
    <sup>2</sup>
    = 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

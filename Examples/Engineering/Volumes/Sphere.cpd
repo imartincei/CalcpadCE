@@ -1,7 +1,6 @@
 '<!-- Volume $V = \tfrac{4}{3}\pi r^3$ and surface area $S = 4\pi r^2$ of a sphere from its radius. -->
 '<div style = "max-width:100mm"><img style="height:60pt;" class="side" alt="sphere.png" src = "../../Images/math/volume/sphere.png"></div>
-'Radius
-r = ? {1}
+#UI 'Radius -'r = 1m
 'Volume
 V = 4/3*π*r^3
 'Surface area

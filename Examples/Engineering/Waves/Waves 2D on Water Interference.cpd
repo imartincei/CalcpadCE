@@ -3,16 +3,17 @@
 
 'Interferencja fal na wodzie
 #rad
-λ = 0.2m
+#UI 'Wavelength -'λ = 0.2m
+#UI 'Slit width -'a = 0.6m
+#UI 'Wave speed -'v = 1m/s
+#UI 'Amplitude -'Ψ_0 = 0.5m
+#UI 'Time -'t = 0.0s
+#pause
 k = (2*π)/λ
 r(x; y) = sqrt(x^2 + y^2)
-a = 0.6m
-v = 1m/s
 T = λ/v
 f = 1/T|Hz
 ω = (2*π)/T
-Ψ_0 = 0.5*m
-t = 0.0s
 Δt = 0*T/4
 Ψ_2D_1(x; y; t) = Ψ_0*sin(k*r(x - a/2; y) - ω*t)
 Ψ_2D_2(x; y; t) = Ψ_0*sin(k*r(x + a/2; y) - ω*(t + Δt))

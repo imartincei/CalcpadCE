@@ -4,21 +4,20 @@
  <div style="max-width:110mm;">
   <img alt="sector-chord.png" class="side" src="Images/math/area/sector-chord.png" style="height:60pt;"/>
  </div>
- <p>Dimensions</p>
  <p>
   Radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>
   Chord -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-6">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <!--
@@ -43,9 +42,11 @@
    <span class="b1">(</span>
    <span class="dvc">
     1
+    <i>m</i>
     <span class="dvl">
     </span>
     2 · 1
+    <i>m</i>
    </span>
    <span class="b1">)</span>
    = 60°
@@ -70,6 +71,7 @@
    =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <sup>2</sup>
     · 60°
     <span class="dvl">
@@ -77,6 +79,8 @@
     360°
    </span>
    = 0.524
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Arch length</p>
@@ -96,12 +100,15 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 1 · 60°
+    3.14 · 1
+    <i>m</i>
+    · 60°
     <span class="dvl">
     </span>
     180°
    </span>
    = 1.05
+   <i>m</i>
   </span>
  </p>
  <!--

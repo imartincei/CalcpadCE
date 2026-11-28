@@ -1,5 +1,4 @@
 <div class="calcpad-output">
- <!--{"uiOverrides":{"b:1":"400"}}-->
  <!-- Full RC beam design check to [Eurocode 2](https://en.wikipedia.org/wiki/Eurocode_2), authored entirely in Markdown mode with page breaks for a print-ready report. -->
  <h2>RC Beam Design to Eurocode 2</h2>
  <p>
@@ -31,15 +30,17 @@
  </p>
  <h4>Loads</h4>
  <p>
-  Uniformly distributed load -
+  Uniformly distributed load (total, factored) -
   <span class="eq">
    <var>q</var>
    = 12
-   <i>kN</i>
-   <i class="unit">∕</i>
-   <i>m</i>
+   <span class="dvc">
+    <i>kN</i>
+    <span class="dvl">
+    </span>
+    <i>m</i>
+   </span>
   </span>
-  (total, factored)
  </p>
  <h4>Materials</h4>
  <h5>Concrete</h5>
@@ -577,7 +578,6 @@ circle.Series1 {fill:Tomato;}
    = 650
    <i>mm</i>
   </span>
-  cm
  </p>
  <p>
   Relative design bending moment -
@@ -1426,4 +1426,5 @@ circle.Series1 {fill:Tomato;}
    = 0.00251
   </span>
  </p>
+ <!--{"uiOverrides":{"b:1":"400"}}-->
 </div>

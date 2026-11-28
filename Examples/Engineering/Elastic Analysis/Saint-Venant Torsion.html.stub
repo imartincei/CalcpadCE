@@ -2,57 +2,40 @@
  <!-- Closed-form [Saint-Venant torsion](https://en.wikipedia.org/wiki/Saint-Venant%27s_principle) of a rectangular cross-section, evaluating the shear-stress field $τ_{zx}$, $τ_{zy}$ and torsional rigidity from a single Fourier series.
 <p>A hand-check baseline for FE torsion models and for simplified rectangular-section design formulas. -->
  <h3>Input data</h3>
- <table>
-  <tr>
-   <td>
-    <p>Dimensions of cross section</p>
-    <p>
-     <span class="eq">
-      <var>a</var>
-      =
-      <u class="input-6">50</u>
-      <i>cm</i>
-     </span>
-     ,
-     <span class="eq">
-      <var>b</var>
-      =
-      <u class="input-6">30</u>
-      ·
-      <span class="dvc">
-       <i>cm</i>
-       <span class="dvl">
-       </span>
-       2
-      </span>
-      = 15
-      <i>cm</i>
-     </span>
-    </p>
-    <p>
-     Torsional moment -
-     <span class="eq">
-      <var>M</var>
-      <sub>t</sub>
-      =
-      <u class="input-7">20</u>
-      <i>kNm</i>
-     </span>
-    </p>
-    <p>
-     Number of iterations -
-     <span class="eq">
-      <var>n</var>
-      =
-      <u class="input-8">10</u>
-     </span>
-    </p>
-   </td>
-   <td>
-    <img src="Images/mechanics/elastic/torsion.png" style="height:110pt; width:152pt; margin-left:50pt;"/>
-   </td>
-  </tr>
- </table>
+ <div style="max-width:152mm">
+  <img class="side" src="Images/mechanics/elastic/torsion.png" style="height:110pt; width:152pt;"/>
+ </div>
+ <p>Dimensions of cross section</p>
+ <p>
+  Width -
+  <span class="eq">
+   <var>a</var>
+   = 50
+   <i>cm</i>
+  </span>
+  , Half-height -
+  <span class="eq">
+   <var>b</var>
+   = 15
+   <i>cm</i>
+  </span>
+ </p>
+ <p>
+  Torsional moment -
+  <span class="eq">
+   <var>M</var>
+   <sub>t</sub>
+   = 20
+   <i>kNm</i>
+  </span>
+ </p>
+ <p>
+  Number of iterations -
+  <span class="eq">
+   <var>n</var>
+   = 10
+  </span>
+ </p>
  <h3>Analysis</h3>
  <p>
   <span class="eq">

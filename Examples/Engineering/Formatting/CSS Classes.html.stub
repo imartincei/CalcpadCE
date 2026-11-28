@@ -12,9 +12,9 @@
   <img alt="cantilever-beam-concentrated-force.png" class="side" src="Images/mechanics/beams/cantilever-beam-concentrated-force.png" style="height:114pt; width:127pt;"/>
   <div class="fold">
    <h4>Folded content heading</h4>
-   <p>Folded content line 1</p>
-   <p>Folded content line 2</p>
-   <p>Folded content line 3...</p>
+   Folded content line 1
+Folded content line 2
+Folded content line 3...
   </div>
   <p>Bordered table</p>
   <table class="bordered">

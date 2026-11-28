@@ -9,27 +9,35 @@
    Beam length -
    <span class="eq">
     <var>l</var>
-    =
-    <u class="input-5">5</u>
+    = 5
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Load -
    <span class="eq">
     <var>q</var>
     <sub>1</sub>
-    =
-    <u class="input-6">5</u>
+    = 5
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m,
+   ,
    <span class="eq">
     <var>q</var>
     <sub>2</sub>
-    =
-    <u class="input-6">15</u>
+    = 15
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+    </span>
    </span>
-   kN/m
   </p>
   <p>
    <span class="eq">
@@ -40,9 +48,19 @@
     −
     <var>q</var>
     <sub>1</sub>
-    = 15 − 5 = 10
+    = 15
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    − 5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    = 10
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
    </span>
-   kN/m
   </p>
   <p>
    <b>Internal forces</b>
@@ -61,9 +79,15 @@
     =
     <span class="dvc">
      10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
      <span class="dvl">
      </span>
      5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
     = 2
    </span>
@@ -101,6 +125,7 @@
     =
     <span class="dvc">
      5
+     <i>m</i>
      <span class="dvl">
      </span>
      2
@@ -122,8 +147,8 @@
     − 1
     <span class="b1">)</span>
     = 2.7
+    <i>m</i>
    </span>
-   m
   </p>
   <p>Bending</p>
   <p>
@@ -175,22 +200,42 @@
     </span>
     =
     <span class="dvc">
-     5 · 2.7 ·  ( 5 − 2.7 )
+     5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     · 2.7
+     <i>m</i>
+     ·  ( 5
+     <i>m</i>
+     − 2.7
+     <i>m</i>
+     )
      <span class="dvl">
      </span>
      2
     </span>
     +
     <span class="dvc up">
-     10 · 2.7 · 5 ·
+     10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     · 2.7
+     <i>m</i>
+     · 5
+     <i>m</i>
+     ·
      <span class="b1">(</span>
      1 −
      <span class="b1">(</span>
      <span class="dvc">
       2.7
+      <i>m</i>
       <span class="dvl">
       </span>
       5
+      <i>m</i>
      </span>
      <span class="b1">)</span>
      <sup class="raised">2</sup>
@@ -200,8 +245,8 @@
      6
     </span>
     = 31.46
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -227,10 +272,15 @@
      6
     </span>
     <span class="b1">)</span>
-    = 5 ·
+    = 5
+    <i>m</i>
+    ·
     <span class="b1">(</span>
     <span class="dvc">
      5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
      <span class="dvl">
      </span>
      2
@@ -238,14 +288,17 @@
     +
     <span class="dvc">
      10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
      <span class="dvl">
      </span>
      6
     </span>
     <span class="b1">)</span>
     = 20.83
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <span class="eq">
@@ -270,10 +323,15 @@
      3
     </span>
     <span class="b1">)</span>
-    = 5 ·
+    = 5
+    <i>m</i>
+    ·
     <span class="b1">(</span>
     <span class="dvc">
      5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
      <span class="dvl">
      </span>
      2
@@ -281,14 +339,17 @@
     +
     <span class="dvc">
      10
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
      <span class="dvl">
      </span>
      3
     </span>
     <span class="b1">)</span>
     = 29.17
+    <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <b>Diagrams</b>
@@ -298,10 +359,9 @@
    <span class="eq">
     <var>x</var>
     <sub>1</sub>
-    =
-    <u class="input-31">1</u>
+    = 1
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
   </p>
@@ -444,9 +504,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>M</var>
-    ( 1 )  = 18
+    ( 1
+    <i>m</i>
+    )  = 18
+    <i>kNm</i>
    </span>
-   kN·m
   </p>
   <p>Shear</p>
   <p>
@@ -579,9 +641,11 @@ circle.Series1 {fill:Tomato;}
     <sub>1</sub>
     )  =
     <var>V</var>
-    ( 1 )  = 14.83
+    ( 1
+    <i>m</i>
+    )  = 14.83
+    <i>kN</i>
    </span>
-   kN
   </p>
  </div>
 </div>

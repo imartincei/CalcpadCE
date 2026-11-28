@@ -6,13 +6,14 @@
 #rad
 '<table><tr><td>
 '<h4>Input parameters</h4>
-'Gravitational acceleration -'g = 9.80665m/s^2
-'Pendulum length -'l = 1m
-'Pendulum mass -'m = 1kg
-'Initial angle -'θ_0 = -179°|rad
-'Initial angular velocity -'ω_0 = 1.834rad/s
-'Maximum simulation time -'t_max = 20s
-'Damping factor (normaized) -'β = 0.005
+#UI 'Gravitational acceleration -'g = 9.80665m/s^2
+#UI 'Pendulum length -'l = 1m
+#UI 'Pendulum mass -'m = 1kg
+#UI 'Initial angle -'θ_0 = -179°
+#UI 'Initial angular velocity -'ω_0 = 1.834rad/s
+#UI 'Maximum simulation time -'t_max = 20s
+#UI 'Step size -'h = 0.02s
+#UI 'Damping factor (normalized) -'β = 0.005
 'Critical damping -'b_cr = 2*m*sqrt(g/l)
 'Damping -'b = β*b_cr
 '</td><td>
@@ -44,7 +45,7 @@ svg$
 '<polygon points="0,0 '-δ','-δ' 'δ','-δ'" solid_style$/>
 line$(0; 0; 0; l*k; thin_style$)
 '<path d="M 0 '0.2*L' A '0.2*L' '0.2*L' 0 0 'θ_0 < 0°' '0.2*x' '0.2*y'" thin_style$/>
-texth$(-1.2*δ*sign(θ_0);0.25*L;'θ_0*180/π'°)
+texth$(-1.2*δ*sign(θ_0);0.25*L;'θ_0'°)
 line$(0; 0; x; y; thick_style$)
 text$(x/2-δ_x*y/L; y/2+δ_x*x/L;if(θ_0<0°;450°+θ_0;450°-θ_0);'l'm)
 circle$(0; 0; R/2; solid_style$)
@@ -55,6 +56,7 @@ texth$(x+3*δ_x; y_g-δ;g)
 '</svg>
 #equ
 '</td></tr></table>
+#pause
 '<h4>Solution by Runge-Kutta RK4 method (explicit)</h4>
 #noc
 'Differential equation -'θ″ + b/m*θ′ + g/l*sin(θ) = 0
@@ -64,7 +66,7 @@ texth$(x+3*δ_x; y_g-δ;g)
 θ′ = ω'and'ω′ = (g/l)*sin(-θ) - b/m*ω
 #equ
 'The solution is performed iteratively
-'Step size -'h = 0.02s
+'Step size -'h
 'Number of steps -'n = t_max/h
 #hide
 N = min(n; 120)
@@ -117,7 +119,9 @@ $Plot{t(i)|E_k(i) + E_p(i) & 0s|0J & 0s|0J & 0s|0J & t(i)|E_p(i) & t(i)|E_k(i) &
 '<br/><b style="color:MediumVioletRed">━━</b> Potential - <var>E</var><sub>p</sub>,
 '<b style="color:MediumSpringGreen">━━</b> Kinetic - <var>E</var><sub>k</sub>,
 '<b style="color:Tomato">━━</b> Total - <var>E</var><sub>tot</sub>
-'<style>.Series3, .Series4{stroke:none!Important; fill:none!Important;} .fr{display:none;} .fr svg{margin-right:64pt; align-center;}</style>
+#html
+<style>.Series3, .Series4{stroke:none!Important; fill:none!Important;} .fr{display:none;} .fr svg{margin-right:64pt; align-center;}</style>
+#end html
 '<h4>Animate results</h4>
 #format 0.00
 #hide

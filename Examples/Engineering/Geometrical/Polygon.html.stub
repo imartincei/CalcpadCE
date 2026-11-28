@@ -4,34 +4,128 @@
  <h4>Point coordinates</h4>
  <p>
   <span class="eq">
-   <var>
-    <span class="vec">⃗</span>
-    x
-   </var>
+   <b>
+    <var>P</var>
+   </b>
    =
    <span class="b0">[</span>
-   0; 6.3; 6; 1; 0.4; 0
+   0
+   <i>m</i>
+   ; 0
+   <i>m</i>
+   <span class="b0">|</span>
+   6.3
+   <i>m</i>
+   ; 0
+   <i>m</i>
+   <span class="b0">|</span>
+   6
+   <i>m</i>
+   ; 0.6
+   <i>m</i>
+   <span class="b0">|</span>
+   1
+   <i>m</i>
+   ; 1
+   <i>m</i>
+   <span class="b0">|</span>
+   0.4
+   <i>m</i>
+   ; 4
+   <i>m</i>
+   <span class="b0">|</span>
+   0
+   <i>m</i>
+   ; 4.2
+   <i>m</i>
    <span class="b0">]</span>
    =
-   <b class="b0">[</b>
-   0 6.3 6 1 0.4 0
-   <b class="b0">]</b>
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>
-    <span class="vec">⃗</span>
-    y
-   </var>
-   =
-   <span class="b0">[</span>
-   0; 0; 0.6; 1; 4; 4.2
-   <span class="b0">]</span>
-   =
-   <b class="b0">[</b>
-   0 0 0.6 1 4 4.2
-   <b class="b0">]</b>
+   <span class="matrix">
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      0
+      <i>m</i>
+     </span>
+     <span class="td">
+      0
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      6.3
+      <i>m</i>
+     </span>
+     <span class="td">
+      0
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      6
+      <i>m</i>
+     </span>
+     <span class="td">
+      0.6
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      1
+      <i>m</i>
+     </span>
+     <span class="td">
+      1
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      0.4
+      <i>m</i>
+     </span>
+     <span class="td">
+      4
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+    <span class="tr">
+     <span class="td">
+     </span>
+     <span class="td">
+      0
+      <i>m</i>
+     </span>
+     <span class="td">
+      4.2
+      <i>m</i>
+     </span>
+     <span class="td">
+     </span>
+    </span>
+   </span>
   </span>
  </p>
  <h4>Geometrical properties</h4>
@@ -40,18 +134,22 @@
   <span class="eq">
    <var>A</var>
    = 7.23
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
   , Center point -
   <span class="eq">
    <var>x</var>
    <sub>C</sub>
    = 2.07
+   <i>m</i>
   </span>
   ,
   <span class="eq">
    <var>y</var>
    <sub>C</sub>
    = 0.984
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -60,18 +158,24 @@
    <var>I</var>
    <sub>x</sub>
    = 7.36
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
   ,
   <span class="eq">
    <var>I</var>
    <sub>y</sub>
    = 24.47
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
   ,
   <span class="eq">
    <var>I</var>
    <sub>xy</sub>
    = -7.69
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
  </p>
  <p>
@@ -80,18 +184,24 @@
    <var>I</var>
    <sub>1</sub>
    = 27.42
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
   ,
   <span class="eq">
    <var>I</var>
    <sub>2</sub>
    = 4.41
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
   ,
   <span class="eq">
    <var>I</var>
    <sub>o</sub>
    = 31.82
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
  </p>
  <p>

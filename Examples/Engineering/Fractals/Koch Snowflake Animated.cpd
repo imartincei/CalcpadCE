@@ -1,23 +1,25 @@
-#val
-'<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-#equ
+#html
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+#end html
 '<!-- Animated variant of the Koch snowflake: every iteration becomes an SVG layer, toggled in sequence by CSS so the limit curve emerges over time. -->
 'Initial triangle coordinates
 #def a$ = sqrt(3)/2
 x = hp([0; 1; 0.5; 0])', 'y = hp([0; 0; a$; 0])
-'Number of iterations -'n = 6
-
+#UI 'Number of iterations -'n = 6
+#pause
 #val
-'<style>#kochAnim polygon{display:none; stroke:#08a; stroke-width:0.1}</style>
+#html
+<style>#kochAnim polygon{display:none; stroke:#08a; stroke-width:0.1}</style>
+#end html
 #hide
 w = 300', 'h = 1.2*w', 'k = 100
-#show
+#end hide
 '<center><svg id="kochAnim" viewBox="0 10 'k' 'k'" style="width:'w'pt; height:'h'pt;">
 '<defs><radialGradient id="sff" cx="50%" cy="50%"><stop offset="0%" stop-color="lightSkyBlue"/><stop offset="70%" stop-color="steelBlue"/><stop offset="120%" stop-color="#2060a0"/></radialGradient></defs>
 #for i = 1 : n
 	#hide
 	n_p = len(x)
-	#show
+	#end hide
 	'<polygon id="kochAnim-fr-'i'" points="
 	#for j = 1 : n_p
 		x.j*k','(a$ - y.j)*k' '
@@ -41,7 +43,8 @@ w = 300', 'h = 1.2*w', 'k = 100
 	'Reassign to the original vectors
 	x = join(x1; p2.1)
 	y = join(y1; p2.2)
-	#show
+	#end hide
 #loop
 '</svg></center>
 '<script>(function(){var i=1;var f=$("#kochAnim-fr-1");f.show();setInterval(function(){if(++i>'n'){i=1;$("#kochAnim polygon:not(#kochAnim-fr-1)").hide();}f=$("#kochAnim-fr-"+i);f.show(600);},500);})();</script>
+#end val

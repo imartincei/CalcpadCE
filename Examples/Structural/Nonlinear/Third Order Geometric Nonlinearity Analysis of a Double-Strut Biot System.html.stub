@@ -1,14 +1,89 @@
 <div class="calcpad-output">
- <!-- Symmetric two-bar Biot truss in third-order geometric nonlinearity: the deformed length $l <span class="err">Error in "(v) = \sqrt{l^2 + v^2}$ enters the equilibrium directly and the vertical displacement is found by four different numerical methods. --&gt;" on line [<a href="#0" data-text="1">1</a>]: Invalid symbol: "{".</span>
-<p>(solved by four different numerical methods) </p>
-<h4>Input data</h4>
-<p>Strut length - <span class="eq"><var>l</var> = 2 <i>m</i></span></p>
-<p>Material - steel. Modulus of elasticity - <span class="eq"><var>E</var> = 210 <i>GPa</i></span></p>
-<p>Cross section - circular with diameter <span class="eq"><var>Φ</var> = 20 <i>mm</i></span></p>
-<p>Area - <span class="eq"><var>A</var> = <span class="dvc"><var>π</var> · <var>Φ</var><sup>2</sup><span class="dvl"></span>4</span> = <span class="dvc">3.14 ·  ( 20 <i>mm</i> ) <sup>2</sup><span class="dvl"></span>4</span> = 3.14 <i>cm</i><sup class="unit">2</sup></span></p>
-<p>Axial stiffness - <span class="eq"><var>EA</var> = <var>E</var> · <var>A</var> = 210 <i>GPa</i> · 3.14 <i>cm</i><sup class="unit">2</sup> = 65973.4 <i>kN</i></span></p>
-<p>Vertical force - <span class="eq"><var>F</var><sub>y</sub> = 20 <i>kN</i></span></p>
-<!-- SVG drawing macros (lines, points, dimension marks and rotated text) included by the nonlinear truss worksheets to render undeformed and deformed configurations side by side. -->
+ <!-- Symmetric two-bar Biot truss in third-order geometric nonlinearity: the deformed length $l′(v) = \sqrt{l^2 + v^2}$ enters the equilibrium directly and the vertical displacement is found by four different numerical methods. -->
+ <p>(solved by four different numerical methods)</p>
+ <h4>Input data</h4>
+ <p>
+  Strut length -
+  <span class="eq">
+   <var>l</var>
+   = 2
+   <i>m</i>
+  </span>
+ </p>
+ <p>Material - steel</p>
+ <p>
+  Modulus of elasticity -
+  <span class="eq">
+   <var>E</var>
+   = 210
+   <i>GPa</i>
+  </span>
+ </p>
+ <p>Cross section - circular</p>
+ <p>
+  Diameter -
+  <span class="eq">
+   <var>Φ</var>
+   = 20
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Area -
+  <span class="eq">
+   <var>A</var>
+   =
+   <span class="dvc">
+    <var>π</var>
+    ·
+    <var>Φ</var>
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   =
+   <span class="dvc">
+    3.14 ·  ( 20
+    <i>mm</i>
+    )
+    <sup>2</sup>
+    <span class="dvl">
+    </span>
+    4
+   </span>
+   = 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+  </span>
+ </p>
+ <p>
+  Axial stiffness -
+  <span class="eq">
+   <var>EA</var>
+   =
+   <var>E</var>
+   ·
+   <var>A</var>
+   = 210
+   <i>GPa</i>
+   · 3.14
+   <i>cm</i>
+   <sup class="unit">2</sup>
+   = 65973.4
+   <i>kN</i>
+  </span>
+ </p>
+ <p>
+  Vertical force -
+  <span class="eq">
+   <var>F</var>
+   <sub>y</sub>
+   = 20
+   <i>kN</i>
+  </span>
+ </p>
+ <!-- SVG drawing macros (lines, points, dimension marks and rotated text) included by the nonlinear truss worksheets to render undeformed and deformed configurations side by side. -->
  <svg style="font-family: DejaVu Serif Condensed; font-size:8px; width:450pt; height:150pt" version="1.1" viewbox="-50 -50 300 100" xmlns="http://www.w3.org/2000/svg">
   <line style="stroke:black; stroke-width:1.5; fill:none" x1="0" x2="100" y1="0" y2="0">
   </line>

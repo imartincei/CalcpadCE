@@ -5,7 +5,8 @@ mygcd(a; b) = $while{
   t = b;
   b = a⦼b;
   a = t}
+#UI 'First number -'a = 1071', Second number -'b = 462
 'Example:
-mygcd(1071; 462)
+mygcd(a; b)
 'Internal gcd function:
-gcd(1071; 462)
+gcd(a; b)

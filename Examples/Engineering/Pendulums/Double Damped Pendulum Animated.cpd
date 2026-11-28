@@ -6,16 +6,20 @@
 #rad
 '<table width="120%"><tr><td>
 '<h4>Input parameters</h4>
-'Gravitational acceleration -'g = 9.80665m/s^2
-'Pendulum lengths -'l_1 = 1.5m', 'l_2 = 1m
+#UI 'Gravitational acceleration -'g = 9.80665m/s^2
+#UI 'Upper pendulum length -'l_1 = 1.5m
+#UI 'Lower pendulum length -'l_2 = 1m
 'Total length -'l = l_1 + l_2
-'Pendulum masses -'m_1 = 2kg', 'm_2 = 1kg
+#UI 'Upper pendulum mass -'m_1 = 2kg
+#UI 'Lower pendulum mass -'m_2 = 1kg
 'Total mass -'m = m_1 + m_2
-'Initial angles
-θ_01 = -90°|rad', 'θ_02 = -120°|rad
-'Initial angular velocities
-ω_01 = 0rad/s', 'ω_02 = 0rad/s
-'Damping factor (normalized) -'β = 0.01
+#UI 'Initial angle of the upper pendulum -'θ_01 = -90°
+#UI 'Initial angle of the lower pendulum -'θ_02 = -120°
+#UI 'Initial angular velocity of the upper pendulum -'ω_01 = 0rad/s
+#UI 'Initial angular velocity of the lower pendulum -'ω_02 = 0rad/s
+#UI 'Damping factor (normalized) -'β = 0.01
+#UI 'Maximum simulation time -'t_max = 20s
+#UI 'Step size -'h = 0.001s
 '</td><td>
 #hide
 PlotWidth = 220','PlotHeight = 140','PlotSVG = 1
@@ -48,15 +52,17 @@ y_g2 = y_2 - δ_y + R
 #include svg_drawing.cpd
 #show
 #val
-'<style>.thin{stroke:goldenrod; stroke-width:1; fill:none;} .thick{stroke:steelblue; stroke-width:1.5; fill:none;} .ball{stroke:steelblue; stroke-width:0.5;  fill:url(#ball);} .solid{stroke:black; stroke-width:1; fill:#eee;} .load{stroke:steelblue; stroke-width:1; fill:steelblue;}</style>
+#html
+<style>.thin{stroke:goldenrod; stroke-width:1; fill:none;} .thick{stroke:steelblue; stroke-width:1.5; fill:none;} .ball{stroke:steelblue; stroke-width:0.5;  fill:url(#ball);} .solid{stroke:black; stroke-width:1; fill:#eee;} .load{stroke:steelblue; stroke-width:1; fill:steelblue;}</style>
+#end html
 svg$
 '<defs><radialGradient id="ball" cx="35%" cy="35%"><stop offset="0%" stop-color="lightcyan"/><stop offset="100%" stop-color="lightblue"/></radialGradient><pattern id="concrete" x="4" y="4" width="8" height="8" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="8" height="8" fill="#eae9e8" /><circle cx="1" cy="1" r="1.2" fill="#ccb" /><circle cx="5" cy="2" r="1.6" fill="#dadad0" /><circle cx="4" cy="6" r="0.8" fill="#aa9" /><circle cx="3" cy="4" r="0.4" fill="#884" /><circle cx="7" cy="5" r="1.2" fill="#cacaba" /><circle cx="5" cy="3" r="0.9" fill="#fffded" /></pattern></defs>
 '<polygon points="0,0 '-δ','-δ' 'δ','-δ'" solid_style$/>
 line$(0; 0; 0; 5/3*r; thin_style$)
 '<path d="M 0 '0.15*L' A 'r' 'r' 0 0 'θ_01 < 0°' 'r*x_1/L_1' 'r*y_1/L_1'" thin_style$/>
 '<path d="M 'x_1' 'y_1 + r' A 'r' 'r' 0 0 'θ_02 < 0°' 'x_1 + r*(x_2 - x_1)/L_2' 'y_1 + r*(y_2 - y_1)/L_2'" thin_style$/>
-texth$(-1.2*δ*sign(θ_01);0.2*L;'θ_01*180/π'°)
-texth$(x_1-1.2*δ*sign(θ_02);y_1+0.2*L;'θ_02*180/π'°)
+texth$(-1.2*δ*sign(θ_01);0.2*L;'θ_01'°)
+texth$(x_1-1.2*δ*sign(θ_02);y_1+0.2*L;'θ_02'°)
 line$(0; 0; x_1; y_1; thick_style$)
 line$(x_1; y_1; x_2; y_2; thick_style$)
 text$(x_1/2-δ_x*y_1/L_1; y_1/2+δ_x*x_1/L_1;450°+θ_01;'l_1' m)
@@ -72,11 +78,12 @@ texth$(x_2+3*δ_x; y_g2+δ_x;g)
 '</svg>
 #equ
 '</td></tr></table>
+#pause
 'Critical damping
 b_cr,1 = 2*m_1*sqrt(g*l_1)','b_cr,2 = 2*m_2*sqrt(g*l_2)
 'Damping factors (uncoupled)
 b_1 = β*b_cr,1','b_2 = β*b_cr,2
-'Maximum simulation time -'t_max = 20s
+'Maximum simulation time -'t_max
 '<h4>Solution by Runge-Kutta RK4 method (explicit)</h4>
 'Differential equations (<a href="https://seamplex.com/feenox/examples/daes.html#the-double-pendulum">https://seamplex.com</a>)
 #noc
@@ -92,7 +99,7 @@ m_2*l_2^2*θ″_2 + m_2*l_1*l_2*θ″_1*cos(Δ_θ) - m_2*l_1*l_2*θ′_1^2*sin(�
 'where'D = 2*(m_1 + m_2*sin(Δ_θ)^2)
 #equ
 'The solution is performed iteratively
-'Step size -'h = 0.001s
+'Step size -'h
 'Number of steps -'n = t_max/h
 #hide
 N = min(n; 120)
@@ -166,7 +173,9 @@ $Plot{t(i)|E_p(i) + E_k(i) & 0s|0J & 0s|0J & 0s|0J & t(i)|E_p(i) & t(i)|E_k(i) @
 '<b style="color:DarkCyan">━━</b> Kinetic - <var>E</var><sub>k</sub>,
 '<b style="color:Tomato">━━</b> Total - <var>E</var><sub>tot</sub>
 '</td></tr></table>
-'<style>.Series3, .Series4{stroke:none!Important; fill:none!Important;} .fr{display:none;} .fr svg{margin-right:64pt; align:center;} .trace{stroke:red; stroke-width:1; fill:none; opacity:0.5;}</style>
+#html
+<style>.Series3, .Series4{stroke:none!Important; fill:none!Important;} .fr{display:none;} .fr svg{margin-right:64pt; align:center;} .trace{stroke:red; stroke-width:1; fill:none; opacity:0.5;}</style>
+#end html
 '<h4>Animate results</h4>
 #format 0.00
 #hide
@@ -185,7 +194,7 @@ n_tr = 40
 	x_2i = x2.i','y_2i = y2.i
 	t = t(i)
 	i_0 = max((i_N - n_tr)*k_N; 2)
-	#show
+	#end hide
 	#val
 	'<div class="fr" id="p3v2-fr-'i_N'">
 	#equ

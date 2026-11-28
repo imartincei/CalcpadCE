@@ -3,5 +3,6 @@ f(x) = x^2 - 3*x + 4
 
 $Plot{f(x) @ x = 0 : 3}
 
-f(0.75)
-f(1.25)
+#UI 'First point -'x_1 = 0.75', Second point -'x_2 = 1.25
+f(x_1)
+f(x_2)

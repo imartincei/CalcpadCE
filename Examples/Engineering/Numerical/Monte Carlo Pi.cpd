@@ -1,6 +1,7 @@
 '<!-- Estimates $\pi$ by sampling random points in the unit square and counting those falling inside the quarter circle.
 'Includes a live SVG plot of the sample cloud coloured by inside-versus-outside membership, so accuracy and variance can be eyeballed at any sample size. -->
-'Number of points -'n = 10000
+#UI 'Number of points -'n = 10000
+#pause
 'Point coordinates:
 x = random(fill(vector_hp(n); 1))
 y = random(fill(Vector_hp(n); 1))

@@ -7,8 +7,7 @@ y(t) = $Integral{sin(s^2) @ s = 0 : t}
 #hide
 PlotWidth = 440
 PlotHeight = 400
+#end hide
 #post
 $Plot{x(t)|y(t) @ t = 0 : 2*π}
-#pre
-
-'Tip: Click "<b>Calculate</b>" to see the respective plot.
+#end post

@@ -1,11 +1,11 @@
 '<!-- Five-storey three-bay reinforced concrete frame with T-section beams, programmatically generated joints and elements, and Eurocode load combinations on dead, live and self-weight contributions. -->
 #include svg_drawing.cpd
 '<h4>Input data</h4>
-'Number of stories -'n_st = 5',  Number of bays - 'n_b = 3
-'Story height - 'h_st = 2.85m',ㅤBay length - 'l_b = 4m
-'Slab thickness -'h_pl = 18cm
-'Cross section of columns - 'b_c = 25cm', 'h_c = 60cm
-'Cross section of beams -ㅤ'b_b = 25cm', 'h_b = 40cm
+#UI 'Number of stories -'n_st = 5',  Number of bays - 'n_b = 3
+#UI 'Story height - 'h_st = 2.85m',ㅤBay length - 'l_b = 4m
+#UI 'Slab thickness -'h_pl = 18cm
+#UI 'Cross section of columns - 'b_c = 25cm', 'h_c = 60cm
+#UI 'Cross section of beams -ㅤ'b_b = 25cm', 'h_b = 40cm
 #deg
 '<!--'δz = 10^-12'-->
 #hide
@@ -14,7 +14,7 @@ x_J = vector_hp(n_J)*m', 'y_J = vector_hp(n_J)*m
 j(i; k) = i + k*n_b1
 $Repeat{$Repeat{x_J.j(i; k - 1) = (i - 1)*l_b @ i = 1 : n_b1} @ k = 1 : n_s1}
 $Repeat{$Repeat{y_J.j(i; k - 1) = (k - 1)*h_st @ i = 1 : n_b1} @ k = 1 : n_s1}
-#show
+#end hide
 '<h5>Joint coordinates <small>- 'n_J'</small></h5>
 x_J
 y_J
@@ -38,7 +38,7 @@ e(i; k) = i + k*n_b
 		e_J.(e; 2) = j + 1
 	#loop
 #loop
-#show
+#end hide
 '<h5>Elements - [J1; J2] <small>- 'n_E'</small></h5>
 transp(e_J)
 'Element endpoint coordinates
@@ -59,18 +59,19 @@ range(1; n_b1; 1); _
 fill(vector_hp(n_b1); cc); _
 fill(vector_hp(n_b1); cc); _
 fill(vector_hp(n_b1); 0kNm))
-#show
+#end hide
 '<h5>Supports <small>- 'n_c'</small></h5>
 c
 '<h4>Unit weights of building materials</h4>
-'ㅤ - concrete -'γ_c = 25kN÷m^3
-'ㅤ - screed -'γ_scr = 21kN÷m^3
-'ㅤ - finishes -'γ_fin = 18kN÷m^3
-'ㅤ - brickwork -'γ_bw = 16kN÷m^3
-'ㅤ - plaster/render -'γ_pla = 16kN÷m^3
-'ㅤ - insulation -'γ_ins = 0.5kN÷m^3
+#UI 'ㅤ - concrete -'γ_c = 25kN/m^3
+#UI 'ㅤ - screed -'γ_scr = 21kN/m^3
+#UI 'ㅤ - finishes -'γ_fin = 18kN/m^3
+#UI 'ㅤ - brickwork -'γ_bw = 16kN/m^3
+#UI 'ㅤ - plaster/render -'γ_pla = 16kN/m^3
+#UI 'ㅤ - insulation -'γ_ins = 0.5kN/m^3
 '<h4>Loads</h4>
-'Total halfwidth of adjacent plate spans -'a = 5m/2
+#UI 'Adjacent plate span -'l_p = 5m
+'Total halfwidth of adjacent plate spans -'a = l_p/2
 '<p><b>Self weight</b></p>
 'ㅤPlate -'g_pl = h_pl*a*γ_c
 'ㅤBeam -'g_b = b_b*(h_b - h_pl)*γ_c
@@ -86,7 +87,8 @@ c
 '<img style="width:240pt; max-width:50%;" src="./Images/floor_finishes.png" alt="floor_finishes.png"><img style="width:240pt; max-width:50%;" src="./Images/wall_layers.png" alt="wall_layers.png">
 'Total dead load
 dl = g_scr + g_fin + g_pls + g_bw + g_ins + g_plw
-'<p><b>Live load</b> -'ll = a*2kN/m^2'</p>
+#UI 'Live load intensity -'q_ll = 2kN/m^2
+'<p><b>Live load</b> -'ll = a*q_ll'</p>
 '<p><b>Total load</b></p>
 'On beams -'p_b = (sw + dl)*1.35 + ll*1.5
 'On columns -'p_c = g_c*1.35
@@ -95,7 +97,7 @@ q_x = vector_hp(n_E)*kN/m
 q_y = vector_hp(n_E)*kN/m
 $Repeat{q_y.i = -p_c @ i = 1 : n_CE}
 $Repeat{q_y.(n_CE + i) = -p_b @ i = 1 : n_BE}
-#show
+#end hide
 'Load values on elements
 q_x
 q_y
@@ -110,7 +112,7 @@ H = h*k_w + 100*(1 - n_st/20)
 #def thin_style$ = style = "stroke:green; stroke-width:1; fill:none"
 #def thick_style$ = style = "stroke:green; stroke-width:2; fill:none"
 k_q = 0.4*m/kN
-#show
+#end hide
 #val
 svg$
 #for i = 1 : n_E
@@ -156,7 +158,7 @@ svg$
 	y1 = (h - y_1(i))*k_w
 	x2 = x_2(i)*k_w
 	y2 = (h - y_2(i))*k_w
-	#show
+	#end hide
 	line$(x1; y1; x2; y2; main_style$)
 #loop
 #for i = 1 : n_c
@@ -169,7 +171,7 @@ svg$
 	y2 = y1 - abs(δ)
 	x3 = x1 + δ
 	y3 = y1 + abs(δ)
-	#show
+	#end hide
 	#if c.(i; 2) ≠ 0kN/m
 		#if c.(i; 3) ≠ 0kN/m
 			#if c.(i; 4) ≠ 0kNm
@@ -214,7 +216,7 @@ svg$
 	#hide
 	x = (x_1(i) + x_2(i))*k_w/2
 	y = (h - (y_1(i) + y_2(i))/2)*k_w
-	#show
+	#end hide
 	#if i ≤ n_CE
 		textv$(x - 0.15m*k_w; y; e'i')
 	#else
@@ -236,8 +238,10 @@ dimh$(0; w*k_w; (h + 1.6m)*k_w; 'w')
 '</svg>
 #equ
 '<h4>Materials</h4>
-'Modules of elasticity -'E = hp([35GPa])
-'Poisson coefficients -'ν = hp([0.2])
+#UI 'Modules of elasticity -'E_c = 35GPa
+E = hp([E_c])
+#UI 'Poisson coefficients -'ν_c = 0.2
+ν = hp([ν_c])
 'Shear modules -'G = E/(2*(1 + ν))
 'Assignments on elements
 e_M = fill(vector_hp(n_E); 1)
@@ -247,11 +251,12 @@ l_0 = 0.85*l_b
 b_eff = b_b + min(0.2*a + 0.1*l_0; 0.2*l_0)
 #hide
 b = vector_hp(2)*mm','h = vector_hp(2)*mm','b_f = vector_hp(2)*mm','h_f = vector_hp(2)*mm
-#show
+#end hide
 'Section 1 -'b.1 = b_c','h.1 = h_c'- columns
 'Section 2 -'b.2 = b_b','h.2 = h_b' - beams
 'ㅤㅤㅤㅤ ' _
 b_f.2 = b_eff','h_f.2 = h_pl
+#pause
 '<h4>Cross section properties</h4>
 'Area
 'ㅤWeb -'A_w = b*h|cm^2
@@ -312,7 +317,7 @@ K = symmetric_hp(3*n_J)
 	j = 3*c.(i; 1) - 2
 	add(vec2diag(last(row(c; i); 3)/[kN/m; kN/m; kNm]); K; j; j)
 #loop
-#show
+#end hide
 K
 '<h4>Element load vector</h4>
 'Lateral load in local CS -'q_E(e) = -q_x.e*s(e) + q_y.e*c(e)
@@ -333,7 +338,7 @@ F = vector_hp(3*n_J)
 	#loop
 #loop
 Tol = 10^-2
-#show
+#end hide
 F
 '<h4>Results</h4>
 '<p><b>Solution of the system of equations by PCG method</b></p>
@@ -490,7 +495,7 @@ svg$
 	y = v_y*k_R
 	xd2 = x1 + x*c_e - y*s_e
 	yd2 = y1 - x*s_e - y*c_e
-	#show
+	#end hide
 	#for j = 0 : 10
 		#hide
 		xd1 = xd2
@@ -503,7 +508,7 @@ svg$
 		xd2 = x1 + x*c_e - y*s_e
 		yd2 = y1 - x*s_e - y*c_e
 		d = -15*sign(v_y)
-		#show
+		#end hide
 		line$(xd1; yd1; xd2; yd2; red_style$)
 	#loop
 #loop
@@ -516,7 +521,7 @@ svg$
 	y = (h - y_J.j)*k_w - v_y*k_R
 	dx = 0.5m*k_w*sign(u_x)
 	dy = -0.5m*k_w*sign(v_y)
-	#show
+	#end hide
 	#if abs(u_x) > tol
 		texth$(x - dx; y - 0.2*abs(dy); 'u_x*1000')
 	#end if

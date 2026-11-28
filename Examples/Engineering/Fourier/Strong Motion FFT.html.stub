@@ -1,6 +1,14 @@
 <div class="calcpad-output">
  <!-- FFT analysis of the [Anamizu 2024 earthquake](https://en.wikipedia.org/wiki/2024_Noto_earthquake) strong-motion acceleration record.
 <p>Extracts the Fourier amplitude spectrum and power spectral density from a real seismic time history to identify dominant frequency content. -->
+ <p>
+  Sampling frequency -
+  <span class="eq">
+   <var>Fs</var>
+   = 100
+   <i>Hz</i>
+  </span>
+ </p>
  <p>Accelleration data</p>
  <p>Raw record length = 225.000 sec, Uncor max = 136992, at 73.050 sec.</p>
  <p>Processed: 2024-01-05 23:22:02 GMT, USGS, Max = 7.283 cm/sec2 at   72.590 sec</p>
@@ -151,14 +159,6 @@
      </span>
     </span>
    </span>
-  </span>
- </p>
- <p>
-  Sampling frequency -
-  <span class="eq">
-   <var>Fs</var>
-   = 100
-   <i>Hz</i>
   </span>
  </p>
  <p>

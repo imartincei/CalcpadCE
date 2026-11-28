@@ -5,30 +5,31 @@
  </div>
  <p>Dimensions of base</p>
  <p>
+  Side a -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">5</u>
+   = 5
+   <i>m</i>
   </span>
-  ,
+  , Side b -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">4</u>
+   = 4
+   <i>m</i>
   </span>
-  ,
+  , Side c -
   <span class="eq">
    <var>c</var>
-   =
-   <u class="input-4">3</u>
+   = 3
+   <i>m</i>
   </span>
  </p>
- <p>Height</p>
  <p>
+  Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-6">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <!--
@@ -43,7 +44,14 @@
    <var>b</var>
    +
    <var>c</var>
-   )  = 0.5 ·  ( 5 + 4 + 3 )  = 6
+   )  = 0.5 ·  ( 5
+   <i>m</i>
+   + 4
+   <i>m</i>
+   + 3
+   <i>m</i>
+   )  = 6
+   <i>m</i>
   </span>
  </p>
  <p>Area of base (Heron equation)</p>
@@ -71,9 +79,25 @@
    =
    <span class="o0">
     <span class="r">√</span>
-    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+    6
+    <i>m</i>
+    ·  ( 6
+    <i>m</i>
+    − 5
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 4
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 3
+    <i>m</i>
+    )
    </span>
    = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Volume</p>
@@ -98,7 +122,14 @@
     </span>
     3
    </span>
-   · 6 · 2 = 4
+   · 6
+   <i>m</i>
+   <sup class="unit">2</sup>
+   · 2
+   <i>m</i>
+   = 4
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <!--

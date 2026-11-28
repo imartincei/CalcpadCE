@@ -12,15 +12,13 @@
    Width -
    <span class="eq">
     <var>b</var>
-    =
-    <u class="input-6">300</u>
+    = 300
     <i>mm</i>
    </span>
    , Height -
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-6">700</u>
+    = 700
     <i>mm</i>
    </span>
   </p>
@@ -50,8 +48,7 @@
    <span class="eq">
     <var>A</var>
     <sub>s1</sub>
-    =
-    <u class="input-11">8</u>
+    = 8
     <i>cm</i>
     <sup class="unit">2</sup>
    </span>
@@ -59,8 +56,7 @@
    <span class="eq">
     <var>A</var>
     <sub>s2</sub>
-    =
-    <u class="input-11">8</u>
+    = 8
     <i>cm</i>
     <sup class="unit">2</sup>
    </span>
@@ -106,16 +102,14 @@
    <span class="eq">
     <var>d</var>
     <sub>1</sub>
-    =
-    <u class="input-16">50</u>
+    = 50
     <i>mm</i>
    </span>
    , Right -
    <span class="eq">
     <var>d</var>
     <sub>2</sub>
-    =
-    <u class="input-16">50</u>
+    = 50
     <i>mm</i>
    </span>
   </p>
@@ -144,8 +138,7 @@
    <span class="eq">
     <var>N</var>
     <sub>Ed</sub>
-    =
-    <u class="input-21">1200</u>
+    = 1200
     <i>kN</i>
    </span>
    (positive for compression)
@@ -155,8 +148,7 @@
    <span class="eq">
     <var>M</var>
     <sub>Ed</sub>
-    =
-    <u class="input-22">200</u>
+    = 200
     <i>kNm</i>
    </span>
   </p>
@@ -170,8 +162,7 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-26">20</u>
+    = 20
     <i>MPa</i>
    </span>
   </p>
@@ -182,12 +173,13 @@
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Coefficient for long-term effects -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-27">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -298,8 +290,7 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-36">500</u>
+    = 500
     <i>MPa</i>
    </span>
   </p>
@@ -545,8 +536,7 @@ circle.Series1 {fill:Tomato;}
    <span class="eq">
     <var>K</var>
     <sub>G</sub>
-    =
-    <u class="input-58">0.75</u>
+    = 0.75
    </span>
   </p>
   <p>
@@ -565,17 +555,23 @@ circle.Series1 {fill:Tomato;}
    ) =
    <span class="eq">
     <var>φ</var>
-    =
-    <u class="input-63">2.5</u>
+    = 2.5
    </span>
   </p>
   <p>
    Column height -
    <span class="eq">
     <var>L</var>
-    =
-    <u class="input-64">4</u>
+    = 4
     <i>m</i>
+   </span>
+  </p>
+  <p>
+   Effective length factor -
+   <span class="eq">
+    <var>β</var>
+    <sub>L</sub>
+    = 1
    </span>
   </p>
   <p>
@@ -584,12 +580,11 @@ circle.Series1 {fill:Tomato;}
     <var>L</var>
     <sub>o</sub>
     =
-    <u class="input-65">1</u>
+    <var>β</var>
+    <sub>L</sub>
     ·
     <var>L</var>
-    =
-    <u class="input-65">1</u>
-    · 4
+    = 1 · 4
     <i>m</i>
     = 4
     <i>m</i>
@@ -603,8 +598,7 @@ circle.Series1 {fill:Tomato;}
     Number of vertical members contributing to the total effect -
     <span class="eq">
      <var>m</var>
-     =
-     <u class="input-70">1</u>
+     = 1
     </span>
    </p>
    <p>Reduction factor for height:</p>
@@ -1788,8 +1782,7 @@ circle.Series1 {fill:Tomato;}
    <span class="eq">
     <var>M</var>
     <sub>Edy</sub>
-    =
-    <u class="input-194">50</u>
+    = 50
     <i>kNm</i>
    </span>
   </p>
@@ -1798,9 +1791,16 @@ circle.Series1 {fill:Tomato;}
    <span class="eq">
     <var>M</var>
     <sub>Rdy</sub>
-    =
-    <u class="input-195">100</u>
+    = 100
     <i>kNm</i>
+   </span>
+  </p>
+  <p>
+   Effective length factor -
+   <span class="eq">
+    <var>β</var>
+    <sub>y</sub>
+    = 1
    </span>
   </p>
   <p>
@@ -1809,12 +1809,11 @@ circle.Series1 {fill:Tomato;}
     <var>L</var>
     <sub>oy</sub>
     =
-    <u class="input-196">1</u>
+    <var>β</var>
+    <sub>y</sub>
     ·
     <var>L</var>
-    =
-    <u class="input-196">1</u>
-    · 4
+    = 1 · 4
     <i>m</i>
     = 4
     <i>m</i>
@@ -2166,7 +2165,6 @@ circle.Series1 {fill:Tomato;}
     = 3020
     <i>kN</i>
    </span>
-   kN
   </p>
   <p>
    <span class="eq">

@@ -5,16 +5,17 @@
  </div>
  <p>Dimensions</p>
  <p>
+  Length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">2</u>
+   = 2
+   <i>m</i>
   </span>
-  ,
+  , Width -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Area</p>
@@ -25,7 +26,13 @@
    <var>a</var>
    ·
    <var>b</var>
-   = 2 · 1 = 2
+   = 2
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 2
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Perimeter</p>
@@ -36,7 +43,12 @@
    <var>a</var>
    +
    <var>b</var>
-   )  = 2 ·  ( 2 + 1 )  = 6
+   )  = 2 ·  ( 2
+   <i>m</i>
+   + 1
+   <i>m</i>
+   )  = 6
+   <i>m</i>
   </span>
  </p>
  <p>

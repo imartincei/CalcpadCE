@@ -1,9 +1,10 @@
 '<!-- Solves $a x^2 + b x + c = 0$ with the built-in numerical root finder, returning both real or complex roots from the user-supplied coefficients. -->
 f(x) = a*x^2 + b*x + c'= 0
 'Coefficients:
-a = ? {2}','b = ? {3}','c = ? {-5}
+#UI a = 2','b = 3','c = -5
 #hide
 PlotWidth = 360''PlotHeight = 200
+#end hide
 #post
 #if a ≡ 0
 	'The coefficient <i>a</i> is equal to zero. The equation is linear.
@@ -20,7 +21,7 @@ PlotWidth = 360''PlotHeight = 200
 		d = abs(x_2 - x_1)/4
 		x_min = min(x_1; x_2) - d
 		x_max = max(x_1; x_2) + d
-		#post
+		#end hide
 		$Plot{f(x) & x_1|0 & x_2|0 @ x = x_min : x_max}
 	#else
 		'The discriminant is less than zero. There are no real roots.
@@ -28,7 +29,8 @@ PlotWidth = 360''PlotHeight = 200
 		d = -b/(2*a)
 		x_min = d + abs(a)
 		x_max = d - abs(a)
-		#post
+		#end hide
 		$Plot{f(x) @ x = x_min : x_max}
 	#end if
 #end if
+#end post

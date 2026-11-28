@@ -5,16 +5,15 @@
 #deg
 δz = 10^-12
 Precision = 10^-8
-x_J = [0; 0; 8; 16; 16]*m
-y_J = [0; 8; 10; 8; 0]*m
-#show
-x_J','y_J
+#end hide
+#UI {"columnHeaders": ["x, m", "y, m"], "rowHeaders": ["J1", "J2", "J3", "J4", "J5"]} xy_J = [0m; 0m|0m; 8m|8m; 10m|16m; 8m|16m; 0m]
+#hide
+x_J = col(xy_J; 1)
+y_J = col(xy_J; 2)
+#end hide
 n_J = len(x_J)
 '<h4>Elements - [J1; J2]</h4>
-#hide
-e_J = [1; 2|3; 2|3; 4|5; 4]
-#show
-transp(e_J)
+#UI {"columnHeaders": ["J1", "J2"]} e_J = [1; 2|3; 2|3; 4|5; 4]
 n_E = n_rows(e_J)
 'Element endpoint coordinates
 x_1(e) = x_J.e_J.(e; 1)','y_1(e) = y_J.e_J.(e; 1)
@@ -27,21 +26,17 @@ c(e) = (x_2(e) - x_1(e))/l(e)','s(e) = (y_2(e) - y_1(e))/l(e)
 'Generation of the full transformation matrix
 T(e) = add(t(e); add(t(e); matrix(6; 6); 1; 1); 4; 4)
 '<h4>Supports - [Joint; cx; cy; cr]</h4>
-#hide
-c = [1; 10^20kN/m; 10^20kN/m; 0kNm|5; 10^20kN/m; 10^20kN/m; 10^20kNm]
-#show
-c
+#UI {"columnHeaders": ["Joint", "c<sub>x</sub>, kN/m", "c<sub>y</sub>, kN/m", "c<sub>r</sub>, kNm"]} c = [1; 100000000000000000000kN/m; 100000000000000000000kN/m; 0kNm|5; 100000000000000000000kN/m; 100000000000000000000kN/m; 100000000000000000000kNm]
 n_c = n_rows(c)
 '<h4>Loads - [Element, qx, qy]</h4>
+#UI {"columnHeaders": ["Element", "q<sub>x</sub>, kN/m", "q<sub>y</sub>, kN/m"]} q = [1; 10kN/m; 0kN/m|2; 0kN/m; -20kN/m|3; 0kN/m; -10kN/m]
 #hide
-q = [1; 10kN/m; 0kN/m|2; 0kN/m; -20kN/m|3; 0kN/m; -10kN/m]
 n_q = n_rows(q)
 q_x = vector(n_E)*kN/m
 q_y = vector(n_E)*kN/m
 $Repeat{q_x.(q.(i; 1)) = q_x.(q.(i; 1)) + q.(i; 2) @ i = 1 : n_q}
 $Repeat{q_y.(q.(i; 1)) = q_y.(q.(i; 1)) + q.(i; 3) @ i = 1 : n_q}
-#show
-q
+#end hide
 'Load values on elements
 q_x
 q_y
@@ -56,7 +51,7 @@ k = W/w
 #def thin_style$ = style = "stroke:green; stroke-width:1; fill:none"
 #def thick_style$ = style = "stroke:green; stroke-width:2; fill:none"
 k_q = m/kN
-#show
+#end hide
 #val
 svg$
 #for i = 1 : n_E
@@ -106,7 +101,7 @@ svg$
 	y1 = (h - y_1(i))*k
 	x2 = x_2(i)*k
 	y2 = (h - y_2(i))*k
-	#show
+	#end hide
 	line$(x1; y1; x2; y2; main_style$)
 #loop
 #for i = 1 : n_c
@@ -119,7 +114,7 @@ svg$
 	y2 = y1 - abs(δ)
 	x3 = x1 + δ
 	y3 = y1 + abs(δ)
-	#show
+	#end hide
 	#if c.(i; 2) ≠ 0kN/m
 		#if c.(i; 3) ≠ 0kN/m
 			#if c.(i; 4) ≠ 0kNm
@@ -164,7 +159,7 @@ svg$
 	#hide
 	x = (x_1(i) + x_2(i))*k/2
 	y = (h - (y_1(i) + y_2(i))/2)*k
-	#show
+	#end hide
 	texth$(x + 0.8m*sign(W/2 - x)*k; y + 0.6m*k; e'i')
 #loop
 #for i = 1 : n_J
@@ -177,16 +172,17 @@ dimh$(0; w*k; (h + 1.5m)*k; 'w')
 '</svg>
 #equ
 '<h4>Materials</h4>
-'Modules of elasticity -'E = [45; 35]*GPa
-'Poisson coefficients -'ν = [0.2; 0.2]
+#UI {"columnHeaders": ["E, GPa"]} 'Modules of elasticity -'E = [45GPa; 35GPa]
+#UI {"columnHeaders": ["ν"]} 'Poisson coefficients -'ν = [0.2; 0.2]
 'Shear modules -'G = E/(2*(1 + ν))
-'Assignment on elements -'e_M = [1; 2; 2; 1]
+#UI {"columnHeaders": ["Material"]} 'Assignment on elements -'e_M = [1; 2; 2; 1]
 '<h4>Cross-sections</h4>
 #hide
 b = vector(2)','h = vector(2)
-#show
-'Section S1 -'b_1 = 300mm','h_1 = 300mm
-'Section S2 -'b_2 = 300mm','h_2 = 900mm
+#end hide
+#UI 'Section S1 -'b_1 = 300mm', 'h_1 = 300mm
+#UI 'Section S2 -'b_2 = 300mm', 'h_2 = 900mm
+#pause
 'General representation
 'Width -'b(ξ; z) = b_1 + (b_2 - b_1)*ξ
 'Height -'h(ξ) = h_1 + (h_2 - h_1)*ξ
@@ -247,7 +243,7 @@ K = symmetric(3*n_J)
 	j = 3*c.(i; 1) - 2
 	add(vec2diag(last(row(c; i); 3)/[kN/m; kN/m; kNm]); K; j; j)
 #loop
-#show
+#end hide
 K
 '<h4>Element load vector</h4>
 'Load functions
@@ -296,7 +292,7 @@ F = vector(3*n_J)
 		F.(j + 3) = F.(j + 3) + take(3*jj; F_E(e))
 	#loop
 #loop
-#show
+#end hide
 F
 '<h4>Results</h4>
 '<p><strong>Solution of the system of equations</strong></p>
@@ -444,7 +440,7 @@ svg$
 	y = v*k_R
 	xd2 = x1 + x*c_e - y*s_e
 	yd2 = y1 - x*s_e - y*c_e
-	#show
+	#end hide
 	#for j = 0 : 10
 		#hide
 		xd1 = xd2
@@ -457,7 +453,7 @@ svg$
 		xd2 = x1 + x*c_e - y*s_e
 		yd2 = y1 - x*s_e - y*c_e
 		d = -15*sign(v)
-		#show
+		#end hide
 		line$(xd1; yd1; xd2; yd2; red_style$)
 	#loop
 #loop
@@ -470,7 +466,7 @@ svg$
 	y = (h - y_J.j)*k - v*k_R
 	dx = 15*sign(u)
 	dy = -15*sign(v)
-	#show
+	#end hide
 	#if abs(u) > tol
 		texth$(x + dx; y; 'u*1000')
 	#end if

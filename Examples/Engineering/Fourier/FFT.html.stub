@@ -17,6 +17,42 @@
   </span>
  </p>
  <p>
+  First frequency -
+  <span class="eq">
+   <var>f</var>
+   <sub>1</sub>
+   = 10
+   <i>Hz</i>
+  </span>
+ </p>
+ <p>
+  Second frequency -
+  <span class="eq">
+   <var>f</var>
+   <sub>2</sub>
+   = 30
+   <i>Hz</i>
+  </span>
+ </p>
+ <p>
+  First amplitude -
+  <span class="eq">
+   <var>X</var>
+   <sub>1</sub>
+   = 20
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
+  Second amplitude -
+  <span class="eq">
+   <var>X</var>
+   <sub>2</sub>
+   = 20
+   <i>mm</i>
+  </span>
+ </p>
+ <p>
   Time step -
   <span class="eq">
    <var>Δt</var>
@@ -65,37 +101,6 @@
    0.999
    <b class="b0">]</b>
    <i>s</i>
-  </span>
- </p>
- <p>Frequencies and amplitudes</p>
- <p>
-  <span class="eq">
-   <var>f</var>
-   <sub>1</sub>
-   = 10
-   <i>Hz</i>
-  </span>
-  ,
-  <span class="eq">
-   <var>f</var>
-   <sub>2</sub>
-   = 30
-   <i>Hz</i>
-  </span>
- </p>
- <p>
-  <span class="eq">
-   <var>X</var>
-   <sub>1</sub>
-   = 20
-   <i>mm</i>
-  </span>
-  ,
-  <span class="eq">
-   <var>X</var>
-   <sub>2</sub>
-   = 20
-   <i>mm</i>
   </span>
  </p>
  <p>

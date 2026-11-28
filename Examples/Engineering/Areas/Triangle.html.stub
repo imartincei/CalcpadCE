@@ -5,22 +5,23 @@
  </div>
  <p>Side lengths</p>
  <p>
+  Side a -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">5</u>
+   = 5
+   <i>m</i>
   </span>
-  ,
+  , Side b -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-4">4</u>
+   = 4
+   <i>m</i>
   </span>
-  ,
+  , Side c -
   <span class="eq">
    <var>c</var>
-   =
-   <u class="input-4">3</u>
+   = 3
+   <i>m</i>
   </span>
  </p>
  <!--
@@ -35,7 +36,14 @@
    <var>b</var>
    +
    <var>c</var>
-   = 5 + 4 + 3 = 12
+   = 5
+   <i>m</i>
+   + 4
+   <i>m</i>
+   + 3
+   <i>m</i>
+   = 12
+   <i>m</i>
   </span>
  </p>
  <p>Area (Heron formula)</p>
@@ -45,7 +53,10 @@
    <var>p</var>
    = 0.5 ·
    <var>P</var>
-   = 0.5 · 12 = 6
+   = 0.5 · 12
+   <i>m</i>
+   = 6
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -72,9 +83,25 @@
    =
    <span class="o0">
     <span class="r">√</span>
-    6 ·  ( 6 − 5 )  ·  ( 6 − 4 )  ·  ( 6 − 3 )
+    6
+    <i>m</i>
+    ·  ( 6
+    <i>m</i>
+    − 5
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 4
+    <i>m</i>
+    )  ·  ( 6
+    <i>m</i>
+    − 3
+    <i>m</i>
+    )
    </span>
    = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <!--

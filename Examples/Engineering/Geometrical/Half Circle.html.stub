@@ -4,14 +4,13 @@
  <div style="max-width:120mm">
   <img alt="half-circle.png" class="side" src="Images/mechanics/sections/half-circle.png" style="height:112pt;"/>
  </div>
- <p>Diameter</p>
  <p>
+  Diameter -
   <span class="eq">
    <var>d</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -30,15 +29,16 @@
    =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <sup>2</sup>
     <span class="dvl">
     </span>
     8
    </span>
    = 0.393
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Perimeter</p>
  <p>
@@ -58,13 +58,16 @@
    =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
-   + 1 = 2.57
+   + 1
+   <i>m</i>
+   = 2.57
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Centroid</p>
  <p>
@@ -81,13 +84,14 @@
    =
    <span class="dvc">
     1
+    <i>m</i>
     <span class="dvl">
     </span>
     2
    </span>
    = 0.5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -105,13 +109,14 @@
    =
    <span class="dvc">
     2 · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     3 · 3.14
    </span>
    = 0.212
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -155,11 +160,12 @@
    </span>
    <span class="b1">)</span>
    · 1
+   <i>m</i>
    <sup>4</sup>
    = 0.00686
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -178,15 +184,16 @@
    =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <sup>4</sup>
     <span class="dvl">
     </span>
     128
    </span>
    = 0.0245
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -199,10 +206,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 0.00686 + 0.0245 = 0.0314
+   = 0.00686
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 0.0245
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 0.0314
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -227,14 +240,18 @@
     </span>
     <span class="dvc">
      0.00686
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.393
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.132
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -258,14 +275,18 @@
     </span>
     <span class="dvc">
      0.0245
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.393
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.25
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -289,13 +310,17 @@
     </span>
     <span class="dvc">
      0.0314
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      0.393
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.283
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

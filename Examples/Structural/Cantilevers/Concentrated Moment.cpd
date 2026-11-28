@@ -2,28 +2,27 @@
 '<div style="max-width:180mm;">
 '<img style="width:165pt;" alt="cantilever-beam-concentrated-moment.png" class="side" src="../../Images/mechanics/beams/cantilever-beam-concentrated-moment.png">
 '<p><b>Input data</b></p>
-'Beam Length -'l = ? {5}'m
-'Load -'M = ? {10}'kN·m
+#UI 'Beam Length -'l = 5m
+#UI 'Load -'M = 10kNm
 #post
 '<p><b>Internal forces</b></p>
-'Bending -'M = M'kN·m
-'Shear -'V = 0'kN
+'Bending -'M = M|kNm
+'Shear -'V = 0kN
 '<p><b>Diagrams</b></p>
 #hide
 PlotWidth = 600
 PlotHeight = 150
-#show
-'Calculate internal forces at'x_1 = ? {1}'m
-#pre
-
+#end hide
+#end post
+#UI 'Calculate internal forces at'x_1 = 1m
 #post
 'Bending
 M(x) = -M
-$Plot{-M(x) @ x = 0 : l}
-M(x_1)'kN·m
+$Plot{-M(x) @ x = 0m : l}
+M(x_1)|kNm
 'Shear
-V(x) = 0
-$Plot{V(x) @ x = 0 : l}
-V(x_1)'kN
-#show
+V(x) = 0kN
+$Plot{V(x) @ x = 0m : l}
+V(x_1)|kN
+#end post
 '</div>

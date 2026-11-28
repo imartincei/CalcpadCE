@@ -13,51 +13,27 @@
   <span class="eq">
    <var>F</var>
    <sub>t_Ed</sub>
-   =
-   <u class="input-8">20</u>
+   = 20
+   <i>kN</i>
   </span>
-  kN
  </p>
  <p>
   Shear -
   <span class="eq">
    <var>F</var>
    <sub>v_Ed</sub>
-   =
-   <u class="input-9">10</u>
+   = 10
+   <i>kN</i>
   </span>
-  kN
  </p>
  <h4>Bolt data</h4>
- <p id="bolt" style="display:none;">
-  <span class="eq">
-   <var>d</var>
-   =
-   <u class="input-11">12</u>
-  </span>
- </p>
- <p>
-  Bolt diameter -
-  <select data-target="bolt">
-   <option value="12">M12</option>
-   <option value="14">M14</option>
-   <option value="16">M16</option>
-   <option value="18">M18</option>
-   <option value="20">M20</option>
-   <option value="22">M22</option>
-   <option value="24">M24</option>
-   <option value="27">M27</option>
-   <option value="30">M30</option>
-   <option value="36">M36</option>
-  </select>
- </p>
  <p>
   Bolt diameter -
   <span class="eq">
    <var>d</var>
    = 12
+   <i>mm</i>
   </span>
-  mm
  </p>
  <p>
   Hole diameter -
@@ -65,8 +41,8 @@
    <var>d</var>
    <sub>0</sub>
    = 13
+   <i>mm</i>
   </span>
-  mm
  </p>
  <p>
   Punching diameter-
@@ -74,8 +50,8 @@
    <var>d</var>
    <sub>m</sub>
    = 20.5
+   <i>mm</i>
   </span>
-  mm
  </p>
  <p>
   Area of the unthreaded part (gross) -
@@ -93,15 +69,18 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 12
+    3.14 ·  ( 12
+    <i>mm</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
     4
    </span>
    = 113.1
+   <i>mm</i>
+   <sup class="unit">2</sup>
   </span>
-  mm²
  </p>
  <p>
   Area of the threaded part (net) -
@@ -109,27 +88,16 @@
    <var>A</var>
    <sub>s</sub>
    = 84
-  </span>
-  mm²
- </p>
- <p id="grade" style="display:none;">
-  <span class="eq">
-   <var>Grade</var>
-   =
-   <u class="input-54">10.9</u>
+   <i>mm</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>
   Bolt steel grade -
-  <select data-target="grade">
-   <option value="4.6">4.6</option>
-   <option value="4.8">4.8</option>
-   <option value="5.6">5.6</option>
-   <option value="5.8">5.8</option>
-   <option value="6.8">6.8</option>
-   <option value="8.8">8.8</option>
-   <option value="10.9">10.9</option>
-  </select>
+  <span class="eq">
+   <var>Grade</var>
+   = 10.9
+  </span>
  </p>
  Bolt steel grade - 10.9
  <p>
@@ -138,8 +106,8 @@
    <var>f</var>
    <sub>ub</sub>
    = 1000
+   <i>MPa</i>
   </span>
-  MPa
  </p>
  <p>
   Bolt yield strength -
@@ -147,28 +115,26 @@
    <var>f</var>
    <sub>yb</sub>
    = 900
+   <i>MPa</i>
   </span>
-  MPa
  </p>
  <h4>Plate data</h4>
  <p>
   Plate thickness -
   <span class="eq">
    <var>t</var>
-   =
-   <u class="input-77">18</u>
+   = 18
+   <i>mm</i>
   </span>
-  mm
  </p>
  <p>
   Steel yield strength -
   <span class="eq">
    <var>f</var>
    <sub>y</sub>
-   =
-   <u class="input-78">355</u>
+   = 355
+   <i>MPa</i>
   </span>
-  MPa
  </p>
  <p>
   Steel tensile strength -
@@ -176,8 +142,8 @@
    <var>f</var>
    <sub>u</sub>
    = 510
+   <i>MPa</i>
   </span>
-  MPa
  </p>
  <p>Partial safety factors</p>
  <p>

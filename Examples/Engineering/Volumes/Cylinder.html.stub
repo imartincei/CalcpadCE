@@ -3,21 +3,20 @@
  <div style="max-width:100mm">
   <img alt="cylinder.png" class="side" src="Images/math/volume/cylinder.png" style="height:55pt;"/>
  </div>
- <p>Dimensions</p>
  <p>
   Base radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>
   Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-5">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <p>Area of base</p>
@@ -30,8 +29,11 @@
    <var>r</var>
    <sup>2</sup>
    = 3.14 · 1
+   <i>m</i>
    <sup>2</sup>
    = 3.14
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Volume</p>
@@ -42,7 +44,14 @@
    <var>A</var>
    ·
    <var>h</var>
-   = 3.14 · 2 = 6.28
+   = 3.14
+   <i>m</i>
+   <sup class="unit">2</sup>
+   · 2
+   <i>m</i>
+   = 6.28
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Area of side surface</p>
@@ -56,7 +65,13 @@
    <var>r</var>
    ·
    <var>h</var>
-   = 2 · 3.14 · 1 · 2 = 12.57
+   = 2 · 3.14 · 1
+   <i>m</i>
+   · 2
+   <i>m</i>
+   = 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Total surface area</p>
@@ -68,7 +83,15 @@
    <sub>o</sub>
    + 2 ·
    <var>A</var>
-   = 12.57 + 2 · 3.14 = 18.85
+   = 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 2 · 3.14
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 18.85
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

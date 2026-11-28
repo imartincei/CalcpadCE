@@ -9,7 +9,9 @@
 #equ
 '**Solution:** Transform the equation in the form:'f(x) = x^x - 10'= 0</p>
 'The first derivative is'f′(x) = x^x*(ln(x) + 1)
-'Initial guess -'x_0 = 4', target precision -'δ = 10^-14
+#UI 'Initial guess -'x_0 = 4
+'Target precision -'δ = 10^-14
+#pause
 '#### Animation
 '<style>#start{height:1.8em; padding-top:0;} .fr{display:none;} .Series3, .Series6{opacity:0;} .Series7{stroke-width:6pt;}</style>
 #hide

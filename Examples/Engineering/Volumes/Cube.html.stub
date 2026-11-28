@@ -3,12 +3,12 @@
  <div style="max-width:90mm">
   <img alt="cube.png" class="side" src="Images/math/volume/cube.png" style="height:65pt;"/>
  </div>
- <p>Side length</p>
  <p>
+  Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -19,8 +19,11 @@
    <var>a</var>
    <sup>3</sup>
    = 1
+   <i>m</i>
    <sup>3</sup>
    = 1
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Surface area</p>
@@ -31,8 +34,11 @@
    <var>a</var>
    <sup>2</sup>
    = 6 · 1
+   <i>m</i>
    <sup>2</sup>
    = 6
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

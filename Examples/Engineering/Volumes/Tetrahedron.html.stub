@@ -3,12 +3,12 @@
  <div style="max-width:110mm">
   <img alt="tetrahedron.png" class="side" src="Images/math/volume/tetrahedron.png" style="height:60pt;"/>
  </div>
- <p>Side length</p>
  <p>
+  Side length -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-4">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -35,12 +35,15 @@
      2
     </span>
     · 1
+    <i>m</i>
     <sup>3</sup>
     <span class="dvl">
     </span>
     12
    </span>
    = 0.118
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Surface area</p>
@@ -61,8 +64,11 @@
     3
    </span>
    · 1
+   <i>m</i>
    <sup>2</sup>
    = 1.73
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

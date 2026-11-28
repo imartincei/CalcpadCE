@@ -2,7 +2,7 @@
 #hide
 #rad
 r(θ) = 1
-#show
+#end hide
 'General parametric equation:
 x(θ) = r(θ)*cos(θ)
 y(θ) = r(θ)*sin(θ)
@@ -11,40 +11,43 @@ y(θ) = r(θ)*sin(θ)
 #hide
 PlotWidth = 400
 PlotHeight = 390
+#end hide
 #post
 $Plot{x(θ)|y(θ) @ θ = 0 : 8*π}
-#show
+#end post
 'Fermat spiral - 'r(θ) = sqr(θ)
 #hide
 PlotHeight = 387
+#end hide
 #post
 $Plot{x(θ)|y(θ) & -x(θ)|-y(θ) @ θ = 0 : 8*π}
-#show
+#end post
+#UI 'Growth rate -'a = 0.3
 'Logarithmic spiral -'r(θ) = e^(a*θ)
 #hide
-a = 0.3
 φ = (1 + sqr(5))/2
 PlotHeight = 259
+#end hide
 #post
 $Plot{x(θ)|y(θ) @ θ = 0 : 8*π}
-#show
+#end post
 'Golden spiral -'r(θ) = φ^(2/π*θ)
 #hide
 PlotHeight = 255
+#end hide
 #post
 $Plot{x(θ)|y(θ) @ θ = 0 : 8*π}
-#show
+#end post
 'Hyperbolic spiral -'r(θ) = 1/θ
 #hide
 PlotHeight = 177
+#end hide
 #post
 $Plot{x(θ)|y(θ) @ θ = π/8 : 8*π}
-#show
+#end post
 'Lituus -'r(θ) = 1/sqr(θ)
 #hide
 PlotHeight = 188
 #post
 $Plot{x(θ)|y(θ) @ θ = π/16 : 16*π}
-#pre
-
-'Tip: Click "<b>Calculate</b>" to see the respective plot.
+#end post

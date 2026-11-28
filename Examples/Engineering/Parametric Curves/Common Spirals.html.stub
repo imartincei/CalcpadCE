@@ -252,6 +252,13 @@ circle.Series2 {fill:YellowGreen;}
   </g>
  </svg>
  <p>
+  Growth rate -
+  <span class="eq">
+   <var>a</var>
+   = 0.3
+  </span>
+ </p>
+ <p>
   Logarithmic spiral -
   <span class="eq">
    <var>r</var>
@@ -680,11 +687,4 @@ circle.Series1 {fill:Tomato;}
    </polyline>
   </g>
  </svg>
- <p>
- </p>
- <p>
-  Tip: Click "
-  <b>Calculate</b>
-  " to see the respective plot.
- </p>
 </div>

@@ -1,9 +1,8 @@
 '<!-- Volume $V = a\, b\, c$ and surface area $S = 2(a b + b c + c a)$ of a rectangular prism (box). -->
 '<div style = "max-width:130mm"><img style="height:65pt;" class="side" alt="rectangular-prism.png" src = "../../Images/math/volume/rectangular-prism.png"></div>
 'Dimensions of base
-a = ? {3}','b = ? {2}
-'Height
-h = ? {1}
+#UI 'Base length -'a = 3m', Base width -'b = 2m
+#UI 'Height -'h = 1m
 'Volume
 V = a*b*h
 'Surface area

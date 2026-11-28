@@ -1,9 +1,8 @@
 '<!-- Volume and surface area of a right triangular prism, from triangle sides and prism length. -->
 '<div style = "max-width:120mm"><img style="height:60pt;" class="side" alt="triangular-prism.png" src = "../../Images/math/volume/triangular-prism.png"></div>
 'Dimensions of base
-a = ? {5}','b = ? {4}','c = ? {3}
-'Height
-h = ? {2}
+#UI 'Side a -'a = 5m', Side b -'b = 4m', Side c -'c = 3m
+#UI 'Height -'h = 2m
 '<!--
 #if (a + b > c)*(b + c > a)*(c + a > b)
 '<-->

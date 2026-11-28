@@ -4,14 +4,19 @@
 a = sqrt(3)/2
 x = hp([0; 1; 0.5; 0])
 y = hp([0; 0; a; 0])
-'Number of iterations -'n = 5
+#UI 'Number of iterations -'n = 5
+#pause
 #val
-'<style>polygon {stroke:steelBlue; stroke-width:0.2; stroke-opacity:0.4;}</style>
+#html
+<style>polygon {stroke:steelBlue; stroke-width:0.2; stroke-opacity:0.4;}</style>
+#end html
 #hide
 w = 150', 'h = 1.2*w', 'k = 100
+#end hide
 #for i = 1 : n
+	#hide
 	n_p = len(x)
-	#show
+	#end hide
 	'<h4>Iteration 'i'</h4>
 	'<svg viewBox="0 10 'k' 'k'" style="transform:scale(0.9); width:'w'pt; height:'h'pt">
 	'<defs><radialGradient id="sff" cx="50%" cy="50%"><stop offset="0%" stop-color="lightCyan"/><stop offset="100%" stop-color="lightBlue"/></radialGradient></defs>
@@ -38,4 +43,6 @@ w = 150', 'h = 1.2*w', 'k = 100
 	'Reassign to the original vectors
 	x = join(x1; p2.1)
 	y = join(y1; p2.2)
+	#end hide
 #loop
+#end val

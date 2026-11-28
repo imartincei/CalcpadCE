@@ -3,26 +3,27 @@
 '<div style="max-width:180mm">
 '<img style="width:375pt;" style="max-width:100%;" src="../../Images/structures/rc/detailing/beam.png" alt="beam.png">
 '<p><b>Beam dimensions</b></p>
-'Cross section - 'b_w = ? {350}'mm, 'h_w = ? {650}'mm
-'Clear beam span -'l_cl = ? {5000}'mm
-'Slab depth -'h_f = ? {130}'mm
+#UI 'Cross section - 'b_w = 350mm', 'h_w = 650mm
+#UI 'Clear beam span -'l_cl = 5000mm
+#UI 'Slab depth -'h_f = 130mm
 #post
-'Cross section area -'A_c = b_w*h_w'mm²
-#show
-'Dimensions of columns -'b_c = ? {500}'mm,'h_c = ? {500}'mm
-'Maximum seismic axial load in beam -'N_Ed = ? {0}'kN
+'Cross section area -'A_c = b_w*h_w|mm^2
+#end post
+#UI 'Dimensions of columns -'b_c = 500mm', 'h_c = 500mm
+#UI 'Maximum seismic axial load in beam -'N_Ed = 0kN
 
 '<p><b>Concrete</b></p>
-'Characteristic compressive cylinder strength -'f_ck = ? {25}'MPa
-'Partial safety factor -'γ_c = 1.5','α_ct = 1','α_cc = ? {1}
+#UI 'Characteristic compressive cylinder strength -'f_ck = 25MPa
+'Partial safety factor -'γ_c = 1.5','α_ct = 1
+#UI 'Coefficient for long-term effects -'α_cc = 1
 #post
-'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c'MPa
-'Mean value of axial tensile strength -'f_ctm = 0.30*f_ck^(2/3)'MPa
-'Characteristic axial tensile strength -'f_ctk,005 = 0.7*f_ctm'MPa
+'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c|MPa
+'Mean value of axial tensile strength -'f_ctm = 0.30*(f_ck/1MPa)^(2/3)*1MPa
+'Characteristic axial tensile strength -'f_ctk,005 = 0.7*f_ctm
 
 '<p class="ref">[§ 5.1.2 (1)]</p>
 '<p><b>Check for normalized axial load</b></p>
-ν_d = N_Ed/(A_c*f_cd)*1000
+ν_d = N_Ed/(A_c*f_cd)
 #if ν_d > 0.1
 	'<p class="err">'ν_d'&gt; 0.1. The check is NOT satisfied! ❌</p>
 #else
@@ -30,26 +31,21 @@
 #end if
 '<p class="ref">[§ 5.4.1.2.1 (3)]</p>
 '<p><b>Beam width check</b></p>
-b_w,max = min(b_c + h_w;2*b_c)'mm
+b_w,max = min(b_c + h_w;2*b_c)
 #if b_w ≤ b_w,max
-	b_w'mm &le;'b_w,max'mm. The check is satisfied! ✓
+	b_w' &le; 'b_w,max'. The check is satisfied! ✓
 #else
-	'<p class="err">'b_w'mm &gt;'b_w,max'mm. The check is NOT satisfied! ❌</p>
+	'<p class="err">'b_w' &gt; 'b_w,max'. The check is NOT satisfied! ❌</p>
 #end if
 '<p class="ref">[§ 5.4.3.1.1 (3)]</p>
 '<p><b>Maximum effective flange width</b></p>
 '<table class="bordered"><tr><th></th><th>Exterior column</th><th>Interior column</th></tr>
-'<tr><th>In the absence of transverse beam</th><td>'b_c'mm</td><td>'b_c + 4*h_f'mm</td></tr>
-'<tr><th>With transverse beam</th><td>'b_c + 4*h_f'mm</td><td>'b_c + 8*h_f'mm</td></tr></table>
-#show
+'<tr><th>In the absence of transverse beam</th><td>'b_c'</td><td>'b_c + 4*h_f'</td></tr>
+'<tr><th>With transverse beam</th><td>'b_c + 4*h_f'</td><td>'b_c + 8*h_f'</td></tr></table>
+#end post
 '<p><b>Longitudinal reinforcement</b></p>
-'<p id="C" style="display:none;">'C = ? {0}'</p>
-'Characteristic yield strength -'f_yk = ? {500}'MPa
-#pre
-'<p>Steel class - <select data-target="C">
-'<option value="0"> Class B </option>
-'<option value="1"> Class C </option>
-'</select></p>
+#UI 'Characteristic yield strength -'f_yk = 500MPa
+#UI {"type": "dropdown", "keys": ["Class B", "Class C"], "values": ["0", "1"]} 'Steel class -'C = 0
 #post
 #val
 #if C ≡ 0
@@ -59,15 +55,15 @@ b_w,max = min(b_c + h_w;2*b_c)'mm
 #else
 	'<p class="err">Invalid steel class!</p>
 #end if
-#equ
+#end val
 'Partial safety factor for steel -'γ_s = 1.15
-'Design yield strength -'f_yd = f_yk/γ_s'MPa
-'Modulus of elasticity -'E_s = 200000'MPa
-#show
+'Design yield strength -'f_yd = f_yk/γ_s|MPa
+'Modulus of elasticity -'E_s = 200000MPa
+#end post
 '<p><b>Bottom reinforcement in critical regions</b></p>
-'Bar diameter -'d_bL1 = ? {16}'mm
-'Effective cross section depth -'d_1 = ? {590}'mm
-'Reinforcement area -'A_s1 = ? {1005}'mm²
+#UI {"type": "dropdown", "keys": ["12 mm", "14 mm", "16 mm", "18 mm", "20 mm", "22 mm", "25 mm", "28 mm", "32 mm", "40 mm"], "values": ["12mm", "14mm", "16mm", "18mm", "20mm", "22mm", "25mm", "28mm", "32mm", "40mm"]} 'Bar diameter -'d_bL1 = 16mm
+#UI 'Effective cross section depth -'d_1 = 590mm
+#UI 'Reinforcement area -'A_s1 = 1005mm^2
 #post
 'Reinforcement ratio -'ρ_1 = A_s1/(b_w*d_1)
 '<p class="ref">[§ 5.4.3.1.2 (5)]</p>
@@ -83,34 +79,34 @@ b_w,max = min(b_c + h_w;2*b_c)'mm
 #end if
 '<p><b>Design anchorage length</b></p>
 η_1 = 1 'when good conditions are obtained
-#if d_bL1 ≤ 32
+#if d_bL1 ≤ 32mm
 	η_2 = 1'- for'd_bL1'≤ 32 mm
 #else
-	η_2 = (132 - d_bL1)/100'- for'd_bL1'> 32 mm
+	η_2 = (132 - d_bL1/1mm)/100'- for'd_bL1'> 32 mm
 #end if
-f_ctd = α_ct*f_ctk,005/γ_c'MPa
+f_ctd = α_ct*f_ctk,005/γ_c|MPa
 '<p class="ref">[EN 1992-1-1, § 8.4.2 (2)]</p>
-f_bd = 2.25*η_1*η_2*f_ctd'MPa
-σ_sd = f_yd'MPa
+f_bd = 2.25*η_1*η_2*f_ctd|MPa
+σ_sd = f_yd|MPa
 '<p class="ref">[EN 1992-1-1, § 8.4.3 (2)]</p>
-l_b,rqd = d_bL1/4*(σ_sd/f_bd)'mm
+l_b,rqd = d_bL1/4*(σ_sd/f_bd)|mm
 '<p class="ref">[EN 1992-1-1, Table 8.2]</p>
 α_1 = 1','α_2 = 1','α_3 = 1','α_4 = 1','α_5 = 1
 '<p class="ref">[EN 1992-1-1, § 8.4.4 (1)]</p>
-l_bd_ = α_1*α_2*α_3*α_4*α_5*l_b,rqd'mm
-l_b,min = max(0.6*l_b,rqd;10*d_bL1;100)'mm
-l_bd = round(max(l_bd_;l_b,min))'mm
-#show
+l_bd_ = α_1*α_2*α_3*α_4*α_5*l_b,rqd|mm
+l_b,min = max(0.6*l_b,rqd;10*d_bL1;100mm)|mm
+l_bd = round(max(l_bd_;l_b,min))|mm
+#end post
 '<p><b>Top reinforcement at supports</b></p>
-'Bar diameter -'d_bL2 = ? {20}'mm
-'Effective cross section depth -'d_2 = ? {590}'mm
-'Reinforcement area -'A_s2 = ? {1571}'mm²
+#UI {"type": "dropdown", "keys": ["12 mm", "14 mm", "16 mm", "18 mm", "20 mm", "22 mm", "25 mm", "28 mm", "32 mm", "40 mm"], "values": ["12mm", "14mm", "16mm", "18mm", "20mm", "22mm", "25mm", "28mm", "32mm", "40mm"]} 'Bar diameter -'d_bL2 = 20mm
+#UI 'Effective cross section depth -'d_2 = 590mm
+#UI 'Reinforcement area -'A_s2 = 1571mm^2
 #post
 'Reinforcement ratio -'ρ_2 = A_s2/(b_w*d_2)
-#show
-'Fundamental period of first vibration mode -'T_1 = ? {0.55}'s
-'Upper limit period of constant spectral acceleration -'T_C = ? {0.60}'s
-'Basic behavior factor value -'q_0 = ? {3.9}
+#end post
+#UI 'Fundamental period of first vibration mode -'T_1 = 0.55s
+#UI 'Upper limit period of constant spectral acceleration -'T_C = 0.6s
+#UI 'Basic behavior factor value -'q_0 = 3.9
 #post
 'Curvature ductility factor
 '<p class="ref">[§ 5.2.3.4 (3)]</p>
@@ -136,75 +132,75 @@ l_bd = round(max(l_bd_;l_b,min))'mm
 #end if
 '<p><b>Design anchorage length</b></p>
 #hide
-#if d_bL2 ≤ 32
+#if d_bL2 ≤ 32mm
 	η_2 = 1
 #else
-	η_2 = (132 - d_bL2)/100
+	η_2 = (132 - d_bL2/1mm)/100
 #end if
 f_bd = 2.25*η_1*η_2*f_ctd
-l_b,rqd = d_bL2/4*σ_sd/f_bd
-l_bd_ = α_1*α_2*α_3*α_4*α_5*l_b,rqd
-l_b,min = max(0.6*l_b,rqd;10*d_bL2;100)
-#post
-l_bd = round(max(l_bd_;l_b,min))'mm
+l_b,rqd = d_bL2/4*σ_sd/f_bd|mm
+l_bd_ = α_1*α_2*α_3*α_4*α_5*l_b,rqd|mm
+l_b,min = max(0.6*l_b,rqd;10*d_bL2;100mm)|mm
+#end hide
+l_bd = round(max(l_bd_;l_b,min))|mm
 '<p><b>Limit of bar diameter to column size</b></p>
 'Model uncertainty factor -'γ_Rd = 1.0
 'Factor reflecting the ductility class -'k_D = 2/3
-'Maximum diameter of longitudinal reinforcement 'd_bL = max(d_bL1;d_bL2)'mm
-#show
+'Maximum diameter of longitudinal reinforcement 'd_bL = max(d_bL1;d_bL2)|mm
+#end post
 '<p class="ref">[§ 5.6.2.2 (2), a)]</p>
 '<p><b>For interior beam-column joints</b></p>
-'Minimal normalized design axial force at column -'ν_d = ? {0.14}'(<var>ν</var><sub>d</sub> = <var>N</var><sub>Еd</sub> / <var>f</var><sub>cd</sub><var>A</var><sub>c</sub>)
+#UI 'Minimal normalized design axial force at column -'ν_d,int = 0.14'(<var>ν</var><sub>d</sub> = <var>N</var><sub>Еd</sub> / <var>f</var><sub>cd</sub><var>A</var><sub>c</sub>)
 #post
-d_bL,max = h_c*7.5*f_ctm/(γ_Rd*f_yd)*(1 + 0.8*ν_d)/(1 + 0.75*k_D*ρ_1/ρ_max)'mm
+d_bL,max = h_c*7.5*f_ctm/(γ_Rd*f_yd)*(1 + 0.8*ν_d,int)/(1 + 0.75*k_D*ρ_1/ρ_max)|mm
 #if d_bL > d_bL,max
-	'<p class="err">'d_bL'mm &gt;'d_bL,max'mm. The check is NOT satisfied! ❌
+	'<p class="err">'d_bL' &gt; 'd_bL,max'. The check is NOT satisfied! ❌
 #else
-	'Design check:'d_bL'mm &le;'d_bL,max'mm. The check is satisfied! ✓
+	'Design check:'d_bL' &le; 'd_bL,max'. The check is satisfied! ✓
 #end if
-#show
+#end post
 '<p class="ref">[§ 5.6.2.2 (2), b)]</p>
 '<p><b>For exterior beam-column joints</b></p>
-'Minimal normalized design axial force at column -'ν_d = ? {0.07}
+#UI 'Minimal normalized design axial force at column -'ν_d,ext = 0.07
 #post
-d_bL,max = h_c*7.5*f_ctm/(γ_Rd*f_yd)*(1 + 0.8*ν_d)'mm
+d_bL,max = h_c*7.5*f_ctm/(γ_Rd*f_yd)*(1 + 0.8*ν_d,ext)|mm
 #if d_bL > d_bL,max
-	'<p class="err">'d_bL'mm &gt;'d_bL,max'mm. The check is NOT satisfied! ❌'
+	'<p class="err">'d_bL' &gt; 'd_bL,max'. The check is NOT satisfied! ❌'
 #else
-	'Design check:'d_bL'mm &le;'d_bL,max'mm. The check is satisfied! ✓
+	'Design check:'d_bL' &le; 'd_bL,max'. The check is satisfied! ✓
 #end if
 'According to § 5.6.2.2 (4), Top or bottom bars passing through interior joints, shall terminate in the members framing into the joint at a distance not less than <var>l</var><sub>cr</sub>.
-#show
+#end post
 
 '<p><b>Transverse reinforcement</b></p>
-'Hoop diameter -'d_bw = ? {6}'mm
-'Characteristic yield strength -'f_ywk = ? {500}'MPa
+#UI {"type": "dropdown", "keys": ["6 mm", "8 mm", "10 mm", "12 mm"], "values": ["6mm", "8mm", "10mm", "12mm"]} 'Hoop diameter -'d_bw = 6mm
+#UI 'Characteristic yield strength -'f_ywk = 500MPa
 #post
-'Design yield strength -'f_ywd = f_ywk/γ_s'MPa
+'Design yield strength -'f_ywd = f_ywk/γ_s|MPa
 '<p class="ref">[§ 5.4.3.1.2 (6), a)]</p>
-'Minimum diameter -'d_bw,min = 6'mm
+'Minimum diameter -'d_bw,min = 6mm
 #if d_bw < d_bw,min
 	'<p class="err">Hoop diameter is smaller than the minimum:</p>
-	'<p class="err">'d_bw'&lt;'d_bw,min'mm. ❌</p>
+	'<p class="err">'d_bw' &lt; 'd_bw,min'. ❌</p>
 #else
-	'Design check:'d_bw'≥'d_bw,min'mm. The check is satisfied! ✓
+	'Design check:'d_bw' ≥ 'd_bw,min'. The check is satisfied! ✓
 #end if
 '<p class="ref">[§ 5.4.3.1.2 (1)]</p>
-'<p><b>Critical region length</b> -'l_cr = h_w'mm</p>
-'Minimum longitudinal bars diameter -'d_bL = min(d_bL1; d_bL2)'mm
-'Effective cross section depth -'d = min(d_1; d_2)'mm
+'<p><b>Critical region length</b> -'l_cr = h_w'</p>
+'Minimum longitudinal bars diameter -'d_bL = min(d_bL1; d_bL2)
+'Effective cross section depth -'d = min(d_1; d_2)
 '<p><b>Hoop spacing</b></p>
 '<p class="ref">[§ 5.4.3.1.2 (6), b)]</p>
 'Inside critical regions:
-s_cr,max = min(h_w/4; 24*d_bw; 8*d_bL; 225)'mm
+s_cr,max = min(h_w/4; 24*d_bw; 8*d_bL; 225mm)|mm
 '<p class="ref">[EN 1992-1-1, § 9.2.2 (6)]</p>
 'Outside critical regions:
-s_l,max = 0.75*d'mm
+s_l,max = 0.75*d|mm
 '<p class="ref">[§ 5.4.3.1.2 (6), c)]</p>
 'Maximum distance from column edge to the first hoop - 50 mm
 'Minimum reinforcement ratio for transverse reinforcement
 '<p class="ref">[EN 1992-1-1 NA.2.79, § 9.2.2 (5)]</p>
-ρ_w,min = 0.10*sqr(f_ck)/f_ywk
+ρ_w,min = 0.10*sqr(f_ck/1MPa)*1MPa/f_ywk
 'NOTE: All references are according to EN 1998-1, unless noted otherwise.
-#show
+#end post
 '</div>

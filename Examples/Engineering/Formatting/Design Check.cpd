@@ -1,5 +1,5 @@
 '<!-- Reusable check function that flips between `ok` and `err` CSS classes based on a utilisation ratio, the canonical pattern for engineering design checks. -->
-"Design check example
+'<h1>Design check example</h1>
 #def check$(s$; f$)
 	#if s$ < f$
 		'<p>Design check:'s$'&le;'f$'<span class="ok">The check is satisfied ✔</span>
@@ -8,8 +8,8 @@
 	#end if
 #end def
 '
-'Stress -'σ = 200MPa
-'Resitance -'f_y = 205MPa
+#UI 'Stress -'σ = 200MPa
+#UI 'Resistance -'f_y = 205MPa
 check$(σ; f_y)
 '
 'Stress -'σ = 210MPa

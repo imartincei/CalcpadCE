@@ -1,13 +1,15 @@
 '<!-- Discrete-Fourier analysis of a synthetic two-tone signal that switches frequency mid-record, using the built-in `fft()` function.
 'Returns the power and amplitude spectral densities so the basic vibration-analysis workflow stays fully visible on the worksheet. -->
 #rad
-'Sampling frequency -'Fs = 1024Hz
-'Number of sampling points - 'N = 1024
+#UI 'Sampling frequency -'Fs = 1024Hz
+#UI 'Number of sampling points - 'N = 1024
+#UI 'First frequency -'f_1 = 10Hz
+#UI 'Second frequency -'f_2 = 30Hz
+#UI 'First amplitude -'X_1 = 20mm
+#UI 'Second amplitude -'X_2 = 20mm
+#pause
 'Time step -'Δt = 1/Fs
 'Times of sampling points -'t = range_hp(0; N - 1; 1)*Δt
-'Frequencies and amplitudes
-f_1 = 10Hz','f_2 = 30Hz
-X_1 = 20mm','X_2 = 20mm
 t_0 = 0.5*N*Δt
 f(t) = f_1*(t < t_0) + f_2*(t ≥ t_0)
 X(t) = X_1*(t < t_0) + X_2*(t ≥ t_0)

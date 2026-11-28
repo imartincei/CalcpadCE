@@ -6,18 +6,18 @@
  </div>
  <p>Dimensions</p>
  <p>
+  Semi-axis -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-5">2</u>
+   = 2
+   <i>m</i>
   </span>
-  m,
+  , Semi-axis -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -29,10 +29,14 @@
    <var>a</var>
    ·
    <var>b</var>
-   = 3.14 · 2 · 1 = 6.28
+   = 3.14 · 2
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 6.28
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -42,6 +46,7 @@
    =
    <var>a</var>
    = 2
+   <i>m</i>
   </span>
   m,
   <span class="eq">
@@ -50,8 +55,8 @@
    =
    <var>b</var>
    = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter (approx.)</p>
  <p>
@@ -76,14 +81,26 @@
     <var>b</var>
     )
    </span>
-   )  = 3.14 ·  ( 3 ·  ( 2 + 1 )  −
+   )  = 3.14 ·  ( 3 ·  ( 2
+   <i>m</i>
+   + 1
+   <i>m</i>
+   )  −
    <span class="o0">
     <span class="r">√</span>
-    ( 3 · 2 + 1 )  ·  ( 2 + 3 · 1 )
+    ( 3 · 2
+    <i>m</i>
+    + 1
+    <i>m</i>
+    )  ·  ( 2
+    <i>m</i>
+    + 3 · 1
+    <i>m</i>
+    )
    </span>
    )  = 9.69
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -104,16 +121,19 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 2 · 1
+    3.14 · 2
+    <i>m</i>
+    · 1
+    <i>m</i>
     <sup>3</sup>
     <span class="dvl">
     </span>
     4
    </span>
    = 1.57
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -133,16 +153,20 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 1 · 2
+    3.14 · 1
+    <i>m</i>
+    ·  ( 2
+    <i>m</i>
+    )
     <sup>3</sup>
     <span class="dvl">
     </span>
     4
    </span>
    = 6.28
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -155,10 +179,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 1.57 + 6.28 = 7.85
+   = 1.57
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 6.28
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 7.85
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional constant</p>
  <p>
@@ -184,32 +214,40 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 2
+    3.14 ·  ( 2
+    <i>m</i>
+    )
     <sup>3</sup>
     · 1
+    <i>m</i>
     <sup>3</sup>
     <span class="dvl">
     </span>
-    2
+    ( 2
+    <i>m</i>
+    )
     <sup>2</sup>
     + 1
+    <i>m</i>
     <sup>2</sup>
    </span>
    = 5.03
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional section modulus</p>
  <p>
   <span class="eq">
    <var>a</var>
    = 2
+   <i>m</i>
   </span>
   &gt;
   <span class="eq">
    <var>b</var>
    = 1
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -230,16 +268,19 @@
    </span>
    =
    <span class="dvc">
-    3.14 · 2 · 1
+    3.14 · 2
+    <i>m</i>
+    · 1
+    <i>m</i>
     <sup>2</sup>
     <span class="dvl">
     </span>
     2
    </span>
    = 3.14
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -264,14 +305,18 @@
     </span>
     <span class="dvc">
      1.57
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      6.28
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 0.5
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -295,14 +340,18 @@
     </span>
     <span class="dvc">
      6.28
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      6.28
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 1
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -326,13 +375,17 @@
     </span>
     <span class="dvc">
      7.85
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      6.28
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 1.12
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

@@ -4,51 +4,52 @@
 '<img class="side" style="width:260pt;" src="../../Images/structures/rc/design/punching.png" alt="punching.png">
 '<h4>Input data</h4>
 '<p><b>Column</b></p>
-'Dimensions - 'c_1 = ? {600}'mm, 'c_2 = ? {300}'mm
+#UI 'Dimensions - 'c_1 = 600mm', 'c_2 = 300mm
 '<p><b>Design loads</b></p>
-'Support reaction -'V_Ed = ? {500}'kN
+#UI 'Support reaction -'V_Ed = 500kN
 'Bending moments
-M_x_Ed = ? {0}'kNm,'M_y_Ed = ? {0}'kNm
+#UI 'About x -'M_x_Ed = 0kNm', about y -'M_y_Ed = 0kNm
 '<p><b>Slab</b></p>
-'Depth -'h = ? {200}'mm
-'Concrete cover -'c = ? {20}'mm
-'Longitudinal bars diameter -'d_bL = ? {10}'mm
-'Links diameter -'d_w = ? {6}'mm
+#UI 'Depth -'h = 200mm
+#UI 'Concrete cover -'c = 20mm
+#UI {"type": "dropdown", "keys": ["Ø6", "Ø8", "Ø10", "Ø12", "Ø14", "Ø16", "Ø18", "Ø20", "Ø22", "Ø25", "Ø28", "Ø32"], "values": ["6mm", "8mm", "10mm", "12mm", "14mm", "16mm", "18mm", "20mm", "22mm", "25mm", "28mm", "32mm"]} 'Longitudinal bars diameter -'d_bL = 10mm
+#UI {"type": "dropdown", "keys": ["Ø6", "Ø8", "Ø10", "Ø12", "Ø14", "Ø16"], "values": ["6mm", "8mm", "10mm", "12mm", "14mm", "16mm"]} 'Links diameter -'d_w = 6mm
 #post
 'Effective slab depth
-d = h - c - d_bL'mm
-#show
+d = h - c - d_bL|mm
+#end post
 'Longitudinal reinforcement area
-A_sx = ? {1200}'mm²/m, 'A_sy = ? {1200}'mm²/m
+#UI 'Along x -'A_sx = 1200mm^2/m', along y -'A_sy = 1200mm^2/m
 #post
 'Reinforcement ratio
-ρ_lx = A_sx/(1000*d)
-ρ_ly = A_sy/(1000*d)
+ρ_lx = A_sx/d
+ρ_ly = A_sy/d
 ρ_l = sqr(ρ_lx*ρ_ly)
-#show
+#end post
 '<p><b>Material properties</b></p>
 '<p><b>Concrete</b> [EN 1992-1-1, Table 3.1]</p>
-'Characteristic compressive cylinder strength -'f_ck = ? {25}'MPa
-'Partial safety factor for concrete -'γ_c = 1.5','α_cc = ? {1}
+#UI 'Characteristic compressive cylinder strength -'f_ck = 25MPa
+'Partial safety factor for concrete -'γ_c = 1.5
+#UI 'Coefficient for long-term effects -'α_cc = 1
 #post
-'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c'MPa
-#show
+'Design compressive cylinder strength -'f_cd = α_cc*f_ck/γ_c|MPa
+#end post
 '<p><b>Steel</b></p>
-'Characteristic yield strength -'f_yk = ? {500}'MPa
+#UI 'Characteristic yield strength -'f_yk = 500MPa
 #post
 'Partial safety factor for steel -'γ_s = 1.15
-'Design yield strength -'f_ywd = f_yk/γ_s'MPa
+'Design yield strength -'f_ywd = f_yk/γ_s|MPa
 'Basic control perimeter length
-u_1 = 2*(c_1 + c_2) + 4*π*d'mm
+u_1 = 2*(c_1 + c_2) + 4*π*d|mm
 '<p><b>Calculation of the β factor</b></p>
-#if M_y_Ed ≡ 0
-	#if M_x_Ed ≡ 0
+#if M_y_Ed ≡ 0kNm
+	#if M_x_Ed ≡ 0kNm
 		'<p class="ref">[EN 1992-1-1, Figure 6.21N]</p>
 		β = 1.15
 	#else
 		'<p class="ref">[EN 1992-1-1 (6.41)]</p>
 		'Critical perimeter modulus
-		W_1 = c_1^2/2 + c_1*c_2 + 4*c_2*d + 16*d^2 + 2*π*d*c_1'mm²
+		W_1 = c_1^2/2 + c_1*c_2 + 4*c_2*d + 16*d^2 + 2*π*d*c_1|mm^2
 		k_c = c_1/c_2
 		'<p class="ref">[EN 1992-1-1, Table 6.1]</p>
 		#if k_c ≤ 0.5
@@ -63,13 +64,13 @@ u_1 = 2*(c_1 + c_2) + 4*π*d'mm
 			k = 0.8
 		#end if
 		'<p class="ref">[EN 1992-1-1 (6.39)]</p>
-		β = 1 + k*1000*M_x_Ed/V_Ed*u_1/W_1
+		β = 1 + k*M_x_Ed/V_Ed*u_1/W_1
 	#end if
 #else
-	#if M_x_Ed ≡ 0
+	#if M_x_Ed ≡ 0kNm
 		'<p class="ref">[EN 1992-1-1 (6.41)]</p>
 		'Critical perimeter modulus
-		W_1 = c_2^2/2 + c_1*c_2 + 4*c_1*d + 16*d^2 + 2*π*d*c_2'mm²
+		W_1 = c_2^2/2 + c_1*c_2 + 4*c_1*d + 16*d^2 + 2*π*d*c_2|mm^2
 		k_c = c_2/c_1
 		'<p class="ref">[EN 1992-1-1, Table 6.1]</p>
 		#if k_c ≤ 0.5
@@ -84,12 +85,12 @@ u_1 = 2*(c_1 + c_2) + 4*π*d'mm
 			k = 0.8
 		#end if
 		'<p class="ref">[EN 1992-1-1 (6.39)]</p>
-		β = 1 + k*1000*M_y_Ed/V_Ed*u_1/W_1
+		β = 1 + k*M_y_Ed/V_Ed*u_1/W_1
 	#else
-		e_x = 1000*M_x_Ed/V_Ed
-		e_y = 1000*M_y_Ed/V_Ed
-		b_x = c_1 + 4*d
-		b_y = c_2 + 4*d
+		e_x = M_x_Ed/V_Ed|mm
+		e_y = M_y_Ed/V_Ed|mm
+		b_x = c_1 + 4*d|mm
+		b_y = c_2 + 4*d|mm
 		'<p class="ref">[EN 1992-1-1 (6.43)]</p>
 		β = 1 + 1.8*sqr((e_x/b_x)^2 + (e_y/b_y)^2)
 	#end if
@@ -100,97 +101,97 @@ u_1 = 2*(c_1 + c_2) + 4*π*d'mm
 #end if
 '<div class="fold">
 '<h4>Punching shear resistance without reinforcement</h4>
-k = min(1 + sqr(200/d);2)
+k = min(1 + sqr(200mm/d);2)
 C_Rd_c = 0.18/γ_c
 '<p class="ref">[EN 1992-1-1 (6.47)]</p>
 'Punching shear resistance
-v_Rd_c_ = C_Rd_c*k*(100*ρ_l*f_ck)^(1/3)'MPa
+v_Rd_c_ = C_Rd_c*k*(100*ρ_l*f_ck/1MPa)^(1/3)*1MPa|MPa
 '<p class="ref">[EN 1992-1-1 (6.2b)]</p>
 'Minimum shear resistance
-v_min = 0.035*k^(3/2)*sqr(f_ck)'MPa
-v_Rd_c = max(v_Rd_c_; v_min)'MPa
+v_min = 0.035*k^(3/2)*sqr(f_ck/1MPa)*1MPa|MPa
+v_Rd_c = max(v_Rd_c_; v_min)|MPa
 '<p class="ref">[EN 1992-1-1 (6.38)]</p>
 'Design shear stress
-v_Ed = β*V_Ed*10^3/(u_1*d)'MPa
+v_Ed = β*V_Ed/(u_1*d)|MPa
 '</div>
 '<p class="ref">[EN 1992-1-1, §6.4.3 (2,b)]</p>
 #if v_Ed ≤ v_Rd_c
-	v_Ed'MPa &le; 'v_Rd_c'MPa. Shear reinforcement is NOT required.
+	v_Ed' &le; 'v_Rd_c'. Shear reinforcement is NOT required.
 #else
-	v_Ed'MPa &gt;'v_Rd_c'MPa. Shear reinforcement is required.
+	v_Ed' &gt;'v_Rd_c'. Shear reinforcement is required.
 	'<div class="fold">
 	'<h4>Check at column edge</h4>
 	'Column perimeter
-	u_0 = 2*(c_1 + c_2)'mm
+	u_0 = 2*(c_1 + c_2)|mm
 	'<p class="ref">[EN 1992-1-1 (6.53)]</p>
 	'Punching shear resistance at column edge
-	v_Ed_max = β*V_Ed*10^3/(u_0*d)'MPa
+	v_Ed_max = β*V_Ed/(u_0*d)|MPa
 	'Maximum punching shear stress
-	ν = 0.6*(1 - f_ck/250)
+	ν = 0.6*(1 - f_ck/250MPa)
 	'<p class="ref">[BS EN 1992-1-1, Table NA.1, §6.4.5 (3)]</p>
-	v_Rd_max = 0.5*ν*f_cd'MPa
+	v_Rd_max = 0.5*ν*f_cd|MPa
 	'</div>
 	'<p class="ref">[EN 1992-1-1, §6.4.3 (2,a)]</p>
 	#if v_Ed_max ≤ v_Rd_max
-		v_Ed_max' MPa &le; 'v_Rd_max'MPa. Design check is satisfied.
+		v_Ed_max' &le; 'v_Rd_max'. Design check is satisfied.
 	#else
-		'<p class="err">'v_Ed_max' MPa &gt; 'v_Rd_max'MPa. Design check is NOT satisfied!</p>
+		'<p class="err">'v_Ed_max' &gt; 'v_Rd_max'. Design check is NOT satisfied!</p>
 		'<p class="err">Increase slab thickness, column dimensions or concrete grade.</p>
 	#end if
 	'<p class="ref">[BS EN 1992-1-1, Table NA.1, §6.4.5 (3)]</p>
 	'Limitation of punching stress at first control perimeter
 	#if v_Ed ≤ 2*v_Rd_c
-		v_Ed' MPa &le; '2*v_Rd_c'MPa. Design check is satisfied.
+		v_Ed' &le; '2*v_Rd_c'. Design check is satisfied.
 	#else
-		'<p class="err">'v_Ed' MPa &gt; '2*v_Rd_c'MPa. Design check is NOT satisfied!</p>
+		'<p class="err">'v_Ed' &gt; '2*v_Rd_c'. Design check is NOT satisfied!</p>
 	#end if
 	'<div class="fold">
 	'<h4>Punching resistance with shear reinforcement</h4>
 	'Effective yield strength of shear reinforcement
-	f_ywd_ef = min(250 + 0.25*d;f_ywd)'MPa
+	f_ywd_ef = min(250MPa + 0.25MPa*d/1mm;f_ywd)|MPa
 	'Area of one shear link
-	A_sw_1 = π*d_w^2/4'mm²
+	A_sw_1 = π*d_w^2/4|mm^2
 	'<p class="ref">[EN 1992-1-1, §9.4.3 (1)]</p>
-	'Radial link spacing - 's_r = 0.75*d'mm
+	'Radial link spacing - 's_r = 0.75*d|mm
 	'Required shear reinforcement
-	A_sw_req = (v_Ed - 0.75*v_Rd_c)*u_1*s_r/(1.5*f_ywd_ef)'mm²
-	'Tangential link spacing - 's_t = floor(u_1*A_sw_1/A_sw_req)'mm
+	A_sw_req = (v_Ed - 0.75*v_Rd_c)*u_1*s_r/(1.5*f_ywd_ef)|mm^2
+	'Tangential link spacing - 's_t = floor(u_1*A_sw_1/A_sw_req/1mm)*1mm|mm
 	'<p class="ref">[EN 1992-1-1, §9.4.3 (1)]</p>
 	#if s_t ≤ 1.5*d
-		'Check:'s_t'mm &le; '1.5*d'mm. Check is satisfied.
+		'Check:'s_t' &le; '1.5*d'. Check is satisfied.
 	#else
-		'Check:'s_t'mm &gt;'1.5*d'mm.
+		'Check:'s_t' &gt;'1.5*d'.
 		'<p class="err">Distance exceeds the maximum value.</p>
-		'Accepted value: 's_t = 1.5*d'mm
+		'Accepted value: 's_t = 1.5*d|mm
 	#end if
 	'<p class="ref">[EN 1992-1-1, §9.4.3 (2)]</p>
 	'Minimum shear reinforcement
-	A_sw_min = 0.08*sqr(f_ck)/f_yk*s_r*s_t/1.5'mm²
+	A_sw_min = 0.08*sqr(f_ck/1MPa)*1MPa/f_yk*s_r*s_t/1.5|mm^2
 	#if A_sw_1 ≥ A_sw_min
-		A_sw_1'mm² &ge;'A_sw_min'mm². The calculated reinforcement is greater than the minimum.
+		A_sw_1' &ge;'A_sw_min'. The calculated reinforcement is greater than the minimum.
 	#else
-		'<p class="err">'A_sw_1'mm² &lt;'A_sw_min'mm². The calculated reinforcement is lower than the minimum!</p>
+		'<p class="err">'A_sw_1' &lt;'A_sw_min'. The calculated reinforcement is lower than the minimum!</p>
 	#end if
 	'</div>
 	'Total shear reinforcement for each perimeter
-	A_sw = A_sw_1*u_1/s_t'mm²
+	A_sw = A_sw_1*u_1/s_t|mm^2
 	'<p class="ref">[EN 1992-1-1 (6.52)]</p>
 	'Punching resistance with shear reinforcement
-	v_Rd_cs = 0.75*v_Rd_c + 1.5*d/s_r*A_sw*f_ywd_ef/(u_1*d)
+	v_Rd_cs = 0.75*v_Rd_c + 1.5*d/s_r*A_sw*f_ywd_ef/(u_1*d)|MPa
 	#if v_Ed ≤ v_Rd_cs
-		v_Ed'MPa &le;'v_Rd_cs'MPa. Check is satisfied!
+		v_Ed' &le;'v_Rd_cs'. Check is satisfied!
 		'<p class="ref">[EN 1992-1-1 (6.54)]</p>
 		'Outer control perimeter at which shear reinforcement is not required
-		u_out = β*V_Ed*10^3/(v_Rd_c*d)'mm
+		u_out = β*V_Ed/(v_Rd_c*d)|mm
 		'Distance to outer control perimeter
-		a_out = (u_out/2 - c_1 - c_2)/π'mm
+		a_out = (u_out/2 - c_1 - c_2)/π|mm
 		'Required number of perimeters
 		n = ceiling(max((a_out - 2*d)/(0.75*d) + 1;2))
 	#else
-		'<p class="err">'v_Ed'MPa &gt;'v_Rd_cs'MPa. Check is NOT satisfied. Increase shear reinforcement area.</p>
+		'<p class="err">'v_Ed' &gt;'v_Rd_cs'. Check is NOT satisfied. Increase shear reinforcement area.</p>
 	#end if
 	'<img style="width:225pt;" style="display:inline;" src="../../Images/structures/rc/design/punching-reinf-plan.png" alt="punching-reinf-plan.png">
 	'<img style="width:260pt;" src="../../Images/structures/rc/design/punching-reinf-section.png" alt="punching-reinf-section.png">
 #end if
-#show
+#end post
 '</div>

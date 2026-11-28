@@ -35,7 +35,7 @@ f(8; 27)
 	'</tr>
 #loop
 '</table>
-#equ
+#end val
 PlotHeight = 300
 PlotWidth = PlotHeight
 'Plot

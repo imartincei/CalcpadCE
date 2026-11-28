@@ -1,4 +1,5 @@
 <div class="calcpad-output">
+ <!-- A first tour of CalcpadCE: arithmetic, comparisons, variables, constants, integration and matrix multiplication, with a few values you can edit in the input form. -->
  <p>Simple calculation:</p>
  <p>
   <span class="eq">1 + 1 = 2</span>
@@ -16,12 +17,12 @@
  </p>
  <p>Calculation with variables:</p>
  <p>
+  First number -
   <span class="eq">
    <var>a</var>
    = 2
   </span>
- </p>
- <p>
+  , Second number -
   <span class="eq">
    <var>b</var>
    = 3
@@ -39,9 +40,11 @@
  </p>
  <p>Using built-in constants:</p>
  <p>
+  Radius -
   <span class="eq">
    <var>r</var>
    = 1.5
+   <i>m</i>
   </span>
  </p>
  <p>
@@ -52,9 +55,13 @@
    ·
    <var>r</var>
    <sup>2</sup>
-   = 3.14 · 1.5
+   = 3.14 ·  ( 1.5
+   <i>m</i>
+   )
    <sup>2</sup>
    = 7.07
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

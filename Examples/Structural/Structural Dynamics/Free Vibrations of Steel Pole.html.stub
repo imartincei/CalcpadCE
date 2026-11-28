@@ -66,7 +66,14 @@
    </span>
   </span>
  </p>
- <!--Section shape  <span class="eq"><var>shape</var> = 3</span> ,  <span class="eq"><var>Precision</var> = 10<sup>-4</sup> = 0.0001</span> -->
+ <p>
+  Cross-section shape -
+  <span class="eq">
+   <var>shape</var>
+   = 3
+  </span>
+ </p>
+ <!-- <span class="eq"><var>Precision</var> = 10<sup>-4</sup> = 0.0001</span> -->
  <h3>Cross-section</h3>
  <p>Section height:</p>
  <p>
@@ -187,14 +194,16 @@
   <b>Elliptical tube</b>
  </p>
  <p>
-  Thickness -
+  Thickness at bottom -
   <span class="eq">
    <var>t</var>
    <sub>b</sub>
    = 20
    <i>mm</i>
   </span>
-  ,
+ </p>
+ <p>
+  Thickness at top -
   <span class="eq">
    <var>t</var>
    <sub>t</sub>
@@ -1766,9 +1775,11 @@ circle.Series6 {fill:MediumSpringGreen;}
     d
    </var>
    <sub>M</sub>
-   )  = 71.62
+   )  ·
+   <i>t</i>
+   = 71.62
+   <i>t</i>
   </span>
-  t
  </p>
  <p>Eigenvalues</p>
  <p>
@@ -2253,9 +2264,20 @@ circle.Series6 {fill:MediumSpringGreen;}
      </var>
     </span>
    </span>
+   ·
+   <i>s</i>
+   <sup class="unit">-1</sup>
    =
    <b class="b0">[</b>
-   2.27 7.6 17.13
+   2.27
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   7.6
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   17.13
+   <i>s</i>
+   <sup class="unit">-1</sup>
    <b class="b0">]</b>
   </span>
  </p>
@@ -2277,8 +2299,6 @@ circle.Series6 {fill:MediumSpringGreen;}
     2 ·
     <var>π</var>
    </span>
-   ·
-   <i>Hz</i>
    =
    <span class="dvc">
     <var>
@@ -2289,8 +2309,6 @@ circle.Series6 {fill:MediumSpringGreen;}
     </span>
     2 · 3.14
    </span>
-   ·
-   <i>Hz</i>
    =
    <b class="b0">[</b>
    0.361

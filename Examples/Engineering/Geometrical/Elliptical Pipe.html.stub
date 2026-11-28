@@ -7,26 +7,26 @@
  <p>(ellipse with elliptical hole)</p>
  <p>Dimensions</p>
  <p>
+  Semi-axis -
   <span class="eq">
    <var>a</var>
-   =
-   <u class="input-6">20</u>
+   = 20
+   <i>m</i>
   </span>
-  m,
+  , Semi-axis -
   <span class="eq">
    <var>b</var>
-   =
-   <u class="input-6">10</u>
+   = 10
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
+  Wall thickness -
   <span class="eq">
    <var>t</var>
-   =
-   <u class="input-7">2</u>
+   = 2
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -36,9 +36,13 @@
    <var>a</var>
    −
    <var>t</var>
-   = 20 − 2 = 18
+   = 20
+   <i>m</i>
+   − 2
+   <i>m</i>
+   = 18
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -48,9 +52,13 @@
    <var>b</var>
    −
    <var>t</var>
-   = 10 − 2 = 8
+   = 10
+   <i>m</i>
+   − 2
+   <i>m</i>
+   = 8
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Area</p>
  <p>
@@ -68,10 +76,18 @@
    ·
    <var>b</var>
    <sub>1</sub>
-   )  = 3.14 ·  ( 20 · 10 − 18 · 8 )  = 175.93
+   )  = 3.14 ·  ( 20
+   <i>m</i>
+   · 10
+   <i>m</i>
+   − 18
+   <i>m</i>
+   · 8
+   <i>m</i>
+   )  = 175.93
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
-  m
-  <sup>2</sup>
  </p>
  <p>Centroid</p>
  <p>
@@ -81,6 +97,7 @@
    =
    <var>a</var>
    = 20
+   <i>m</i>
   </span>
   m,
   <span class="eq">
@@ -89,8 +106,8 @@
    =
    <var>b</var>
    = 10
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Perimeter (approx.)</p>
  <p>
@@ -115,14 +132,26 @@
     <var>b</var>
     )
    </span>
-   )  = 3.14 ·  ( 3 ·  ( 20 + 10 )  −
+   )  = 3.14 ·  ( 3 ·  ( 20
+   <i>m</i>
+   + 10
+   <i>m</i>
+   )  −
    <span class="o0">
     <span class="r">√</span>
-    ( 3 · 20 + 10 )  ·  ( 20 + 3 · 10 )
+    ( 3 · 20
+    <i>m</i>
+    + 10
+    <i>m</i>
+    )  ·  ( 20
+    <i>m</i>
+    + 3 · 10
+    <i>m</i>
+    )
    </span>
    )  = 96.88
+   <i>m</i>
   </span>
-  m
  </p>
  <p>Second moments of area</p>
  <p>
@@ -155,14 +184,22 @@
     </span>
     4
    </span>
-   ·  ( 20 · 10
+   ·  ( 20
+   <i>m</i>
+   ·  ( 10
+   <i>m</i>
+   )
    <sup>3</sup>
-   − 18 · 8
+   − 18
+   <i>m</i>
+   ·  ( 8
+   <i>m</i>
+   )
    <sup>3</sup>
    )  = 8469.73
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>
   <span class="eq">
@@ -194,14 +231,22 @@
     </span>
     4
    </span>
-   ·  ( 10 · 20
+   ·  ( 10
+   <i>m</i>
+   ·  ( 20
+   <i>m</i>
+   )
    <sup>3</sup>
-   − 8 · 18
+   − 8
+   <i>m</i>
+   ·  ( 18
+   <i>m</i>
+   )
    <sup>3</sup>
    )  = 26188.3
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Polar moment of area</p>
  <p>
@@ -214,10 +259,16 @@
    +
    <var>I</var>
    <sub>z</sub>
-   = 8469.73 + 26188.3 = 34658.1
+   = 8469.73
+   <i>m</i>
+   <sup class="unit">4</sup>
+   + 26188.3
+   <i>m</i>
+   <sup class="unit">4</sup>
+   = 34658.1
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional constant</p>
  <p>
@@ -234,9 +285,11 @@
    =
    <span class="dvc">
     8
+    <i>m</i>
     <span class="dvl">
     </span>
     10
+    <i>m</i>
    </span>
    = 0.8
   </span>
@@ -267,23 +320,31 @@
    <sup>4</sup>
    )  =
    <span class="dvc">
-    3.14 · 20
+    3.14 ·  ( 20
+    <i>m</i>
+    )
     <sup>3</sup>
-    · 10
+    ·  ( 10
+    <i>m</i>
+    )
     <sup>3</sup>
     <span class="dvl">
     </span>
-    20
+    ( 20
+    <i>m</i>
+    )
     <sup>2</sup>
-    + 10
+    +  ( 10
+    <i>m</i>
+    )
     <sup>2</sup>
    </span>
    ·  ( 1 − 0.8
    <sup>4</sup>
    )  = 29676.7
+   <i>m</i>
+   <sup class="unit">4</sup>
   </span>
-  m
-  <sup>4</sup>
  </p>
  <p>Torsional section modulus</p>
  <p>
@@ -307,7 +368,11 @@
    <sup>4</sup>
    )  =
    <span class="dvc">
-    3.14 · 20 · 10
+    3.14 · 20
+    <i>m</i>
+    ·  ( 10
+    <i>m</i>
+    )
     <sup>2</sup>
     <span class="dvl">
     </span>
@@ -316,9 +381,9 @@
    ·  ( 1 − 0.8
    <sup>4</sup>
    )  = 1854.8
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
-  m
-  <sup>3</sup>
  </p>
  <p>Radii of gyration</p>
  <p>
@@ -343,14 +408,18 @@
     </span>
     <span class="dvc">
      8469.73
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      175.93
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 6.94
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -374,14 +443,18 @@
     </span>
     <span class="dvc">
      26188.3
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      175.93
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 12.2
+   <i>m</i>
   </span>
-  m
  </p>
  <p>
   <span class="eq">
@@ -405,13 +478,17 @@
     </span>
     <span class="dvc">
      34658.1
+     <i>m</i>
+     <sup class="unit">4</sup>
      <span class="dvl">
      </span>
      175.93
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
    </span>
    = 14.04
+   <i>m</i>
   </span>
-  m
  </p>
 </div>

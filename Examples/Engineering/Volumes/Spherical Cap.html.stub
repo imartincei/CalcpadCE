@@ -3,21 +3,20 @@
  <div style="max-width:120mm">
   <img alt="cap.png" class="side" src="Images/math/volume/cap.png" style="height:55pt;"/>
  </div>
- <p>Dimensions</p>
  <p>
   Base radius -
   <span class="eq">
    <var>r</var>
-   =
-   <u class="input-4">2</u>
+   = 2
+   <i>m</i>
   </span>
  </p>
  <p>
   Height -
   <span class="eq">
    <var>h</var>
-   =
-   <u class="input-5">1</u>
+   = 1
+   <i>m</i>
   </span>
  </p>
  <p>Radius of sphere</p>
@@ -38,15 +37,20 @@
    </span>
    =
    <span class="dvc">
-    2
+    ( 2
+    <i>m</i>
+    )
     <sup>2</sup>
     + 1
+    <i>m</i>
     <sup>2</sup>
     <span class="dvl">
     </span>
     2 · 1
+    <i>m</i>
    </span>
    = 2.5
+   <i>m</i>
   </span>
  </p>
  <p>Volume</p>
@@ -71,15 +75,21 @@
    )  =
    <span class="dvc">
     3.14 · 1
+    <i>m</i>
     <span class="dvl">
     </span>
     6
    </span>
-   ·  ( 3 · 2
+   ·  ( 3 ·  ( 2
+   <i>m</i>
+   )
    <sup>2</sup>
    + 1
+   <i>m</i>
    <sup>2</sup>
    )  = 6.81
+   <i>m</i>
+   <sup class="unit">3</sup>
   </span>
  </p>
  <p>Area of curved surface</p>
@@ -93,7 +103,13 @@
    <var>R</var>
    ·
    <var>h</var>
-   = 2 · 3.14 · 2.5 · 1 = 15.71
+   = 2 · 3.14 · 2.5
+   <i>m</i>
+   · 1
+   <i>m</i>
+   = 15.71
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Area of base</p>
@@ -105,9 +121,13 @@
    ·
    <var>r</var>
    <sup>2</sup>
-   = 3.14 · 2
+   = 3.14 ·  ( 2
+   <i>m</i>
+   )
    <sup>2</sup>
    = 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>Total surface area</p>
@@ -119,7 +139,15 @@
    <sub>o</sub>
    +
    <var>A</var>
-   = 15.71 + 12.57 = 28.27
+   = 15.71
+   <i>m</i>
+   <sup class="unit">2</sup>
+   + 12.57
+   <i>m</i>
+   <sup class="unit">2</sup>
+   = 28.27
+   <i>m</i>
+   <sup class="unit">2</sup>
   </span>
  </p>
  <p>

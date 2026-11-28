@@ -18,20 +18,24 @@
    )
   </p>
   <p>
+   Along
+   <i>x</i>
+   -
    <span class="eq">
     <var>l</var>
     <sub>x_cl</sub>
-    =
-    <u class="input-7">4</u>
+    = 4
+    <i>m</i>
    </span>
-   m,
+   , along
+   <i>y</i>
+   -
    <span class="eq">
     <var>l</var>
     <sub>y_cl</sub>
-    =
-    <u class="input-7">6</u>
+    = 6
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Beam width along
@@ -40,10 +44,9 @@
    <span class="eq">
     <var>b</var>
     <sub>y</sub>
-    =
-    <u class="input-8">25</u>
+    = 25
+    <i>cm</i>
    </span>
-   cm
   </p>
   <p>
    Beam width along
@@ -52,28 +55,25 @@
    <span class="eq">
     <var>b</var>
     <sub>x</sub>
-    =
-    <u class="input-9">25</u>
+    = 25
+    <i>cm</i>
    </span>
-   cm
   </p>
   <p>
    Slab thickness -
    <span class="eq">
     <var>h</var>
-    =
-    <u class="input-10">14</u>
+    = 14
+    <i>cm</i>
    </span>
-   cm
   </p>
   <p>
    Concrete cover -
    <span class="eq">
     <var>c</var>
-    =
-    <u class="input-11">2</u>
+    = 2
+    <i>cm</i>
    </span>
-   cm
   </p>
   <p>Design span lengths</p>
   <p>
@@ -85,42 +85,22 @@
     <sub>x_cl</sub>
     +
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     <var>b</var>
-     <sub>x</sub>
-     <span class="dvl">
-     </span>
-     100
-    </span>
+    (
+    <var>b</var>
+    <sub>x</sub>
     ;
-    <span class="dvc">
-     <var>h</var>
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    <span class="b1">)</span>
-    = 4 +
+    <var>h</var>
+    )  = 4
+    <i>m</i>
+    +
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     25
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    ;
-    <span class="dvc">
-     14
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    <span class="b1">)</span>
-    = 4.14
+    ( 25
+    <i>cm</i>
+    ; 14
+    <i>cm</i>
+    )  = 4.14
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    <span class="eq">
@@ -131,42 +111,22 @@
     <sub>y_cl</sub>
     +
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     <var>b</var>
-     <sub>y</sub>
-     <span class="dvl">
-     </span>
-     100
-    </span>
+    (
+    <var>b</var>
+    <sub>y</sub>
     ;
-    <span class="dvc">
-     <var>h</var>
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    <span class="b1">)</span>
-    = 6 +
+    <var>h</var>
+    )  = 6
+    <i>m</i>
+    +
     <b>min</b>
-    <span class="b1">(</span>
-    <span class="dvc">
-     25
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    ;
-    <span class="dvc">
-     14
-     <span class="dvl">
-     </span>
-     100
-    </span>
-    <span class="b1">)</span>
-    = 6.14
+    ( 25
+    <i>cm</i>
+    ; 14
+    <i>cm</i>
+    )  = 6.14
+    <i>m</i>
    </span>
-   m
   </p>
   <p>
    Span ratio -
@@ -184,9 +144,11 @@
     =
     <span class="dvc">
      6.14
+     <i>m</i>
      <span class="dvl">
      </span>
      4.14
+     <i>m</i>
     </span>
     = 1.48
    </span>
@@ -208,10 +170,9 @@
       <span class="eq">
        <var>l</var>
        <sub>x2</sub>
-       =
-       <u class="input-26">0</u>
+       = 0
+       <i>m</i>
       </span>
-      m;
      </p>
     </td>
     <td>
@@ -219,10 +180,14 @@
       <span class="eq">
        <var>M</var>
        <sub>Ed_xt2_</sub>
-       =
-       <u class="input-28">0</u>
+       = 0
+       <span class="dvc">
+        <i>kNm</i>
+        <span class="dvl">
+        </span>
+        <i>m</i>
+       </span>
       </span>
-      kN·m/m
      </p>
     </td>
    </tr>
@@ -239,31 +204,62 @@
    <span class="eq">
     <var>g</var>
     <sub>sw</sub>
-    = 0.25 ·
+    = 25
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+     <sup class="unit">3</sup>
+    </span>
+    ·
     <var>h</var>
-    = 0.25 · 14 = 3.5
+    = 25
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+     <sup class="unit">3</sup>
+    </span>
+    · 14
+    <i>cm</i>
+    = 3.5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   kN/m²
   </p>
   <p>
    Permanent -
    <span class="eq">
     <var>g</var>
     <sub>k</sub>
-    =
-    <u class="input-34">2.5</u>
+    = 2.5
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+     <sup class="unit">2</sup>
+    </span>
    </span>
-   kN/m²
   </p>
   <p>
    Variable -
    <span class="eq">
     <var>q</var>
     <sub>k</sub>
-    =
-    <u class="input-35">2</u>
+    = 2
+    <span class="dvc">
+     <i>kN</i>
+     <span class="dvl">
+     </span>
+     <i>m</i>
+     <sup class="unit">2</sup>
+    </span>
    </span>
-   kN/m²
   </p>
   <p>
    Partial safety factor -
@@ -298,9 +294,27 @@
     ·
     <var>γ</var>
     <sub>Q</sub>
-    =  ( 3.5 + 2.5 )  · 1.35 + 2 · 1.5 = 11.1
+    =  ( 3.5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
+    + 2.5
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
+    )  · 1.35 + 2
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
+    · 1.5 = 11.1
+    <i>kN</i>
+    <i class="unit">∕</i>
+    <i>m</i>
+    <sup class="unit">2</sup>
    </span>
-   kN/m²
   </p>
   <div class="fold">
    <p>
@@ -339,14 +353,27 @@
         </span>
         =
         <span class="dvc">
-         ( 3.5 + 2.5 )  · 4
+         ( 3.5
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         + 2.5
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         )  · 4
+         <i>m</i>
          <span class="dvl">
          </span>
          4
         </span>
         = 6
+        <i>kN</i>
+        <i class="unit">∕</i>
+        <i>m</i>
        </span>
-       kN/m
       </p>
      </td>
     </tr>
@@ -369,14 +396,22 @@
         </span>
         =
         <span class="dvc">
-         2 · 4
+         2
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         · 4
+         <i>m</i>
          <span class="dvl">
          </span>
          4
         </span>
         = 2
+        <i>kN</i>
+        <i class="unit">∕</i>
+        <i>m</i>
        </span>
-       kN/m
       </p>
      </td>
     </tr>
@@ -426,11 +461,26 @@
         </span>
         =
         <span class="dvc up">
-         ( 3.5 + 2.5 )  · 4 ·
+         ( 3.5
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         + 2.5
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         )  · 4
+         <i>m</i>
+         ·
          <span class="b1">(</span>
-         6 −
+         6
+         <i>m</i>
+         −
          <span class="dvc">
           4
+          <i>m</i>
           <span class="dvl">
           </span>
           2
@@ -439,10 +489,13 @@
          <span class="dvl">
          </span>
          2 · 6
+         <i>m</i>
         </span>
         = 8
+        <i>kN</i>
+        <i class="unit">∕</i>
+        <i>m</i>
        </span>
-       kN/m
       </p>
      </td>
     </tr>
@@ -480,11 +533,21 @@
         </span>
         =
         <span class="dvc up">
-         2 · 4 ·
+         2
+         <i>kN</i>
+         <i class="unit">∕</i>
+         <i>m</i>
+         <sup class="unit">2</sup>
+         · 4
+         <i>m</i>
+         ·
          <span class="b1">(</span>
-         6 −
+         6
+         <i>m</i>
+         −
          <span class="dvc">
           4
+          <i>m</i>
           <span class="dvl">
           </span>
           2
@@ -493,10 +556,13 @@
          <span class="dvl">
          </span>
          2 · 6
+         <i>m</i>
         </span>
         = 2.67
+        <i>kN</i>
+        <i class="unit">∕</i>
+        <i>m</i>
        </span>
-       kN/m
       </p>
      </td>
     </tr>
@@ -512,24 +578,24 @@
    <span class="eq">
     <var>f</var>
     <sub>ck</sub>
-    =
-    <u class="input-64">25</u>
+    = 25
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
-   Partial safety factors for concrete -
+   Partial safety factor for concrete -
    <span class="eq">
     <var>γ</var>
     <sub>c</sub>
     = 1.5
    </span>
-   ,
+  </p>
+  <p>
+   Long-term effects coefficient -
    <span class="eq">
     <var>α</var>
     <sub>cc</sub>
-    =
-    <u class="input-65">0.85</u>
+    = 0.85
    </span>
   </p>
   <p>
@@ -552,13 +618,14 @@
     =
     <span class="dvc">
      0.85 · 25
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.5
     </span>
     = 14.17
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Factor defining the effective height of the compression zone -
@@ -580,9 +647,17 @@
     <var>f</var>
     <sub>ctm</sub>
     = 0.3 ·
-    <var>f</var>
-    <sub>ck</sub>
-    <sup>
+    <span class="b1">(</span>
+    <span class="dvc">
+     <var>f</var>
+     <sub>ck</sub>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -590,8 +665,20 @@
       3
      </span>
     </sup>
-    = 0.3 · 25
-    <sup>
+    · 1
+    <i>MPa</i>
+    = 0.3 ·
+    <span class="b1">(</span>
+    <span class="dvc">
+     25
+     <i>MPa</i>
+     <span class="dvl">
+     </span>
+     1
+     <i>MPa</i>
+    </span>
+    <span class="b1">)</span>
+    <sup class="raised">
      <span class="dvc">
       2
       <span class="dvl">
@@ -599,9 +686,11 @@
       3
      </span>
     </sup>
+    · 1
+    <i>MPa</i>
     = 2.56
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    <b>Steel</b>
@@ -611,10 +700,9 @@
    <span class="eq">
     <var>f</var>
     <sub>yk</sub>
-    =
-    <u class="input-73">500</u>
+    = 500
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Partial safety factor for steel -
@@ -641,13 +729,14 @@
     =
     <span class="dvc">
      500
+     <i>MPa</i>
      <span class="dvl">
      </span>
      1.15
     </span>
     = 434.78
+    <i>MPa</i>
    </span>
-   MPa
   </p>
   <p>
    Limit relative compressive zone depth -
@@ -667,19 +756,18 @@
    <span class="eq">
     <var>d</var>
     <sub>bxb</sub>
-    =
-    <u class="input-80">8</u>
+    = 8
+    <i>mm</i>
    </span>
-   mm, parallel to
+   , parallel to
    <i>y</i>
    -
    <span class="eq">
     <var>d</var>
     <sub>byb</sub>
-    =
-    <u class="input-80">8</u>
+    = 8
+    <i>mm</i>
    </span>
-   mm
   </p>
   <p>
    - Top parallel to
@@ -688,10 +776,9 @@
    <span class="eq">
     <var>d</var>
     <sub>bxt</sub>
-    =
-    <u class="input-81">6</u>
+    = 6
+    <i>mm</i>
    </span>
-   mm
   </p>
   <div class="fold">
    <h4>Static calculations</h4>
@@ -1010,16 +1097,33 @@
       </span>
       2
      </span>
-     = 1.35 ·  ( 3.5 + 2.5 )  +
+     = 1.35 ·  ( 3.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     + 2.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     )  +
      <span class="dvc">
       1.5 · 2
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
       <span class="dvl">
       </span>
       2
      </span>
      = 9.6
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <span class="eq">
@@ -1039,13 +1143,20 @@
      =
      <span class="dvc">
       1.5 · 2
+      <i>kN</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      <sup class="unit">2</sup>
       <span class="dvl">
       </span>
       2
      </span>
      = 1.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
     </span>
-    kN/m²
    </p>
    <p>
     <b>Bending moments</b>
@@ -1075,13 +1186,29 @@
      <var>l</var>
      <sub>x</sub>
      <sup>2</sup>
-     = 0.0605 · 9.6 · 4.14
+     = 0.0605 · 9.6
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     ·  ( 4.14
+     <i>m</i>
+     )
      <sup>2</sup>
-     + 0.0912 · 1.5 · 4.14
+     + 0.0912 · 1.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     ·  ( 4.14
+     <i>m</i>
+     )
      <sup>2</sup>
      = 12.3
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN·m/m
    </p>
    <p>
     <span class="eq">
@@ -1107,13 +1234,29 @@
      <var>l</var>
      <sub>x</sub>
      <sup>2</sup>
-     = 0.044 · 9.6 · 4.14
+     = 0.044 · 9.6
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     ·  ( 4.14
+     <i>m</i>
+     )
      <sup>2</sup>
-     + 0.056 · 1.5 · 4.14
+     + 0.056 · 1.5
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     ·  ( 4.14
+     <i>m</i>
+     )
      <sup>2</sup>
      = 8.68
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN·m/m
    </p>
    <p>Support moment</p>
    <p>
@@ -1129,11 +1272,20 @@
      <var>l</var>
      <sub>x</sub>
      <sup>2</sup>
-     = 0.0835 · 11.1 · 4.14
+     = 0.0835 · 11.1
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     ·  ( 4.14
+     <i>m</i>
+     )
      <sup>2</sup>
      = 15.88
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN·m/m
    </p>
    <p>
     <b>Average moments at supports from the adjacent spans</b>
@@ -1165,14 +1317,30 @@
      </span>
      =
      <span class="dvc">
-      0 · 0 + 15.88 · 4.14
+      0
+      <i>kNm</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      · 0
+      <i>m</i>
+      + 15.88
+      <i>kNm</i>
+      <i class="unit">∕</i>
+      <i>m</i>
+      · 4.14
+      <i>m</i>
       <span class="dvl">
       </span>
-      0 + 4.14
+      0
+      <i>m</i>
+      + 4.14
+      <i>m</i>
      </span>
      = 15.88
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN·m/m
    </p>
    <p>
     <b>Shear forces</b>
@@ -1189,9 +1357,18 @@
      ·
      <var>l</var>
      <sub>x</sub>
-     = 0.368 · 11.1 · 4.14 = 16.93
+     = 0.368 · 11.1
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4.14
+     <i>m</i>
+     = 16.93
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <span class="eq">
@@ -1205,9 +1382,18 @@
      ·
      <var>l</var>
      <sub>x</sub>
-     = 0.567 · 11.1 · 4.14 = 26.04
+     = 0.567 · 11.1
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4.14
+     <i>m</i>
+     = 26.04
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <span class="eq">
@@ -1221,9 +1407,18 @@
      ·
      <var>l</var>
      <sub>x</sub>
-     = 0.29 · 11.1 · 4.14 = 13.33
+     = 0.29 · 11.1
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     <sup class="unit">2</sup>
+     · 4.14
+     <i>m</i>
+     = 13.33
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN/m
    </p>
    <p>
     <b>Edge support moments</b>
@@ -1246,36 +1441,48 @@
       <sub>x</sub>
       <span class="dvl">
       </span>
-      200
+      2
      </span>
      ;
      <span class="dvc">
       <var>h</var>
       <span class="dvl">
       </span>
-      200
+      2
      </span>
      <span class="b1">)</span>
-     = 15.88 − 26.04 ·
+     = 15.88
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     − 26.04
+     <i>kN</i>
+     <i class="unit">∕</i>
+     <i>m</i>
+     ·
      <b>min</b>
      <span class="b1">(</span>
      <span class="dvc">
       25
+      <i>cm</i>
       <span class="dvl">
       </span>
-      200
+      2
      </span>
      ;
      <span class="dvc">
       14
+      <i>cm</i>
       <span class="dvl">
       </span>
-      200
+      2
      </span>
      <span class="b1">)</span>
      = 14.06
+     <i>kNm</i>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    kN·m/m
    </p>
   </div>
   <div class="fold">
@@ -1301,18 +1508,23 @@
       <sub>bxb</sub>
       <span class="dvl">
       </span>
-      20
+      2
      </span>
-     = 14 − 2 −
+     = 14
+     <i>cm</i>
+     − 2
+     <i>cm</i>
+     −
      <span class="dvc">
       8
+      <i>mm</i>
       <span class="dvl">
       </span>
-      20
+      2
      </span>
      = 11.6
+     <i>cm</i>
     </span>
-    cm
    </p>
    <p>
     Relative design bending moment -
@@ -1321,7 +1533,6 @@
      <sub>Ed</sub>
      =
      <span class="dvc">
-      10 ·
       <var>M</var>
       <sub>Ed_xb</sub>
       <span class="dvl">
@@ -1337,12 +1548,18 @@
      </span>
      =
      <span class="dvc">
-      10 · 12.3
+      12.3
+      <i>kNm</i>
+      <i class="unit">∕</i>
+      <i>m</i>
       <span class="dvl">
       </span>
-      11.6
+      ( 11.6
+      <i>cm</i>
+      )
       <sup>2</sup>
       · 1 · 14.17
+      <i>MPa</i>
      </span>
      = 0.0645
     </span>
@@ -1369,6 +1586,7 @@
      )  =
      <span class="dvc">
       11.6
+      <i>cm</i>
       <span class="dvl">
       </span>
       0.8
@@ -1379,8 +1597,8 @@
       1 − 2 · 0.0645
      </span>
      )  = 0.968
+     <i>cm</i>
     </span>
-    cm
    </p>
    <p>
     Relative compression zone depth -
@@ -1397,9 +1615,11 @@
      =
      <span class="dvc">
       0.968
+      <i>cm</i>
       <span class="dvl">
       </span>
       11.6
+      <i>cm</i>
      </span>
      = 0.0834
     </span>
@@ -1415,9 +1635,13 @@
      <var>λ</var>
      ·
      <var>x</var>
-     = 11.6 − 0.5 · 0.8 · 0.968 = 11.21
+     = 11.6
+     <i>cm</i>
+     − 0.5 · 0.8 · 0.968
+     <i>cm</i>
+     = 11.21
+     <i>cm</i>
     </span>
-    cm
    </p>
    <p>
     Area of required reinforcement -
@@ -1428,8 +1652,6 @@
      <span class="dvc">
       <var>M</var>
       <sub>Ed_xb</sub>
-      · 10
-      <sup>3</sup>
       <span class="dvl">
       </span>
       <var>z</var>
@@ -1439,15 +1661,23 @@
      </span>
      =
      <span class="dvc">
-      12.3 · 10
-      <sup>3</sup>
+      12.3
+      <i>kNm</i>
+      <i class="unit">∕</i>
+      <i>m</i>
       <span class="dvl">
       </span>
-      11.21 · 434.78
+      11.21
+      <i>cm</i>
+      · 434.78
+      <i>MPa</i>
      </span>
      = 2.52
+     <i>cm</i>
+     <sup class="unit">2</sup>
+     <i class="unit">∕</i>
+     <i>m</i>
     </span>
-    cm²/m
    </p>
    <p>
     Reinforcement ratio -
@@ -1462,14 +1692,18 @@
       </span>
       <var>d</var>
       <sub>xb</sub>
-      · 100
      </span>
      =
      <span class="dvc">
       2.52
+      <i>cm</i>
+      <sup class="unit">2</sup>
+      <i class="unit">∕</i>
+      <i>m</i>
       <span class="dvl">
       </span>
-      11.6 · 100
+      11.6
+      <i>cm</i>
      </span>
      = 0.00217
     </span>
@@ -1508,9 +1742,11 @@
      <span class="b1">(</span>
      <span class="dvc">
       0.26 · 2.56
+      <i>MPa</i>
       <span class="dvl">
       </span>
       500
+      <i>MPa</i>
      </span>
      ; 0.0013
      <span class="b1">)</span>
@@ -1535,36 +1771,62 @@
      <sub>xb</sub>
      =
      <b>floor</b>
-     <span class="b1">(</span>
-     <span class="dvc">
-      <var>π</var>
-      ·
-      <var>d</var>
-      <sub>bxb</sub>
-      <sup>2</sup>
-      <span class="dvl">
+     <span class="b2">(</span>
+     <span class="dvc down">
+      <span class="dvc up">
+       <span class="dvc">
+        <var>π</var>
+        ·
+        <var>d</var>
+        <sub>bxb</sub>
+        <sup>2</sup>
+        <span class="dvl">
+        </span>
+        4 ·
+        <var>A</var>
+        <sub>sxb</sub>
+       </span>
+       <span class="dvl">
+       </span>
+       1
+       <i>cm</i>
       </span>
-      4 ·
-      <var>A</var>
-      <sub>sxb</sub>
      </span>
-     <span class="b1">)</span>
+     <span class="b2">)</span>
+     · 1
+     <i>cm</i>
      =
      <b>floor</b>
-     <span class="b1">(</span>
-     <span class="dvc">
-      3.14 · 8
-      <sup>2</sup>
-      <span class="dvl">
+     <span class="b2">(</span>
+     <span class="dvc down">
+      <span class="dvc up">
+       <span class="dvc">
+        3.14 ·  ( 8
+        <i>mm</i>
+        )
+        <sup>2</sup>
+        <span class="dvl">
+        </span>
+        4 · 2.52
+        <i>cm</i>
+        <sup class="unit">2</sup>
+        <i class="unit">∕</i>
+        <i>m</i>
+       </span>
+       <span class="dvl">
+       </span>
+       1
+       <i>cm</i>
       </span>
-      4 · 2.52
      </span>
-     <span class="b1">)</span>
+     <span class="b2">)</span>
+     · 1
+     <i>cm</i>
      = 19
+     <i>cm</i>
     </span>
-    cm
    </p>
-   <!-- <span class="eq"><var>s</var><sub>yb</sub> = <b>floor</b><span class="b1">(</span><span class="dvc"><var>π</var> · <var>d</var><sub>byb</sub><sup>2</sup><span class="dvl"></span>4 · <var>A</var><sub>syb</sub></span><span class="b1">)</span> = <b>floor</b><span class="b1">(</span><span class="dvc">3.14 · 8<sup>2</sup><span class="dvl"></span>4 · 1.9</span><span class="b1">)</span> = 26</span> cm-->
+   <!-- <span class="eq"><var>s</var><sub>yb</sub> = <b>floor</b><span class="b2">(</span><span class="dvc down"><span class="dvc up"><span class="dvc"><var>π</var> · <var>d</var><sub>byb</sub><sup>2</sup><span class="dvl"></span>4 · <var>A</var><sub>syb</sub></span><span class="dvl"></span>1 <i>cm</i></span></span><span class="b2">)</span> · 1 <i>cm</i> = <b>floor</b><span class="b2">(</span><span class="dvc down"><span class="dvc up"><span class="dvc">3.14 ·  ( 8 <i>mm</i> ) <sup>2</sup><span class="dvl"></span>4 · 1.9 <i>cm</i><sup class="unit">2</sup><i class="unit"> ∕ </i><i>m</i></span><span class="dvl"></span>1 <i>cm</i></span></span><span class="b2">)</span> · 1 <i>cm</i> = 26 <i>cm</i></span> -->
    <p class="ref">[EN 1992-1-1, § 9.3.1.1 (3)]</p>
    <p>Maximum bar spacing</p>
    <p>
@@ -1575,13 +1837,19 @@
      <b>min</b>
      ( 2 ·
      <var>h</var>
-     ; 25 )  =
+     ; 25
+     <i>cm</i>
+     )  =
      <b>min</b>
-     ( 2 · 14; 25 )  = 25
+     ( 2 · 14
+     <i>cm</i>
+     ; 25
+     <i>cm</i>
+     )  = 25
+     <i>cm</i>
     </span>
-    cm
    </p>
-   <!--<p><i>s</i><sub>yb</sub> &gt; <i>s</i><sub>max</sub>. Assume <span class="eq"><var>s</var><sub>yb</sub> = <var>s</var><sub>max</sub> = 25</span> cm</p>-->
+   <!--<p><i>s</i><sub>yb</sub> &gt; <i>s</i><sub>max</sub>. Assume <span class="eq"><var>s</var><sub>yb</sub> = <var>s</var><sub>max</sub> = 25 <i>cm</i></span> </p>-->
    <p>
     <b>The rest of the reinforcement is detailed similarly.</b>
    </p>

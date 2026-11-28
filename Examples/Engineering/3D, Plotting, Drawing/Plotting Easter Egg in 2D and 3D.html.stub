@@ -1,18 +1,18 @@
 <div class="calcpad-output">
  <!-- Render the same egg-shaped curve as a 2D parametric plot and as a shaded 3D surface side by side, illustrating the difference between the `$Plot` and `$Map` plot directives in CalcpadCE and the role of `PlotShadows`, `PlotPalette` and `PlotLightDir`. -->
  <p>
+  Horizontal radius -
   <span class="eq">
    <var>a</var>
    = 1
   </span>
-  - horizontal radius
  </p>
  <p>
+  Vertical radius -
   <span class="eq">
    <var>b</var>
    = 0.7
   </span>
-  - vertical radius
  </p>
  <!-- <span class="eq"><var>PlotWidth</var> = 400</span> ,  <span class="eq"><var>PlotHeight</var> = <var>PlotWidth</var> = 400</span> ,  <span class="eq"><var>PlotStep</var> = 1</span> ,  <span class="eq"><var>PlotShadows</var> = 1</span> ,  <span class="eq"><var>PlotPalette</var> = 4</span> ,  <span class="eq"><var>PlotLightDir</var> = 7</span> -->
  <table>

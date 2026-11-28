@@ -2,21 +2,24 @@
 'Initial coordinates
 #def a$ = sqrt(3)/2
 x = hp([0; 1])', 'y = hp([0; 0])
-'Number of iterations -'n = 7
+#UI 'Number of iterations -'n = 7
+#pause
 '<h4>Animation</h4>
 #val
-'<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-'<style>#kochwaveWave polyline{display:none; stroke:Teal; stroke-width:0.08; stroke-linejoin:round;}</style>
-#hide 8
+#html
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<style>#kochwaveWave polyline{display:none; stroke:Teal; stroke-width:0.08; stroke-linejoin:round;}</style>
+#end html
+#hide
 w = 400', 'h = 200', 'k = 120
 #round 12
-#show
+#end hide
 '<svg id="kochwaveWave" viewBox="0 '0.4*k' 'k' 'k/2'" style="width:'w'pt; height:'h'pt;">
 '<defs><linearGradient id="sff" gradientTransform="rotate(90)"><stop offset="0%" stop-color="#8de"/><stop offset="30%" stop-color="#bef"/><stop offset="100%" stop-color="White"/></linearGradient></defs>
 #for i = 1 : n
 	#hide
 	n_p = len(x)
-	#show
+	#end hide
 	'<polyline id="kochwaveWave-fr-'i'" points="
 	#for j = 1 : n_p
 		x.j*k','(a$ + y.j)*k' '
@@ -40,7 +43,7 @@ w = 400', 'h = 200', 'k = 120
 	'Reassign to the original vectors
 	x = join(x1; p2.1)
 	y = join(y1; p2.2)
-	#show
+	#end hide
 #loop
 '</svg><br/>
 'Number of points -'n_p
@@ -58,3 +61,4 @@ w = 400', 'h = 200', 'k = 120
 '},500);
 '})();
 '</script>
+#end val

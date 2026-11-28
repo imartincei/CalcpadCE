@@ -1,5 +1,6 @@
 '<!-- Multiline quadratic-roots function returning both roots of $a x^2 + b x + c = 0$ via the discriminant, with real/complex branching. -->
-"Quadratic Equation Roots function
+'<h1>Quadratic Equation Roots function</h1>
+#UI 'Coefficient a -'a = 2', Coefficient b -'b = 3', Coefficient c -'c = -5
 'Multiline code block example:
 quadRoots(a; b; c) = _
 $block{
@@ -8,7 +9,7 @@ $block{
     x_2 = (-b + sqrt(D))/(2*a);
     [x_1; x_2];
 }
-quadRoots(2; 3; -5)
+quadRoots(a; b; c)
 'Inline code block example:
 quadRoots(a; b; c) = $inline{D = b^2 - 4*a*c; x_1 = (-b - sqrt(D))/(2*a); x_2 = (-b + sqrt(D))/(2*a); [x_1; x_2]}
-quadRoots(2; 3; -5)
+quadRoots(a; b; c)

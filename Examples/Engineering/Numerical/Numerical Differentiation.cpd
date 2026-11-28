@@ -2,7 +2,8 @@
 'Exposes the round-off blow-up of finite differences and the machine-precision accuracy of the complex-step trick. -->
 #md on
 #rad
-'Function -'f(x) = e^x', Point - 'a = 100
+'Function -'f(x) = e^x
+#UI 'Point -'a = 100
 'Theoretical value -'f′(x) = e^x', 'y′_a = f′(a)
 '**$Slope** function (Richardson extrapolation) -'y′_aS = $Slope{f(x) @ x = a}
 '> Error -'δ = abs(y′_a - y′_aS)/y′_a|%'- <span class="err">Approx.</span>

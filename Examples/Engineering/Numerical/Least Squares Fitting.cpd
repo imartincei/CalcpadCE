@@ -1,8 +1,8 @@
 '<!-- Fits a 10-point dataset with linear, quadratic and quintic polynomial models built from the normal equations $X^T\, X\, a = X^T y$.
 'All three curves are then plotted together so the residual pattern of each model is immediately visible. -->
 'Point coordinates
-x = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9]
-y = [400; 450; 440; 400; 380; 330; 250; 200; 150; 160]
+#UI x = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9]
+#UI y = [400; 450; 440; 400; 380; 330; 250; 200; 150; 160]
 'Number of points -'n = len(x)
 e = fill(vector(n); 1)
 '<h4>Linear fit</h4>
@@ -28,7 +28,7 @@ P_C(x) = dot(a_C; [1; x; x^2; x^3; x^4; x^5])
 PlotWidth = 250
 PlotHeight = 150
 #def P$ = x.1|y.1 & x.2|y.2 & x.3|y.3 & x.4|y.4 & x.5|y.5 & x.6|y.6 & x.7|y.7 & x.8|y.8 & x.9|y.9 & x.10|y.10
-#show
+#end hide
 $Plot{ξ|P_L(ξ) & P$ @ ξ = x.1 : x.n}
 $Plot{ξ|P_Q(ξ) & P$ @ ξ = x.1 : x.n}
 $Plot{ξ|P_C(ξ) & P$ @ ξ = x.1 : x.n}

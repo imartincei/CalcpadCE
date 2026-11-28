@@ -1,239 +1,64 @@
 '<!-- Catalogue-driven variant of the I-section properties calculation: a single drop-down selector populates the dimensions and an SVG sketch of the chosen rolled section is rendered alongside the results. -->
-"Design of steel I-Section <hr/><small>According to <strong>Eurocode</strong>: EN 1993-1-1 </small>
+'<h1>Design of steel I-Section <hr/><small>According to <strong>Eurocode</strong>: EN 1993-1-1 </small></h1>
 #pre
 '<div style="max-width:150mm; padding-left:5mm; background:#f0f0ee; border: solid 1pt #e4e4e0; border-radius:6pt; box-shadow: 3pt 3pt 6pt rgba(0, 0, 0, 0.4)">
-#show
+#end pre
 '
 '<table><tr><td>
 '<h4>Dimensions</h4>
-#pre
-'<p>Select section -
-'<select data-target="section">
-#post
-'<p>Section type -
-'<select data-target="section" style="font-weight:bold; border:none; background: none; color: black; box-shadow:none; appearance: none;">
-#show
-'<option value=100;4.1;55;5.7;55;5.7;7;0>IPE 100 </option>
-'<option value=120;4.4;64;6.3;64;6.3;7;0>IPE 120 </option>
-'<option value=137.4;3.8;73;5.6;73;5.6;7;0>IPE 140 A</option>
-'<option value=140;4.7;73;6.9;73;6.9;7;0>IPE 140 </option>
-'<option value=142;5.3;72;7.8;72;7.8;7;0>IPE 140 R</option>
-'<option value=157;4;82;5.9;82;5.9;9;0>IPE 160 A</option>
-'<option value=160;5;82;7.4;82;7.4;9;0>IPE 160 </option>
-'<option value=162;5.6;81;8.5;81;8.5;9;0>IPE 160 R</option>
-'<option value=177;4.3;91;6.5;91;6.5;9;0>IPE 180 A</option>
-'<option value=180;5.3;91;8;91;8;9;0>IPE 180 </option>
-'<option value=182;6;92;9;92;9;9;0>IPE 180 O</option>
-'<option value=183;6.4;89;9.5;89;9.5;9;0>IPE 180 R</option>
-'<option value=197;4.5;100;7;100;7;12;0>IPE 200 A</option>
-'<option value=200;5.6;100;8.5;100;8.5;12;0>IPE 200 </option>
-'<option value=202;6.2;102;9.5;102;9.5;12;0>IPE 200 O</option>
-'<option value=204;6.6;98;10.5;98;10.5;12;0>IPE 200 R</option>
-'<option value=217;5;110;7.7;110;7.7;12;0>IPE 220 A</option>
-'<option value=220;5.9;110;9.2;110;9.2;12;0>IPE 220 </option>
-'<option value=222;6.6;112;10.2;112;10.2;12;0>IPE 220 O</option>
-'<option value=225;6.7;108;11.8;108;11.8;12;0>IPE 220 R</option>
-'<option value=237;5.2;120;8.3;120;8.3;15;0>IPE 240 A</option>
-'<option value=240;6.2;120;9.8;120;9.8;15;0>IPE 240 </option>
-'<option value=242;7;122;10.8;122;10.8;15;0>IPE 240 O</option>
-'<option value=245;7.5;118;12.3;118;12.3;15;0>IPE 240 R</option>
-'<option value=267;5.5;135;8.7;135;8.7;15;0>IPE 270 A</option>
-'<option value=270;6.6;135;10.2;135;10.2;15;0>IPE 270 </option>
-'<option value=274;7.5;136;12.2;136;12.2;15;0>IPE 270 O</option>
-'<option value=276;7.7;133;13.1;133;13.1;15;0>IPE 270 R</option>
-'<option value=297;6.1;150;9.2;150;9.2;15;0>IPE 300 A</option>
-'<option value=300;7.1;150;10.7;150;10.7;15;0>IPE 300 </option>
-'<option value=304;8;152;12.7;152;12.7;15;0>IPE 300 O</option>
-'<option value=306;8.5;147;13.7;147;13.7;15;0>IPE 300 R</option>
-'<option value=327;6.5;160;10;160;10;18;0>IPE 330 A</option>
-'<option value=330;7.5;160;11.5;160;11.5;18;0>IPE 330 </option>
-'<option value=334;8.5;162;13.5;162;13.5;18;0>IPE 330 O</option>
-'<option value=336;9.2;158;14.5;158;14.5;18;0>IPE 330 R</option>
-'<option value=357.6;6.6;170;11.5;170;11.5;18;0>IPE 360 A</option>
-'<option value=360;8;170;12.7;170;12.7;18;0>IPE 360 </option>
-'<option value=364;9.2;172;14.7;172;14.7;18;0>IPE 360 O</option>
-'<option value=366;9.9;168;16;168;16;18;0>IPE 360 R</option>
-'<option value=397;7;180;12;180;12;21;0>IPE 400 A</option>
-'<option value=400;8.6;180;13.5;180;13.5;21;0>IPE 400 </option>
-'<option value=404;9.7;182;15.5;182;15.5;21;0>IPE 400 O</option>
-'<option value=407;10.6;178;17;178;17;21;0>IPE 400 R</option>
-'<option value=408;10.6;182;17.5;182;17.5;21;0>IPE 400 V</option>
-'<option value=447;7.6;190;13.1;190;13.1;21;0>IPE 450 A</option>
-'<option value=450;9.4;190;14.6;190;14.6;21;0>IPE 450 </option>
-'<option value=456;11;192;17.6;192;17.6;21;0>IPE 450 O</option>
-'<option value=458;11.3;188;18.6;188;18.6;21;0>IPE 450 R</option>
-'<option value=460;12.4;194;19.6;194;19.6;21;0>IPE 450 V</option>
-'<option value=497;8.4;200;14.5;200;14.5;21;0>IPE 500 A</option>
-'<option value=500;10.2;200;16;200;16;21;0>IPE 500 </option>
-'<option value=506;12;202;19;202;19;21;0>IPE 500 O</option>
-'<option value=508;12.6;198;20;198;20;21;0>IPE 500 R</option>
-'<option value=514;14.2;204;23;204;23;21;0>IPE 500 V</option>
-'<option value=547;9;210;15.7;210;15.7;24;0>IPE 550 A</option>
-'<option value=550;11.1;210;17.2;210;17.2;24;0>IPE 550 </option>
-'<option value=556;12.7;212;20.2;212;20.2;24;0>IPE 550 O</option>
-'<option value=560;14;210;22.2;210;22.2;24;0>IPE 550 R</option>
-'<option value=566;17.1;216;25.2;216;25.2;24;0>IPE 550 V</option>
-'<option value=597;9.8;220;17.5;220;17.5;24;0>IPE 600 A</option>
-'<option value=600;12;220;19;220;19;24;0>IPE 600 </option>
-'<option value=610;15;224;24;224;24;24;0>IPE 600 O</option>
-'<option value=608;14;218;23;218;23;24;0>IPE 600 R</option>
-'<option value=618;18;228;28;228;28;24;0>IPE 600 V</option>
-'<option value=753;11.5;263;17;263;17;17;0>IPE 750 x 137</option>
-'<option value=753;13.2;265;17;265;17;17;0>IPE 750 x 147</option>
-'<option value=758;13.8;266;19.3;266;19.3;17;0>IPE 750 x 161</option>
-'<option value=762;14.4;267;21.6;267;21.6;17;0>IPE 750 x 174</option>
-'<option value=766;14.9;267;23.6;267;23.6;17;0>IPE 750 x185</option>
-'<option value=770;15.6;268;25.4;268;25.4;17;0>IPE 750 x 197</option>
-'<option value=775;16;268;28;268;28;17;0>IPE 750 x 210</option>
-'<option value=778;17;269;29.5;269;29.5;17;0>IPE 750 x 223</option>
-'<option value=96;5;100;8;100;8;12;0>HE 100 A</option>
-'<option value=96;5;100;8;100;8;12;0>HE 100 A</option>
-'<option value=100;6;100;10;100;10;12;0>HE 100 B</option>
-'<option value=109;4.2;120;5.5;120;5.5;12;0>HE 120 AA</option>
-'<option value=114;5;120;8;120;8;12;0>HE 120 A</option>
-'<option value=120;6.5;120;11;120;11;12;0>HE 120 B</option>
-'<option value=128;4.3;140;6;140;6;12;0>HE 140 AA</option>
-'<option value=133;5.5;140;8.5;140;8.5;12;0>HE 140 A</option>
-'<option value=140;7;140;12;140;12;12;0>HE 140 B</option>
-'<option value=148;4.5;160;7;160;7;15;0>HE 160 AA</option>
-'<option value=152;6;160;9;160;9;15;0>HE 160 A</option>
-'<option value=160;8;160;13;160;13;15;0>HE 160 B</option>
-'<option value=180;14;166;23;166;23;15;0>HE 160 M</option>
-'<option value=167;5;180;7.5;180;7.5;15;0>HE 180 AA</option>
-'<option value=171;6;180;9.5;180;9.5;15;0>HE 180 A</option>
-'<option value=180;8.5;180;14;180;14;15;0>HE 180 B</option>
-'<option value=200;14.5;186;24;186;24;15;0>HE 180 M</option>
-'<option value=186;5.5;200;8;200;8;18;0>HE 200 AA</option>
-'<option value=190;6.5;200;10;200;10;18;0>HE 200 A</option>
-'<option value=200;9;200;15;200;15;18;0>HE 200 B</option>
-'<option value=220;15;206;25;206;25;18;0>HE 200 M</option>
-'<option value=205;6;220;8.5;220;8.5;18;0>HE 220 AA</option>
-'<option value=210;7;220;11;220;11;18;0>HE 220 A</option>
-'<option value=220;9.5;220;16;220;16;18;0>HE 220 B</option>
-'<option value=240;15.5;226;26;226;26;18;0>HE 220 M</option>
-'<option value=224;6.5;240;9;240;9;21;0>HE 240 AA</option>
-'<option value=230;7.5;240;12;240;12;21;0>HE 240 A</option>
-'<option value=240;10;240;17;240;17;21;0>HE 240 B</option>
-'<option value=270;18;248;32;248;32;21;0>HE 240 M</option>
-'<option value=244;6.5;260;9.5;260;9.5;24;0>HE 260 AA</option>
-'<option value=250;7.5;260;12.5;260;12.5;24;0>HE 260 A</option>
-'<option value=260;10;260;17.5;260;17.5;24;0>HE 260 B</option>
-'<option value=290;18;268;32.5;268;32.5;24;0>HE 260 M</option>
-'<option value=264;7;280;10;280;10;24;0>HE 280 AA</option>
-'<option value=270;8;280;13;280;13;24;0>HE 280 A</option>
-'<option value=280;10.5;280;18;280;18;24;0>HE 280 B</option>
-'<option value=310;18.5;288;33;288;33;24;0>HE 280 M</option>
-'<option value=283;7.5;300;10.5;300;10.5;27;0>HE 300 AA</option>
-'<option value=290;8.5;300;14;300;14;27;0>HE 300 A</option>
-'<option value=300;11;300;19;300;19;27;0>HE 300 B</option>
-'<option value=320;16;305;29;305;29;27;0>HE 300 C</option>
-'<option value=340;21;310;39;310;39;27;0>HE 300 M</option>
-'<option value=301;8;300;11;300;11;27;0>HE 320 AA</option>
-'<option value=310;9;300;15.5;300;15.5;27;0>HE 320 A</option>
-'<option value=320;11.5;300;20.5;300;20.5;27;0>HE 320 B</option>
-'<option value=359;21;309;40;309;40;27;0>HE 320 M</option>
-'<option value=320;8.5;300;11.5;300;11.5;27;0>HE 340 AA</option>
-'<option value=330;9.5;300;16.5;300;16.5;27;0>HE 340 A</option>
-'<option value=340;12;300;21.5;300;21.5;27;0>HE 340 B</option>
-'<option value=377;21;309;40;309;40;27;0>HE 340 M</option>
-'<option value=339;9;300;12;300;12;27;0>HE 360 AA</option>
-'<option value=350;10;300;17.5;300;17.5;27;0>HE 360 A</option>
-'<option value=360;12.5;300;22.5;300;22.5;27;0>HE 360 B</option>
-'<option value=395;21;308;40;308;40;27;0>HE 360 M</option>
-'<option value=378;9.5;300;13;300;13;27;0>HE 400 AA</option>
-'<option value=384;10;297;16;297;16;27;0>HE 400 x 107</option>
-'<option value=390;11;300;19;300;19;27;0>HE 400 A</option>
-'<option value=400;13.5;300;24;300;24;27;0>HE 400 B</option>
-'<option value=432;21;307;40;307;40;27;0>HE 400 M</option>
-'<option value=425;10;300;13.5;300;13.5;27;0>HE 450 AA</option>
-'<option value=435;10.2;300;18.5;300;18.5;27;0>HE 450 x 124</option>
-'<option value=440;11.5;300;21;300;21;27;0>HE 450 A</option>
-'<option value=450;14;300;26;300;26;27;0>HE 450 B</option>
-'<option value=478;21;307;40;307;40;27;0>HE 450 M</option>
-'<option value=472;10.5;300;14;300;14;27;0>HE 500 AA</option>
-'<option value=490;12;300;23;300;23;27;0>HE 500 A</option>
-'<option value=500;14.5;300;28;300;28;27;0>HE 500 B</option>
-'<option value=524;21;306;40;306;40;27;0>HE 500 M</option>
-'<option value=522;11.5;300;15;300;15;27;0>HE 550 AA</option>
-'<option value=540;12.5;300;24;300;24;27;0>HE 550 A</option>
-'<option value=550;15;300;29;300;29;27;0>HE 550 B</option>
-'<option value=572;21;306;40;306;40;27;0>HE 550 M</option>
-'<option value=571;12;300;15.5;300;15.5;27;0>HE 600 AA</option>
-'<option value=575;11.8;300;17.5;300;17.5;27;0>HE 600 x 137</option>
-'<option value=582;11.6;300;20.6;300;20.6;27;0>HE 600 x 151</option>
-'<option value=588;13.6;300;23.9;300;23.9;27;0>HE 600 x 175</option>
-'<option value=590;13;300;25;300;25;27;0>HE 600 A</option>
-'<option value=600;15.5;300;30;300;30;27;0>HE 600 B</option>
-'<option value=620;21;305;40;305;40;27;0>HE 600 M</option>
-'<option value=620;12.5;300;16;300;16;27;0>HE 650 AA</option>
-'<option value=640;13.5;300;26;300;26;27;0>HE 650 A</option>
-'<option value=650;16;300;31;300;31;27;0>HE 650 B</option>
-'<option value=668;21;305;40;305;40;27;0>HE 650 M</option>
-'<option value=670;13;300;17;300;17;27;0>HE 700 AA</option>
-'<option value=678;12.5;300;21;300;21;27;0>HE 700 x 166</option>
-'<option value=690;14.5;300;27;300;27;27;0>HE 700 A</option>
-'<option value=700;17;300;32;300;32;27;0>HE 700 B</option>
-'<option value=716;21;304;40;304;40;27;0>HE 700 M</option>
-'<option value=770;14;300;18;300;18;30;0>HE 800 AA</option>
-'<option value=790;15;300;28;300;28;30;0>HE 800 A</option>
-'<option value=800;17.5;300;33;300;33;30;0>HE 800 B</option>
-'<option value=814;21;303;40;303;40;30;0>HE 800 M</option>
-'<option value=870;15;300;20;300;20;30;0>HE 900 AA</option>
-'<option value=890;16;300;30;300;30;30;0>HE 900 A</option>
-'<option value=900;18.5;300;35;300;35;30;0>HE 900 B</option>
-'<option value=910;21;302;40;302;40;30;0>HE 900 M</option>
-'<option value=970;16;300;21;300;21;30;0>HE 1000 A</option>
-'<option value=990;16.5;300;31;300;31;30;0>HE 1000 A</option>
-'<option value=1000;19;300;36;300;36;30;0>HE 1000 B</option>
-'<option value=1008;21;302;40;302;40;30;0>HE 1000 M</option>
-'</select></p>
-#show
-'<table id="section">
-'<tr><td style="padding-right: 10px;">'h = ? {180}'mm, </td><td>'t_w = ? {5.3}'mm </td></tr>
-'<tr><td style="padding-right: 10px;">'b_f1 = ? {91}'mm,</td><td>'t_f1 = ? {8}'mm</td></tr>
-'<tr><td style="padding-right: 10px;">'b_f2 = ? {91}'mm,</td><td>'t_f2 = ? {8}'mm</td></tr>
-'<tr><td style="padding-right: 10px;">'r = ? {9}'mm, </td><td style="display:none">'r_2 = ? {0}'mm</td></tr>
-'</table>
-h_w = h - t_f1 - t_f2'mm
-#pre
-'<p>Section type -
-'<select data-target="rolled">
-'<option value="1">Rolled</option>
-'<option value="0">Welded</option>
-'</select></p>
-#show
-'<p style="display:none;" id="rolled">'rolled = ? {1}'</p>
+#UI {"type": "dropdown", "keys": ["IPE 100", "IPE 120", "IPE 140 A", "IPE 140", "IPE 140 R", "IPE 160 A", "IPE 160", "IPE 160 R", "IPE 180 A", "IPE 180", "IPE 180 O", "IPE 180 R", "IPE 200 A", "IPE 200", "IPE 200 O", "IPE 200 R", "IPE 220 A", "IPE 220", "IPE 220 O", "IPE 220 R", "IPE 240 A", "IPE 240", "IPE 240 O", "IPE 240 R", "IPE 270 A", "IPE 270", "IPE 270 O", "IPE 270 R", "IPE 300 A", "IPE 300", "IPE 300 O", "IPE 300 R", "IPE 330 A", "IPE 330", "IPE 330 O", "IPE 330 R", "IPE 360 A", "IPE 360", "IPE 360 O", "IPE 360 R", "IPE 400 A", "IPE 400", "IPE 400 O", "IPE 400 R", "IPE 400 V", "IPE 450 A", "IPE 450", "IPE 450 O", "IPE 450 R", "IPE 450 V", "IPE 500 A", "IPE 500", "IPE 500 O", "IPE 500 R", "IPE 500 V", "IPE 550 A", "IPE 550", "IPE 550 O", "IPE 550 R", "IPE 550 V", "IPE 600 A", "IPE 600", "IPE 600 O", "IPE 600 R", "IPE 600 V", "IPE 750 x 137", "IPE 750 x 147", "IPE 750 x 161", "IPE 750 x 174", "IPE 750 x185", "IPE 750 x 197", "IPE 750 x 210", "IPE 750 x 223", "HE 100 A", "HE 100 A", "HE 100 B", "HE 120 AA", "HE 120 A", "HE 120 B", "HE 140 AA", "HE 140 A", "HE 140 B", "HE 160 AA", "HE 160 A", "HE 160 B", "HE 160 M", "HE 180 AA", "HE 180 A", "HE 180 B", "HE 180 M", "HE 200 AA", "HE 200 A", "HE 200 B", "HE 200 M", "HE 220 AA", "HE 220 A", "HE 220 B", "HE 220 M", "HE 240 AA", "HE 240 A", "HE 240 B", "HE 240 M", "HE 260 AA", "HE 260 A", "HE 260 B", "HE 260 M", "HE 280 AA", "HE 280 A", "HE 280 B", "HE 280 M", "HE 300 AA", "HE 300 A", "HE 300 B", "HE 300 C", "HE 300 M", "HE 320 AA", "HE 320 A", "HE 320 B", "HE 320 M", "HE 340 AA", "HE 340 A", "HE 340 B", "HE 340 M", "HE 360 AA", "HE 360 A", "HE 360 B", "HE 360 M", "HE 400 AA", "HE 400 x 107", "HE 400 A", "HE 400 B", "HE 400 M", "HE 450 AA", "HE 450 x 124", "HE 450 A", "HE 450 B", "HE 450 M", "HE 500 AA", "HE 500 A", "HE 500 B", "HE 500 M", "HE 550 AA", "HE 550 A", "HE 550 B", "HE 550 M", "HE 600 AA", "HE 600 x 137", "HE 600 x 151", "HE 600 x 175", "HE 600 A", "HE 600 B", "HE 600 M", "HE 650 AA", "HE 650 A", "HE 650 B", "HE 650 M", "HE 700 AA", "HE 700 x 166", "HE 700 A", "HE 700 B", "HE 700 M", "HE 800 AA", "HE 800 A", "HE 800 B", "HE 800 M", "HE 900 AA", "HE 900 A", "HE 900 B", "HE 900 M", "HE 1000 A", "HE 1000 A", "HE 1000 B", "HE 1000 M"], "values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "120", "121", "122", "123", "124", "125", "126", "127", "128", "129", "130", "131", "132", "133", "134", "135", "136", "137", "138", "139", "140", "141", "142", "143", "144", "145", "146", "147", "148", "149", "150", "151", "152", "153", "154", "155", "156", "157", "158", "159", "160", "161", "162", "163", "164", "165", "166", "167", "168", "169", "170", "171", "172", "173"]} 'Section -'sec = 10
+#hide
+h_p = [100; 120; 137.4; 140; 142; 157; 160; 162; 177; 180; 182; 183; 197; 200; 202; 204; 217; 220; 222; 225; 237; 240; 242; 245; 267; 270; 274; 276; 297; 300; 304; 306; 327; 330; 334; 336; 357.6; 360; 364; 366; 397; 400; 404; 407; 408; 447; 450; 456; 458; 460; 497; 500; 506; 508; 514; 547; 550; 556; 560; 566; 597; 600; 610; 608; 618; 753; 753; 758; 762; 766; 770; 775; 778; 96; 96; 100; 109; 114; 120; 128; 133; 140; 148; 152; 160; 180; 167; 171; 180; 200; 186; 190; 200; 220; 205; 210; 220; 240; 224; 230; 240; 270; 244; 250; 260; 290; 264; 270; 280; 310; 283; 290; 300; 320; 340; 301; 310; 320; 359; 320; 330; 340; 377; 339; 350; 360; 395; 378; 384; 390; 400; 432; 425; 435; 440; 450; 478; 472; 490; 500; 524; 522; 540; 550; 572; 571; 575; 582; 588; 590; 600; 620; 620; 640; 650; 668; 670; 678; 690; 700; 716; 770; 790; 800; 814; 870; 890; 900; 910; 970; 990; 1000; 1008]*1mm
+t_w_p = [4.1; 4.4; 3.8; 4.7; 5.3; 4; 5; 5.6; 4.3; 5.3; 6; 6.4; 4.5; 5.6; 6.2; 6.6; 5; 5.9; 6.6; 6.7; 5.2; 6.2; 7; 7.5; 5.5; 6.6; 7.5; 7.7; 6.1; 7.1; 8; 8.5; 6.5; 7.5; 8.5; 9.2; 6.6; 8; 9.2; 9.9; 7; 8.6; 9.7; 10.6; 10.6; 7.6; 9.4; 11; 11.3; 12.4; 8.4; 10.2; 12; 12.6; 14.2; 9; 11.1; 12.7; 14; 17.1; 9.8; 12; 15; 14; 18; 11.5; 13.2; 13.8; 14.4; 14.9; 15.6; 16; 17; 5; 5; 6; 4.2; 5; 6.5; 4.3; 5.5; 7; 4.5; 6; 8; 14; 5; 6; 8.5; 14.5; 5.5; 6.5; 9; 15; 6; 7; 9.5; 15.5; 6.5; 7.5; 10; 18; 6.5; 7.5; 10; 18; 7; 8; 10.5; 18.5; 7.5; 8.5; 11; 16; 21; 8; 9; 11.5; 21; 8.5; 9.5; 12; 21; 9; 10; 12.5; 21; 9.5; 10; 11; 13.5; 21; 10; 10.2; 11.5; 14; 21; 10.5; 12; 14.5; 21; 11.5; 12.5; 15; 21; 12; 11.8; 11.6; 13.6; 13; 15.5; 21; 12.5; 13.5; 16; 21; 13; 12.5; 14.5; 17; 21; 14; 15; 17.5; 21; 15; 16; 18.5; 21; 16; 16.5; 19; 21]*1mm
+b_f1_p = [55; 64; 73; 73; 72; 82; 82; 81; 91; 91; 92; 89; 100; 100; 102; 98; 110; 110; 112; 108; 120; 120; 122; 118; 135; 135; 136; 133; 150; 150; 152; 147; 160; 160; 162; 158; 170; 170; 172; 168; 180; 180; 182; 178; 182; 190; 190; 192; 188; 194; 200; 200; 202; 198; 204; 210; 210; 212; 210; 216; 220; 220; 224; 218; 228; 263; 265; 266; 267; 267; 268; 268; 269; 100; 100; 100; 120; 120; 120; 140; 140; 140; 160; 160; 160; 166; 180; 180; 180; 186; 200; 200; 200; 206; 220; 220; 220; 226; 240; 240; 240; 248; 260; 260; 260; 268; 280; 280; 280; 288; 300; 300; 300; 305; 310; 300; 300; 300; 309; 300; 300; 300; 309; 300; 300; 300; 308; 300; 297; 300; 300; 307; 300; 300; 300; 300; 307; 300; 300; 300; 306; 300; 300; 300; 306; 300; 300; 300; 300; 300; 300; 305; 300; 300; 300; 305; 300; 300; 300; 300; 304; 300; 300; 300; 303; 300; 300; 300; 302; 300; 300; 300; 302]*1mm
+t_f1_p = [5.7; 6.3; 5.6; 6.9; 7.8; 5.9; 7.4; 8.5; 6.5; 8; 9; 9.5; 7; 8.5; 9.5; 10.5; 7.7; 9.2; 10.2; 11.8; 8.3; 9.8; 10.8; 12.3; 8.7; 10.2; 12.2; 13.1; 9.2; 10.7; 12.7; 13.7; 10; 11.5; 13.5; 14.5; 11.5; 12.7; 14.7; 16; 12; 13.5; 15.5; 17; 17.5; 13.1; 14.6; 17.6; 18.6; 19.6; 14.5; 16; 19; 20; 23; 15.7; 17.2; 20.2; 22.2; 25.2; 17.5; 19; 24; 23; 28; 17; 17; 19.3; 21.6; 23.6; 25.4; 28; 29.5; 8; 8; 10; 5.5; 8; 11; 6; 8.5; 12; 7; 9; 13; 23; 7.5; 9.5; 14; 24; 8; 10; 15; 25; 8.5; 11; 16; 26; 9; 12; 17; 32; 9.5; 12.5; 17.5; 32.5; 10; 13; 18; 33; 10.5; 14; 19; 29; 39; 11; 15.5; 20.5; 40; 11.5; 16.5; 21.5; 40; 12; 17.5; 22.5; 40; 13; 16; 19; 24; 40; 13.5; 18.5; 21; 26; 40; 14; 23; 28; 40; 15; 24; 29; 40; 15.5; 17.5; 20.6; 23.9; 25; 30; 40; 16; 26; 31; 40; 17; 21; 27; 32; 40; 18; 28; 33; 40; 20; 30; 35; 40; 21; 31; 36; 40]*1mm
+b_f2_p = [55; 64; 73; 73; 72; 82; 82; 81; 91; 91; 92; 89; 100; 100; 102; 98; 110; 110; 112; 108; 120; 120; 122; 118; 135; 135; 136; 133; 150; 150; 152; 147; 160; 160; 162; 158; 170; 170; 172; 168; 180; 180; 182; 178; 182; 190; 190; 192; 188; 194; 200; 200; 202; 198; 204; 210; 210; 212; 210; 216; 220; 220; 224; 218; 228; 263; 265; 266; 267; 267; 268; 268; 269; 100; 100; 100; 120; 120; 120; 140; 140; 140; 160; 160; 160; 166; 180; 180; 180; 186; 200; 200; 200; 206; 220; 220; 220; 226; 240; 240; 240; 248; 260; 260; 260; 268; 280; 280; 280; 288; 300; 300; 300; 305; 310; 300; 300; 300; 309; 300; 300; 300; 309; 300; 300; 300; 308; 300; 297; 300; 300; 307; 300; 300; 300; 300; 307; 300; 300; 300; 306; 300; 300; 300; 306; 300; 300; 300; 300; 300; 300; 305; 300; 300; 300; 305; 300; 300; 300; 300; 304; 300; 300; 300; 303; 300; 300; 300; 302; 300; 300; 300; 302]*1mm
+t_f2_p = [5.7; 6.3; 5.6; 6.9; 7.8; 5.9; 7.4; 8.5; 6.5; 8; 9; 9.5; 7; 8.5; 9.5; 10.5; 7.7; 9.2; 10.2; 11.8; 8.3; 9.8; 10.8; 12.3; 8.7; 10.2; 12.2; 13.1; 9.2; 10.7; 12.7; 13.7; 10; 11.5; 13.5; 14.5; 11.5; 12.7; 14.7; 16; 12; 13.5; 15.5; 17; 17.5; 13.1; 14.6; 17.6; 18.6; 19.6; 14.5; 16; 19; 20; 23; 15.7; 17.2; 20.2; 22.2; 25.2; 17.5; 19; 24; 23; 28; 17; 17; 19.3; 21.6; 23.6; 25.4; 28; 29.5; 8; 8; 10; 5.5; 8; 11; 6; 8.5; 12; 7; 9; 13; 23; 7.5; 9.5; 14; 24; 8; 10; 15; 25; 8.5; 11; 16; 26; 9; 12; 17; 32; 9.5; 12.5; 17.5; 32.5; 10; 13; 18; 33; 10.5; 14; 19; 29; 39; 11; 15.5; 20.5; 40; 11.5; 16.5; 21.5; 40; 12; 17.5; 22.5; 40; 13; 16; 19; 24; 40; 13.5; 18.5; 21; 26; 40; 14; 23; 28; 40; 15; 24; 29; 40; 15.5; 17.5; 20.6; 23.9; 25; 30; 40; 16; 26; 31; 40; 17; 21; 27; 32; 40; 18; 28; 33; 40; 20; 30; 35; 40; 21; 31; 36; 40]*1mm
+r_p = [7; 7; 7; 7; 7; 9; 9; 9; 9; 9; 9; 9; 12; 12; 12; 12; 12; 12; 12; 12; 15; 15; 15; 15; 15; 15; 15; 15; 15; 15; 15; 15; 18; 18; 18; 18; 18; 18; 18; 18; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 21; 24; 24; 24; 24; 24; 24; 24; 24; 24; 24; 17; 17; 17; 17; 17; 17; 17; 17; 12; 12; 12; 12; 12; 12; 12; 12; 12; 15; 15; 15; 15; 15; 15; 15; 15; 18; 18; 18; 18; 18; 18; 18; 18; 21; 21; 21; 21; 24; 24; 24; 24; 24; 24; 24; 24; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 27; 30; 30; 30; 30; 30; 30; 30; 30; 30; 30; 30; 30]*1mm
+h = h_p.(sec)
+t_w = t_w_p.(sec)
+b_f1 = b_f1_p.(sec)
+t_f1 = t_f1_p.(sec)
+b_f2 = b_f2_p.(sec)
+t_f2 = t_f2_p.(sec)
+r = r_p.(sec)
+#end hide
+h', 't_w
+b_f1', 't_f1
+b_f2', 't_f2
+r
+h_w = h - t_f1 - t_f2
+#UI {"type": "radio", "keys": ["Rolled", "Welded"], "values": ["1", "0"]} 'Section type -'rolled = 1
 #post
 #if rolled
 	'Section type - Rolled
 #else
 	'Section type - Welded
 #end if
-#show
+#end post
 '
 '
 '<h4>Steel properties</h4>
-'Yield strength - 'f_y = ? {235}'MPa
-'Tensile strength - 'f_u = ? {360}'MPa
-#pre
-
+#UI 'Yield strength - 'f_y = 235MPa
+#UI 'Tensile strength - 'f_u = 360MPa
 #post
-'Modulus of elasticity - 'E = 210000'MPa
+'Modulus of elasticity - 'E = 210000MPa
 'Private factors of safety:
 γ_M0 = 1.05', 'γ_M2 = 1.25
-#show
+#end post
 '</td><td>
 #pre
 '<img alt="I-section.svg" src="./i-section.svg">
+#end pre
 #hide
 #if rolled
 	A_r = (1 - π/4)*r^2
 	y_cr = (1 - 1/(6*(1 - π/4)))*r
 	I_r = 0.00754511564159655*r^4
 #else
-	A_r = 0
-	y_cr = 0
-	I_r = 0
+	A_r = 0mm^2
+	y_cr = 0mm
+	I_r = 0mm^4
 #end if
 b_1 = b_f1 - t_w
 b_2 = b_f2 - t_w
@@ -289,7 +114,7 @@ D_1 = ((t_f1 + r)^2 + r*t_w + t_w^2/4)/(2*r + t_f1)
 #end if
 D_2 = ((t_f2 + r)^2 + r*t_w + t_w^2/4)/(2*r + t_f2)
 I_t = I_tw + I_tf1 + I_tf2 + α_1*D_1^4 + α_2*D_2^4
-#if r ≡ 0
+#if r ≡ 0mm
 	W_t = I_t/max(t_w; max(t_f1; t_f2))
 #else
 	D = max(D_1; D_2)
@@ -302,58 +127,61 @@ I_z2 = t_f2*b_f2^3/12
 I_w = I_z1*I_z2/(I_z1 + I_z2)*h_2^2
 e_z = t_f1/2 + h_2*I_z1/I_z
 H = 180
-k = H/h
-b = max(b_f1; b_f2)
+k = H/(h/1mm)
+b = max(b_f1; b_f2)/1mm
 B = b*k
-x1 = -b_f2/2
-x2 = -t_w/2
-x3 = t_w/2
-x4 = b_f2/2
-x5 = -b_f1/2
-x6 = b_f1/2
+x1 = -b_f2/2/1mm
+x2 = -t_w/2/1mm
+x3 = t_w/2/1mm
+x4 = b_f2/2/1mm
+x5 = -b_f1/2/1mm
+x6 = b_f1/2/1mm
 y1 = 0
-y2 = t_f2
-y3 = h - t_f1
-y4 = h
-R = r
-y2r = y2 + r
-y3r = y3 - r
-x2r = x2 - r
-x3r = x3 + r
+y2 = t_f2/1mm
+y3 = (h - t_f1)/1mm
+y4 = h/1mm
+z_d = z_c/1mm
+R = r/1mm
+y2r = y2 + R
+y3r = y3 - R
+x2r = x2 - R
+x3r = x3 + R
 stroke = 0.4/k
 dist = 15*stroke
+#end hide
 #post
 #val
 #include svg_drawing.cpd
-'<svg width="'B + 80'pt" height="'H + 80'pt" viewBox="'-b/2 - 50/k' '-50/k' 'b + 100/k' 'h + 100/k'" style="font-size:'9/k'pt;" xmlns="http://www.w3.org/2000/svg">
-'<path d="M'x1','y1'H'x4'V'y2'H'x3r'A'r','r' 0 0 0 'x3','y2r'V'y3r'A'r','r' 0 0 0 'x3r','y3'H'x6'V'y4'H'x5'V'y3'H'x2r'A'r','r' 0 0 0 'x2','y3r'V'y2r'A'r','r' 0 0 0 'x2r','y2'H'x1'Z" fill="LightSkyBlue" fill-opacity="0.6" stroke="#4ac" stroke-width="'1.5/k'" />
-line$(-b/2 - 35/k; h - z_c; b/2 + 35/k;h - z_c; axis_style$)
-texth$(-b/2 - 40/k; h - z_c; y)
-texth$(b/2 + 40/k; h - z_c; y)
-line$(0; -35/k; 0;h + 35/k; axis_style$)
+'<svg width="'B + 80'pt" height="'H + 80'pt" viewBox="'-b/2 - 50/k' '-50/k' 'b + 100/k' 'y4 + 100/k'" style="font-size:'9/k'pt;" xmlns="http://www.w3.org/2000/svg">
+'<path d="M'x1','y1'H'x4'V'y2'H'x3r'A'R','R' 0 0 0 'x3','y2r'V'y3r'A'R','R' 0 0 0 'x3r','y3'H'x6'V'y4'H'x5'V'y3'H'x2r'A'R','R' 0 0 0 'x2','y3r'V'y2r'A'R','R' 0 0 0 'x2r','y2'H'x1'Z" fill="LightSkyBlue" fill-opacity="0.6" stroke="#4ac" stroke-width="'1.5/k'" />
+line$(-b/2 - 35/k; y4 - z_d; b/2 + 35/k;y4 - z_d; axis_style$)
+texth$(-b/2 - 40/k; y4 - z_d; y)
+texth$(b/2 + 40/k; y4 - z_d; y)
+line$(0; -35/k; 0;y4 + 35/k; axis_style$)
 texth$(0;-40/k; z)
-texth$(0; h + 45/k; z)
+texth$(0; y4 + 45/k; z)
 dimv$(x1 - 15/k; y1; y4; 'h')
 dimv$(x4 + 25/k; y1; y2; 't_f2')
 dimv$(x6 + 25/k; y3; y4; 't_f1')
 dimh$(x5; x6; y4 + 25/k; 'b_f1')
 dimh$(x1; x4; -15/k; 'b_f2')
 #format
-dimh$(x2; x3; z_c - 15/k; )
-texth$(x3 + 15/k; z_c - 20/k; 't_w')
-line$(x3r - 0.707*r; y3r + 0.707*r; x3r + 25/k; y3r - 25/k; dim_style$)
+dimh$(x2; x3; z_d - 15/k; )
+texth$(x3 + 15/k; z_d - 20/k; 't_w')
+line$(x3r - 0.707*R; y3r + 0.707*R; x3r + 25/k; y3r - 25/k; dim_style$)
 line$(x3r + 25/k; y3r - 25/k; x3r + 35/k; y3r - 25/k; dim_style$)
 texth$(x3r + 45/k; y3r - 20/k; 'r')
 '</svg>
-#equ
+#end val
 '</td></tr></table>
 '
 '
 #post
 '<h4>Section properties</h4>
 '<table style="width:100%">
-'<tr><td>'A'mm<sup>2</sup></td><td>'y_c'mm</td><td>'z_c'mm</td><td></td></tr>
-'<tr><td>'I_y'mm<sup>4</sup></td><td>'r_y'mm</td><td>'W_el_y'mm<sup>3</sup></td><td>'W_pl_y'mm<sup>3</sup></td></tr>
-'<tr><td>'I_z'mm<sup>4</sup></td><td>'r_z'mm</td><td>'W_el_z'mm<sup>3</sup></td><td>'W_pl_z'mm<sup>3</sup></td></tr>
-'<tr><td>'I_t'mm<sup>4</sup></td><td>'I_w'mm<sup>6</sup></td><td>'W_t'mm<sup>3</sup></td><td></td></tr>
+'<tr><td>'A|mm^2'</td><td>'y_c|mm'</td><td>'z_c|mm'</td><td></td></tr>
+'<tr><td>'I_y|mm^4'</td><td>'r_y|mm'</td><td>'W_el_y|mm^3'</td><td>'W_pl_y|mm^3'</td></tr>
+'<tr><td>'I_z|mm^4'</td><td>'r_z|mm'</td><td>'W_el_z|mm^3'</td><td>'W_pl_z|mm^3'</td></tr>
+'<tr><td>'I_t|mm^4'</td><td>'I_w|mm^6'</td><td>'W_t|mm^3'</td><td></td></tr>
 '</table>
+#end post

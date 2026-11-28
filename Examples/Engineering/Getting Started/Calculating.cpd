@@ -1,3 +1,4 @@
+'<!-- A first tour of CalcpadCE: arithmetic, comparisons, variables, constants, integration and matrix multiplication, with a few values you can edit in the input form. -->
 'Simple calculation:
 1 + 1
 
@@ -6,18 +7,17 @@
 7 < 3
 
 'Calculation with variables:
-a = 2
-b = 3
+#UI 'First number -'a = 2', Second number -'b = 3
 a*b
 
 'Using built-in constants:
-r = 1.5
+#UI 'Radius -'r = 1.5m
 A = π*r^2
 
 'Integration:
 $Integral{ln(x) @ x = 0 : 1}
 
 'Matrix multiplication:
-A = [1; 2; 3|4; 5; 6]
-B = [6; 5|4; 3|2; 1]
+#UI {"columnHeaders": ["1", "2", "3"]} A = [1; 2; 3|4; 5; 6]
+#UI {"columnHeaders": ["1", "2"]} B = [6; 5|4; 3|2; 1]
 A*B

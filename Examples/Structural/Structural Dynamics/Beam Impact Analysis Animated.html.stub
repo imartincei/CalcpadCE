@@ -331,6 +331,21 @@
   </span>
  </p>
  <p>
+  Damping factor -
+  <span class="eq">
+   <var>ξ</var>
+   = 0.05
+  </span>
+ </p>
+ <p>
+  Number of intermediate joints (odd) -
+  <span class="eq">
+   <var>n</var>
+   <sub>J</sub>
+   = 11
+  </span>
+ </p>
+ <p>
   Gravity acceleration -
   <span class="eq">
    <var>g</var>
@@ -1690,7 +1705,6 @@ circle.Series2 {fill:YellowGreen;}
    <sub>J</sub>
    = 11
   </span>
-  (odd)
  </p>
  <p>
   Length of one segment -
@@ -2621,9 +2635,11 @@ circle.Series3 {fill:CornflowerBlue;}
     d
    </var>
    <sub>M</sub>
-   )  = 19.7
+   )  ·
+   <i>t</i>
+   = 19.7
+   <i>t</i>
   </span>
-  t
  </p>
  <p>Eigenvalues</p>
  <p>
@@ -3117,13 +3133,34 @@ circle.Series3 {fill:CornflowerBlue;}
      </var>
     </span>
    </span>
+   ·
+   <i>s</i>
+   <sup class="unit">-1</sup>
    =
    <b class="b0">[</b>
-   19.57 85.55 173.53 327.32 457.58 678.76 814.79
+   19.57
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   85.55
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   173.53
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   327.32
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   457.58
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   678.76
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   814.79
+   <i>s</i>
+   <sup class="unit">-1</sup>
    <b class="b0">]</b>
   </span>
-  <i>s</i>
-  ⁻¹
  </p>
  <p>
   Natural vibration frequences -
@@ -3143,8 +3180,6 @@ circle.Series3 {fill:CornflowerBlue;}
     2 ·
     <var>π</var>
    </span>
-   ·
-   <i>Hz</i>
    =
    <span class="dvc">
     <var>
@@ -3155,8 +3190,6 @@ circle.Series3 {fill:CornflowerBlue;}
     </span>
     2 · 3.14
    </span>
-   ·
-   <i>Hz</i>
    =
    <b class="b0">[</b>
    3.11
@@ -3961,9 +3994,15 @@ circle.Series3 {fill:CornflowerBlue;}
     2 · 0.05
     <span class="dvl">
     </span>
-    19.57 + 85.55
+    19.57
+    <i>s</i>
+    <sup class="unit">-1</sup>
+    + 85.55
+    <i>s</i>
+    <sup class="unit">-1</sup>
    </span>
    = 0.000951
+   <i>s</i>
   </span>
   ,
   <span class="eq">
@@ -3982,7 +4021,17 @@ circle.Series3 {fill:CornflowerBlue;}
     ω
    </var>
    <sub>2</sub>
-   = 0.000951 · 19.57 · 85.55 = 1.59
+   = 0.000951
+   <i>s</i>
+   · 19.57
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   · 85.55
+   <i>s</i>
+   <sup class="unit">-1</sup>
+   = 1.59
+   <i>s</i>
+   <sup class="unit">-1</sup>
   </span>
  </p>
  <p>
@@ -4161,9 +4210,6 @@ circle.Series7 {fill:BlueViolet;}
      2
     </sup>
    </span>
-   ·
-   <i>s</i>
-   <sup class="unit">-1</sup>
    =
    <b class="b0">[</b>
    19.54
@@ -4290,9 +4336,6 @@ circle.Series7 {fill:BlueViolet;}
     <sub>
      <var>i</var>
     </sub>
-    ·
-    <var>s</var>
-    <sup class="unit">-1</sup>
     ·  (
     <var>t</var>
     −

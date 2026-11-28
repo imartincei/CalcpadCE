@@ -1,16 +1,17 @@
 '<!-- Section properties of an arbitrary polygon from a list of vertex coordinates: signed area, centroid and second moments of area via the shoelace formulas. -->
-"Geometrical properties of arbitrary polygon
+'<h1>Geometrical properties of arbitrary polygon</h1>
 '<h4>Point coordinates</h4>
-x = [0; 6.3; 6; 1; 0.4; 0]
-y = [0; 0; 0.6; 1; 4; 4.2]
+#UI {"columnHeaders": ["x, m", "y, m"]} P = [0m; 0m | 6.3m; 0m | 6m; 0.6m | 1m; 1m | 0.4m; 4m | 0m; 4.2m]
 #hide
+x = col(P; 1)
+y = col(P; 2)
 'Calculations
-A = 0
-I_x = 0
-I_y = 0
-I_xy = 0
-S_x = 0
-S_y = 0
+A = 0m^2
+I_x = 0m^4
+I_y = 0m^4
+I_xy = 0m^4
+S_x = 0m^3
+S_y = 0m^3
 n = len(x)
 #for i1 = 1 : n
 	i2 = if(i1 ≡ n; 1; i1 + 1)
@@ -36,7 +37,6 @@ y = y - y_C
 	I_x = I_x + I_x,i
 	I_y = I_y + I_y,i
 	I_xy = I_xy - I_xy,i
-	#hide
 #loop
 x = x + x_C
 y = y + y_C
@@ -53,7 +53,7 @@ I_o = I_1 + I_2
 #else
 	α = atan(I_xy/(I_y - I_1))
 #end if
-#show
+#end hide
 '<h4>Geometrical properties</h4>
 'Area -'A', Center point -'x_C','y_C
 'Second moments of area -'I_x','I_y','I_xy
@@ -61,6 +61,10 @@ I_o = I_1 + I_2
 'Angle of first principal axis -'α|°
 '<h4>Drawing</h4>
 #hide
+x = x/1m
+y = y/1m
+x_C = x_C/1m
+y_C = y_C/1m
 x0 = min(x)
 y0 = min(y)
 w = max(x) - x0
@@ -77,13 +81,13 @@ y_I = y_C′ + [s; -s; c; -c]*r
 #def axis$ = stroke:green; stroke-width:0.02; stroke-opacity:0.5; stroke-dasharray:0.2,0.1,0.05,0.1
 #def section$ = stroke:black; stroke-width:0.025;
 #def p$(i$) = 'x.i$','y′.i$'
-#show
+#end hide
 #val
 '<svg viewbox="'x0 - 1' 'y0 - 1' 'w + 1' 'h + 1'" xmlns="http://www.w3.org/2000/svg" version="1.1" style="font-size:0.12pt; width:'80*(w + 2)'px; height:'80*(h + 2)'px;">
 #for i1 = 1 : n
 	#hide
 	i2 = if(i1 ≡ n; 1; i1 + 1)
-	#show
+	#end hide
 	'<line x1="'x.i1'" y1="'y′.i1'" x2="'x.i2'" y2="'y′.i2'" style="section$"/>
 	'<circle r="0.05" cx="'x.i1'" cy="'y′.i1'" fill="red" />
 	'<text x="'x.i1 + δ'" y="'y′.i1 - δ'">'i1' ('x.i1','y.i1')</text>
@@ -97,4 +101,4 @@ y_I = y_C′ + [s; -s; c; -c]*r
 '<circle r="0.05" cx="'x_C'" cy="'y_C′'" fill="red"  />
 '<text x="'x_C + δ'" y="'y_C′ - δ'">C ('x_C','y_C')</text>
 '</svg>
-#equ
+#end val
