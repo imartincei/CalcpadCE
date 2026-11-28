@@ -11,7 +11,9 @@
     "build:desktop": "vite build --mode desktop",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
-    "check:contrast": "node ../scripts/check-contrast.mjs"
+    "check:contrast": "node ../scripts/check-contrast.mjs",
+    "i18n": "node ../scripts/i18n/i18n.mjs",
+    "i18n:check": "node ../scripts/i18n/i18n.mjs --check"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

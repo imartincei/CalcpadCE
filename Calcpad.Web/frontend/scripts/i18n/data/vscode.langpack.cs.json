@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-cs"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Zavřít"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Zavřít"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Kopírovat"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Zavřít"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Chyba",
+        "Warning": "Upozornění"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Další",
+        "previous": "Předchozí"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Zavřít"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Zrušit"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Vložit"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Zavřít"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Chyba",
+        "accessibility.signals.positionHasWarning": "Upozornění",
+        "accessibility.signals.save": "Uložit",
+        "accessibilitySignals.save": "Uložit"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Soubor"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Chyba",
+        "sev.warning": "Upozornění"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "Chyba",
+        "dialogWarningMessage": "Upozornění"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Zavřít"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "Sbalit vše"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "Kopírovat",
+        "copyAll": "Kopírovat vše"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Zavřít"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Kopírovat"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Zavřít"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Chyba",
+        "Warning": "Upozornění"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Další",
+        "previous": "Předchozí"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Zavřít"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Zrušit"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Vložit"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Zavřít"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Chyba",
+        "accessibility.signals.positionHasWarning": "Upozornění",
+        "accessibility.signals.save": "Uložit",
+        "accessibilitySignals.save": "Uložit"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Soubor"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "Zrušit"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "Otevřít složku"
+      },
+      "vs/platform/log/common/log": {
+        "error": "Chyba",
+        "off": "Vypnuto",
+        "warn": "Upozornění"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Chyba",
+        "sev.warning": "Upozornění"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "Zrušit",
+        "mMinimize": "Minimalizovat",
+        "mNewTab": "Nová karta"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "Zrušit"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "Nové okno"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "Název"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "Popis",
+        "settings": "Nastavení"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "Odebrat"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "Kopírovat",
+        "cut": "Vyjmout",
+        "paste": "Vložit",
+        "redo": "Znovu",
+        "undo": "Zpět"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "Nové okno"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "Otevřít..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "Zavřít",
+        "closeAll": "Zavřít vše",
+        "closeOthers": "Zavřít ostatní",
+        "newWindow": "Nové okno"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "Zavřít"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "Otevřít složku",
+        "watermark.openRecent": "Otevřít nedávné"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "Sbalit vše",
+        "refresh": "Aktualizovat"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "Problémy"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "Zrušit"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "Použít"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "Kopírovat"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "Kopírovat vše",
+        "interactive.copyItem.label": "Kopírovat"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "Zrušit"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "Soubor",
+        "files": "Soubory"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "Zrušit",
+        "save": "Uložit"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "Kopírovat"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "Zavřít",
+        "label.find": "Najít",
+        "placeholder.find": "Najít"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "Sbalit"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "Sbalit vše"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "Režim",
+        "noTriggerByBreakpoint": "Žádné"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "Sbalit vše"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "Proměnné"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "Všechno sbalit"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "Sbalit vše",
+        "copy": "Kopírovat",
+        "copyAll": "Kopírovat vše"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "Sbalit vše"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "Sbalit vše"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "Typ"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "Preview"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "Žádný",
+        "refreshExtension": "Aktualizovat",
+        "workbench.extensions.action.configure": "Nastavení",
+        "workbench.extensions.action.copyExtension": "Kopírovat"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "Zrušit",
+        "close": "Zavřít",
+        "review": "Revize"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "Chyba"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "Otevřít složku"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "Otevřít složku",
+        "openRecent": "Otevřít nedávné"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "Kopírovat"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "Zavřít",
+        "closeAll": "Zavřít vše",
+        "closeOthers": "Zavřít ostatní",
+        "copyRelativePath": "Kopírovat relativní cestu"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "Uložit",
+        "saveAs": "Uložit jako..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "Soubory"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "Soubor",
+        "openContainer": "Otevřít nadřazenou složku"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "Formátování",
+        "null": "Žádný",
+        "nullFormatterDescription": "Žádný"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "Zrušit"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "Zrušit",
+        "save": "Uložit"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "Popis"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "Název"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "Otevřít nadřazenou složku"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "Sbalit vše",
+        "copyMarker": "Kopírovat",
+        "problems": "Problémy",
+        "status.problems": "Problémy"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "Problémy"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "Soubor"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "Problémy"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "Resetovat"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "Zavřít"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "Formátování"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "Proměnné"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "Výstup"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "Sbalit vše"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "Výstup"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "Výstup"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "Kopírovat"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "Nastavení"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "Nastavení"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "Preview"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "Soubory",
+        "formatting": "Formátování",
+        "newWindow": "Nové okno",
+        "output": "Výstup",
+        "problems": "Problémy"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "Nastavení"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "Zrušit"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "Výstup"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "Zavřít"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "Aktualizovat"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "Zavřít",
+        "scmInputCancelAction": "Zrušit"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "Kopírovat vše",
+        "copyMatchLabel": "Kopírovat"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "Sbalit vše",
+        "RefreshAction.label": "Aktualizovat"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "Otevřít složku"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "Kopírovat"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "Zavřít",
+        "insert": "Vložit"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "Kopírovat"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "Soubor"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "Zrušit",
+        "noIconThemeLabel": "Žádný"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "Aktualizovat"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "Kopírovat",
+        "empty profile": "Žádný",
+        "none": "Žádné",
+        "settings": "Nastavení"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "Zrušit",
+        "preview": "Náhled"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "Zrušit"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "Obnovit"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "Otevřít složku"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "Kopírovat"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "Název"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "Otevřít…",
+        "openFolder": "Otevřít složku"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "Soubor"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "Zrušit"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "Resetovat",
+        "zoomSettings": "Nastavení"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "Název"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "Otevřít složku"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "Zrušit"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "Systém"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "Nastavení"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "Zrušit"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "Popis"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "Žádný"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "Nastavení"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "Zavřít"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "Uložit"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "Nastavení"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "Uložit jako…"
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "Uložit"
+      }
+    }
+  }
+}

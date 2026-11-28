@@ -1,0 +1,129 @@
+{
+  "locales": [
+    {
+      "tag": "en",
+      "label": "English",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": false,
+      "monaco": false
+    },
+    {
+      "tag": "cs",
+      "label": "Čeština",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-cs"
+    },
+    {
+      "tag": "de",
+      "label": "Deutsch",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-de"
+    },
+    {
+      "tag": "es",
+      "label": "Español",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-es"
+    },
+    {
+      "tag": "fr",
+      "label": "Français",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-fr"
+    },
+    {
+      "tag": "it",
+      "label": "Italiano",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-it"
+    },
+    {
+      "tag": "ja",
+      "label": "日本語",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-ja"
+    },
+    {
+      "tag": "ko",
+      "label": "한국어",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-ko"
+    },
+    {
+      "tag": "pl",
+      "label": "Polski",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-pl"
+    },
+    {
+      "tag": "pt-BR",
+      "label": "Português (Brasil)",
+      "aliases": [],
+      "languageFallback": false,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-pt-BR"
+    },
+    {
+      "tag": "ru",
+      "label": "Русский",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-ru"
+    },
+    {
+      "tag": "tr",
+      "label": "Türkçe",
+      "aliases": [],
+      "languageFallback": true,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-tr"
+    },
+    {
+      "tag": "zh",
+      "label": "中文",
+      "aliases": ["zh-Hans", "zh-CN", "zh-SG", "zh-MY"],
+      "languageFallback": false,
+      "catalog": false,
+      "monaco": true,
+      "pack": "vscode-language-pack-zh-hans"
+    },
+    {
+      "tag": "zh-Hant",
+      "label": "繁體中文",
+      "aliases": ["zh-TW", "zh-HK", "zh-MO"],
+      "languageFallback": false,
+      "catalog": true,
+      "monaco": true,
+      "pack": "vscode-language-pack-zh-hant"
+    }
+  ]
+}

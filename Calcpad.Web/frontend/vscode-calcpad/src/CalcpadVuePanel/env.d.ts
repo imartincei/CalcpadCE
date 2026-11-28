@@ -12,6 +12,8 @@ declare global {
       postMessage(message: unknown): void
     }
     insertData?: unknown
+    __CALCPAD_HOST_LOCALE__?: string
+    __CALCPAD_CURRENT_CULTURE__?: string
   }
 
   const acquireVsCodeApi: () => {

@@ -1,0 +1,1202 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d"
+  },
+  "keys": {
+    "Error": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/gotoError/browser/gotoErrorWidget",
+        "key": "Error"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.positionHasError"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/markers/common/markers",
+        "key": "sev.error"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/base/browser/ui/dialog/dialog",
+        "key": "dialogErrorMessage"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/gotoError/browser/gotoErrorWidget",
+        "key": "Error"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.positionHasError"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/log/common/log",
+        "key": "error"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/markers/common/markers",
+        "key": "sev.error"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionsViewer",
+        "key": "error"
+      }
+    ],
+    "Warning": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/gotoError/browser/gotoErrorWidget",
+        "key": "Warning"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.positionHasWarning"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/markers/common/markers",
+        "key": "sev.warning"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/base/browser/ui/dialog/dialog",
+        "key": "dialogWarningMessage"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/gotoError/browser/gotoErrorWidget",
+        "key": "Warning"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.positionHasWarning"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/log/common/log",
+        "key": "warn"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/markers/common/markers",
+        "key": "sev.warning"
+      }
+    ],
+    "Close": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/base/browser/ui/tree/abstractTree",
+        "key": "close"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/find/browser/findWidget",
+        "key": "label.closeButton"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/peekView/browser/peekView",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/suggest/browser/suggestWidgetDetails",
+        "key": "details.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/base/browser/ui/tree/abstractTree",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/find/browser/findWidget",
+        "key": "label.closeButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/peekView/browser/peekView",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/suggest/browser/suggestWidgetDetails",
+        "key": "details.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/layoutActions",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editor.contribution",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editorActions",
+        "key": "closeOneEditor"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget",
+        "key": "label.closeButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/exceptionWidget",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionsActions",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileActions.contribution",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/inlineChat/browser/inlineChatActions",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget",
+        "key": "label.closeButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/scm/browser/dirtydiffDecorator",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/scm/browser/scmViewPane",
+        "key": "label.close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/share/browser/share.contribution",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions",
+        "key": "closeChat"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/testing/browser/testingOutputPeek",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution",
+        "key": "close"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService",
+        "key": "close"
+      }
+    ],
+    "Collapse All": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/base/browser/ui/tree/treeDefaults",
+        "key": "collapse all"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/views/treeView",
+        "key": "collapseAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/comments/browser/comments.contribution",
+        "key": "collapseAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/callStackView",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/loadedScriptsView",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/repl",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/variablesView",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/watchExpressionsView",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markers.contribution",
+        "key": "collapseAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/outline/browser/outlineActions",
+        "key": "collapse"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/search/browser/searchActionsTopBar",
+        "key": "CollapseDeepestExpandedLevelAction.label"
+      }
+    ],
+    "Copy": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/clipboard/browser/clipboard",
+        "key": "actions.clipboard.copyLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/code/electron-sandbox/processExplorer/processExplorerMain",
+        "key": "copy"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/clipboard/browser/clipboard",
+        "key": "actions.clipboard.copyLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/textInputActions",
+        "key": "copy"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions",
+        "key": "interactive.copyCodeBlock.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/actions/chatCopyActions",
+        "key": "interactive.copyItem.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget",
+        "key": "actions.copy.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/repl",
+        "key": "copy"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensions.contribution",
+        "key": "workbench.extensions.action.copyExtension"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileActions",
+        "key": "copyFile"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markers.contribution",
+        "key": "copyMarker"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/keybindingsEditor",
+        "key": "copyLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/search/browser/searchActionsCopy",
+        "key": "copyMatchLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminal/browser/terminalMenus",
+        "key": "workbench.action.terminal.copySelection.short"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu",
+        "key": "copy"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor",
+        "key": "copy description"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/webview/browser/webview.contribution",
+        "key": "copy"
+      }
+    ],
+    "Copy All": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/code/electron-sandbox/processExplorer/processExplorerMain",
+        "key": "copyAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/actions/chatCopyActions",
+        "key": "interactive.copyAll.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/repl",
+        "key": "copyAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/search/browser/searchActionsCopy",
+        "key": "copyAllLabel"
+      }
+    ],
+    "Cut": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/textInputActions",
+        "key": "cut"
+      }
+    ],
+    "Paste": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/textInputActions",
+        "key": "paste"
+      }
+    ],
+    "Undo": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/textInputActions",
+        "key": "undo"
+      }
+    ],
+    "Redo": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/textInputActions",
+        "key": "redo"
+      }
+    ],
+    "Find": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget",
+        "key": "label.find"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget",
+        "key": "placeholder.find"
+      }
+    ],
+    "Previous": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget",
+        "key": "previous"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget",
+        "key": "previous"
+      }
+    ],
+    "Next": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget",
+        "key": "next"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget",
+        "key": "next"
+      }
+    ],
+    "Cancel": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/rename/browser/renameWidget",
+        "key": "cancelRenameSuggestionsButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/rename/browser/renameWidget",
+        "key": "cancelRenameSuggestionsButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/dialogs/common/dialogs",
+        "key": "cancelButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/menubar/electron-main/menubar",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/native/electron-main/nativeHostMainService",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/api/browser/mainThreadMessageService",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction",
+        "key": "manageTrustedExtensions.cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/actions/chatExecuteActions",
+        "key": "interactive.cancel.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatEditorSaving",
+        "key": "discard"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionFeaturesTab",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionsActions",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution",
+        "key": "cancelShort"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl",
+        "key": "discard"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/issue/browser/issueFormService",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsWidgets",
+        "key": "cancelButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/scm/browser/scmViewPane",
+        "key": "scmInputCancelAction"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/themes/browser/themes.contribution",
+        "key": "button.cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel",
+        "key": "cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataSync/browser/userDataSync",
+        "key": "cancel turning on sync"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/workspace/browser/workspace.contribution",
+        "key": "cancelWorkspaceTrustButton"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/dialogs/browser/simpleFileDialog",
+        "key": "remoteFileDialog.cancel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/progress/browser/progressService",
+        "key": "cancel"
+      }
+    ],
+    "Insert": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/editor/contrib/suggest/browser/suggestController",
+        "key": "accept.insert"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/editor/contrib/suggest/browser/suggestController",
+        "key": "accept.insert"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions",
+        "key": "insert"
+      }
+    ],
+    "Save": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibilitySignals.save"
+      },
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibilitySignals.save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/accessibilitySignal/browser/accessibilitySignalService",
+        "key": "accessibility.signals.save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatEditorSaving",
+        "key": "save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileConstants",
+        "key": "save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl",
+        "key": "save"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService",
+        "key": "download sync activity dialog open label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService",
+        "key": "save"
+      }
+    ],
+    "File": [
+      {
+        "source": "vscode-monaco",
+        "module": "vs/platform/action/common/actionCommonCategories",
+        "key": "file"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/action/common/actionCommonCategories",
+        "key": "file"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatDragAndDrop",
+        "key": "file"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution",
+        "key": "filesCategory"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markersTable",
+        "key": "fileColumnLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick",
+        "key": "terminal.integrated.localFileLinks"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/welcomeViews/common/newFile.contribution",
+        "key": "file"
+      }
+    ],
+    "Open Folder": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/dialogs/electron-main/dialogMainService",
+        "key": "openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editorGroupWatermark",
+        "key": "watermark.openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/editors/textFileEditor",
+        "key": "openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/explorerViewlet",
+        "key": "openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/search/browser/searchView",
+        "key": "openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution",
+        "key": "open"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent",
+        "key": "openFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/dialogs/browser/abstractFileDialogService",
+        "key": "openFolder.title"
+      }
+    ],
+    "Off": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/log/common/log",
+        "key": "off"
+      }
+    ],
+    "Minimize": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/menubar/electron-main/menubar",
+        "key": "mMinimize"
+      }
+    ],
+    "New Tab": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/menubar/electron-main/menubar",
+        "key": "mNewTab"
+      }
+    ],
+    "New Window": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/platform/workspaces/electron-main/workspacesHistoryMainService",
+        "key": "newWindow"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/windowActions",
+        "key": "newWindow"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editor.contribution",
+        "key": "newWindow"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsLayout",
+        "key": "newWindow"
+      }
+    ],
+    "Title": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/api/browser/viewsExtensionPoint",
+        "key": "view container title"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/issue/browser/issueReporterPage",
+        "key": "issueTitleLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint",
+        "key": "title"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/actions/common/menusExtensionPoint",
+        "key": "command title"
+      }
+    ],
+    "Description": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/api/common/configurationExtensionPoint",
+        "key": "description"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/issue/browser/baseIssueReporterService",
+        "key": "description"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/themes/common/colorExtensionPoint",
+        "key": "description"
+      }
+    ],
+    "Settings": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/api/common/configurationExtensionPoint",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensions.contribution",
+        "key": "workbench.extensions.action.configure"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/preferences.contribution",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsEditor2",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsTree",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/electron-sandbox/window",
+        "key": "zoomSettings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/preferences/common/preferencesEditorInput",
+        "key": "settingsEditor2InputName"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/userDataProfile/browser/settingsResource",
+        "key": "settings"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/userDataSync/common/userDataSync",
+        "key": "settings"
+      }
+    ],
+    "Remove": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/developerActions",
+        "key": "removeLargeStorageEntriesPickerButton"
+      }
+    ],
+    "Open...": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/actions/workspaceActions",
+        "key": "openFileFolder"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent",
+        "key": "gettingStarted.openMac.title"
+      }
+    ],
+    "Close Others": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editor.contribution",
+        "key": "closeOthers"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileActions.contribution",
+        "key": "closeOthers"
+      }
+    ],
+    "Close All": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editor.contribution",
+        "key": "closeAll"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileActions.contribution",
+        "key": "closeAll"
+      }
+    ],
+    "Open Recent": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/editor/editorGroupWatermark",
+        "key": "watermark.openRecent"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/explorerViewlet",
+        "key": "openRecent"
+      }
+    ],
+    "Refresh": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/browser/parts/views/treeView",
+        "key": "refresh"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensions.contribution",
+        "key": "refreshExtension"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/scm/browser/scmHistoryViewPane",
+        "key": "refreshGraph"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/search/browser/searchActionsTopBar",
+        "key": "RefreshAction.label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/timeline/browser/timelinePane",
+        "key": "refresh"
+      }
+    ],
+    "Problems": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/common/configuration",
+        "key": "problemsConfigurationTitle"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markers.contribution",
+        "key": "problems"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markers.contribution",
+        "key": "status.problems"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/markersFileDecorations",
+        "key": "label"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/markers/browser/messages",
+        "key": "markers.panel.title.problems"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsLayout",
+        "key": "problems"
+      }
+    ],
+    "Apply": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane",
+        "key": "ok"
+      }
+    ],
+    "Files": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/chat/browser/chatDragAndDrop",
+        "key": "files"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/files.contribution",
+        "key": "filesConfigurationTitle"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsLayout",
+        "key": "files"
+      }
+    ],
+    "Collapse": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/comments/browser/commentThreadHeader",
+        "key": "label.collapse"
+      }
+    ],
+    "Mode": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/breakpointWidget",
+        "key": "bpMode"
+      }
+    ],
+    "None": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/breakpointWidget",
+        "key": "noTriggerByBreakpoint"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensions.contribution",
+        "key": "none"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/format/browser/formatActionsMultiple",
+        "key": "null"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/format/browser/formatActionsMultiple",
+        "key": "nullFormatterDescription"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/themes/browser/themes.contribution",
+        "key": "noIconThemeLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor",
+        "key": "empty profile"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor",
+        "key": "none"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/themes/common/themeConfiguration",
+        "key": "noIconThemeLabel"
+      }
+    ],
+    "Variables": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/browser/debug.contribution",
+        "key": "variables"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/notebook/browser/controller/variablesActions",
+        "key": "notebookActions.openVariablesView"
+      }
+    ],
+    "Type": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/debug/common/debugSchemas",
+        "key": "debugger type"
+      }
+    ],
+    "Preview": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionEditor",
+        "key": "preview"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators",
+        "key": "previewLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel",
+        "key": "preview"
+      }
+    ],
+    "Review": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/extensions/browser/extensionsActions",
+        "key": "review"
+      }
+    ],
+    "Copy Relative Path": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileActions.contribution",
+        "key": "copyRelativePath"
+      }
+    ],
+    "Save As...": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/browser/fileConstants",
+        "key": "saveAs"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/workingCopy/common/storedFileWorkingCopy",
+        "key": "saveAs"
+      }
+    ],
+    "Open Containing Folder": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution",
+        "key": "openContainer"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands",
+        "key": "openContainer"
+      }
+    ],
+    "Formatting": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/format/browser/formatActionsMultiple",
+        "key": "formatter"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants",
+        "key": "notebookFormatSave.formatting"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsLayout",
+        "key": "formatting"
+      }
+    ],
+    "Reset": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/mergeEditor/browser/commands/commands",
+        "key": "mergeEditor.resetResultToBaseAndAutoMerge.short"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/electron-sandbox/window",
+        "key": "zoomReset"
+      }
+    ],
+    "Output": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor",
+        "key": "notebookCellOutputLabel"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/output/browser/output.contribution",
+        "key": "output"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/output/browser/outputView",
+        "key": "output"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/preferences/browser/settingsLayout",
+        "key": "output"
+      },
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/quickaccess/browser/viewQuickAccess",
+        "key": "channels"
+      }
+    ],
+    "Restore": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/contrib/userDataSync/browser/userDataSyncViews",
+        "key": "workbench.actions.sync.replaceCurrent"
+      }
+    ],
+    "System": [
+      {
+        "source": "vscode-shared-ui",
+        "module": "vs/workbench/services/preferences/browser/keybindingsEditorModel",
+        "key": "default"
+      }
+    ]
+  }
+}

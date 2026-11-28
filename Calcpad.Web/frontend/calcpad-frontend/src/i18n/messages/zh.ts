@@ -1,3 +1,4 @@
+// Provenance: see provenance.zh.json. Every key has an explicit source and origin.
 const zh: Record<string, string> = {
     "Files": "文件",
     "Insert": "插入",
@@ -312,6 +313,18 @@ const zh: Record<string, string> = {
     "Return to the editor": "返回编辑器",
     "File menu (Alt+M)": "文件菜单（Alt+M）",
     "File menu": "文件菜单",
+    "No Recent Files": "无最近文件",
+    "Clear Recent": "清除最近记录",
+    "Open Recent": "最近打开",
+    "New Tab": "新建标签页",
+    "New Window": "新建窗口",
+    "Open...": "打开…",
+    "Save As...": "另存为…",
+    "Close Tab": "关闭标签页",
+    "Show Server Log": "显示服务器日志",
+    "Stop Server": "停止服务器",
+    "Restart Server": "重启服务器",
+    "Quit": "退出",
     "Minimize": "最小化",
     "Restore": "还原",
     "Maximize": "最大化",

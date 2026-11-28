@@ -8,6 +8,7 @@ import { readCustomizations, customizationExtras, CUSTOMIZATION_KEYS, buildSetti
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
+import { currentCulture, setUiLocale } from './uiLocale';
 
 export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'calcpadVueUI';
@@ -125,6 +126,10 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         const webview = this._view?.webview ?? { postMessage: async (_message: unknown) => false };
         this._outputChannel.appendLine(`Received message: ${data.type}`, 'verbose');
         switch (data.type) {
+            case 'uiLocale':
+                if (typeof data.locale === 'string') setUiLocale(data.locale);
+                break;
+
             case 'insertText': {
                 const insertEditor = this.getSourceEditor?.() ?? vscode.window.activeTextEditor;
                 if (insertEditor) {
@@ -1044,7 +1049,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
         const nonce = getNonce();
 
         return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${vscode.env.language}">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
@@ -1059,6 +1064,7 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             <br><small>If this message persists, check the developer console for errors</small>
         </div>
     </div>
+    <script nonce="${nonce}">window.__CALCPAD_HOST_LOCALE__ = ${scriptJson(vscode.env.language)}; window.__CALCPAD_CURRENT_CULTURE__ = ${scriptJson(currentCulture())};</script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
@@ -1070,4 +1076,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
 // inside the CSP header without escaping.
 function getNonce() {
     return crypto.randomBytes(24).toString('base64url');
+}
+
+function scriptJson(value: string): string {
+    return JSON.stringify(value).replace(/</g, '\\u003c');
 }

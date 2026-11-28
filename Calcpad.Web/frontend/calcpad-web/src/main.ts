@@ -2,8 +2,9 @@ import * as monaco from 'monaco-editor';
 import { createApp, nextTick, watch, type Ref } from 'vue';
 import type { Composer } from 'vue-i18n';
 import App from './App.vue';
-import { createCalcpadI18n, readLocaleSetting, menuLabelsFor } from 'calcpad-frontend/i18n';
+import { createCalcpadI18n, readLocaleSetting, menuLabels, LOCALE_CHANGED_EVENT, setCurrentCulture, translate } from 'calcpad-frontend/i18n';
 import { invoke } from '@tauri-apps/api/core';
+import { locale as osLocale } from '@tauri-apps/plugin-os';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
 import { initMessaging } from 'calcpad-frontend/vue/services/messaging';
 import { discardMetadataDraft } from 'calcpad-frontend/vue/metadata-drafts';
@@ -46,7 +47,6 @@ import {
     type InlineImageBudget,
 } from 'calcpad-frontend';
 import { registerCalcpadLanguage, registerCalcpadTheme, remeasureEditorFontsWhenReady, resolveEditorFontFamily } from './editor/setup';
-import { uiText } from './editor/ui-text';
 import { setAppTheme, coerceAppTheme, getResolvedAppTheme, onAppThemeChanged } from './editor/app-theme';
 import { registerSemanticTokensProvider } from './editor/semantic-tokens';
 import { setupDiagnostics, setRunErrorMarkers, setIncludedMarkers, type FileLinker } from './editor/diagnostics';
@@ -319,17 +319,27 @@ async function bootstrap(): Promise<void> {
     // sidebar tabs (TOC) can post `goToLine` and reach Monaco.
     (window as any).monaco = monaco;
 
+    // Auto follows the OS culture on desktop; the webview language is the fallback.
+    if (isTauri) {
+        try {
+            setCurrentCulture((await osLocale()) ?? undefined);
+        } catch {
+            // Keep the browser/navigator fallback.
+        }
+    }
+
     // Mount the main app layout
     const app = createApp(App, { isDesktop: isTauri });
     const i18n = createCalcpadI18n(readLocaleSetting());
     app.use(i18n);
     if (isTauri) {
-        const syncMenu = (locale: string) => {
-            void invoke('set_menu_labels', { labels: menuLabelsFor(locale) }).catch(() => {});
+        const syncMenu = () => {
+            const { t } = i18n.global as unknown as Composer;
+            void invoke('set_menu_labels', { labels: menuLabels(t) }).catch(() => {});
         };
         const localeRef = i18n.global.locale as unknown as Ref<string>;
-        syncMenu(localeRef.value);
-        watch(localeRef, value => syncMenu(value));
+        syncMenu();
+        watch(localeRef, syncMenu);
     }
     const appInstance = app.mount('#app') as any;
 
@@ -1215,7 +1225,7 @@ async function bootstrap(): Promise<void> {
         // Focus-the-preview-to-line context action (targets this group).
         ed.addAction({
             id: 'calcpad.focusPreviewToLine',
-            label: uiText('Focus Preview to Line', '预览定位到光标行'),
+            label: translate('Focus Preview to Line'),
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 1.5,
             run: () => syncPreviewToCursorFor(group, true),
@@ -1225,7 +1235,7 @@ async function bootstrap(): Promise<void> {
         // shortcut comes from the `keybindings` setting, dispatched at the window level.
         ed.addAction({
             id: 'calcpad.runPreview',
-            label: uiText('Run Preview', '运行预览'),
+            label: translate('Run Preview'),
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 1.4,
             run: () => { void runRefresh(); },
@@ -1236,7 +1246,7 @@ async function bootstrap(): Promise<void> {
         // Code `editMetadataProperties` command.
         ed.addAction({
             id: 'calcpad.editMetadata',
-            label: uiText('Edit Metadata Properties', '编辑元数据属性'),
+            label: translate('Edit Metadata Properties'),
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 1.6,
             run: (edEditor) => {
@@ -2481,11 +2491,11 @@ async function bootstrap(): Promise<void> {
             return id;
         }
 
-        async function writeDraft(tabId: string): Promise<void> {
+        async function writeDraft(tabId: string, throwOnError = false): Promise<boolean> {
             const g = groupForTab(tabId);
-            if (!g || !g.tabs.isDirty(tabId)) return;
+            if (!g || !g.tabs.isDirty(tabId)) return true;
             const content = g.tabs.getContent(tabId);
-            if (content == null) return;
+            if (content == null) return true;
             const filePath = g.tabs.getFilePath(tabId);
             const title = g.tabs.getTitle(tabId) ?? UNTITLED_TITLE;
             const filename = filePath ? title : `${title}.cpd`;
@@ -2496,13 +2506,16 @@ async function bootstrap(): Promise<void> {
                     filePath,
                     content,
                 });
+                return true;
             } catch (err) {
+                if (throwOnError) throw err;
                 appInstance.appendOutput('warn',
                     `Autosave failed for ${title}: ${err instanceof Error ? err.message : String(err)}`);
+                return false;
             }
         }
 
-        persistTransferredTab = writeDraft;
+        persistTransferredTab = async (tabId: string) => { await writeDraft(tabId); };
 
         async function deleteDraft(tabId: string): Promise<void> {
             const id = draftIds.get(tabId);
@@ -2660,6 +2673,31 @@ async function bootstrap(): Promise<void> {
             }
             workspace.update({ openFiles, activeFile: activeGroup.tabs.activeTab?.filePath ?? '' });
         }
+
+        // Monaco freezes its NLS strings and the editor actions at startup, so a
+        // locale change needs a fresh webview. Preserve drafts and the session first.
+        let localeReloadPending = false;
+        window.addEventListener(LOCALE_CHANGED_EVENT, () => {
+            if (localeReloadPending) return;
+            localeReloadPending = true;
+            void (async () => {
+                try {
+                    captureSession();
+                    const dirty: string[] = [];
+                    for (const g of groups.values())
+                        for (const t of g.tabs.all)
+                            if (g.tabs.isDirty(t.id)) dirty.push(t.id);
+                    for (const id of dirty) await writeDraft(id, true);
+                    await workspace.flush();
+                } catch (err) {
+                    localeReloadPending = false;
+                    appInstance.appendOutput('warn',
+                        `Could not preserve the session before reloading: ${err instanceof Error ? err.message : String(err)}`);
+                    return;
+                }
+                window.location.reload();
+            })();
+        });
 
         /**
          * Reopens last launch's files into the primary group. Deliberately not routed

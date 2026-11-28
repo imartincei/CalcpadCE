@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-ru"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Закрыть"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Закрыть"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Копирование"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Закрыть"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Ошибка",
+        "Warning": "Предупреждение"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Далее",
+        "previous": "Назад"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Закрыть"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Отмена"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Вставить"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Закрыть"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Ошибка",
+        "accessibility.signals.positionHasWarning": "Предупреждение",
+        "accessibility.signals.save": "Сохранить",
+        "accessibilitySignals.save": "Сохранить"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Файл"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Ошибка",
+        "sev.warning": "Предупреждение"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "Ошибка",
+        "dialogWarningMessage": "Предупреждение."
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Закрыть"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "Свернуть все"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "Копировать",
+        "copyAll": "Копировать все"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Закрыть"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Копирование"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Закрыть"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Ошибка",
+        "Warning": "Предупреждение"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Далее",
+        "previous": "Назад"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Закрыть"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Отмена"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Вставить"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Закрыть"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Ошибка",
+        "accessibility.signals.positionHasWarning": "Предупреждение",
+        "accessibility.signals.save": "Сохранить",
+        "accessibilitySignals.save": "Сохранить"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Файл"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "Отмена"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "Открыть папку"
+      },
+      "vs/platform/log/common/log": {
+        "error": "Ошибка",
+        "off": "ОТКЛ.",
+        "warn": "Предупреждение"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Ошибка",
+        "sev.warning": "Предупреждение"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "Отмена",
+        "mMinimize": "Свернуть",
+        "mNewTab": "Создать вкладку"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "Отмена"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "Новое окно"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "Отмена"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "Название"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "Описание",
+        "settings": "Параметры"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "Удалить"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "Копирование",
+        "cut": "Вырезать",
+        "paste": "Вставить",
+        "redo": "Вернуть",
+        "undo": "Отменить"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "Новое окно"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "Открыть..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "Закрыть",
+        "closeAll": "Закрыть все",
+        "closeOthers": "Закрыть другие",
+        "newWindow": "Новое окно"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "Закрыть"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "Открыть папку",
+        "watermark.openRecent": "Открыть последний"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "Свернуть все",
+        "refresh": "Обновить"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "Проблемы"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "Отмена"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "Применить"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "Копировать"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "Копировать все",
+        "interactive.copyItem.label": "Копировать"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "Отмена"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "Отменить"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "Файл",
+        "files": "Файлы"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "Отмена",
+        "save": "Сохранить"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "Копировать"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "Закрыть",
+        "label.find": "Поиск",
+        "placeholder.find": "Поиск"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "Свернуть"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "Свернуть все"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "Режим",
+        "noTriggerByBreakpoint": "Нет"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "Свернуть все"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "Переменные"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "Свернуть все"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "Свернуть все",
+        "copy": "Копирование",
+        "copyAll": "Копировать все"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "Свернуть все"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "Свернуть все"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "Тип"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "Предварительная версия"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "Отмена"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "Нет",
+        "refreshExtension": "Обновить",
+        "workbench.extensions.action.configure": "Параметры",
+        "workbench.extensions.action.copyExtension": "Копировать"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "Отмена",
+        "close": "Закрыть",
+        "review": "Проверить"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "Ошибка"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "Открыть папку"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "Открыть папку",
+        "openRecent": "Открыть последние"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "Копирование"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "Закрыть",
+        "closeAll": "Закрыть все",
+        "closeOthers": "Закрыть другие",
+        "copyRelativePath": "Скопировать относительный путь"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "Сохранить",
+        "saveAs": "Сохранить как..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "Файлы"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "Файл",
+        "openContainer": "Открыть содержащую папку"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "Форматирование",
+        "null": "Нет",
+        "nullFormatterDescription": "NONE"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "Отмена"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "Отмена",
+        "save": "Сохранить"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "Описание"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "Отмена"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "Название"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "Открыть содержащую папку"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "Свернуть все",
+        "copyMarker": "Копирование",
+        "problems": "Проблемы",
+        "status.problems": "Проблемы"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "Проблемы"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "Файл"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "Проблемы"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "Сброс"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "Закрыть"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "Форматирование"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "Переменные"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "Выходные данные"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "Свернуть все"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "Выходные данные"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "Выходные данные"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "Копирование"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "Параметры"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "Параметры"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "Предварительная версия"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "Файлы",
+        "formatting": "Форматирование",
+        "newWindow": "Новое окно",
+        "output": "Вывод",
+        "problems": "Проблемы"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "Параметры"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "Отмена"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "Вывод"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "Закрыть"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "Обновить"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "Закрыть",
+        "scmInputCancelAction": "Отмена"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "Копировать все",
+        "copyMatchLabel": "Копирование"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "Свернуть все",
+        "RefreshAction.label": "Обновить"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "Открыть папку"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "Копирование"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "Отменить"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "Закрыть",
+        "insert": "Вставить"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "Копировать"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "Файл"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "Отмена",
+        "noIconThemeLabel": "NONE"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "Обновить"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "Копировать",
+        "empty profile": "Нет",
+        "none": "Нет",
+        "settings": "Параметры"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "Отмена",
+        "preview": "Предварительный просмотр"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "Отмена"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "Восстановить"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "Открыть папку"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "Копирование"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "Название"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "Открыть…",
+        "openFolder": "Открыть папку"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "Файл"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "Отмена"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "Сбросить",
+        "zoomSettings": "Параметры"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "Название"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "Открыть папку"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "Отмена"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "Система"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "Параметры"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "Отмена"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "Описание"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "Нет"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "Параметры"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "Закрыть"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "Сохранить"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "Параметры"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "Сохранить как..."
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "Сохранить"
+      }
+    }
+  }
+}

@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-pt-BR"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Erro",
+        "Warning": "Aviso"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Erro",
+        "accessibility.signals.positionHasWarning": "Aviso",
+        "accessibilitySignals.save": "Salvar",
+        "accessibility.signals.save": "Salvar"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Erro",
+        "sev.warning": "Aviso"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Fechar"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Fechar"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Fechar"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Fechar"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Fechar"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Copiar"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "previous": "Anterior",
+        "next": "Avançar"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Cancelar"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Inserir"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Arquivo"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "Erro",
+        "dialogWarningMessage": "Aviso"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Erro",
+        "Warning": "Aviso"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Erro",
+        "accessibility.signals.positionHasWarning": "Aviso",
+        "accessibilitySignals.save": "Salvar",
+        "accessibility.signals.save": "Salvar"
+      },
+      "vs/platform/log/common/log": {
+        "error": "Erro",
+        "warn": "Aviso",
+        "off": "Desligar"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Erro",
+        "sev.warning": "Aviso"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "Erro"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Fechar"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Fechar"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Fechar"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Fechar"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Fechar"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "Fechar"
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "Fechar",
+        "newWindow": "Nova Janela",
+        "closeOthers": "Fechar Outros",
+        "closeAll": "Fechar Tudo"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "Fechar"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "Fechar"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "Fechar",
+        "label.find": "Localizar",
+        "placeholder.find": "Localizar"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "Fechar"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "close": "Fechar",
+        "cancel": "Cancelar",
+        "review": "Revisão"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "Fechar",
+        "closeOthers": "Fechar Outros",
+        "closeAll": "Fechar Tudo",
+        "copyRelativePath": "Copiar Caminho Relativo"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "Fechar"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "Fechar"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "Fechar"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "Fechar",
+        "scmInputCancelAction": "Cancelar"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "Fechar"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "Fechar",
+        "insert": "Inserir"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "Fechar"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "Fechar"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "Fechar"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "Recolher Tudo"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "Recolher Tudo",
+        "refresh": "Atualizar"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "Recolher Tudo",
+        "copy": "Copiar",
+        "copyAll": "Copiar Tudo"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "Recolher Tudo",
+        "copyMarker": "Copiar",
+        "problems": "Problemas",
+        "status.problems": "Problemas"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "Recolher Tudo"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "Recolher Tudo",
+        "RefreshAction.label": "Atualizar"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "Copiar",
+        "copyAll": "Copiar Tudo"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Copiar"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "Copiar",
+        "cut": "Recortar",
+        "paste": "Colar",
+        "redo": "Refazer",
+        "undo": "Desfazer"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "Copiar"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyItem.label": "Copiar",
+        "interactive.copyAll.label": "Copiar Tudo"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "Copiar"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "workbench.extensions.action.copyExtension": "Copiar",
+        "workbench.extensions.action.configure": "Configurações",
+        "refreshExtension": "Atualizar",
+        "none": "Nenhuma"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "Copiar"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "Copiar"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyMatchLabel": "Copiar",
+        "copyAllLabel": "Copiar Tudo"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "Copiar"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "Copiar"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "Copiar",
+        "settings": "Configurações",
+        "empty profile": "Nenhum",
+        "none": "Nenhum"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "Copiar"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "previous": "Anterior",
+        "next": "Avançar"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "Cancelar"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "Cancelar"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "Cancelar",
+        "mMinimize": "Minimizar",
+        "mNewTab": "Nova Guia"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "Cancelar"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "Cancelar",
+        "save": "Salvar"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "Cancelar"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "Cancelar",
+        "save": "Salvar"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "Cancelar"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "Cancelar"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "Cancelar",
+        "noIconThemeLabel": "Nenhum"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "Cancelar",
+        "preview": "Visualização"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "Cancelar"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "Cancelar"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "Cancelar"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "Cancelar"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Inserir"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "Salvar",
+        "saveAs": "Salvar como..."
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "Salvar"
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "Salvar"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Arquivo"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "Arquivo",
+        "files": "Arquivos"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "Arquivo",
+        "openContainer": "Abrir pasta que contém"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "Arquivo"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "Arquivo"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "Arquivo"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "Abrir a Pasta"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "Abrir a Pasta",
+        "watermark.openRecent": "Abrir Recente"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "Abrir Pasta"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "Abrir Pasta",
+        "openRecent": "Abrir itens usados recentemente"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "Abrir a Pasta"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "Abrir Pasta"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "openFolder": "Abrir Pasta",
+        "gettingStarted.openMac.title": "Abrir..."
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "Abrir a Pasta"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "Nova Janela"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "Nova Janela"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "newWindow": "Nova Janela",
+        "problems": "Problemas",
+        "files": "Arquivos",
+        "formatting": "Formatação",
+        "output": "Saída"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "Título"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "Título"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "Título"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "Título"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "Descrição",
+        "settings": "Configurações"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "Descrição"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "Descrição"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "Configurações"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "Configurações"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "Configurações"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomSettings": "Configurações",
+        "zoomReset": "Reiniciar"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "Configurações"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "Configurações"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "Configurações"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "Remover"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "Abrir..."
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "Atualizar"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "Atualizar"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "Problemas"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "Problemas"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "Problemas"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "Aplicar"
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "Arquivos"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "Recolher"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "Modo",
+        "noTriggerByBreakpoint": "Nenhum"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "null": "Nenhum",
+        "nullFormatterDescription": "Nenhum",
+        "formatter": "Formatação"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "Nenhum"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "Variáveis"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "Variáveis"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "Digitar"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "Visualizar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "Visualizar"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "SalvarComo..."
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "Abrir Pasta de retenção"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "Formatação"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "Redefinir"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "Saída"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "Saída"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "Saída"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "Saída"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "Restaurar"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "Sistema"
+      }
+    }
+  }
+}

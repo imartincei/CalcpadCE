@@ -245,7 +245,7 @@
       <section v-show="sectionVisible('settings')" data-anchor="settings" class="metadata-section">
         <h3 class="section-header" @click="toggle('settings')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('settings') }">&#x25BC;</span>
-          <CalcpadSearchHighlight text="Settings" :query="query" />
+          <CalcpadSearchHighlight :text="t('Settings')" :query="query" />
           <span v-if="settingChanges" class="dirty-mark" :title="t('Unsaved changes - Apply or Reset')">*</span>
         </h3>
         <div v-show="bodyVisible('settings')" class="section-body">
@@ -262,14 +262,14 @@
                 <div class="list-row">
                   <select v-model="row.key" @change="pdf.seedDefault(row)">
                     <option value="">(select)</option>
-                    <option v-for="s in pdfKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+                    <option v-for="s in pdfKeys" :key="s.key" :value="s.key" :title="s.detail ? tt(s.detail) : undefined">{{ tt(s.label) }}</option>
                   </select>
                   <select v-if="pdf.type(row.key) === 'boolean'" v-model="row.value">
                     <option value="true">true</option>
                     <option value="false">false</option>
                   </select>
                   <select v-else-if="pdf.type(row.key) === 'enum'" v-model="row.value">
-                    <option v-for="opt in pdf.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                    <option v-for="opt in pdf.options(row.key)" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
                   </select>
                   <input
                     v-else
@@ -280,8 +280,8 @@
                     :step="pdf.step(row.key)"
                     v-model="row.value"
                   />
-                  <span v-if="row.key" class="setting-info" :title="pdf.detail(row.key)">ⓘ</span>
-                  <button class="icon" title="Remove" @click="model.pdf.splice(i, 1)">✕</button>
+                  <span v-if="row.key" class="setting-info" :title="pdf.detail(row.key) ? tt(pdf.detail(row.key)) : undefined">ⓘ</span>
+                  <button class="icon" :title="t('Remove')" @click="model.pdf.splice(i, 1)">✕</button>
                 </div>
                 <div v-if="pdf.error(row)" class="setting-error">{{ pdf.error(row) }}</div>
               </div>
@@ -294,14 +294,14 @@
                 <div class="list-row">
                   <select v-model="row.key" @change="setting.seedDefault(row)">
                     <option value="">(select)</option>
-                    <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail">{{ s.label }}</option>
+                    <option v-for="s in settingKeys" :key="s.key" :value="s.key" :title="s.detail ? tt(s.detail) : undefined">{{ tt(s.label) }}</option>
                   </select>
                   <select v-if="setting.type(row.key) === 'boolean'" v-model="row.value">
                     <option value="true">true</option>
                     <option value="false">false</option>
                   </select>
                   <select v-else-if="setting.type(row.key) === 'enum'" v-model="row.value">
-                    <option v-for="opt in setting.options(row.key)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                    <option v-for="opt in setting.options(row.key)" :key="opt.value" :value="opt.value">{{ tt(opt.label) }}</option>
                   </select>
                   <input
                     v-else
@@ -312,8 +312,8 @@
                     :step="setting.step(row.key)"
                     v-model="row.value"
                   />
-                  <span v-if="row.key" class="setting-info" :title="setting.detail(row.key)">ⓘ</span>
-                  <button class="icon" title="Remove" @click="model.settings.splice(i, 1)">✕</button>
+                  <span v-if="row.key" class="setting-info" :title="setting.detail(row.key) ? tt(setting.detail(row.key)) : undefined">ⓘ</span>
+                  <button class="icon" :title="t('Remove')" @click="model.settings.splice(i, 1)">✕</button>
                 </div>
                 <div v-if="setting.error(row)" class="setting-error">{{ setting.error(row) }}</div>
               </div>
@@ -423,7 +423,7 @@ import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CalcpadFileInfoSection from './CalcpadFileInfoSection.vue'
 import CalcpadUiOverridesSection from './CalcpadUiOverridesSection.vue'
 
-const { t } = useI18n()
+const { t, t: tt } = useI18n()
 
 interface Props {
   block?: MetadataCommentBlock | null

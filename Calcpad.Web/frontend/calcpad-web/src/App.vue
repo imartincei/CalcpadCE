@@ -251,12 +251,12 @@
           v-if="outputContextMenu.line"
           class="context-menu"
           @click="onCopyOutputLine"
-        >Copy</button>
+        >{{ t('Copy') }}</button>
         <button
           class="context-menu"
           :disabled="filteredOutputLines.length === 0"
           @click="onCopyAllOutput"
-        >Copy All</button>
+        >{{ t('Copy All') }}</button>
       </div>
 
       <!-- Bottom panel (Problems / Output) — reflects the ACTIVE group. -->
@@ -267,7 +267,7 @@
             :class="{ active: activeBottomTab === 'problems' }"
             @click="activeBottomTab = 'problems'"
           >
-            Problems
+            {{ t('Problems') }}
             <span v-if="errorCount + warningCount + infoCount > 0" class="problems-badge" :class="errorCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'info'">
               {{ errorCount + warningCount + infoCount }}
             </span>
@@ -277,7 +277,7 @@
             :class="{ active: activeBottomTab === 'output' }"
             @click="activeBottomTab = 'output'"
           >
-            Output
+            {{ t('Output') }}
           </button>
           <select
             v-if="activeBottomTab === 'output'"
@@ -286,7 +286,7 @@
             title="Output channel"
           >
             <option v-for="ch in (['app', 'preview', 'server', 'html'] as OutputChannel[])" :key="ch" :value="ch">
-              {{ OUTPUT_CHANNEL_LABELS[ch] }}
+              {{ outputChannelLabel(ch) }}
             </option>
           </select>
           <span v-if="isSplit" class="panel-scope" :title="'Showing the active editor group'">
@@ -495,29 +495,29 @@
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.undo"
           @click="onPreviewUiHistory('uiUndo')"
-        >{{ t('Undo (Ctrl+Z)') }}</button>
+        >{{ shortcutLabel('Undo', ' (Ctrl+Z)') }}</button>
         <button
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.redo"
           @click="onPreviewUiHistory('uiRedo')"
-        >{{ t('Redo (Ctrl+Y)') }}</button>
+        >{{ shortcutLabel('Redo', ' (Ctrl+Y)') }}</button>
       </template>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('cut')"
-      >{{ t('Cut (Ctrl+X)') }}</button>
+      >{{ shortcutLabel('Cut', ' (Ctrl+X)') }}</button>
       <button
         class="context-menu"
         :disabled="!previewContextMenu.selection && !previewContextMenu.editable"
         @click="onPreviewClipboard('copy')"
-      >{{ t('Copy (Ctrl+C)') }}</button>
+      >{{ shortcutLabel('Copy', ' (Ctrl+C)') }}</button>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('paste')"
-      >{{ t('Paste (Ctrl+V)') }}</button>
-      <button class="context-menu" @click="onFindInPreview">{{ t('Find… (Ctrl+F)') }}</button>
+      >{{ shortcutLabel('Paste', ' (Ctrl+V)') }}</button>
+      <button class="context-menu" @click="onFindInPreview">{{ shortcutLabel('Find', '… (Ctrl+F)') }}</button>
       <button v-if="onOpenFullHtmlRequest" class="context-menu" @click="onOpenFullHtml">{{ t('Open Full HTML') }}</button>
     </div>
 
@@ -659,6 +659,15 @@ import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
 import { navigationDirection } from './editor/navigation-history'
 
 const { t } = useI18n()
+
+/** Prefer an exact key with the shortcut; otherwise append it to the shared-UI term. */
+function shortcutLabel(key: string, suffix: string): string {
+  const full = `${key}${suffix}`
+  const translated = t(full)
+  if (translated !== full) return translated
+  const plain = t(key)
+  return plain !== key ? `${plain}${suffix}` : full
+}
 
 const props = withDefaults(defineProps<{ isDesktop?: boolean }>(), { isDesktop: false })
 const autoRunEnabled = ref(true)
@@ -1538,11 +1547,13 @@ export interface OutputLine {
   groupId?: string
 }
 
-const OUTPUT_CHANNEL_LABELS: Record<OutputChannel, string> = {
-  app: 'CalcpadCE',
-  preview: 'Preview Console',
-  server: 'Server',
-  html: 'HTML Preview Output',
+function outputChannelLabel(channel: OutputChannel): string {
+  switch (channel) {
+    case 'preview': return t('Preview Console')
+    case 'server': return t('Server')
+    case 'html': return t('HTML Preview Output')
+    default: return 'CalcpadCE'
+  }
 }
 
 const outputLines = ref<OutputLine[]>([])

@@ -94,6 +94,50 @@ Licence files ship alongside the fonts.
 
 ---
 
+## Translation data
+
+- **VS Code language packs** (`vscode-language-pack-cs`, `vscode-language-pack-de`,
+  `vscode-language-pack-es`, `vscode-language-pack-fr`, `vscode-language-pack-it`,
+  `vscode-language-pack-ja`, `vscode-language-pack-ko`, `vscode-language-pack-pl`,
+  `vscode-language-pack-pt-BR`, `vscode-language-pack-ru`, `vscode-language-pack-tr`,
+  `vscode-language-pack-zh-hans`, `vscode-language-pack-zh-hant`) — MIT. The
+  Monaco editor maps in
+  `Calcpad.Web/frontend/calcpad-web/src/editor/monaco-nls/` are derived from
+  these packs at tag `v1.96.2024121109` (commit
+  `110df563b65cd2a1f9d8b58e3bdcadce90427f6d`). The MIT notice travels with the
+  maps in `monaco-nls/LICENSE.md`; it is reproduced here because the maps are
+  compiled into the web and desktop bundles.
+
+  ```
+  Visual Studio Code Localization Packs
+
+  Copyright (c) Microsoft Corporation
+
+  All rights reserved.
+
+  MIT License
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  ```
+
+---
+
 ## Components by licence
 
 516 components across 29 declared licences. Generated

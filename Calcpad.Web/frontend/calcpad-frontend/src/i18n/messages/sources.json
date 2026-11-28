@@ -1,0 +1,12 @@
+{
+  "community": {
+    "description": "Translations contributed by the CalcpadCE community, including the initial Chinese catalog and future locales."
+  },
+  "vscode": {
+    "description": "Reused from the pinned Microsoft VS Code language pack, in Monaco or a shared UI surface.",
+    "source": "microsoft/vscode-loc",
+    "tag": "v1.96.2024121109",
+    "commit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "license": "MIT"
+  }
+}
