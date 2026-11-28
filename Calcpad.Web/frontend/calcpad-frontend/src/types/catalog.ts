@@ -3,10 +3,15 @@
  * `#settings` JSON (must match what Calcpad.Core parses), `label` is the friendly
  * text shown in the dropdown.
  */
+import en from '../i18n/messages/en'
+
 export interface SettingOption {
     value: string;
     label: string;
 }
+
+/** Label text for a validation message; labels may be message IDs. */
+const labelText = (label: string): string => en[label] ?? label;
 
 /** A catalog entry generic enough to cover both `MetadataSettingKey` and `UiPropertyKey`. */
 interface CatalogKeySpec {
@@ -44,9 +49,9 @@ export function specForKey<T extends CatalogKeySpec>(catalog: T[], key: string):
 }
 
 function rangeMessage(spec: CatalogKeySpec): string {
-    if (spec.min !== undefined && spec.max !== undefined) return `${spec.label} must be between ${spec.min} and ${spec.max}`;
-    if (spec.min !== undefined) return `${spec.label} must be at least ${spec.min}`;
-    if (spec.max !== undefined) return `${spec.label} must be at most ${spec.max}`;
+    if (spec.min !== undefined && spec.max !== undefined) return `${labelText(spec.label)} must be between ${spec.min} and ${spec.max}`;
+    if (spec.min !== undefined) return `${labelText(spec.label)} must be at least ${spec.min}`;
+    if (spec.max !== undefined) return `${labelText(spec.label)} must be at most ${spec.max}`;
     return '';
 }
 
@@ -66,13 +71,13 @@ export function validateCatalogValue<T extends CatalogKeySpec>(
     if (spec.type === 'enum')
         return spec.options?.some(o => o.value === String(value))
             ? null
-            : `${spec.label} must be one of: ${spec.options?.map(o => o.label).join(', ')}`;
+            : `${labelText(spec.label)} must be one of: ${spec.options?.map(o => labelText(o.label)).join(', ')}`;
     if (spec.type === 'number') {
         const n = Number(value);
-        if (String(value).trim() === '' || !Number.isFinite(n)) return `${spec.label} must be a number`;
+        if (String(value).trim() === '' || !Number.isFinite(n)) return `${labelText(spec.label)} must be a number`;
         if (spec.min !== undefined && n < spec.min || spec.max !== undefined && n > spec.max) return rangeMessage(spec);
     }
     if (spec.pattern && !spec.pattern.test(String(value)))
-        return `${spec.label} must be ${spec.patternHint}`;
+        return `${labelText(spec.label)} must be ${spec.patternHint}`;
     return null;
 }

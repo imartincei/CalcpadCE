@@ -79,8 +79,8 @@ export interface HarnessInfo {
     permissionModes: PermissionModeInfo[];
 }
 
-const FALLBACK_MODE: PermissionModeInfo = { value: 'default', label: 'Default', hint: '', edits: 'review' };
-const DEFAULT_MODEL: ModelOption = { value: '', label: 'Default' };
+const FALLBACK_MODE: PermissionModeInfo = { value: 'default', label: 'agentChat.default', hint: '', edits: 'review' };
+const DEFAULT_MODEL: ModelOption = { value: '', label: 'agentChat.default' };
 
 export function harnessInfo(id: string | undefined): HarnessInfo | null {
     return agentChat.harnesses.find(h => h.id === id) ?? null;

@@ -52,16 +52,16 @@ export function macroCallsToEnum(mode: string | undefined): number {
 }
 
 const COLOR_SCALE_OPTIONS: SettingOption[] = [
-    { value: 'None', label: 'None' },
-    { value: 'Gray', label: 'Grayscale' },
-    { value: 'Rainbow', label: 'Rainbow' },
-    { value: 'Terrain', label: 'Terrain' },
-    { value: 'VioletToYellow', label: 'Violet → Yellow' },
-    { value: 'GreenToYellow', label: 'Green → Yellow' },
-    { value: 'Blues', label: 'Blues' },
-    { value: 'BlueToYellow', label: 'Blue → Yellow' },
-    { value: 'BlueToRed', label: 'Blue → Red' },
-    { value: 'PurpleToYellow', label: 'Purple → Yellow' },
+    { value: 'None', label: 'common.none' },
+    { value: 'Gray', label: 'catalog.grayscale' },
+    { value: 'Rainbow', label: 'settings.rainbow' },
+    { value: 'Terrain', label: 'catalog.terrain' },
+    { value: 'VioletToYellow', label: 'catalog.violetYellow' },
+    { value: 'GreenToYellow', label: 'catalog.greenYellow' },
+    { value: 'Blues', label: 'catalog.blues' },
+    { value: 'BlueToYellow', label: 'catalog.blueYellow' },
+    { value: 'BlueToRed', label: 'catalog.blueRed' },
+    { value: 'PurpleToYellow', label: 'catalog.purpleYellow' },
 ];
 
 /**
@@ -74,18 +74,18 @@ export type WriteMode = 'previewAndReport' | 'reportOnly' | 'manual';
 export const WRITE_MODE_OPTIONS: { value: WriteMode; label: string; detail: string }[] = [
     {
         value: 'previewAndReport',
-        label: 'Preview and Report',
-        detail: 'The Preview and Report views both write, so the files are rewritten as you type. The input form does not.',
+        label: 'catalog.previewAndReport',
+        detail: 'catalog.thePreviewAndReportViewsBothWriteSo',
     },
     {
         value: 'reportOnly',
-        label: 'Report Only',
-        detail: 'Only a report render writes: the preview pane switched to Report, and a report export. The Preview view leaves the files alone, so typing does not rewrite them.',
+        label: 'catalog.reportOnly',
+        detail: 'catalog.onlyAReportRenderWritesThePreviewPane',
     },
     {
         value: 'manual',
-        label: 'Manual',
-        detail: 'Nothing writes until you press Write to Disk.',
+        label: 'catalog.manual',
+        detail: 'catalog.nothingWritesUntilYouPressWriteToDisk',
     },
 ];
 
@@ -103,23 +103,23 @@ export type CalcpadLogLevel = 'error' | 'warning' | 'information' | 'verbose';
 export const LOG_LEVEL_OPTIONS: { value: CalcpadLogLevel; label: string; detail: string }[] = [
     {
         value: 'error',
-        label: 'Error',
-        detail: 'Only failures. Crash and hang reports are always written regardless of this setting.',
+        label: 'common.error',
+        detail: 'settings.onlyFailuresCrashAndHangReportsAreAlways',
     },
     {
         value: 'warning',
-        label: 'Warning',
-        detail: 'Failures plus recoverable problems, such as a missing browser for PDF export. The default, and silent during normal editing.',
+        label: 'common.warning',
+        detail: 'settings.failuresPlusRecoverableProblemsSuchAsAMissing',
     },
     {
         value: 'information',
-        label: 'Information',
-        detail: 'Adds one-off events: startup, the bound URL, server restarts, shutdown, and browser downloads.',
+        label: 'settings.information',
+        detail: 'settings.addsOneOffEventsStartupTheBoundUrl',
     },
     {
         value: 'verbose',
-        label: 'Verbose',
-        detail: 'Adds a line per request, on both the server and the editor. Useful when diagnosing a specific worksheet, noisy otherwise, since editing sends requests continuously.',
+        label: 'settings.verbose',
+        detail: 'settings.addsALinePerRequestOnBothThe',
     },
 ];
 
@@ -146,33 +146,33 @@ export function writesAllowed(mode: WriteMode, forPrint: boolean, enableUi = fal
  * ranges mirror `Calcpad.Core`'s `SettingsDto`, so keep in sync with `Settings.cs`.
  */
 export const METADATA_SETTINGS_KEYS: MetadataSettingKey[] = [
-    { key: 'decimals', label: 'Decimals', detail: 'Decimal places in output (0 to 15)', type: 'number', def: 2, min: 0, max: 15 },
+    { key: 'decimals', label: 'settings.decimals', detail: 'settings.decimalPlacesInOutput0To15', type: 'number', def: 2, min: 0, max: 15 },
     {
-        key: 'degrees', label: 'Angle units', detail: 'Angle unit: 0=degrees, 1=radians, 2=gradians', type: 'enum', def: 0,
-        options: [{ value: '0', label: 'Degrees' }, { value: '1', label: 'Radians' },{ value: '2', label: 'Gradians' }],
+        key: 'degrees', label: 'settings.angleUnits', detail: 'settings.angleUnit0Degrees1Radians2Gradians', type: 'enum', def: 0,
+        options: [{ value: '0', label: 'settings.degrees' }, { value: '1', label: 'settings.radians' },{ value: '2', label: 'settings.gradians' }],
     },
     { key: 'returnAngleUnits', label: 'Return angle units', detail: 'Inverse trig functions (asin, atan2, phase, etc.) return results with the current angle unit attached (°, rad or grad) instead of a unitless number. Can be overridden per-document with a ReturnAngleUnits = 0 line.', type: 'boolean', def: true },
-    { key: 'complex', label: 'Complex numbers', detail: 'Enable complex number mode', type: 'boolean', def: false },
-    { key: 'substitute', label: 'Substitute variables', detail: 'Substitute variable values into expressions', type: 'boolean', def: true },
-    { key: 'formatEquations', label: 'Format equations', detail: 'Professional (checked) renders equations in stacked math form; Inline (unchecked) renders them on a single line.', type: 'boolean', def: true },
-    { key: 'zeroSmallMatrixElements', label: 'Zero small matrix elements', detail: 'Display very small matrix/vector values as 0 instead of using scientific notation.', type: 'boolean', def: true },
-    { key: 'showHiddenOutput', label: 'Show hidden output', detail: 'Ignore #hide so suppressed content is rendered anyway. For debugging.', type: 'boolean', def: false },
-    { key: 'maxOutputCount', label: 'Max output count', detail: 'Maximum number of rows/columns shown for large matrices and vectors (5–100).', type: 'number', def: 20, min: 5, max: 100 },
-    { key: 'isUs', label: 'Non-metric units', detail: 'Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).', type: 'boolean', def: true },
-    { key: 'vectorGraphics', label: 'Vector graphics', detail: 'Renders plots as SVG (scalable, sharp at any zoom) instead of raster PNG images.', type: 'boolean', def: false },
-    { key: 'colorScale', label: 'Plot color scale', detail: 'Plot color scale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
-    { key: 'smoothScale', label: 'Smooth color scale', detail: 'Smooth color scale transitions', type: 'boolean', def: false },
-    { key: 'shadows', label: 'Plot shadows', detail: 'Enable 3-D plot shadows', type: 'boolean', def: true },
-    { key: 'adaptivePlot', label: 'Adaptive plotting', detail: 'Concentrates sample points where the curve bends sharply instead of spacing them evenly. Produces smoother plots of curved functions at a lower point count; disable for a fixed dense sampling.', type: 'boolean', def: true },
-    { key: 'plotWidth', label: 'Plot width', detail: 'Width of the plot area in pixels (at least 1). Can be overridden per-document with a PlotWidth = … line.', type: 'number', def: 500, min: 1 },
-    { key: 'plotHeight', label: 'Plot height', detail: 'Height of the plot area in pixels (at least 1). Can be overridden per-document with a PlotHeight = … line.', type: 'number', def: 300, min: 1 },
-    { key: 'plotStep', label: 'Plot mesh step', detail: 'Mesh size for map (surface) plotting in pixels; 0 lets Calcpad choose automatically. Can be overridden per-document with a PlotStep = … line.', type: 'number', def: 0, min: 0 },
-    { key: 'precision', label: 'Numerical precision', detail: 'Relative precision for numerical methods such as integration and root finding (1e-15 to 1e-2). Can be overridden per-document with a Precision = … line.', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
-    { key: 'tol', label: 'Solver tolerance', detail: 'Target tolerance for the iterative PCG solver and eigensolver (1e-15 to 1e-2). Can be overridden per-document with a Tol = … line.', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
-    { key: 'calculatePost', label: 'Calculate #post in input form', detail: 'Calculate #post blocks while the input form is shown, hidden, so their variables stay available to later lines. Turn off to skip them entirely and keep the form responsive when the report is all at the end.', type: 'boolean', def: true },
+    { key: 'complex', label: 'settings.complexNumbers', detail: 'settings.enableComplexNumberMode', type: 'boolean', def: false },
+    { key: 'substitute', label: 'settings.substituteVariables', detail: 'settings.substituteVariableValuesIntoExpressions', type: 'boolean', def: true },
+    { key: 'formatEquations', label: 'settings.formatEquations', detail: 'settings.professionalCheckedRendersEquationsInStackedMathForm', type: 'boolean', def: true },
+    { key: 'zeroSmallMatrixElements', label: 'settings.zeroSmallMatrixElements', detail: 'settings.displayVerySmallMatrixVectorValuesAs0', type: 'boolean', def: true },
+    { key: 'showHiddenOutput', label: 'settings.showHiddenOutput', detail: 'settings.ignoreHashHideSoSuppressedContentIsRendered', type: 'boolean', def: false },
+    { key: 'maxOutputCount', label: 'settings.maxOutputCount', detail: 'settings.maximumNumberOfRowsColumnsShownForLarge', type: 'number', def: 20, min: 5, max: 100 },
+    { key: 'isUs', label: 'settings.nonMetricUnits', detail: 'settings.selectsUsOrUkDefinitionsForBareUnit', type: 'boolean', def: true },
+    { key: 'vectorGraphics', label: 'settings.vectorGraphics', detail: 'settings.rendersPlotsAsSvgScalableSharpAtAny', type: 'boolean', def: false },
+    { key: 'colorScale', label: 'settings.plotColorScale', detail: 'settings.plotColorScale', type: 'enum', def: 'Rainbow', options: COLOR_SCALE_OPTIONS },
+    { key: 'smoothScale', label: 'settings.smoothColorScale', detail: 'settings.smoothColorScaleTransitions', type: 'boolean', def: false },
+    { key: 'shadows', label: 'settings.plotShadows', detail: 'settings.enable3DPlotShadows', type: 'boolean', def: true },
+    { key: 'adaptivePlot', label: 'settings.adaptivePlotting', detail: 'settings.concentratesSamplePointsWhereTheCurveBendsSharply', type: 'boolean', def: true },
+    { key: 'plotWidth', label: 'settings.plotWidth', detail: 'settings.widthOfThePlotAreaInPixelsAt', type: 'number', def: 500, min: 1 },
+    { key: 'plotHeight', label: 'settings.plotHeight', detail: 'settings.heightOfThePlotAreaInPixelsAt', type: 'number', def: 300, min: 1 },
+    { key: 'plotStep', label: 'settings.plotMeshStep', detail: 'settings.meshSizeForMapSurfacePlottingInPixels', type: 'number', def: 0, min: 0 },
+    { key: 'precision', label: 'settings.numericalPrecision', detail: 'settings.relativePrecisionForNumericalMethodsSuchAsIntegration', type: 'number', def: 1e-14, min: 1e-15, max: 1e-2 },
+    { key: 'tol', label: 'settings.solverTolerance', detail: 'settings.targetToleranceForTheIterativePcgSolverAnd', type: 'number', def: 1e-6, min: 1e-15, max: 1e-2 },
+    { key: 'calculatePost', label: 'service.calculateHashPostInInputForm', detail: 'settings.calculateHashPostBlocksWhileTheInputForm', type: 'boolean', def: true },
     {
         key: 'macroCalls', label: 'Macro calls', detail: 'When name$ is parsed as a macro call: auto = once a macro is defined, on = always (undefined macros are errors), off = never ($ is left as text).', type: 'enum', def: 'auto',
-        options: [{ value: 'auto', label: 'Auto' }, { value: 'on', label: 'On' }, { value: 'off', label: 'Off' }],
+        options: [{ value: 'auto', label: 'common.auto' }, { value: 'on', label: 'settings.on' }, { value: 'off', label: 'common.off' }],
     },
 ];
 

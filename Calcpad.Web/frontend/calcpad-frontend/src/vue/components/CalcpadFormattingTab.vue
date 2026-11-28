@@ -1,19 +1,19 @@
 <template>
   <div class="formatting-tab">
     <div class="formatting-container p-3">
-      <h3 class="section-title">{{ t('Prettify') }}</h3>
-      <p class="section-desc">{{ t('Auto-indents the active document. Content is not modified outside of whitespace.') }}</p>
+      <h3 class="section-title">{{ t('api.prettify') }}</h3>
+      <p class="section-desc">{{ t('formatting.autoIndentsTheActiveDocumentContentIsNot') }}</p>
 
       <div class="setting-group">
-        <label for="indentStyle">{{ t('Indent style:') }}</label>
+        <label for="indentStyle">{{ t('formatting.indentStyleLabel') }}</label>
         <select id="indentStyle" :value="indentStyle" @change="onIndentStyleChange">
-          <option value="tab">{{ t('Tab') }}</option>
-          <option value="space">{{ t('Space') }}</option>
+          <option value="tab">{{ t('desktop.tab') }}</option>
+          <option value="space">{{ t('formatting.space') }}</option>
         </select>
       </div>
 
       <div class="setting-group" v-if="indentStyle === 'space'">
-        <label for="indentSize">{{ t('Spaces per level:') }}</label>
+        <label for="indentSize">{{ t('formatting.spacesPerLevelLabel') }}</label>
         <input
           id="indentSize"
           type="number"
@@ -30,12 +30,12 @@
             type="checkbox"
             :checked="trimTrailingWhitespace"
             @change="onTrimChange"
-          />{{ t('Trim trailing whitespace') }}</label>
+          />{{ t('formatting.trimTrailingWhitespace') }}</label>
       </div>
 
       <div class="actions">
-        <button @click="onPrettify" :disabled="sourceUnavailable" :title="sourceUnavailable ? t('Unavailable in input mode') : undefined">
-          {{ t('Prettify Document') }}
+        <button @click="onPrettify" :disabled="sourceUnavailable" :title="sourceUnavailable ? t('formatting.unavailableInInputMode') : undefined">
+          {{ t('formatting.prettifyDocument') }}
         </button>
       </div>
     </div>
@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 
 const { t } = useI18n()
 interface Props {

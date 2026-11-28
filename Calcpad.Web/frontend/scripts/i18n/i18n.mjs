@@ -16,15 +16,20 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(here, '../..');
 const dataDir = path.join(here, 'data');
 const messagesDir = path.join(frontendRoot, 'calcpad-frontend/src/i18n/messages');
+const communityDir = path.join(frontendRoot, 'calcpad-frontend/src/i18n/community');
+const enFile = path.join(messagesDir, 'en.ts');
 const webRoot = path.join(frontendRoot, 'calcpad-web');
 const monacoDir = path.join(webRoot, 'src/editor/monaco-nls');
 const cacheDir = path.join(webRoot, 'node_modules/.cache/calcpad-monaco-nls');
+const monacoMapsDir = path.join(cacheDir, 'maps');
+const monacoOverridesDir = path.join(cacheDir, 'overrides');
 
 const VSCODE_TAG = '1.96.2';
 const VSCODE_LOC_TAG = 'v1.96.2024121109';
@@ -43,8 +48,9 @@ const SOURCES = ['vscode-monaco', 'vscode-shared-ui'];
 const args = process.argv.slice(2);
 const check = args.includes('--check');
 const verbose = args.includes('--verbose');
+const monacoOnly = args.includes('--monaco-cache');
 const only = args.find(argument => argument.startsWith('--locale='))?.split('=')[1];
-const unknown = args.filter(argument => !['--check', '--verbose'].includes(argument) && !argument.startsWith('--locale='));
+const unknown = args.filter(argument => !['--check', '--verbose', '--monaco-cache'].includes(argument) && !argument.startsWith('--locale='));
 if (unknown.length) {
     console.error(`Unknown option: ${unknown.join(', ')}`);
     process.exit(1);
@@ -68,10 +74,65 @@ function readJson(file) {
 }
 
 function readCatalog(text) {
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    if (start < 0 || end < 0) return {};
-    return JSON.parse(text.slice(start, end + 1).replace(/,\s*}$/, '}'));
+    const declaration = /\bconst\s+\w+\s*(?::[^=]+)?=\s*\{/.exec(text)
+        ?? /\bexport\s+default\s*\{/.exec(text);
+    if (!declaration) return {};
+    const start = text.indexOf('{', declaration.index);
+    let depth = 0;
+    let quote = null;
+    let escaped = false;
+    let lineComment = false;
+    let blockComment = false;
+    for (let index = start; index < text.length; index++) {
+        const char = text[index];
+        const next = text[index + 1];
+        if (lineComment) {
+            if (char === '\n') lineComment = false;
+            continue;
+        }
+        if (blockComment) {
+            if (char === '*' && next === '/') {
+                blockComment = false;
+                index++;
+            }
+            continue;
+        }
+        if (quote) {
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            if (char === '\\') {
+                escaped = true;
+                continue;
+            }
+            if (char === quote) quote = null;
+            continue;
+        }
+        if (char === "'" || char === '"' || char === '`') {
+            quote = char;
+            continue;
+        }
+        if (char === '/' && next === '/') {
+            lineComment = true;
+            index++;
+            continue;
+        }
+        if (char === '/' && next === '*') {
+            blockComment = true;
+            index++;
+            continue;
+        }
+        if (char === '{') depth++;
+        else if (char === '}') {
+            depth--;
+            if (depth === 0) {
+                const raw = text.slice(start, index + 1).replace(/,\s*}/g, '}');
+                return JSON.parse(raw);
+            }
+        }
+    }
+    return {};
 }
 
 async function fetchWithRetry(url) {
@@ -212,10 +273,61 @@ async function extractLangpacks() {
     }
 }
 
+function readEnglish() {
+    return fs.existsSync(enFile) ? readCatalog(fs.readFileSync(enFile, 'utf8')) : {};
+}
+
+function readCommunity(locale) {
+    const file = path.join(communityDir, `${locale}.ts`);
+    if (!fs.existsSync(file)) return { ui: {}, monaco: {} };
+    const data = readCatalog(fs.readFileSync(file, 'utf8'));
+    return { ui: data.ui ?? {}, monaco: data.monaco ?? {} };
+}
+
+function readCommunityOrigins(locale) {
+    const file = path.join(communityDir, `${locale}.provenance.json`);
+    if (!fs.existsSync(file)) return {};
+    return readJson(file).ui ?? {};
+}
+
+function blameCommunity(locale) {
+    const file = path.join(communityDir, `${locale}.ts`);
+    const relative = path.relative(frontendRoot, file).replace(/\\/g, '/');
+    const output = execFileSync('git', ['blame', '--line-porcelain', '--', relative], {
+        cwd: frontendRoot,
+        encoding: 'utf8',
+    });
+    const origins = {};
+    let commit = null;
+    for (const line of output.split('\n')) {
+        const header = /^([0-9a-f]{40}) \d+ (\d+)(?: \d+)?$/.exec(line);
+        if (header) {
+            commit = header[1];
+            continue;
+        }
+        if (!commit || !line.startsWith('\t')) continue;
+        const match = /^\s*"([^"]+)"\s*:/.exec(line.slice(1));
+        if (match && match[1] !== 'ui' && match[1] !== 'monaco' && !match[1].includes('::'))
+            origins[match[1]] = commit.slice(0, 8);
+        commit = null;
+    }
+    return origins;
+}
+
+function gitMetadata(commit) {
+    const [author, date, ...subject] = execFileSync(
+        'git',
+        ['show', '-s', '--format=%an%n%ad%n%s', '--date=short', commit],
+        { cwd: frontendRoot, encoding: 'utf8' },
+    ).trim().split('\n');
+    return { author, date, subject: subject.join(' ') };
+}
+
 function importCatalogs() {
     const packs = selectedCatalogPacks();
     if (!packs.length) return;
     const index = readJson(path.join(dataDir, 'vscode.index.json'));
+    const english = readEnglish();
     for (const catalogPack of packs) {
         const locale = catalogPack.output;
         const packFile = path.join(dataDir, `vscode.langpack.${locale}.json`);
@@ -230,7 +342,16 @@ function importCatalogs() {
         const selected = {};
         const skipped = [];
 
-        for (const [english, entries] of Object.entries(index.keys ?? {})) {
+        for (const [text, entries] of Object.entries(index.keys ?? {})) {
+            const id = index.ids?.[text];
+            if (!id) {
+                errors.push(`"${text}" has no ID in vscode.index.json`);
+                continue;
+            }
+            if (typeof english[id] !== 'string') {
+                errors.push(`"${id}" is missing from en.ts`);
+                continue;
+            }
             const bySource = Object.fromEntries(SOURCES.map(source => [source, new Set()]));
             for (const { source, module, key } of entries) {
                 const value = pack.contents?.[source]?.[module]?.[key];
@@ -238,64 +359,75 @@ function importCatalogs() {
             }
             const all = new Set(SOURCES.flatMap(source => [...bySource[source]]));
             if (all.size === 0) {
-                errors.push(`"${english}" has no translation in the committed langpack`);
+                errors.push(`"${text}" (${id}) has no translation in the committed langpack`);
                 continue;
             }
             if (all.size === 1) {
                 const value = [...all][0];
                 const source = SOURCES.find(candidate => bySource[candidate].has(value));
-                selected[english] = { value, vscodeSource: source };
+                if (selected[id] && selected[id].value !== value) {
+                    errors.push(`"${id}" has conflicting VS Code translations`);
+                    continue;
+                }
+                selected[id] = { value, vscodeSource: source };
                 continue;
             }
             const detail = SOURCES
                 .filter(source => bySource[source].size)
                 .map(source => `${source}: ${[...bySource[source]].join(', ')}`)
                 .join('; ');
-            skipped.push({ english, detail });
+            skipped.push({ english: text, id, detail });
         }
 
-        const sorted = {};
-        for (const key of Object.keys(selected).sort((a, b) => a.localeCompare(b, 'en'))) sorted[key] = selected[key];
-        let existingProvenance = {};
-        if (fs.existsSync(provenanceFile)) {
+        const community = readCommunity(locale);
+        const origins = readCommunityOrigins(locale);
+        const missingOrigins = Object.keys(community.ui).filter(id => !origins[id]);
+        if (missingOrigins.length) {
+            let blamed = {};
             try {
-                existingProvenance = readJson(provenanceFile);
+                blamed = blameCommunity(locale);
             } catch (error) {
-                errors.push(`${path.basename(provenanceFile)}: ${error.message}`);
+                errors.push(`community/${locale}.ts: commit the file before running the i18n script (${error.message})`);
+            }
+            for (const id of missingOrigins) {
+                const origin = blamed[id];
+                if (!origin || origin.startsWith('0000000')) {
+                    errors.push(`community "${id}" has no origin; commit community/${locale}.ts first`);
+                    continue;
+                }
+                origins[id] = origin;
             }
         }
-        let existingCatalog = {};
-        if (fs.existsSync(catalogFile)) {
-            try {
-                existingCatalog = readCatalog(fs.readFileSync(catalogFile, 'utf8'));
-            } catch (error) {
-                errors.push(`${path.basename(catalogFile)}: ${error.message}`);
-            }
-        }
-
-        const community = {};
-        for (const [key, entry] of Object.entries(existingProvenance.keys ?? {})) {
-            if (entry?.source !== 'community') continue;
-            const value = existingCatalog[key];
-            if (typeof value !== 'string' || !value) {
-                errors.push(`community key "${key}" has no value in ${path.basename(catalogFile)}`);
-                continue;
-            }
-            if (key in sorted && entry.replaces !== 'vscode') {
-                errors.push(`community key "${key}" replaces a VS Code key without replaces: "vscode"`);
-                continue;
-            }
-            community[key] = { value, entry };
-        }
-
         const merged = {};
-        for (const [key, entry] of Object.entries(sorted)) {
-            merged[key] = {
+        for (const [id, entry] of Object.entries(selected)) {
+            merged[id] = {
                 value: entry.value,
                 entry: { source: 'vscode', vscodeSource: entry.vscodeSource },
             };
         }
-        for (const [key, entry] of Object.entries(community)) merged[key] = entry;
+        for (const [id, value] of Object.entries(community.ui)) {
+            if (typeof english[id] !== 'string') {
+                errors.push(`community "${id}" is missing from en.ts`);
+                continue;
+            }
+            if (typeof value !== 'string' || !value) {
+                errors.push(`community "${id}" has an empty value`);
+                continue;
+            }
+            const origin = origins[id];
+            if (!origin) {
+                errors.push(`community "${id}" has no origin in ${locale}.provenance.json`);
+                continue;
+            }
+            merged[id] = {
+                value,
+                entry: {
+                    source: 'community',
+                    ...(id in selected ? { replaces: 'vscode' } : {}),
+                    origin,
+                },
+            };
+        }
 
         const mergedKeys = Object.keys(merged).sort((a, b) => a.localeCompare(b, 'en'));
         const vscodeCount = mergedKeys.filter(key => merged[key].entry.source === 'vscode').length;
@@ -308,18 +440,44 @@ function importCatalogs() {
             key => `    ${JSON.stringify(key)}: ${JSON.stringify(merged[key].value)},`,
         );
         const catalog = `// Generated by scripts/i18n/i18n.mjs for ${locale} from VS Code ${pack.vscode.tag}
-// and ${pack.vscode.pack} ${pack.vscode.locTag}. Community entries are preserved; generated entries are rewritten.
+// and ${pack.vscode.pack} ${pack.vscode.locTag}. Community entries come from community/${locale}.ts.
 const catalog: Record<string, string> = {
 ${lines.join('\n')}
 }
 
 export default catalog
 `;
-        const origins = existingProvenance.origins ?? {};
+        let existingProvenance = {};
+        if (fs.existsSync(provenanceFile)) {
+            try {
+                existingProvenance = readJson(provenanceFile);
+            } catch (error) {
+                errors.push(`${path.basename(provenanceFile)}: ${error.message}`);
+            }
+        }
+        const originsMap = existingProvenance.origins ?? {};
+        for (const origin of new Set(Object.values(origins))) {
+            if (originsMap[origin]) continue;
+            try {
+                originsMap[origin] = gitMetadata(origin);
+            } catch (error) {
+                errors.push(`community origin ${origin}: ${error.message}`);
+            }
+        }
+        const sortedOrigins = Object.fromEntries(
+            Object.entries(origins).sort(([a], [b]) => a.localeCompare(b, 'en')),
+        );
+        const sidecarText = JSON.stringify({ ui: sortedOrigins }, null, 2) + '\n';
+        const sidecarFile = path.join(communityDir, `${locale}.provenance.json`);
+        if (Object.keys(community.ui).length && check) {
+            const currentSidecar = fs.existsSync(sidecarFile) ? fs.readFileSync(sidecarFile, 'utf8') : '';
+            if (currentSidecar !== sidecarText)
+                errors.push(`community/${locale}.provenance.json is out of date; run:\n  node scripts/i18n/i18n.mjs --locale=${locale}`);
+        }
         const provenance = {
             locale,
             vscode: pack.vscode,
-            ...(Object.keys(origins).length ? { origins } : {}),
+            ...(Object.keys(originsMap).length ? { origins: originsMap } : {}),
             keys: Object.fromEntries(mergedKeys.map(key => [key, merged[key].entry])),
         };
         const provenanceText = JSON.stringify(provenance, null, 2) + '\n';
@@ -342,13 +500,7 @@ export default catalog
             continue;
         }
 
-        const existing = fs.existsSync(catalogFile) ? fs.readFileSync(catalogFile, 'utf8') : '';
-        const generated = existing.startsWith('// Generated by scripts/i18n/i18n.mjs')
-            || existing.startsWith('// Generated by scripts/i18n/import-vscode.mjs');
-        if (existing && !generated) {
-            fail(`VS Code ${locale}: refusing to overwrite a non-generated catalog`);
-            continue;
-        }
+        if (Object.keys(community.ui).length) fs.writeFileSync(sidecarFile, sidecarText);
         fs.writeFileSync(catalogFile, catalog);
         fs.writeFileSync(provenanceFile, provenanceText);
         console.log(
@@ -357,7 +509,7 @@ export default catalog
         );
         if (skipped.length) {
             console.log(`Skipped ${skipped.length} keys with multiple translations:`);
-            for (const item of skipped) console.log(`- ${item.english} (${item.detail})`);
+            for (const item of skipped) console.log(`- ${item.english} (${item.id}; ${item.detail})`);
         }
     }
 }
@@ -437,7 +589,10 @@ async function generateMonacoMaps() {
     console.log(`Monaco NLS maps from vscode-loc ${VSCODE_LOC_TAG} (${VSCODE_LOC_COMMIT.slice(0, 12)})`);
     console.log(`Monaco: ${monacoRoot}`);
     console.log(`Calls: ${calls.length} across ${new Set(calls.map(call => call.module)).size} modules\n`);
-    if (!check) fs.mkdirSync(monacoDir, { recursive: true });
+    if (!check) {
+        fs.mkdirSync(monacoMapsDir, { recursive: true });
+        fs.mkdirSync(monacoOverridesDir, { recursive: true });
+    }
 
     for (const pack of packs) {
         let contents;
@@ -489,13 +644,43 @@ async function generateMonacoMaps() {
         }
 
         const serialized = JSON.stringify(sorted, null, 2) + '\n';
-        const target = path.join(monacoDir, `${pack.output}.json`);
+        const target = path.join(monacoMapsDir, `${pack.output}.json`);
         if (check) {
             const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
             if (current !== serialized) fail(`  out of date: ${path.relative(frontendRoot, target)}`);
         } else {
             fs.writeFileSync(target, serialized);
             console.log(`  wrote ${path.relative(frontendRoot, target)}`);
+        }
+
+        const community = readCommunity(pack.output);
+        const overrides = {};
+        for (const [key, value] of Object.entries(community.monaco)) {
+            const separator = key.indexOf('::');
+            const module = separator > 0 ? key.slice(0, separator) : '';
+            const messageKey = separator > 0 ? key.slice(separator + 2) : '';
+            if (!module || !messageKey || !sorted[module]?.[messageKey]) {
+                fail(`${pack.output}: monaco override "${key}" is not in the base map`);
+                continue;
+            }
+            if (typeof value !== 'string' || !value) {
+                fail(`${pack.output}: monaco override "${key}" has an empty value`);
+                continue;
+            }
+            (overrides[module] ??= {})[messageKey] = value;
+        }
+        const sortedOverrides = sortMap(overrides);
+        const overrideTarget = path.join(monacoOverridesDir, `${pack.output}.json`);
+        const overrideSerialized = JSON.stringify(sortedOverrides, null, 2) + '\n';
+        if (check) {
+            const current = fs.existsSync(overrideTarget) ? fs.readFileSync(overrideTarget, 'utf8') : '';
+            if (current !== overrideSerialized)
+                fail(`  out of date: ${path.relative(frontendRoot, overrideTarget)}`);
+        } else {
+            fs.mkdirSync(path.dirname(overrideTarget), { recursive: true });
+            fs.writeFileSync(overrideTarget, overrideSerialized);
+            if (Object.keys(sortedOverrides).length)
+                console.log(`  wrote ${path.relative(frontendRoot, overrideTarget)}`);
         }
     }
 }
@@ -554,6 +739,77 @@ function checkProvenance() {
         return keys;
     };
 
+    const english = readEnglish();
+    const messageIds = readJsonSafe(path.join(here, 'message-ids.json'));
+    const messageIdValues = new Set(Object.values(messageIds));
+    for (const [text, id] of Object.entries(messageIds)) {
+        if (typeof id !== 'string' || !id) {
+            errors.push(`message-ids.json: "${text}" has no ID`);
+            continue;
+        }
+        if (english[id] !== text)
+            errors.push(`message-ids.json: "${text}" -> "${id}" does not match en.ts`);
+    }
+    for (const [id, text] of Object.entries(english)) {
+        if (typeof text !== 'string' || !text)
+            errors.push(`en.ts: "${id}" has an empty English value`);
+        if (!messageIdValues.has(id))
+            errors.push(`en.ts: "${id}" has no entry in message-ids.json`);
+    }
+
+    const legacyFile = path.join(frontendRoot, 'calcpad-frontend/src/i18n/legacy-keys.generated.ts');
+    if (fs.existsSync(legacyFile)) {
+        const legacy = readCatalog(fs.readFileSync(legacyFile, 'utf8'));
+        for (const [text, id] of Object.entries(messageIds)) {
+            if (legacy[text] !== id)
+                errors.push(`legacy-keys.generated.ts: "${text}" does not map to "${id}"`);
+        }
+        for (const text of Object.keys(legacy)) {
+            if (!(text in messageIds))
+                errors.push(`legacy-keys.generated.ts: "${text}" is not in message-ids.json`);
+        }
+    }
+
+    const index = readJsonSafe(path.join(dataDir, 'vscode.index.json'));
+    for (const text of Object.keys(index.keys ?? {})) {
+        const id = index.ids?.[text];
+        if (!id) errors.push(`vscode.index.json: "${text}" has no ID`);
+        else if (english[id] !== text)
+            errors.push(`vscode.index.json: "${text}" -> "${id}" does not match en.ts`);
+    }
+    for (const [text, id] of Object.entries(index.ids ?? {})) {
+        if (!(text in (index.keys ?? {})))
+            errors.push(`vscode.index.json: ID "${id}" belongs to unknown English key "${text}"`);
+        if (!english[id])
+            errors.push(`vscode.index.json: ID "${id}" is missing from en.ts`);
+    }
+
+    for (const pack of CATALOG_PACKS) {
+        const locale = pack.output;
+        const communityFile = path.join(communityDir, `${locale}.ts`);
+        if (!fs.existsSync(communityFile)) continue;
+        let community;
+        try {
+            community = readCommunity(locale);
+        } catch (error) {
+            errors.push(`${path.relative(frontendRoot, communityFile)}: ${error.message}`);
+            continue;
+        }
+        const origins = readCommunityOrigins(locale);
+        for (const id of Object.keys(community.ui ?? {})) {
+            if (!english[id])
+                errors.push(`community/${locale}.ts: "${id}" is missing from en.ts`);
+            if (!origins[id])
+                errors.push(`community/${locale}.ts: "${id}" has no origin`);
+        }
+        for (const [id, value] of Object.entries(community.monaco ?? {})) {
+            if (!id.includes('::'))
+                errors.push(`community/${locale}.ts: monaco key "${id}" must be module::key`);
+            if (typeof value !== 'string' || !value)
+                errors.push(`community/${locale}.ts: monaco key "${id}" has an empty value`);
+        }
+    }
+
     const sources = readJsonSafe(path.join(messagesDir, 'sources.json'));
     if (sources.vscode?.tag !== VSCODE_LOC_TAG || sources.vscode?.commit !== VSCODE_LOC_COMMIT)
         errors.push('sources.json: vscode tag/commit do not match the pinned release');
@@ -583,6 +839,10 @@ function checkProvenance() {
         let overrides = 0;
         let vscodeMatches = 0;
         for (const key of keys) {
+            if (typeof english[key] !== 'string') {
+                errors.push(`${catalog.file}: key "${key}" is missing from en.ts`);
+                continue;
+            }
             const entry = catalog.manifest.keys?.[key];
             if (!entry) {
                 errors.push(`${catalog.file}: key "${key}" has no explicit provenance`);
@@ -629,6 +889,8 @@ function checkProvenance() {
             counts.set(source, (counts.get(source) ?? 0) + 1);
         }
         for (const [key, entry] of Object.entries(catalog.manifest.keys ?? {})) {
+            if (typeof english[key] !== 'string')
+                errors.push(`${catalog.label}: key "${key}" is missing from en.ts`);
             if (!keys.has(key)) errors.push(`${catalog.label}: key "${key}" is not in ${catalog.file}`);
             const source = typeof entry === 'string' ? entry : entry?.source;
             if (!source || !sources[source])
@@ -661,13 +923,8 @@ function checkProvenance() {
         errors.push('SOURCES.json: expected MIT license');
 
     const packs = new Map(MONACO_PACKS.map(pack => [pack.output, pack.folder]));
-    const baseMaps = {};
     for (const [file, info] of Object.entries(monacoSources.maps ?? {})) {
         const output = file.replace(/\.json$/, '');
-        if (!fs.existsSync(path.join(monacoDir, file))) {
-            errors.push(`SOURCES.json: map "${file}" does not exist`);
-            continue;
-        }
         if (!packs.has(output)) {
             errors.push(`SOURCES.json: map "${file}" has no matching generator pack`);
             continue;
@@ -678,7 +935,6 @@ function checkProvenance() {
             errors.push(`SOURCES.json: map "${file}" must be vscode`);
         if (info.vscodeSource !== 'vscode-monaco')
             errors.push(`SOURCES.json: map "${file}" must be vscode-monaco`);
-        baseMaps[output] = readJsonSafe(path.join(monacoDir, file));
     }
     if (Object.keys(monacoSources.maps ?? {}).length !== packs.size)
         errors.push('SOURCES.json: map count does not match the generator packs');
@@ -689,30 +945,10 @@ function checkProvenance() {
             errors.push(`SOURCES.json: override "${locale}" must be community`);
         if (info.replaces !== 'vscode')
             errors.push(`SOURCES.json: override "${locale}" must replace vscode`);
-        const file = path.join(monacoDir, info.path);
-        if (!fs.existsSync(file)) {
-            errors.push(`SOURCES.json: override "${info.path}" does not exist`);
-            continue;
-        }
-        const data = readJsonSafe(file);
-        const base = baseMaps[locale];
-        if (!base) {
-            errors.push(`SOURCES.json: override "${locale}" has no base map`);
-            continue;
-        }
-        for (const [module, entries] of Object.entries(data)) {
-            if (!base[module]) {
-                errors.push(`overrides/${locale}.json: module "${module}" is not in the base map`);
-                continue;
-            }
-            for (const [key, value] of Object.entries(entries)) {
-                if (!base[module][key])
-                    errors.push(`overrides/${locale}.json: "${module}::${key}" is not in the base map`);
-                if (typeof value !== 'string' || !value)
-                    errors.push(`overrides/${locale}.json: "${module}::${key}" has an empty translation`);
-                else
-                    monacoOverrides++;
-            }
+        try {
+            monacoOverrides += Object.keys(readCommunity(locale).monaco ?? {}).length;
+        } catch (error) {
+            errors.push(`community/${locale}.ts: ${error.message}`);
         }
     }
 
@@ -742,10 +978,16 @@ function checkProvenance() {
     console.log('Provenance OK');
 }
 
-console.log(`i18n ${check ? 'check' : 'update'}${only ? ` (${only})` : ''}`);
-await extractLangpacks();
-importCatalogs();
-await generateMonacoMaps();
-checkProvenance();
-if (failed) process.exitCode = 1;
-else console.log(check ? 'i18n: OK' : 'i18n: updated');
+console.log(`i18n ${monacoOnly ? 'monaco cache' : check ? 'check' : 'update'}${only ? ` (${only})` : ''}`);
+if (monacoOnly) {
+    await generateMonacoMaps();
+    if (failed) process.exitCode = 1;
+    else console.log('i18n: monaco cache updated');
+} else {
+    await extractLangpacks();
+    importCatalogs();
+    if (!check) await generateMonacoMaps();
+    checkProvenance();
+    if (failed) process.exitCode = 1;
+    else console.log(check ? 'i18n: OK' : 'i18n: updated');
+}

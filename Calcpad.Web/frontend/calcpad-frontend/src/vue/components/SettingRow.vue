@@ -28,8 +28,8 @@
           <button
             class="setting-row-action star"
             :class="{ active: favorite }"
-            :title="favorite ? t('Remove from Favorites') : t('Add to Favorites')"
-            :aria-label="favorite ? t('Remove from Favorites') : t('Add to Favorites')"
+            :title="favorite ? t('insert.removeFromFavorites') : t('insert.addToFavorites')"
+            :aria-label="favorite ? t('insert.removeFromFavorites') : t('insert.addToFavorites')"
             :aria-pressed="favorite"
             @click="ctx.toggleFavorite(id)"
           >{{ favorite ? '★' : '☆' }}</button>
@@ -42,7 +42,7 @@
         :keybindings="ctx.keybindings()"
         :extra-reserved="ctx.extraReserved()"
         :label-for="ctx.labelFor"
-        :hint="isToggleSetting(id) ? t('The hotkey turns this setting on and off.') : t('The hotkey opens this setting.')"
+        :hint="isToggleSetting(id) ? t('settings.theHotkeyTurnsThisSettingOnAndOff') : t('settings.theHotkeyOpensThisSetting')"
         @save="save"
         @cancel="recordingIn = null"
       />
@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, ref } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import HotkeyRecorder from './HotkeyRecorder.vue'
 import { SETTING_ROW_CONTEXT } from './setting-row-context'
 import { formatHotkey, normalizeHotkey } from '../../services/hotkeys'
@@ -96,7 +96,7 @@ const setCopyEl = (el: Element | ComponentPublicInstance | null) => {
 onBeforeUnmount(() => copyObserver?.disconnect())
 
 const hotkeyTitle = computed(() => {
-  const action = isToggleSetting(id.value) ? t('Set a hotkey to toggle this setting') : t('Set a hotkey to open this setting')
+  const action = isToggleSetting(id.value) ? t('settings.setAHotkeyToToggleThisSetting') : t('settings.setAHotkeyToOpenThisSetting')
   return hotkey.value ? `${action} (${formatHotkey(normalizeHotkey(hotkey.value) ?? hotkey.value)})` : action
 })
 

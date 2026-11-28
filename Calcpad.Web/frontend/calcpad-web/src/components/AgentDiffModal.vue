@@ -1,20 +1,20 @@
 <template>
   <div class="modal-backdrop agent-diff-backdrop">
     <div class="modal-card agent-diff-card" role="dialog" aria-modal="true">
-      <div class="modal-title">{{ review ? t('Changes since backup') : t('Proposed edit') }}: {{ title }}</div>
+      <div class="modal-title">{{ review ? t('agentDiff.changesSinceBackup') : t('agentChat.proposedEdit') }}: {{ title }}</div>
       <div v-if="summary" class="modal-message">{{ summary }}</div>
       <div v-if="review" class="agent-diff-legend">
-        <span>{{ t('Backup') }}</span><span>{{ t('Current') }}</span>
+        <span>{{ t('agentDiff.backup') }}</span><span>{{ t('agentDiff.current') }}</span>
       </div>
       <div ref="host" class="agent-diff-host"></div>
       <div v-if="review" class="modal-actions">
-        <button class="modal-btn" @click="emit('revert')">{{ t('Revert to backup') }}</button>
-        <button class="modal-btn secondary" @click="emit('keep')">{{ t('Keep changes') }}</button>
-        <button class="modal-btn secondary" @click="emit('close')">{{ t('Close') }}</button>
+        <button class="modal-btn" @click="emit('revert')">{{ t('agentChat.revertToBackup') }}</button>
+        <button class="modal-btn secondary" @click="emit('keep')">{{ t('agentChat.keepChanges') }}</button>
+        <button class="modal-btn secondary" @click="emit('close')">{{ t('common.close') }}</button>
       </div>
       <div v-else class="modal-actions">
-        <button class="modal-btn" @click="emit('resolve', true)">{{ t('Accept') }}</button>
-        <button class="modal-btn secondary" @click="emit('resolve', false)">{{ t('Reject') }}</button>
+        <button class="modal-btn" @click="emit('resolve', true)">{{ t('agentDiff.accept') }}</button>
+        <button class="modal-btn secondary" @click="emit('resolve', false)">{{ t('agentDiff.reject') }}</button>
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'calcpad-frontend/i18n'
 import * as monaco from 'monaco-editor'
 
 const props = defineProps<{ title: string; summary: string; original: string; modified: string; review?: boolean }>()

@@ -110,16 +110,25 @@
     {
       "tag": "zh",
       "label": "中文",
-      "aliases": ["zh-Hans", "zh-CN", "zh-SG", "zh-MY"],
+      "aliases": [
+        "zh-Hans",
+        "zh-CN",
+        "zh-SG",
+        "zh-MY"
+      ],
       "languageFallback": false,
-      "catalog": false,
+      "catalog": true,
       "monaco": true,
       "pack": "vscode-language-pack-zh-hans"
     },
     {
       "tag": "zh-Hant",
       "label": "繁體中文",
-      "aliases": ["zh-TW", "zh-HK", "zh-MO"],
+      "aliases": [
+        "zh-TW",
+        "zh-HK",
+        "zh-MO"
+      ],
       "languageFallback": false,
       "catalog": true,
       "monaco": true,

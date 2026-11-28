@@ -64,6 +64,10 @@ jobs:
         if: ${{ !cancelled() }}
         timeout-minutes: 10
         run: node scripts/i18n/i18n.mjs --check
+      - name: VS Code English source matches the index
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: node scripts/i18n/check-vscode-english.mjs
       - name: Test navigation history
         working-directory: .
         run: node --test tools/navigation-history.test.mjs

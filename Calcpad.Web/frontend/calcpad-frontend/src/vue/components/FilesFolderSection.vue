@@ -1,18 +1,18 @@
 <template>
   <div class="files-section" :class="{ collapsed }">
     <div class="files-header">
-      <button class="icon files-collapse-btn" @click="$emit('toggle-collapse')" :title="collapsed ? t('Expand') : t('Collapse')">
+      <button class="icon files-collapse-btn" @click="$emit('toggle-collapse')" :title="collapsed ? t('files.expand') : t('common.collapse')">
         <span class="tree-arrow" :class="{ open: !collapsed }">&#x25B6;</span>
       </button>
       <span class="files-folder-name" :title="folder">{{ folderBasename }}</span>
       <div class="files-header-actions">
-        <button class="icon" @click="$emit('refresh')" :title="t('Refresh')">
+        <button class="icon" @click="$emit('refresh')" :title="t('common.refresh')">
           <RefreshIcon />
         </button>
-        <button class="icon" @click="expandedPaths = []" :title="t('Collapse All')">
+        <button class="icon" @click="expandedPaths = []" :title="t('common.collapseAll')">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4 9h11v1H4z"/></svg>
         </button>
-        <button class="icon" @click="$emit('close')" :title="t('Close Folder')">
+        <button class="icon" @click="$emit('close')" :title="t('files.closeFolder')">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 8.707l3.646 3.647.708-.707L8.707 8l3.647-3.646-.707-.708L8 7.293 4.354 3.646l-.707.708L7.293 8l-3.647 3.646.708.708L8 8.707z"/></svg>
         </button>
       </div>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { ref, computed, watch } from 'vue'
 import type { FileNode } from '../types'
 import FileTreeNode from './FileTreeNode.vue'

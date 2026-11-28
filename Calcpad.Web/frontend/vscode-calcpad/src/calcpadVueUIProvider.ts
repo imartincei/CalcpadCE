@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { parseHeadings, DEFAULT_PDF_SETTINGS, extractPlotsFromHtml, buildZip, serializeMetadataComment, serializeSettingsDirective, hasMetadataContent, computeMetadataBlock, buildSourceDefinitionResolver, findUiDirectiveBlock, serializeUiDirective, DEFAULT_PREVIEW_SIZE_MB, DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, coerceWriteMode, coerceLogLevel, stripCpdSnippetWrapper, readFileInfo, planFileInfoEdit, sanitizeFileInfoPatch, readUiOverrides, planMetadataFooter, planUiOverridesToSource, toRangeEdits, selectionLineRange } from 'calcpad-frontend';
 import type { ParseMode, ExtractedPlot, MetadataCommentBlock, MetadataCommentData, MetadataLayout, SettingsValues, UiDirectiveData, UiControl, LineEdit, HotkeyBinding, CustomSnippet } from 'calcpad-frontend';
-import { readCustomizations, customizationExtras, CUSTOMIZATION_KEYS, buildSettingToggle } from 'calcpad-frontend';
+import { readCustomizations, customizationExtras, CUSTOMIZATION_KEYS, buildSettingToggle, en } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
 import { CalcpadInsertManager } from './calcpadInsertManager';
 import { VSCodeLogger } from './adapters';
@@ -615,7 +615,8 @@ export class CalcpadVueUIProvider implements vscode.WebviewViewProvider {
             if (toggle.message.type === 'updatePdfSettings') await this._onMessage({ type: 'getPdfSettings' });
             else void this._view.webview.postMessage(await this._buildSettingsResponse());
         }
-        vscode.window.setStatusBarMessage(`CalcpadCE: ${toggle.label} ${toggle.enabled ? 'on' : 'off'}`, 3000);
+        const label = en[toggle.label] ?? toggle.label;
+        vscode.window.setStatusBarMessage(`CalcpadCE: ${label} ${toggle.enabled ? 'on' : 'off'}`, 3000);
     }
 
     /** Opens the Insert tab's snippet editor filled in with a draft. */

@@ -109,7 +109,7 @@ export function validateHotkey(hotkey: string): string | null {
     const key = parts[parts.length - 1];
     if (/^F\d+$/.test(key)) return null;
     if (parts.some(p => p === 'Ctrl' || p === 'Alt' || p === 'Meta')) return null;
-    return 'A hotkey needs Ctrl, Alt or {meta}, or a function key';
+    return 'service.aHotkeyNeedsCtrlAltOrMetaOr';
 }
 
 /** Stored form: the platform's primary modifier becomes `Mod`, so a settings file works on any OS. */
@@ -127,14 +127,14 @@ export interface HotkeyBinding {
 
 // Fixed shortcuts that can't be rebound: desktop app commands and common editor defaults.
 const RESERVED_HOTKEY_TABLE: Array<[string, string]> = [
-    ['Mod+S', 'Save'], ['Mod+Shift+S', 'Save As'], ['Mod+O', 'Open'], ['Mod+N', 'New Tab'],
-    ['Mod+W', 'Close Tab'], ['Mod+Alt+W', 'New Window'], ['Mod+P', 'Toggle Preview'],
+    ['Mod+S', 'common.save'], ['Mod+Shift+S', 'Save As'], ['Mod+O', 'common.open'], ['Mod+N', 'common.newTab'],
+    ['Mod+W', 'menu.closeTab'], ['Mod+Alt+W', 'common.newWindow'], ['Mod+P', 'Toggle Preview'],
     ['Mod+\\', 'Split Editor'], ['Mod+,', 'Open Settings'], ['Mod+E', 'Export PDF'],
-    ['Mod+Shift+B', 'Hide the sidebar'], ['Alt+Z', 'Toggle Word Wrap'], ['Mod+D', 'Duplicate Line'],
-    ['F5', 'Run Preview'], ['F1', 'Command Palette'],
-    ['Mod+C', 'Copy'], ['Mod+X', 'Cut'], ['Mod+V', 'Paste'], ['Mod+A', 'Select All'],
-    ['Mod+Z', 'Undo'], ['Mod+Y', 'Redo'], ['Mod+Shift+Z', 'Redo'],
-    ['Mod+F', 'Find'], ['Mod+H', 'Replace'], ['Mod+G', 'Go to Line'],
+    ['Mod+Shift+B', 'app.hideTheSidebar'], ['Alt+Z', 'Toggle Word Wrap'], ['Mod+D', 'Duplicate Line'],
+    ['F5', 'editor.runPreview'], ['F1', 'Command Palette'],
+    ['Mod+C', 'common.copy'], ['Mod+X', 'common.cut'], ['Mod+V', 'common.paste'], ['Mod+A', 'Select All'],
+    ['Mod+Z', 'common.undo'], ['Mod+Y', 'common.redo'], ['Mod+Shift+Z', 'common.redo'],
+    ['Mod+F', 'common.find'], ['Mod+H', 'Replace'], ['Mod+G', 'Go to Line'],
     ['Mod+/', 'Toggle Line Comment'], ['Mod+[', 'Outdent'], ['Mod+]', 'Indent'],
     ['Mod+K', 'Chord prefix'], ['Mod+Shift+K', 'Delete Line'], ['Mod+Shift+P', 'Command Palette'],
     ['Mod+Shift+F', 'Search'], ['Mod+Shift+E', 'Explorer'], ['Mod+J', 'Toggle Panel'],

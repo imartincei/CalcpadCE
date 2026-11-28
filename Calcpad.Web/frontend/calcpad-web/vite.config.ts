@@ -16,13 +16,24 @@ interface LocaleEntry {
 
 type NlsMap = Record<string, Record<string, string>>;
 
-const monacoNlsDir = path.resolve(__dirname, 'src/editor/monaco-nls');
+const monacoNlsDir = path.resolve(__dirname, 'node_modules/.cache/calcpad-monaco-nls/maps');
+const monacoOverridesDir = path.resolve(__dirname, 'node_modules/.cache/calcpad-monaco-nls/overrides');
 const localeConfig = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, '../calcpad-frontend/src/i18n/locales.json'), 'utf8'),
 ) as { locales: LocaleEntry[] };
 
+if (!fs.existsSync(monacoNlsDir))
+    console.warn('[i18n] Monaco cache missing; run: node ../scripts/i18n/i18n.mjs --monaco-cache');
+
 function loadMonacoNls(file: string): NlsMap {
     const fullPath = path.join(monacoNlsDir, file);
+    return fs.existsSync(fullPath)
+        ? JSON.parse(fs.readFileSync(fullPath, 'utf8'))
+        : {};
+}
+
+function loadMonacoOverrides(locale: string): NlsMap {
+    const fullPath = path.join(monacoOverridesDir, `${locale}.json`);
     return fs.existsSync(fullPath)
         ? JSON.parse(fs.readFileSync(fullPath, 'utf8'))
         : {};
@@ -37,10 +48,7 @@ function mergeMonacoNls(base: NlsMap, overrides: NlsMap): NlsMap {
 const monacoNls: Record<string, NlsMap> = {};
 for (const locale of localeConfig.locales.filter(entry => entry.monaco)) {
     const base = loadMonacoNls(`${locale.tag}.json`);
-    const overrideFile = `overrides/${locale.tag}.json`;
-    monacoNls[locale.tag] = fs.existsSync(path.join(monacoNlsDir, overrideFile))
-        ? mergeMonacoNls(base, loadMonacoNls(overrideFile))
-        : base;
+    monacoNls[locale.tag] = mergeMonacoNls(base, loadMonacoOverrides(locale.tag));
 }
 
 const translatedKeys = new Set<string>();

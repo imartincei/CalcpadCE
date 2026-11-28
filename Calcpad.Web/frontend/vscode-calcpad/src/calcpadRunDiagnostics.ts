@@ -1,6 +1,10 @@
 import * as vscode from 'vscode';
-import { expandRunErrors } from 'calcpad-frontend';
+import { expandRunErrors, en, formatMessage } from 'calcpad-frontend';
 import type { CalcpadError } from 'calcpad-frontend';
+
+function localize(messageId: string | undefined, params: Record<string, string | number> | undefined, fallback: string): string {
+    return messageId ? formatMessage(en[messageId] ?? fallback, params) : fallback;
+}
 
 /** Shows each document's last-run errors in the Problems panel, beside the linter's. */
 export class CalcpadRunDiagnostics implements vscode.Disposable {
@@ -11,13 +15,15 @@ export class CalcpadRunDiagnostics implements vscode.Disposable {
         this.collection.set(uri, expandRunErrors(errors).map(err => {
             const diagnostic = new vscode.Diagnostic(
                 this.range(document, err),
-                err.code ? `[Runtime] [${err.code}] ${err.message}` : `[Runtime] ${err.message}`,
+                err.code
+                    ? `[Runtime] [${err.code}] ${localize(err.messageId, err.params, err.message)}`
+                    : `[Runtime] ${localize(err.messageId, err.params, err.message)}`,
                 vscode.DiagnosticSeverity.Error);
             diagnostic.code = err.code;
             if (err.related.length > 0) {
                 diagnostic.relatedInformation = err.related.map(r => new vscode.DiagnosticRelatedInformation(
                     new vscode.Location(uri, this.lineRange(document, r.line, -1, -1)),
-                    r.message));
+                    localize(r.messageId, r.params, r.message)));
             }
             return diagnostic;
         }));

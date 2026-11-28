@@ -6,14 +6,19 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "predev": "node ../scripts/i18n/i18n.mjs --monaco-cache",
     "dev": "vite",
+    "prebuild": "node ../scripts/i18n/i18n.mjs --monaco-cache",
     "build": "vite build",
+    "prebuild:desktop": "node ../scripts/i18n/i18n.mjs --monaco-cache",
     "build:desktop": "vite build --mode desktop",
+    "prebuild:watch": "node ../scripts/i18n/i18n.mjs --monaco-cache",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "check:contrast": "node ../scripts/check-contrast.mjs",
     "i18n": "node ../scripts/i18n/i18n.mjs",
-    "i18n:check": "node ../scripts/i18n/i18n.mjs --check"
+    "i18n:check": "node ../scripts/i18n/i18n.mjs --check",
+    "i18n:check-vscode": "node ../scripts/i18n/check-vscode-english.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

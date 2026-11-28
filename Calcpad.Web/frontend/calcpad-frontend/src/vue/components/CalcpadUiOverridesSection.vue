@@ -1,24 +1,24 @@
 <template>
   <div ref="root" class="ui-overrides-section">
-    <p v-if="!hasDocument" class="note">{{ t('No document is open.') }}</p>
-    <p v-else-if="!rows.length && !dirty" class="note">{{ t('No saved #UI values. Values entered into the input form are saved here, at the end of the file.') }}</p>
+    <p v-if="!hasDocument" class="note">{{ t('fileInfo.noDocumentIsOpen') }}</p>
+    <p v-else-if="!rows.length && !dirty" class="note">{{ t('uiOverrides.noSavedHashUiValuesValuesEnteredInto') }}</p>
 
     <template v-else>
-      <p class="note">{{ t('Values entered into the input form. Click a name to go to the #UI line that declares it.') }}</p>
-      <p v-if="!uiControlsResolved" class="note">{{ t('Checking which controls still exist…') }}</p>
+      <p class="note">{{ t('uiOverrides.valuesEnteredIntoTheInputFormClickA') }}</p>
+      <p v-if="!uiControlsResolved" class="note">{{ t('uiOverrides.checkingWhichControlsStillExistEllipsis') }}</p>
       <p v-else-if="unusedRows.length" class="warning">
         {{ unusedRows.length }} value{{ unusedRows.length === 1 ? '' : 's' }}
         no longer match a #UI control.
       </p>
 
-      <label class="selection-filter" :title="t('Includes values from #include lines and macro calls in the selection.')">
+      <label class="selection-filter" :title="t('uiOverrides.includesValuesFromHashIncludeLinesAndMacro')">
         <input type="checkbox" v-model="selectedLinesOnly" />
-        <span>{{ t('Selected lines only') }}</span>
+        <span>{{ t('uiOverrides.selectedLinesOnly') }}</span>
         <span v-if="selectedLinesOnly && selection" class="selection-lines">({{ selectionLabel }})</span>
       </label>
-      <p v-if="selectedLinesOnly && !selection" class="note">{{ t('Place the cursor on a line to see its values.') }}</p>
+      <p v-if="selectedLinesOnly && !selection" class="note">{{ t('uiOverrides.placeTheCursorOnALineToSee') }}</p>
       <p v-else-if="selectedLinesOnly && uiControlsResolved && !classified.some(rowMatches)" class="note">
-        {{ t('No values for the selected lines.') }}
+        {{ t('uiOverrides.noValuesForTheSelectedLines') }}
       </p>
 
       <div
@@ -37,42 +37,42 @@
         ><CalcpadSearchHighlight :text="row.key" :query="query" /></button>
         <input type="text" v-model="rows[i].value" @keyup.enter="apply" />
         <span v-if="uiControlsResolved && !row.used" class="unused-badge">unused</span>
-        <button class="icon" :title="t('Remove')" @click="rows.splice(i, 1)">✕</button>
+        <button class="icon" :title="t('common.remove')" @click="rows.splice(i, 1)">✕</button>
       </div>
 
       <p v-if="changeCount" class="pending">
-        {{ t('Apply to save {n} change, Reset to revert changes | Apply to save {n} changes, Reset to revert changes', { n: changeCount }, changeCount) }}
+        {{ t('fileInfo.applyToSaveNChangeResetToRevert', { n: changeCount }, changeCount) }}
       </p>
       <div class="actions">
-        <button :disabled="!dirty" @click="apply">{{ t('Apply') }}</button>
-        <button class="secondary" :disabled="!dirty" @click="reset">{{ t('Reset') }}</button>
+        <button :disabled="!dirty" @click="apply">{{ t('common.apply') }}</button>
+        <button class="secondary" :disabled="!dirty" @click="reset">{{ t('common.reset') }}</button>
         <button
           class="tertiary"
           :disabled="!unusedRows.length"
           :title="uiControlsResolved ? undefined : 'Waiting for the document to be rendered'"
           @click="purgeUnused"
-        >{{ t('Purge unused') }}</button>
+        >{{ t('uiOverrides.purgeUnused') }}</button>
       </div>
       <div class="actions">
         <button
           class="secondary"
           :disabled="dirty || !sourceKeys.length"
-          :title="t('Write #UI overrides into the CalcpadCE file as defaults and remove the override. Values in loops, macros, and includes are unaffected.')"
+          :title="t('uiOverrides.writeHashUiOverridesIntoTheCalcpadceFile')"
           @click="emit('override-defaults', sourceKeys)"
-        >{{ sourceKeys.length ? t('Override Defaults ({n})', { n: sourceKeys.length }) : t('Override Defaults') }}</button>
+        >{{ sourceKeys.length ? t('uiOverrides.overrideDefaultsN', { n: sourceKeys.length }) : t('uiOverrides.overrideDefaults') }}</button>
         <button
           class="secondary"
           :disabled="!shownRows.length"
-          :title="t('Reverts displayed #UI overrides back to their default values.')"
+          :title="t('uiOverrides.revertsDisplayedHashUiOverridesBackToTheir')"
           @click="revertToDefaults"
-        >{{ t('Revert to defaults') }}</button>
+        >{{ t('uiOverrides.revertToDefaults') }}</button>
       </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import { classifyUiOverrides, rowInRange } from '../../services/ui-overrides'

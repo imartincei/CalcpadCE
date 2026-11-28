@@ -4,10 +4,14 @@ import type { CalcpadError } from '../types/api';
 export interface RunErrorLink {
     line: number;
     message: string;
+    messageId?: string;
+    params?: Record<string, string | number>;
 }
 
 export interface RunErrorMark extends CalcpadError {
     related: RunErrorLink[];
+    messageId?: string;
+    params?: Record<string, string | number>;
 }
 
 /**
@@ -28,9 +32,13 @@ export function expandRunErrors(errors: CalcpadError[]): RunErrorMark[] {
         marks.push({
             ...err,
             message: `${err.message} In the body of ${inner.name} on line ${inner.sourceLine}.`,
+            messageId: 'run.errorInBody',
+            params: { message: err.message, name: inner.name, line: inner.sourceLine },
             related: frames.map((f, i) => ({
                 line: f.sourceLine,
                 message: i === 0 ? `Error in the body of ${f.name}` : `Called in the body of ${f.name}`,
+                messageId: i === 0 ? 'run.errorBody' : 'run.calledInBody',
+                params: { name: f.name },
             })),
         });
         frames.forEach((f, i) => {
@@ -47,7 +55,14 @@ export function expandRunErrors(errors: CalcpadError[]): RunErrorMark[] {
                 message: i === 0
                     ? `${err.message} At the call on line ${err.sourceLine}.`
                     : `${err.message} In ${inner.name}, at the call on line ${err.sourceLine}.`,
-                related: [{ line: err.sourceLine, message: `Call to ${outer.name}` }],
+                messageId: i === 0 ? 'run.atCall' : 'run.inAtCall',
+                params: { message: err.message, name: inner.name, line: err.sourceLine },
+                related: [{
+                    line: err.sourceLine,
+                    message: `Call to ${outer.name}`,
+                    messageId: 'run.callTo',
+                    params: { name: outer.name },
+                }],
             });
         });
     }

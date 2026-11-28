@@ -1,5 +1,5 @@
 <template>
-  <aside class="agent-panel" :aria-label="t('{name} chat', { name: providerName() })">
+  <aside class="agent-panel" :aria-label="t('agentChat.nameChat', { name: providerName() })">
     <header class="agent-header">
       <div class="agent-brand">
         <span class="agent-logo" aria-hidden="true">
@@ -14,8 +14,8 @@
         <button
           class="agent-icon-btn agent-changes-btn"
           :class="{ active: agentChat.view === 'changes' }"
-          :title="t('Changes')"
-          :aria-label="t('Changes')"
+          :title="t('agentChat.changes')"
+          :aria-label="t('agentChat.changes')"
           :aria-pressed="agentChat.view === 'changes'"
           @click="showChanges(agentChat.view !== 'changes')"
         >
@@ -25,27 +25,27 @@
         <button
           class="agent-icon-btn"
           :class="{ active: agentChat.view === 'history' }"
-          :title="t('Conversation history')"
-          :aria-label="t('Conversation history')"
+          :title="t('agentChat.conversationHistory')"
+          :aria-label="t('agentChat.conversationHistory')"
           :aria-pressed="agentChat.view === 'history'"
           @click="showHistory(agentChat.view !== 'history')"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 1-6.1 8.73.75.75 0 1 1 1.4-.52A5 5 0 1 0 4.1 4.5h1.65a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 0 1 1.5 0v1.42A6.48 6.48 0 0 1 8 1.5m0 3a.75.75 0 0 1 .75.75v2.44l1.78 1.78a.75.75 0 1 1-1.06 1.06l-2-2A.75.75 0 0 1 7.25 8V5.25A.75.75 0 0 1 8 4.5"/></svg>
         </button>
-        <button class="agent-icon-btn" :title="t('New conversation')" :aria-label="t('New conversation')" @click="newConversation">
+        <button class="agent-icon-btn" :title="t('agentChat.newConversation')" :aria-label="t('agentChat.newConversation')" @click="newConversation">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2a.75.75 0 0 1 .75.75v4.5h4.5a.75.75 0 0 1 0 1.5h-4.5v4.5a.75.75 0 0 1-1.5 0v-4.5h-4.5a.75.75 0 0 1 0-1.5h4.5v-4.5A.75.75 0 0 1 8 2"/></svg>
         </button>
         <button
           class="agent-icon-btn"
           :class="{ active: showSettings }"
-          :title="t('Settings')"
-          :aria-label="t('Settings')"
+          :title="t('common.settings')"
+          :aria-label="t('common.settings')"
           :aria-expanded="showSettings"
           @click="toggleSettings"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4.25h6.1a2 2 0 0 1 3.8 0H14v1.5h-2.1a2 2 0 0 1-3.8 0H2zm8 1.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M2 10.25h2.1a2 2 0 0 1 3.8 0H14v1.5H7.9a2 2 0 0 1-3.8 0H2zm4 1.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5"/></svg>
         </button>
-        <button class="agent-icon-btn" :title="t('Close')" :aria-label="t('Close')" @click="emit('close')">
+        <button class="agent-icon-btn" :title="t('common.close')" :aria-label="t('common.close')" @click="emit('close')">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06"/></svg>
         </button>
       </div>
@@ -59,7 +59,7 @@
         :class="{ active: tab.id === conversation.id }"
         role="tab"
         :aria-selected="tab.id === conversation.id"
-        :title="tab.title || t('New conversation')"
+        :title="tab.title || t('agentChat.newConversation')"
         @click="activateConversation(tab.id)"
         @mousedown.middle.prevent="closeConversation(tab.id)"
       >
@@ -68,8 +68,8 @@
           :class="{ busy: tab.status === 'busy' || tab.status === 'starting', attention: needsAttention(tab) }"
           aria-hidden="true"
         ></span>
-        <span class="agent-tab-title">{{ tab.title || t('New conversation') }}</span>
-        <button class="agent-tab-close" :title="t('Close')" :aria-label="t('Close')" @click.stop="closeConversation(tab.id)">
+        <span class="agent-tab-title">{{ tab.title || t('agentChat.newConversation') }}</span>
+        <button class="agent-tab-close" :title="t('common.close')" :aria-label="t('common.close')" @click.stop="closeConversation(tab.id)">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.47 4.47a.75.75 0 0 1 1.06 0L8 6.94l2.47-2.47a.75.75 0 1 1 1.06 1.06L9.06 8l2.47 2.47a.75.75 0 1 1-1.06 1.06L8 9.06l-2.47 2.47a.75.75 0 0 1-1.06-1.06L6.94 8 4.47 5.53a.75.75 0 0 1 0-1.06"/></svg>
         </button>
       </div>
@@ -77,49 +77,49 @@
 
     <form v-if="showSettings" class="agent-settings" @submit.prevent="applySettings">
       <label class="agent-field">
-        <span class="agent-field-label">{{ t('Agent') }}</span>
+        <span class="agent-field-label">{{ t('agentChat.agent') }}</span>
         <select :value="draftSettings.harness" class="agent-select" @change="onDraftHarness">
           <option v-for="harness in agentChat.harnesses" :key="harness.id" :value="harness.id">{{ harnessLabel(harness) }}</option>
         </select>
       </label>
       <label class="agent-field">
-        <span class="agent-field-label">{{ t('{name} executable', { name: draftHarness?.name ?? '' }) }}</span>
+        <span class="agent-field-label">{{ t('agentChat.nameExecutable', { name: draftHarness?.name ?? '' }) }}</span>
         <input
           v-model="draftSettings.executable"
           type="text"
           spellcheck="false"
-          :placeholder="draftHarness?.installed && !draftSettings.executable ? draftHarness.path ?? '' : t('Found automatically')"
+          :placeholder="draftHarness?.installed && !draftSettings.executable ? draftHarness.path ?? '' : t('agentChat.foundAutomatically')"
         />
         <span v-if="draftHarness && !draftHarness.installed" class="agent-field-hint">
-          {{ t('Not found. Install it ({hint}) or enter the full path to its executable.', { hint: draftHarness.installHint }) }}
+          {{ t('agentChat.notFoundInstallItHintOrEnterThe', { hint: draftHarness.installHint }) }}
         </span>
       </label>
       <label v-if="draftModelOptions.length > 1" class="agent-field">
-        <span class="agent-field-label">{{ t('Model') }}</span>
+        <span class="agent-field-label">{{ t('agentChat.model') }}</span>
         <select v-model="draftSettings.model" class="agent-select">
           <option v-for="option in draftModelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
         </select>
       </label>
       <div class="agent-actions">
-        <button type="submit" class="agent-btn primary">{{ t('Save') }}</button>
-        <button type="button" class="agent-btn ghost" @click="showSettings = false">{{ t('Cancel') }}</button>
+        <button type="submit" class="agent-btn primary">{{ t('common.save') }}</button>
+        <button type="button" class="agent-btn ghost" @click="showSettings = false">{{ t('common.cancel') }}</button>
       </div>
     </form>
 
     <div v-if="agentChat.view === 'changes'" class="agent-history agent-changes">
       <div class="agent-changes-head">
-        <span class="agent-history-title">{{ t('Changes in open conversations') }}</span>
+        <span class="agent-history-title">{{ t('agentChat.changesInOpenConversations') }}</span>
         <template v-if="changeRows.length">
-          <button class="agent-icon-btn" :title="t('Revert all')" :aria-label="t('Revert all')" @click="revertAllChanges()">
+          <button class="agent-icon-btn" :title="t('agentChat.revertAll')" :aria-label="t('agentChat.revertAll')" @click="revertAllChanges()">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.53 2.47a.75.75 0 0 1 0 1.06L4.06 5H9.5a4.5 4.5 0 1 1 0 9H6a.75.75 0 0 1 0-1.5h3.5a3 3 0 1 0 0-6H4.06l1.47 1.47a.75.75 0 0 1-1.06 1.06L1.72 6.28a.75.75 0 0 1 0-1.06l2.75-2.75a.75.75 0 0 1 1.06 0"/></svg>
           </button>
-          <button class="agent-icon-btn" :title="t('Keep all')" :aria-label="t('Keep all')" @click="keepAllChanges()">
+          <button class="agent-icon-btn" :title="t('agentChat.keepAll')" :aria-label="t('agentChat.keepAll')" @click="keepAllChanges()">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0"/></svg>
           </button>
         </template>
       </div>
       <div v-if="!changeRows.length" class="agent-empty">
-        <p>{{ t('No open conversation has changed a worksheet. Each worksheet is backed up before its first change.') }}</p>
+        <p>{{ t('agentChat.noOpenConversationHasChangedAWorksheet') }}</p>
       </div>
       <div
         v-for="change in changeRows"
@@ -128,24 +128,24 @@
         :class="{ closed: change.current === null }"
         role="button"
         tabindex="0"
-        :title="change.current === null ? t('Closed; reverting reopens it') : t('Show changes')"
+        :title="change.current === null ? t('agentChat.closedRevertingReopensIt') : t('agentChat.showChanges')"
         @click="openChangeDiff(change.key)"
         @keydown.enter="openChangeDiff(change.key)"
       >
         <svg class="agent-change-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.3L13 5.2v8.3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1m.25 1.25v10.5h7.5V6H8.5V2.75zM9.75 3.3v1.45h1.45z"/></svg>
         <div class="agent-history-text">
           <span class="agent-history-name">{{ baseName(change.path ?? change.title) }}</span>
-          <span class="agent-history-meta" :title="change.path ?? ''">{{ change.path ? dirName(change.path) : t('Untitled') }}</span>
+          <span class="agent-history-meta" :title="change.path ?? ''">{{ change.path ? dirName(change.path) : t('agentChat.untitled') }}</span>
         </div>
-        <span v-if="change.current === null" class="agent-change-stat">{{ t('Closed') }}</span>
+        <span v-if="change.current === null" class="agent-change-stat">{{ t('agentChat.closed') }}</span>
         <span v-else class="agent-change-stat">
           <span class="added">+{{ change.added }}</span>
           <span class="removed">−{{ change.removed }}</span>
         </span>
         <button
           class="agent-icon-btn agent-history-delete"
-          :title="change.locked ? t('Running in another window') : t('Revert to backup')"
-          :aria-label="t('Revert to backup')"
+          :title="change.locked ? t('agentChat.runningInAnotherWindow') : t('agentChat.revertToBackup')"
+          :aria-label="t('agentChat.revertToBackup')"
           :disabled="change.locked || (change.current === null && !change.path)"
           @click.stop="revertChange(change.key)"
         >
@@ -153,8 +153,8 @@
         </button>
         <button
           class="agent-icon-btn agent-history-delete"
-          :title="change.locked ? t('Running in another window') : t('Keep changes')"
-          :aria-label="t('Keep changes')"
+          :title="change.locked ? t('agentChat.runningInAnotherWindow') : t('agentChat.keepChanges')"
+          :aria-label="t('agentChat.keepChanges')"
           :disabled="change.locked"
           @click.stop="keepChange(change.key)"
         >
@@ -164,9 +164,9 @@
     </div>
 
     <div v-else-if="agentChat.view === 'history'" class="agent-history">
-      <div class="agent-history-title">{{ t('Conversation history') }}</div>
+      <div class="agent-history-title">{{ t('agentChat.conversationHistory') }}</div>
       <div v-if="!agentChat.history.length" class="agent-empty">
-        <p>{{ t('No saved conversations yet.') }}</p>
+        <p>{{ t('agentChat.noSavedConversationsYet') }}</p>
       </div>
       <div
         v-for="entry in agentChat.history"
@@ -179,15 +179,15 @@
         @keydown.enter="openFromHistory(entry.id)"
       >
         <div class="agent-history-text">
-          <span class="agent-history-name">{{ entry.title || t('Untitled conversation') }}</span>
+          <span class="agent-history-name">{{ entry.title || t('agentChat.untitledConversation') }}</span>
           <span class="agent-history-meta">
-            {{ relativeTime(entry.updatedAt) }}<template v-if="isOpen(entry.id)"> · {{ t('Open') }}</template>
+            {{ relativeTime(entry.updatedAt) }}<template v-if="isOpen(entry.id)"> · {{ t('common.open') }}</template>
           </span>
         </div>
         <button
           class="agent-icon-btn agent-history-delete"
-          :title="t('Delete')"
-          :aria-label="t('Delete')"
+          :title="t('common.delete')"
+          :aria-label="t('common.delete')"
           @click.stop="deleteFromHistory(entry.id)"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 1.75h3a.75.75 0 0 1 .75.75V3h2.5a.75.75 0 0 1 0 1.5h-.4l-.6 8.4A1.75 1.75 0 0 1 10 14.5H6a1.75 1.75 0 0 1-1.75-1.6l-.6-8.4h-.4a.75.75 0 0 1 0-1.5h2.5v-.5a.75.75 0 0 1 .75-.75m-1.35 2.75.58 8.3c.01.13.12.2.25.2h4.04c.13 0 .24-.07.25-.2l.58-8.3z"/></svg>
@@ -202,10 +202,10 @@
           <svg viewBox="0 0 16 16"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
         </span>
         <template v-if="harness && !harness.installed">
-          <p>{{ t('{name} was not found. Install it ({hint}), or set the path to its executable.', { name: harness.name, hint: harness.installHint }) }}</p>
-          <button class="agent-btn" @click="openSettings">{{ t('Set path') }}</button>
+          <p>{{ t('agentChat.nameWasNotFoundInstallItHintOr', { name: harness.name, hint: harness.installHint }) }}</p>
+          <button class="agent-btn" @click="openSettings">{{ t('agentChat.setPath') }}</button>
         </template>
-        <p v-else>{{ t('Ask {name} about your open worksheets. It can read them, check their errors, and propose edits for you to review.', { name: assistantName() }) }}</p>
+        <p v-else>{{ t('agentChat.askNameAboutYourOpenWorksheetsItCan', { name: assistantName() }) }}</p>
       </div>
 
       <template v-for="(item, index) in conversation.items" :key="conversation.id + ':' + index">
@@ -237,7 +237,7 @@
         <div v-else-if="item.kind === 'question'" class="agent-card agent-question" :class="item.state">
           <div class="agent-card-head">
             <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13m0 1.25a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5m0 7.5a.85.85 0 1 1 0 1.7.85.85 0 0 1 0-1.7M8 4.25c1.3 0 2.25.86 2.25 2 0 .9-.55 1.38-1.03 1.73-.4.3-.47.4-.47.62v.15a.75.75 0 0 1-1.5 0V8.6c0-.98.6-1.45 1.07-1.8.37-.27.43-.36.43-.55 0-.3-.28-.5-.75-.5-.4 0-.68.17-.85.5a.75.75 0 1 1-1.33-.68c.42-.83 1.2-1.32 2.18-1.32"/></svg>
-            <span class="agent-card-title">{{ item.questions.length > 1 ? t('Questions') : t('Question') }}</span>
+            <span class="agent-card-title">{{ item.questions.length > 1 ? t('agentChat.questions') : t('agentChat.question') }}</span>
           </div>
           <div v-for="(q, qi) in item.questions" :key="qi" class="agent-question-block">
             <div class="agent-question-text">
@@ -263,28 +263,28 @@
                 v-model="questionDraft(item).other[qi]"
                 class="agent-question-other"
                 type="text"
-                :placeholder="q.placeholder || (q.options.length ? t('Other answer…') : t('Your answer…'))"
+                :placeholder="q.placeholder || (q.options.length ? t('agentChat.otherAnswerEllipsis') : t('agentChat.yourAnswerEllipsis'))"
                 @keydown.enter.prevent="canSubmit(item) && submitQuestions(item)"
               />
             </template>
             <div v-else-if="item.answers?.[q.question]" class="agent-question-answer">{{ item.answers[q.question] }}</div>
           </div>
           <div v-if="item.state === 'pending'" class="agent-actions">
-            <button class="agent-btn primary" :disabled="!canSubmit(item)" @click="submitQuestions(item)">{{ t('Submit') }}</button>
-            <button class="agent-btn ghost" @click="answerQuestions(conversation.id, item.requestId, null)">{{ t('Skip') }}</button>
+            <button class="agent-btn primary" :disabled="!canSubmit(item)" @click="submitQuestions(item)">{{ t('agentChat.submit') }}</button>
+            <button class="agent-btn ghost" @click="answerQuestions(conversation.id, item.requestId, null)">{{ t('agentChat.skip') }}</button>
           </div>
-          <div v-else-if="item.state !== 'allowed'" class="agent-card-state">{{ item.state === 'denied' ? t('Skipped') : t('No longer pending') }}</div>
+          <div v-else-if="item.state !== 'allowed'" class="agent-card-state">{{ item.state === 'denied' ? t('agentChat.skipped') : t('agentChat.noLongerPending') }}</div>
         </div>
 
         <div v-else-if="item.kind === 'approval' && isPlanTool(item.toolName)" class="agent-card agent-plan" :class="item.state">
           <div class="agent-card-head">
             <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 1.5h5a1 1 0 0 1 1 1V3h1a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h1v-.5a1 1 0 0 1 1-1m.25 1.25v1h4.5v-1zM4.25 4.25v9h7.5v-9h-.25V5a.75.75 0 0 1-.75.75h-5.5A.75.75 0 0 1 4.5 5v-.75zm6.28 2.97a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1.5-1.5a.75.75 0 1 1 1.06-1.06l.97.97 1.97-1.97a.75.75 0 0 1 1.06 0"/></svg>
-            <span class="agent-card-title">{{ t('Plan') }}</span>
+            <span class="agent-card-title">{{ t('agentChat.plan') }}</span>
           </div>
           <div class="agent-plan-body agent-msg assistant" v-html="renderChatMarkdown(planText(item.input))"></div>
           <div v-if="item.state === 'pending'" class="agent-actions">
-            <button class="agent-btn primary" @click="approvePlan(conversation.id, item.requestId)">{{ t('Approve plan') }}</button>
-            <button class="agent-btn ghost" @click="keepPlanning(conversation.id, item.requestId)">{{ t('Keep planning') }}</button>
+            <button class="agent-btn primary" @click="approvePlan(conversation.id, item.requestId)">{{ t('agentChat.approvePlan') }}</button>
+            <button class="agent-btn ghost" @click="keepPlanning(conversation.id, item.requestId)">{{ t('agentChat.keepPlanning') }}</button>
           </div>
           <div v-else class="agent-card-state">{{ planStateLabel(item.state) }}</div>
         </div>
@@ -292,14 +292,14 @@
         <div v-else-if="item.kind === 'approval'" class="agent-card" :class="item.state">
           <div class="agent-card-head">
             <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
-            <span class="agent-card-title">{{ t('Allow this action?') }}</span>
+            <span class="agent-card-title">{{ t('agentChat.allowThisActionQuestion') }}</span>
             <span class="agent-chip">{{ toolLabel(item.toolName) }}</span>
           </div>
           <pre class="agent-card-code">{{ formatInput(item.input) }}</pre>
           <div v-if="item.state === 'pending'" class="agent-actions">
-            <button class="agent-btn primary" @click="answerApproval(conversation.id, item.requestId, true)">{{ t('Allow') }}</button>
-            <button class="agent-btn" @click="answerApproval(conversation.id, item.requestId, true, true)">{{ t('Allow for this conversation') }}</button>
-            <button class="agent-btn ghost" @click="answerApproval(conversation.id, item.requestId, false)">{{ t('Deny') }}</button>
+            <button class="agent-btn primary" @click="answerApproval(conversation.id, item.requestId, true)">{{ t('agentChat.allow') }}</button>
+            <button class="agent-btn" @click="answerApproval(conversation.id, item.requestId, true, true)">{{ t('agentChat.allowForThisConversation') }}</button>
+            <button class="agent-btn ghost" @click="answerApproval(conversation.id, item.requestId, false)">{{ t('agentChat.deny') }}</button>
           </div>
           <div v-else class="agent-card-state">{{ stateLabel(item.state, false) }}</div>
         </div>
@@ -307,15 +307,15 @@
         <div v-else-if="item.kind === 'edit'" class="agent-card" :class="item.state">
           <div class="agent-card-head">
             <svg class="agent-card-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.3L13 5.2v8.3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1m.25 1.25v10.5h7.5V6H8.5V2.75zM9.75 3.3v1.45h1.45z"/></svg>
-            <span class="agent-card-title">{{ t('Proposed edit') }}</span>
+            <span class="agent-card-title">{{ t('agentChat.proposedEdit') }}</span>
             <span class="agent-chip" :title="item.title">{{ baseName(item.title) }}</span>
           </div>
           <div v-if="item.summary" class="agent-card-summary">{{ item.summary }}</div>
           <div class="agent-card-state">
-            <template v-if="item.state === 'pending'">{{ t('Review the diff to accept or reject it.') }}</template>
+            <template v-if="item.state === 'pending'">{{ t('agentChat.reviewTheDiffToAcceptOrRejectIt') }}</template>
             <template v-else-if="item.auto">
-              {{ t('Applied automatically') }} ·
-              <a href="#" class="agent-link" @click.prevent="showChanges(true)">{{ t('View changes') }}</a>
+              {{ t('agentChat.appliedAutomatically') }} ·
+              <a href="#" class="agent-link" @click.prevent="showChanges(true)">{{ t('agentChat.viewChanges') }}</a>
             </template>
             <template v-else>{{ stateLabel(item.state, true) }}</template>
           </div>
@@ -326,18 +326,18 @@
 
       <div v-if="conversation.status === 'starting' || (conversation.status === 'busy' && !isStreaming)" class="agent-thinking">
         <span class="agent-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        {{ conversation.status === 'starting' ? t('Starting {name}…', { name: providerName() }) : t('Working…') }}
+        {{ conversation.status === 'starting' ? t('agentChat.startingNameEllipsis', { name: providerName() }) : t('agentChat.workingEllipsis') }}
       </div>
     </div>
 
     <div class="agent-composer-wrap">
       <div v-if="elsewhere" class="agent-plan-banner">
-        <span class="agent-plan-banner-text">{{ t('Running in another window. You can continue here when it finishes.') }}</span>
+        <span class="agent-plan-banner-text">{{ t('agentChat.runningInAnotherWindowYouCanContinue') }}</span>
       </div>
       <div v-if="currentMode.edits === 'blocked'" class="agent-plan-banner">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
-        <span class="agent-plan-banner-text">{{ t('Plan mode: {name} can read and plan, but not change anything.', { name: assistantName() }) }}</span>
-        <button class="agent-btn ghost" @click="exitPlanMode">{{ t('Exit plan mode') }}</button>
+        <span class="agent-plan-banner-text">{{ t('agentChat.planModeNameCanReadAndPlanBut', { name: assistantName() }) }}</span>
+        <button class="agent-btn ghost" @click="exitPlanMode">{{ t('agentChat.exitPlanMode') }}</button>
       </div>
       <div class="agent-composer">
         <textarea
@@ -345,8 +345,8 @@
           v-model="draft"
           rows="1"
           :disabled="elsewhere"
-          :placeholder="t('Message {name}…', { name: assistantName() })"
-          :title="t('Enter to send · Shift+Enter for a new line')"
+          :placeholder="t('agentChat.messageNameEllipsis', { name: assistantName() })"
+          :title="t('agentChat.enterToSendShiftEnterForANew')"
           @input="autoSize"
           @keydown.enter.exact.prevent="submit"
           @keydown.shift.tab.prevent="cyclePermissionMode"
@@ -355,8 +355,8 @@
           v-if="isWorking"
           class="agent-send stop"
           :disabled="elsewhere"
-          :title="t('Stop')"
-          :aria-label="t('Stop')"
+          :title="t('agentChat.stop')"
+          :aria-label="t('agentChat.stop')"
           @click="interrupt"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="1.5"/></svg>
@@ -365,26 +365,26 @@
           v-else
           class="agent-send"
           :disabled="!draft.trim()"
-          :title="t('Send')"
-          :aria-label="t('Send')"
+          :title="t('agentChat.send')"
+          :aria-label="t('agentChat.send')"
           @click="submit"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5a.75.75 0 0 1 .53.22l4 4a.75.75 0 1 1-1.06 1.06L8.75 5.06v7.69a.75.75 0 0 1-1.5 0V5.06L4.53 7.78a.75.75 0 0 1-1.06-1.06l4-4A.75.75 0 0 1 8 2.5"/></svg>
         </button>
       </div>
       <div class="agent-composer-footer">
-        <label class="agent-model-picker" :title="t('Agent')">
+        <label class="agent-model-picker" :title="t('agentChat.agent')">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1m.25 1.25v7.5h10.5v-7.5zm1.72 1.47a.75.75 0 0 1 1.06 0l1.75 1.75a.75.75 0 0 1 0 1.06l-1.75 1.75a.75.75 0 1 1-1.06-1.06L5.69 8 4.47 6.78a.75.75 0 0 1 0-1.06M8 9.25h3a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1 0-1.5"/></svg>
           <span class="agent-picker-label">{{ providerName() }}</span>
-          <select :value="conversation.provider" :aria-label="t('Agent')" @change="onHarnessPicked">
+          <select :value="conversation.provider" :aria-label="t('agentChat.agent')" @change="onHarnessPicked">
             <option v-for="h in agentChat.harnesses" :key="h.id" :value="h.id">{{ harnessLabel(h) }}</option>
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
         </label>
-        <label v-if="modelOptions.length > 1" class="agent-model-picker agent-model-name" :title="t('Model') + ': ' + currentModelLabel">
+        <label v-if="modelOptions.length > 1" class="agent-model-picker agent-model-name" :title="t('agentChat.model') + ': ' + currentModelLabel">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.25c.45 3.3 2.2 5.4 6 6.25-3.8.85-5.55 2.95-6 6.25-.45-3.3-2.2-5.4-6-6.25 3.8-.85 5.55-2.95 6-6.25M12.25.5c.25 1.75 1.05 2.75 3 3.25-1.95.5-2.75 1.5-3 3.25-.25-1.75-1.05-2.75-3-3.25 1.95-.5 2.75-1.5 3-3.25"/></svg>
           <span class="agent-picker-label">{{ currentModelLabel }}</span>
-          <select :value="conversation.model" :aria-label="t('Model')" @change="onModelPicked">
+          <select :value="conversation.model" :aria-label="t('agentChat.model')" @change="onModelPicked">
             <option v-for="option in modelOptions" :key="option.value" :value="option.value">{{ modelLabel(option) }}</option>
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
@@ -392,7 +392,7 @@
         <label v-if="permissionModes().length > 1" class="agent-model-picker agent-mode-picker" :class="'edits-' + currentMode.edits" :title="modeHint + ' (Shift+Tab)'">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 2.5 3v4.2c0 3.3 2.3 6.3 5.5 7.3 3.2-1 5.5-4 5.5-7.3V3zm4.25 6.2c0 2.6-1.8 5-4.25 5.9-2.45-.9-4.25-3.3-4.25-5.9V3.9L8 2.33l4.25 1.57z"/></svg>
           <span class="agent-picker-label">{{ t(currentMode.label) }}</span>
-          <select :value="conversation.permissionMode" :aria-label="t('Permission mode')" @change="onModePicked">
+          <select :value="conversation.permissionMode" :aria-label="t('agentChat.permissionMode')" @change="onModePicked">
             <option v-for="mode in permissionModes()" :key="mode.value" :value="mode.value">{{ t(mode.label) }}</option>
           </select>
           <svg class="agent-model-caret" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
@@ -405,7 +405,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'calcpad-frontend/i18n'
 import {
   activateConversation,
   activeConversation,
@@ -489,7 +489,7 @@ const draftModelOptions = computed(() => withCurrent(providerModels(draftHarness
 const subtitle = computed(() => [conversation.value.resolvedModel, conversation.value.version && `v${conversation.value.version}`].filter(Boolean).join(' · '))
 
 function modelLabel(option: { value: string; label: string }): string {
-  return option.value === '' ? t('Default') : option.label
+  return option.value === '' ? t('agentChat.default') : option.label
 }
 
 const currentMode = computed(() => modeInfo(conversation.value.permissionMode))
@@ -531,9 +531,9 @@ function onModelPicked(event: Event): void {
 }
 
 function stateLabel(state: ApprovalState, isEdit: boolean): string {
-  if (state === 'expired') return t('No longer pending')
-  if (state === 'allowed') return isEdit ? t('Accepted') : t('Allowed')
-  return isEdit ? t('Rejected') : t('Denied')
+  if (state === 'expired') return t('agentChat.noLongerPending')
+  if (state === 'allowed') return isEdit ? t('agentChat.accepted') : t('agentChat.allowed')
+  return isEdit ? t('agentChat.rejected') : t('agentChat.denied')
 }
 
 function isOpen(id: string): boolean {
@@ -597,7 +597,7 @@ function applySettings(): void {
 }
 
 function harnessLabel(h: HarnessInfo): string {
-  return h.installed ? h.name : t('{name} (not found)', { name: h.name })
+  return h.installed ? h.name : t('agentChat.nameNotFound', { name: h.name })
 }
 
 function onHarnessPicked(event: Event): void {
@@ -655,17 +655,17 @@ function planText(input: unknown): string {
 }
 
 function planStateLabel(state: ApprovalState): string {
-  if (state === 'allowed') return t('Plan approved')
-  if (state === 'denied') return t('Kept planning')
-  return t('No longer pending')
+  if (state === 'allowed') return t('agentChat.planApproved')
+  if (state === 'denied') return t('agentChat.keptPlanning')
+  return t('agentChat.noLongerPending')
 }
 
 function toolLabel(name: string): string {
-  if (isPlanTool(name)) return t('Plan')
-  if (name === 'TodoWrite') return t('Todos')
-  if (name === 'Task' || name === 'Agent') return t('Subagent')
-  if (name === 'AskUserQuestion') return t('Question')
-  if (name === 'EnterPlanMode') return t('Enter plan mode')
+  if (isPlanTool(name)) return t('agentChat.plan')
+  if (name === 'TodoWrite') return t('agentChat.todos')
+  if (name === 'Task' || name === 'Agent') return t('agentChat.subagent')
+  if (name === 'AskUserQuestion') return t('agentChat.question')
+  if (name === 'EnterPlanMode') return t('agentChat.enterPlanMode')
   return name.replace(/^mcp__calcpad__/, '').replace(/^mcp__([^_]+)__/, '$1: ')
 }
 
@@ -673,7 +673,7 @@ function toolDetail(input: unknown): string {
   if (!input || typeof input !== 'object') return ''
   const o = input as Record<string, unknown>
   const list = todos(input)
-  if (list) return t('{done} of {total} done', { done: list.filter(td => td.status === 'completed').length, total: list.length })
+  if (list) return t('agentChat.doneOfTotalDone', { done: list.filter(td => td.status === 'completed').length, total: list.length })
   const value = o.command ?? o.file_path ?? o.filePath ?? o.path ?? o.pattern ?? o.url ?? o.query ?? o.description ?? o.summary
   return typeof value === 'string' ? value.split('\n')[0] : ''
 }

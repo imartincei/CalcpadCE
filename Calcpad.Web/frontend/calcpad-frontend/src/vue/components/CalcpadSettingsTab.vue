@@ -4,7 +4,7 @@
       <CalcpadSearchField
         v-model="searchQuery"
         class="settings-search"
-        :placeholder="t('Search settings...')"
+        :placeholder="t('settings.searchSettingsEllipsis')"
       />
       <CollapseAllButton v-if="!searchActive" :expand="allCollapsed" @click="setAll(!allCollapsed)" />
     </div>
@@ -13,10 +13,10 @@
       <section v-show="favoritesVisible" class="settings-section favorites-section">
         <h3 class="section-header" @click="toggle('favorites')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('favorites') }">&#x25BC;</span>
-          <span class="favorites-star">★</span> {{ t('Favorites') }}
+          <span class="favorites-star">★</span> {{ t('insert.favorites') }}
         </h3>
         <div v-show="bodyVisible('favorites')" class="section-body">
-          <p v-if="favoriteSettings.length === 0" class="favorites-empty">{{ t('Star a setting to pin it here.') }}</p>
+          <p v-if="favoriteSettings.length === 0" class="favorites-empty">{{ t('settings.starASettingToPinItHere') }}</p>
           <div v-for="id in favoriteSettings" :id="favoriteSlotId(id)" :key="id"></div>
         </div>
       </section>
@@ -24,11 +24,11 @@
       <section v-show="sectionVisible('language')" class="settings-section">
         <h3 class="section-header" @click="toggle('language')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('language') }">&#x25BC;</span>
-          {{ t('Language') }}
+          {{ t('settings.language') }}
         </h3>
         <div v-show="bodyVisible('language')" class="section-body">
           <SettingRow section="language" row="uiLanguage">
-            <label for="uiLanguage">{{ t('Language:') }}</label>
+            <label for="uiLanguage">{{ t('settings.languageLabel') }}</label>
             <select id="uiLanguage" v-model="localeSetting" @change="changeLocale">
               <option v-for="opt in LOCALE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.translatable ? tt(opt.label) : opt.label }}</option>
             </select>
@@ -38,7 +38,7 @@
       <section v-show="sectionVisible('math')" class="settings-section">
         <h3 class="section-header" @click="toggle('math')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('math') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Math Settings')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.mathSettings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('math')" class="section-body">
           <SettingRow v-for="spec in MATH_KEYS" :key="spec.key" section="math" :row="spec.key">
@@ -91,7 +91,7 @@
       <section v-show="sectionVisible('plot')" class="settings-section">
         <h3 class="section-header" @click="toggle('plot')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('plot') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Plot Settings')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.plotSettings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('plot')" class="section-body">
           <SettingRow v-for="spec in PLOT_KEYS_A" :key="spec.key" section="plot" :row="spec.key">
@@ -104,7 +104,7 @@
 
           <SettingRow section="plot" row="screenScale">
             <label for="screenScaleFactor">
-              <CalcpadSearchHighlight :text="t('Screen Scale Factor:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.screenScaleFactorLabel')" :query="query" />
             </label>
             <input
               id="screenScaleFactor"
@@ -148,7 +148,7 @@
 
           <SettingRow section="plot" row="lightDirection">
             <label for="lightDirection">
-              <CalcpadSearchHighlight :text="t('Light Direction:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.lightDirectionLabel')" :query="query" />
             </label>
             <select
               id="lightDirection"
@@ -188,21 +188,21 @@
       <section v-show="sectionVisible('units')" class="settings-section">
         <h3 class="section-header" @click="toggle('units')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('units') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Units')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.units')" :query="query" />
         </h3>
         <div v-show="bodyVisible('units')" class="section-body">
           <SettingRow section="units" row="isUs">
             <label for="nonMetricUnits">
-              <CalcpadSearchHighlight :text="t('Non-Metric Units:')" :query="query" />
-              <span class="setting-info" :title="t(`Selects US or UK definitions for bare unit names that differ between the two systems (gal, ton, cwt, pt, qt, bbl, tonf, therm, etc.).`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.nonMetricUnitsLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.selectsUsOrUkDefinitionsForBareUnit')">ⓘ</span>
             </label>
             <select
               id="nonMetricUnits"
               v-model="localSettings.isUs"
               @change="updateSettings"
             >
-              <option :value="false">{{ t('UK (Imperial)') }}</option>
-              <option :value="true">{{ t('US Customary') }}</option>
+              <option :value="false">{{ t('settings.ukImperial') }}</option>
+              <option :value="true">{{ t('settings.usCustomary') }}</option>
             </select>
           </SettingRow>
         </div>
@@ -211,7 +211,7 @@
       <section v-show="sectionVisible('pdf')" class="settings-section">
         <h3 class="section-header" @click="toggle('pdf')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('pdf') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('PDF Export')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.pdfExport')" :query="query" />
         </h3>
         <div v-show="bodyVisible('pdf')" class="section-body">
           <SettingRow v-for="spec in pdfKeys" :key="spec.key" section="pdf" :row="spec.key">
@@ -225,8 +225,8 @@
               v-model="localPdfSettings[spec.key]"
               @change="updatePdfSettings"
             >
-              <option :value="true">{{ t('Yes') }}</option>
-              <option :value="false">{{ t('No') }}</option>
+              <option :value="true">{{ t('settings.yes') }}</option>
+              <option :value="false">{{ t('settings.no') }}</option>
             </select>
             <select
               v-else-if="spec.type === 'enum'"
@@ -250,7 +250,7 @@
 
           <SettingRow section="pdf" row="reset" row-class="settings-actions">
             <button @click="resetPdfSettings" class="reset-button">
-              <CalcpadSearchHighlight :text="t('Reset PDF Settings')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.resetPdfSettings')" :query="query" />
             </button>
           </SettingRow>
         </div>
@@ -259,19 +259,19 @@
       <section v-show="sectionVisible('user')" class="settings-section">
         <h3 class="section-header" @click="toggle('user')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('user') }">&#x25BC;</span>
-          {{ t('User') }}
+          {{ t('settings.user') }}
         </h3>
         <div v-show="bodyVisible('user')" class="section-body">
           <SettingRow section="user" row="userName">
             <label for="userName">
-              {{ t('User Name:') }}
-              <span class="setting-info" :title="t(`Recorded in a file's info (Info tab) as its author, who last updated it, and who reviewed it.`)">ⓘ</span>
+              {{ t('settings.userNameLabel') }}
+              <span class="setting-info" :title="t('settings.recordedInAFilesInfoInfoTabAs')">ⓘ</span>
             </label>
             <input
               id="userName"
               v-model="userName"
               type="text"
-              :placeholder="t('e.g. jsmith')"
+              :placeholder="t('settings.exampleJsmith')"
               @change="updateUserName"
             />
           </SettingRow>
@@ -281,7 +281,7 @@
       <section v-show="sectionVisible('editor')" class="settings-section">
         <h3 class="section-header" @click="toggle('editor')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('editor') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Editor')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.editor')" :query="query" />
         </h3>
         <div v-show="bodyVisible('editor')" class="section-body">
           <SettingRow section="editor" row="quickTyping">
@@ -291,23 +291,23 @@
                 type="checkbox"
                 @change="updateQuickTyping"
               />
-              <CalcpadSearchHighlight :text="t('Enable Quick Typing')" :query="query" />
-              <span class="setting-info" :title="t(`Type shortcuts like ~a → α, ~' → ′`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.enableQuickTyping')" :query="query" />
+              <span class="setting-info" :title="t('settings.typeShortcutsLikeA')">ⓘ</span>
             </label>
           </SettingRow>
 
           <SettingRow section="editor" row="commentFormat">
             <label for="commentFormat">
-              <CalcpadSearchHighlight :text="t('Comment Format:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.commentFormatLabel')" :query="query" />
             </label>
             <select
               id="commentFormat"
               v-model="commentFormat"
               @change="updateCommentFormat"
             >
-              <option value="auto">{{ t('Auto (detect #md on/off)') }}</option>
-              <option value="html">{{ t('HTML') }}</option>
-              <option value="markdown">{{ t('Markdown') }}</option>
+              <option value="auto">{{ t('settings.autoDetectHashMdOnOff') }}</option>
+              <option value="html">{{ t('settings.html') }}</option>
+              <option value="markdown">{{ t('settings.markdown') }}</option>
             </select>
           </SettingRow>
 
@@ -318,8 +318,8 @@
                 type="checkbox"
                 @change="updateFormattingHotkeys"
               />
-              <CalcpadSearchHighlight :text="t('Enable Formatting Hotkeys')" :query="query" />
-              <span class="setting-info" :title="t(`Ctrl+B for bold, Ctrl+I for italic, etc.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.enableFormattingHotkeys')" :query="query" />
+              <span class="setting-info" :title="t('settings.ctrlBForBoldCtrlIForItalic')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -330,8 +330,8 @@
                 type="checkbox"
                 @change="updatePreviewCursorSync"
               />
-              <CalcpadSearchHighlight :text="t('Sync Preview to Cursor Line')" :query="query" />
-              <span class="setting-info" :title="t(`Scroll the preview to follow the line the cursor is on in the editor.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.syncPreviewToCursorLine')" :query="query" />
+              <span class="setting-info" :title="t('settings.scrollThePreviewToFollowTheLineThe')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -342,8 +342,8 @@
                 type="checkbox"
                 @change="updateAutoRun"
               />
-              <CalcpadSearchHighlight :text="t('Auto-Run Preview')" :query="query" />
-              <span class="setting-info" :title="t(`When off, the preview only re-renders when it is first opened or a manual run is triggered.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('service.autoRunPreview')" :query="query" />
+              <span class="setting-info" :title="t('settings.whenOffThePreviewOnlyReRendersWhen')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -354,8 +354,8 @@
                 type="checkbox"
                 @change="updateAutoInputMode"
               />
-              <CalcpadSearchHighlight :text="t('Open #UI Documents in Input Mode')" :query="query" />
-              <span class="setting-info" :title="t(`A document declaring #UI controls opens as its input form the first time you open it.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.openHashUiDocumentsInInputMode')" :query="query" />
+              <span class="setting-info" :title="t('settings.aDocumentDeclaringHashUiControlsOpensAs')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -366,8 +366,8 @@
                 type="checkbox"
                 @change="updatePreviewUiOverrides"
               />
-              <CalcpadSearchHighlight :text="t('Apply #UI Values in Preview')" :query="query" />
-              <span class="setting-info" :title="t(`Preview normally shows the document's own values. Turn this on to render it with the values entered into the input form instead, for tracking down an error that only appears once a form is filled in.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('service.applyHashUiValuesInPreview')" :query="query" />
+              <span class="setting-info" :title="t('settings.previewNormallyShowsTheDocumentsOwnValuesTurn')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -378,8 +378,8 @@
                 type="checkbox"
                 @change="updatePreviewPdf"
               />
-              <CalcpadSearchHighlight :text="t('Render Preview as PDF')" :query="query" />
-              <span class="setting-info" :title="t(`Preview and Report show the PDF export itself, with its exact pages, headers, and footers. Slower than the HTML preview.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.renderPreviewAsPdf')" :query="query" />
+              <span class="setting-info" :title="t('settings.previewAndReportShowThePdfExportItself')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -390,8 +390,8 @@
                 type="checkbox"
                 @change="updateShowFileMetadata"
               />
-              <CalcpadSearchHighlight :text="t('Show File Metadata')" :query="query" />
-              <span class="setting-info" :title="t(`Show the file info and saved #UI values comments at the end of the file. They are hidden by default and edited in the Properties tab.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.showFileMetadata')" :query="query" />
+              <span class="setting-info" :title="t('settings.showTheFileInfoAndSavedHashUi')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -402,8 +402,8 @@
                 type="checkbox"
                 @change="updateShowUiOverrideHints"
               />
-              <CalcpadSearchHighlight :text="t('Show UI Override Hints')" :query="query" />
-              <span class="setting-info" :title="t(`Show saved #UI values above the lines they apply to: the value for a lone #UI control, a count for loops, macro calls and #include lines. Click one to edit it in the Properties tab.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.showUiOverrideHints')" :query="query" />
+              <span class="setting-info" :title="t('settings.showSavedHashUiValuesAboveTheLines')">ⓘ</span>
             </label>
           </SettingRow>
 
@@ -414,15 +414,15 @@
                 type="checkbox"
                 @change="updateAutoSyncUiValues"
               />
-              <CalcpadSearchHighlight :text="t('Auto-Sync #UI Values')" :query="query" />
-              <span class="setting-info" :title="t(`For #UI lines in this file excluding loops, macros, and includes: a value entered in the input form is written into the #UI line, and editing the value on that line removes its saved override.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.autoSyncHashUiValues')" :query="query" />
+              <span class="setting-info" :title="t('settings.forHashUiLinesInThisFileExcluding')">ⓘ</span>
             </label>
           </SettingRow>
 
           <SettingRow v-if="versionConfig.isWebOrDesktop" section="editor" row="completionDelayMs">
             <label for="completionDelayMs">
-              <CalcpadSearchHighlight :text="t('Completion Delay (ms):')" :query="query" />
-              <span class="setting-info" :title="t(`How long to wait before showing code suggestions while typing. Zero shows them immediately.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.completionDelayMsLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.howLongToWaitBeforeShowingCodeSuggestions')">ⓘ</span>
             </label>
             <input
               id="completionDelayMs"
@@ -437,8 +437,8 @@
 
           <SettingRow v-if="versionConfig.isDesktop" section="editor" row="fontFamily">
             <label for="editorFontFamily">
-              <CalcpadSearchHighlight :text="t('Font Family:')" :query="query" />
-              <span class="setting-info" :title="t(`JuliaMono is the bundled default. Drop .woff2/.woff/.ttf/.otf files into the fonts folder to make them available here.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.fontFamilyLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.juliamonoIsTheBundledDefaultDropWoff2Woff')">ⓘ</span>
             </label>
             <select
               id="editorFontFamily"
@@ -447,9 +447,9 @@
               @focus="requestFontRescan"
               @change="updateEditorFontFamily"
             >
-              <option value="JuliaMono">{{ t('JuliaMono (default)') }}</option>
-              <option value="system">{{ t('System Default') }}</option>
-              <optgroup v-if="userFontOptions.length" :label="t('From fonts folder')">
+              <option value="JuliaMono">{{ t('settings.juliamonoDefault') }}</option>
+              <option value="system">{{ t('settings.systemDefault') }}</option>
+              <optgroup v-if="userFontOptions.length" :label="t('settings.fromFontsFolder')">
                 <option
                   v-for="name in userFontOptions"
                   :key="name"
@@ -465,31 +465,31 @@
           <SettingRow v-if="versionConfig.isDesktop" section="editor" row="fontsFolder">
             <button
               class="diagnostics-button"
-              :title="t(`Open the folder where custom fonts can be dropped. Reopen the Font Family picker to pick up new fonts.`)"
+              :title="t('settings.openTheFolderWhereCustomFontsCanBe')"
               @click="openFontsFolder"
             >
-              <CalcpadSearchHighlight :text="t('Open Fonts Folder')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.openFontsFolder')" :query="query" />
             </button>
           </SettingRow>
 
           <SettingRow section="editor" row="previewTheme">
             <label for="previewTheme">
-              <CalcpadSearchHighlight :text="t('Preview Theme:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.previewThemeLabel')" :query="query" />
             </label>
             <select
               id="previewTheme"
               v-model="previewTheme"
               @change="updatePreviewTheme"
             >
-              <option value="system">{{ t('System') }}</option>
-              <option value="light">{{ t('Light') }}</option>
-              <option value="dark">{{ t('Dark') }}</option>
+              <option value="system">{{ t('common.system') }}</option>
+              <option value="light">{{ t('settings.light') }}</option>
+              <option value="dark">{{ t('settings.dark') }}</option>
             </select>
           </SettingRow>
 
           <SettingRow section="editor" row="darkBackground">
             <label for="darkBackground">
-              <CalcpadSearchHighlight :text="t('Dark Mode Background:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.darkModeBackgroundLabel')" :query="query" />
             </label>
             <div class="color-input-row">
               <input
@@ -500,17 +500,17 @@
                 @input="updateDarkBackground"
               />
               <button
-                :title="t('Reset to default (#1e1e1e)')"
+                :title="t('settings.resetToDefaultHash1e1e1e')"
                 @click="resetDarkBackground"
               >
-                {{ t('Reset') }}
+                {{ t('common.reset') }}
               </button>
             </div>
           </SettingRow>
 
           <SettingRow section="editor" row="colorTheme">
             <label for="colorTheme">
-              <CalcpadSearchHighlight :text="t('Color Theme:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.colorThemeLabel')" :query="query" />
             </label>
             <select
               id="colorTheme"
@@ -521,36 +521,36 @@
                 v-if="colorTheme && !knownThemeLabels.has(colorTheme) && colorTheme !== 'System'"
                 :value="colorTheme"
               >{{ colorTheme }}</option>
-              <option value="System">{{ t('System') }}</option>
-              <optgroup v-if="darkThemes.length" :label="t('Dark')">
+              <option value="System">{{ t('common.system') }}</option>
+              <optgroup v-if="darkThemes.length" :label="t('settings.dark')">
                 <option
                   v-for="t in darkThemes"
                   :key="t.label"
                   :value="t.label"
-                >{{ t.label }}</option>
+                >{{ tt(t.label) }}</option>
               </optgroup>
-              <optgroup v-if="lightThemes.length" :label="t('Light')">
+              <optgroup v-if="lightThemes.length" :label="t('settings.light')">
                 <option
                   v-for="t in lightThemes"
                   :key="t.label"
                   :value="t.label"
-                >{{ t.label }}</option>
+                >{{ tt(t.label) }}</option>
               </optgroup>
             </select>
           </SettingRow>
 
           <SettingRow section="editor" row="linterMinSeverity">
             <label for="linterMinSeverity">
-              <CalcpadSearchHighlight :text="t('Linter Minimum Severity:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.linterMinimumSeverityLabel')" :query="query" />
             </label>
             <select
               id="linterMinSeverity"
               v-model="linterMinSeverity"
               @change="updateLinterMinSeverity"
             >
-              <option value="error">{{ t('Error') }}</option>
-              <option value="warning">{{ t('Warning') }}</option>
-              <option value="information">{{ t('Information (all)') }}</option>
+              <option value="error">{{ t('common.error') }}</option>
+              <option value="warning">{{ t('common.warning') }}</option>
+              <option value="information">{{ t('settings.informationAll') }}</option>
             </select>
           </SettingRow>
         </div>
@@ -559,7 +559,7 @@
       <section v-show="sectionVisible('formatting')" class="settings-section">
         <h3 class="section-header" @click="toggle('formatting')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('formatting') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Formatting')" :query="query" />
+          <CalcpadSearchHighlight :text="t('common.formatting')" :query="query" />
         </h3>
         <div v-show="bodyVisible('formatting')" class="section-body">
           <SettingRow section="formatting" row="prettify">
@@ -571,7 +571,7 @@
       <section v-show="sectionVisible('shortcuts')" class="settings-section">
         <h3 class="section-header" @click="toggle('shortcuts')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('shortcuts') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Keyboard Shortcuts')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.keyboardShortcuts')" :query="query" />
         </h3>
         <div v-show="bodyVisible('shortcuts')" class="section-body">
           <div
@@ -585,9 +585,9 @@
               <button
                 class="shortcut-key"
                 :class="{ modified: entry.modified, unassigned: !entry.hotkey }"
-                :title="t('Change shortcut')"
+                :title="t('settings.changeShortcut')"
                 @click="recordingShortcut = recordingShortcut === entry.id ? null : entry.id"
-              >{{ entry.hotkey ? formatHotkey(normalizeHotkey(entry.hotkey) ?? entry.hotkey) : t('Unassigned') }}</button>
+              >{{ entry.hotkey ? formatHotkey(normalizeHotkey(entry.hotkey) ?? entry.hotkey) : t('settings.unassigned') }}</button>
             </div>
             <HotkeyRecorder
               v-if="recordingShortcut === entry.id"
@@ -607,12 +607,12 @@
       <section v-show="sectionVisible('server')" class="settings-section">
         <h3 class="section-header" @click="toggle('server')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('server') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Server Settings')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.serverSettings')" :query="query" />
         </h3>
         <div v-show="bodyVisible('server')" class="section-body">
           <SettingRow section="server" row="url">
             <label for="serverUrl">
-              <CalcpadSearchHighlight :text="t('Remote Server URL:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.remoteServerUrlLabel')" :query="query" />
             </label>
             <input
               id="serverUrl"
@@ -633,16 +633,16 @@
           <SettingRow section="diagnostics" row="logsFolder">
             <button
               class="diagnostics-button"
-              :title="t(`Opens the folder containing server logs and the most recent crash dump.`)"
+              :title="t('settings.opensTheFolderContainingServerLogsAndThe')"
               @click="openLogsFolder"
             >
-              <CalcpadSearchHighlight :text="t('Open Logs Folder')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.openLogsFolder')" :query="query" />
             </button>
           </SettingRow>
 
           <SettingRow section="diagnostics" row="logLevel">
             <label for="logLevel">
-              <CalcpadSearchHighlight :text="t('Log Level:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.logLevelLabel')" :query="query" />
               <span class="setting-info" :title="logLevelDetail">&#9432;</span>
             </label>
             <select
@@ -660,8 +660,8 @@
 
           <SettingRow v-if="versionConfig.isWebOrDesktop" section="diagnostics" row="maxOutputLines">
             <label for="maxOutputLines">
-              <CalcpadSearchHighlight :text="t('Max Output Lines (per channel):')" :query="query" />
-              <span class="setting-info" :title="t(`Lines retained in each Output channel before older lines are dropped. Lower values reduce memory use and improve responsiveness when logs are noisy.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.maxOutputLinesPerChannelLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.linesRetainedInEachOutputChannelBeforeOlder')">ⓘ</span>
             </label>
             <input
               id="maxOutputLines"
@@ -676,8 +676,8 @@
 
           <SettingRow section="diagnostics" row="maxPreviewSize">
             <label for="maxPreviewSize">
-              <CalcpadSearchHighlight :text="t('Max Preview Size (MB):')" :query="query" />
-              <span class="setting-info" :title="t(`A worksheet that renders to more HTML than this is not shown in the preview — showing it risks running the app out of memory. Exporting to PDF, HTML or DOCX is unaffected. Raise it only if you need very large documents on screen.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.maxPreviewSizeMbLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.aWorksheetThatRendersToMoreHtmlThan')">ⓘ</span>
             </label>
             <input
               id="maxPreviewSize"
@@ -692,8 +692,8 @@
 
           <SettingRow section="diagnostics" row="maxPreviewConsoleMessages">
             <label for="maxPreviewConsoleMessages">
-              <CalcpadSearchHighlight :text="t('Max Preview Console Messages:')" :query="query" />
-              <span class="setting-info" :title="t(`How many console lines one preview render may relay before the rest are dropped. A worksheet whose scripts log in a loop can otherwise flood the console channel. Raise it when debugging a script, lower it when a library is noisy. Each line is clipped to 4 KB regardless.`)">ⓘ</span>
+              <CalcpadSearchHighlight :text="t('settings.maxPreviewConsoleMessagesLabel')" :query="query" />
+              <span class="setting-info" :title="t('settings.howManyConsoleLinesOnePreviewRenderMay')">ⓘ</span>
             </label>
             <input
               id="maxPreviewConsoleMessages"
@@ -711,12 +711,12 @@
       <section v-show="sectionVisible('configuration')" class="settings-section">
         <h3 class="section-header" @click="toggle('configuration')">
           <span class="expand-icon" :class="{ collapsed: isCollapsed('configuration') }">&#x25BC;</span>
-          <CalcpadSearchHighlight :text="t('Configuration')" :query="query" />
+          <CalcpadSearchHighlight :text="t('settings.configuration')" :query="query" />
         </h3>
         <div v-show="bodyVisible('configuration')" class="section-body">
           <SettingRow section="configuration" row="activeConfig">
             <label for="activeConfig">
-              <CalcpadSearchHighlight :text="t('Active Config:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.activeConfigLabel')" :query="query" />
             </label>
             <select
               id="activeConfig"
@@ -733,21 +733,21 @@
 
           <SettingRow section="configuration" row="saveConfig">
             <label for="configName">
-              <CalcpadSearchHighlight :text="t('Save current settings as:')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.saveCurrentSettingsAsLabel')" :query="query" />
             </label>
             <div class="color-input-row">
               <input
                 id="configName"
                 v-model="newConfigName"
                 type="text"
-                :placeholder="t('e.g. my-config')"
+                :placeholder="t('settings.exampleMyConfig')"
                 @keyup.enter="saveNamedConfig"
               />
               <button
                 :disabled="!newConfigName.trim()"
                 @click="saveNamedConfig"
               >
-                {{ t('Save') }}
+                {{ t('common.save') }}
               </button>
             </div>
             <span v-if="saveError" class="setting-error">{{ saveError }}</span>
@@ -755,17 +755,17 @@
 
           <SettingRow section="configuration" row="actions" row-class="settings-actions">
             <button @click="openSettingsFolder" class="reset-button">
-              <CalcpadSearchHighlight :text="t('Open Settings Folder')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.openSettingsFolder')" :query="query" />
             </button>
             <button @click="resetSettings" class="reset-button">
-              <CalcpadSearchHighlight :text="t('Reset to Default')" :query="query" />
+              <CalcpadSearchHighlight :text="t('settings.resetToDefault')" :query="query" />
             </button>
           </SettingRow>
         </div>
       </section>
 
       <div v-if="searchActive && !anyVisible" class="no-results">
-        {{ t('No settings found for "{query}"', { query: searchQuery.trim() }) }}
+        {{ t('settings.noSettingsFoundForQuery', { query: searchQuery.trim() }) }}
       </div>
 
       <div v-if="appVersion" class="about-footer">
@@ -777,7 +777,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive, nextTick, provide, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
 import CollapseAllButton from './CollapseAllButton.vue'
@@ -797,6 +797,7 @@ import { getDefaultSettings, METADATA_SETTINGS_KEYS, validateSettingValue, SETTI
 import { PDF_SETTING_KEYS, validatePdfValue } from '../../types/pdf-settings'
 import { specForKey } from '../../types/catalog'
 import { LOCALE_OPTIONS, readLocaleSetting, setLocale, type LocaleSetting } from '../../i18n'
+import en from '../../i18n/messages/en'
 import {
   DEFAULT_PREVIEW_SIZE_MB, MIN_PREVIEW_SIZE_MB, MAX_PREVIEW_SIZE_MB,
   DEFAULT_CONSOLE_MESSAGES_PER_DOCUMENT, MIN_CONSOLE_MESSAGES_PER_DOCUMENT,
@@ -1111,7 +1112,7 @@ const SECTION_META: Record<string, { title: string; rows: Record<string, string>
   },
   shortcuts: {
     title: 'Keyboard Shortcuts',
-    rows: Object.fromEntries(KEYBINDING_COMMANDS.map(c => [c.id, ('keyboard shortcut hotkey keybinding ' + c.label).toLowerCase()]))
+    rows: Object.fromEntries(KEYBINDING_COMMANDS.map(c => [c.id, ('keyboard shortcut hotkey keybinding ' + (en[c.label] ?? c.label)).toLowerCase()]))
   },
   server: {
     title: 'Server Settings',
@@ -1220,7 +1221,7 @@ const settingLabel = (id: string): string => {
 
 const labelFor = (bindingId: string): string => {
   if (bindingId.startsWith(SETTING_KEYBINDING_PREFIX)) {
-    return t('Setting: {name}', { name: settingLabel(bindingId.slice(SETTING_KEYBINDING_PREFIX.length)) })
+    return t('settings.settingName', { name: settingLabel(bindingId.slice(SETTING_KEYBINDING_PREFIX.length)) })
   }
   const command = keybindingCommand(bindingId)
   return command ? tt(command.label) : bindingId

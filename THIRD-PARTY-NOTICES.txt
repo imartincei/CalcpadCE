@@ -101,12 +101,12 @@ Licence files ship alongside the fonts.
   `vscode-language-pack-ja`, `vscode-language-pack-ko`, `vscode-language-pack-pl`,
   `vscode-language-pack-pt-BR`, `vscode-language-pack-ru`, `vscode-language-pack-tr`,
   `vscode-language-pack-zh-hans`, `vscode-language-pack-zh-hant`) — MIT. The
-  Monaco editor maps in
-  `Calcpad.Web/frontend/calcpad-web/src/editor/monaco-nls/` are derived from
-  these packs at tag `v1.96.2024121109` (commit
+  Monaco editor maps are generated at build time from these packs into
+  `calcpad-web/node_modules/.cache/calcpad-monaco-nls/` at tag
+  `v1.96.2024121109` (commit
   `110df563b65cd2a1f9d8b58e3bdcadce90427f6d`). The MIT notice travels with the
-  maps in `monaco-nls/LICENSE.md`; it is reproduced here because the maps are
-  compiled into the web and desktop bundles.
+  source metadata in `monaco-nls/LICENSE.md`; it is reproduced here because the
+  maps are compiled into the web and desktop bundles.
 
   ```
   Visual Studio Code Localization Packs

@@ -1,8 +1,8 @@
 # i18n pipeline
 
 One script owns the whole pipeline. It extracts the pinned VS Code pack subsets,
-imports exact matches into the locale catalogs, generates the Monaco NLS maps,
-and validates provenance.
+imports exact matches into the locale catalogs, generates the Monaco NLS cache
+at build time, and validates provenance.
 
 The locale list is the single source of truth in
 `calcpad-frontend/src/i18n/locales.json`. It records each tag, endonym, aliases,
@@ -15,10 +15,12 @@ catalog and a Monaco map. The script generates the typed
 Run from `Calcpad.Web/frontend`, or use the `calcpad-web` package scripts:
 
 ```sh
-node scripts/i18n/i18n.mjs              # update generated files
-node scripts/i18n/i18n.mjs --check      # verify generated files
+node scripts/i18n/i18n.mjs                 # update generated files and Monaco cache
+node scripts/i18n/i18n.mjs --check         # verify generated catalogs/provenance
+node scripts/i18n/i18n.mjs --monaco-cache  # refresh only the Monaco cache
 node scripts/i18n/i18n.mjs --locale=pt-BR
 node scripts/i18n/i18n.mjs --verbose
+node scripts/i18n/check-vscode-english.mjs # verify English at each module/key
 ```
 
 ```sh
@@ -27,7 +29,16 @@ npm run i18n:check
 ```
 
 `--locale` limits extraction, catalog import, and Monaco generation to one
-locale. `--check` never writes files and exits non-zero when anything is stale.
+locale. `--check` never writes repository files and exits non-zero when the
+catalogs or provenance are stale.
+`--monaco-cache` writes only the build cache under
+`calcpad-web/node_modules/.cache/calcpad-monaco-nls/`; the maps and overrides
+are not committed.
+`check-vscode-english.mjs` verifies the English text at every
+`vscode.index.json` module/key.
+Monaco entries use the installed editor; shared-UI entries are fetched from the
+pinned VS Code source and cached under `node_modules/.cache`.
+CI runs this check; no English source file is committed.
 
 ## Layout
 
@@ -45,6 +56,13 @@ The registry lives in
 The script writes `calcpad-frontend/src/i18n/locales.generated.ts` and the
 locale catalogs next to it.
 
+## Message-ID migration
+
+The catalogs now use stable message IDs.
+A temporary English-to-ID bridge still covers data-driven labels while the
+remaining sources migrate; see [`MESSAGE-IDS.md`](MESSAGE-IDS.md) for the
+convention, the community file format, and the remaining inventory.
+
 ## Rules
 
 - `locales.json` decides which packs are processed.
@@ -55,6 +73,11 @@ locale catalogs next to it.
   `provenance.<locale>.json` are generated for every locale with
   `"catalog": true`. The script rewrites `vscode` entries and preserves entries
   marked `community`; do not edit generated entries.
+- `calcpad-frontend/src/i18n/community/<locale>.ts` is the human-editable
+  community source. Its `ui` and `monaco` sections are merged into the generated
+  catalogs and maps.
+- `community/<locale>.provenance.json` is generated: missing origins come from
+  `git blame` on the community `.ts` file.
 - `zh` is `"catalog": false` because its shared UI catalog is community-authored.
   Its Monaco map still comes from `vscode-language-pack-zh-hans`.
 - The pseudo-locale pack `vscode-language-pack-qps-ploc` is intentionally
