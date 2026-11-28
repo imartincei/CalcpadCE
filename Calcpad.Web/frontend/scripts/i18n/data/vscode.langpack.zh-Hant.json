@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-zh-hant"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "關閉"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "關閉"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "複製"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "關閉"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "錯誤",
+        "Warning": "警告"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "下一頁",
+        "previous": "上一個"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "關閉"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "取消"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "插入"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "關閉"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "錯誤",
+        "accessibility.signals.positionHasWarning": "警告",
+        "accessibility.signals.save": "儲存",
+        "accessibilitySignals.save": "儲存"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "檔案"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "錯誤",
+        "sev.warning": "警告"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "錯誤",
+        "dialogWarningMessage": "警告"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "關閉"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "全部摺疊"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "複製",
+        "copyAll": "全部複製"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "關閉"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "複製"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "關閉"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "錯誤",
+        "Warning": "警告"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "下一頁",
+        "previous": "上一個"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "關閉"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "取消"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "插入"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "關閉"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "錯誤",
+        "accessibility.signals.positionHasWarning": "警告",
+        "accessibility.signals.save": "儲存",
+        "accessibilitySignals.save": "儲存"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "檔案"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "取消"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "開啟資料夾"
+      },
+      "vs/platform/log/common/log": {
+        "error": "錯誤",
+        "off": "關閉",
+        "warn": "警告"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "錯誤",
+        "sev.warning": "警告"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "取消",
+        "mMinimize": "最小化",
+        "mNewTab": "新索引標籤"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "取消"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "新增視窗"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "取消"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "標題"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "描述",
+        "settings": "設定"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "移除"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "關閉"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "複製",
+        "cut": "剪下",
+        "paste": "貼上",
+        "redo": "重做",
+        "undo": "復原"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "開新視窗"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "開啟..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "關閉",
+        "closeAll": "全部關閉",
+        "closeOthers": "關閉其他",
+        "newWindow": "新增視窗"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "關閉"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "開啟資料夾",
+        "watermark.openRecent": "開啟最近使用的檔案"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "全部摺疊",
+        "refresh": "重新整理"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "問題"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "取消"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "套用"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "複製"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "複製全部",
+        "interactive.copyItem.label": "複製"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "取消"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "取消"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "檔案",
+        "files": "檔案"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "取消",
+        "save": "儲存"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "複製"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "關閉",
+        "label.find": "尋找",
+        "placeholder.find": "尋找"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "摺疊"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "全部摺疊"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "模式",
+        "noTriggerByBreakpoint": "無"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "全部摺疊"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "變數"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "全部摺疊"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "全部摺疊",
+        "copy": "複製",
+        "copyAll": "全部複製"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "全部摺疊"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "全部摺疊"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "型別"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "預覽"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "取消"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "無",
+        "refreshExtension": "重新整理",
+        "workbench.extensions.action.configure": "設定",
+        "workbench.extensions.action.copyExtension": "複製"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "取消",
+        "close": "關閉",
+        "review": "檢閱"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "錯誤"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "開啟資料夾"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "開啟資料夾",
+        "openRecent": "開啟最近使用的檔案"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "複製"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "關閉",
+        "closeAll": "全部關閉",
+        "closeOthers": "關閉其他",
+        "copyRelativePath": "複製相對路徑"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "儲存",
+        "saveAs": "另存新檔..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "檔案"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "檔案",
+        "openContainer": "開啟收納資料夾"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "格式化",
+        "null": "無",
+        "nullFormatterDescription": "無"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "取消"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "取消",
+        "save": "儲存"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "描述"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "取消"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "標題"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "開啟所屬資料夾"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "全部摺疊",
+        "copyMarker": "複製",
+        "problems": "問題",
+        "status.problems": "問題"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "問題"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "檔案"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "問題"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "重設"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "關閉"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "格式化"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "變數"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "輸出"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "全部摺疊"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "輸出"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "輸出"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "複製"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "預覽"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "檔案",
+        "formatting": "格式化",
+        "newWindow": "開新視窗",
+        "output": "輸出",
+        "problems": "問題"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "取消"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "輸出"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "關閉"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "重新整理"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "關閉",
+        "scmInputCancelAction": "取消"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "全部複製",
+        "copyMatchLabel": "複製"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "全部摺疊",
+        "RefreshAction.label": "重新整理"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "開啟資料夾"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "複製"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "取消"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "關閉",
+        "insert": "插入"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "複製"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "檔案"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "取消",
+        "noIconThemeLabel": "無"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "重新整理"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "關閉"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "複製",
+        "empty profile": "無",
+        "none": "無",
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "取消",
+        "preview": "預覽"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "取消"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "還原"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "開啟資料夾"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "複製"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "標題"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "開啟...",
+        "openFolder": "開啟資料夾"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "檔案"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "取消"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "重設",
+        "zoomSettings": "設定"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "標題"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "開啟資料夾"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "取消"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "系統"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "設定"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "取消"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "描述"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "無"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "設定"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "關閉"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "儲存"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "設定"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "另存新檔..."
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "儲存"
+      }
+    }
+  }
+}

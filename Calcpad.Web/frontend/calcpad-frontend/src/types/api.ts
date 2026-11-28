@@ -44,6 +44,8 @@ export interface LintRelatedLocation {
     column: number;      // Zero-based start column
     endColumn: number;   // Zero-based end column
     message: string;
+    messageId?: string;
+    params?: Record<string, string | number>;
 }
 
 export interface LintIncludeOrigin {

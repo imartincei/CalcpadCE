@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import CalcpadApp from '@calcpad-vue/components/CalcpadApp.vue'
 import '@calcpad-vue/styles/base.css'
 import { initMessaging, postMessage } from '@calcpad-vue/services/messaging'
-import { createCalcpadI18n, readLocaleSetting } from '@calcpad-i18n'
+import { createCalcpadI18n, getActiveLocale, readLocaleSetting, LOCALE_CHANGED_EVENT, setCurrentCulture, setHostLocale } from '@calcpad-i18n'
 
 // Initialize VS Code API before messaging service
 const vscode = (window as any).acquireVsCodeApi()
@@ -21,8 +21,17 @@ const app = createApp(CalcpadApp, {
   },
   appVersion: import.meta.env.VITE_APP_VERSION,
 })
+setCurrentCulture(window.__CALCPAD_CURRENT_CULTURE__)
+setHostLocale(window.__CALCPAD_HOST_LOCALE__)
 app.use(createCalcpadI18n(readLocaleSetting()))
 app.mount('#app')
+
+// Keep the extension host's Accept-Language in step with the resolved UI locale.
+function announceLocale() {
+  postMessage({ type: 'uiLocale', locale: getActiveLocale() })
+}
+announceLocale()
+window.addEventListener(LOCALE_CHANGED_EVENT, announceLocale)
 
 // Handle any global errors
 app.config.errorHandler = (err, instance, info) => {

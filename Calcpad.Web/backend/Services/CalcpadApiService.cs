@@ -175,6 +175,8 @@ namespace Calcpad.Server.Services
                     await next();
             });
 
+            app.UseUiCulture();
+
             app.Use(async (context, next) =>
             {
                 try

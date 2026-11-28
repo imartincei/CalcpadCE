@@ -1,0 +1,191 @@
+{
+  "locale": "ja",
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-ja"
+  },
+  "keys": {
+    "app.closeAll": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "app.closeOthers": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "app.copyAll": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "app.problems": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "app.variables": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.apply": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.close": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.collapse": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.copyRelativePath": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.cut": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.description": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.error": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.file": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.files": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.find": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.formatting": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.insert": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.minimize": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.mode": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.newTab": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.newWindow": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.next": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.none": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.off": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.openContainingFolder": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.openEllipsis": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.openFolder": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.output": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.paste": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.preview": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.previous": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.redo": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.refresh": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.remove": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.reset": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.restore": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.review": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.save": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    },
+    "common.saveAsEllipsis": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.settings": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.system": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.title": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.type": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.undo": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.warning": {
+      "source": "vscode",
+      "vscodeSource": "vscode-monaco"
+    }
+  }
+}

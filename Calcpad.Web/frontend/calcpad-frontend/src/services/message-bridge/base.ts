@@ -1,4 +1,5 @@
 import { CalcpadApiClient } from '../../api/client';
+import { getActiveLocale } from '../../i18n';
 import { CalcpadSnippetService } from '../snippets';
 import { CalcpadDefinitionsService } from '../definitions';
 import { parseHeadings } from '../headings';
@@ -149,6 +150,7 @@ export abstract class BaseMessageBridge {
     constructor(serverUrl: string, logger?: ILogger) {
         const log: ILogger = logger ?? { appendLine: (msg: string) => console.debug('[CalcPad]', msg) };
         this.apiClient = new CalcpadApiClient(serverUrl, log);
+        this.apiClient.setLocaleProvider(getActiveLocale);
         this.snippetService = new CalcpadSnippetService(this.apiClient, log);
         this.definitionsService = new CalcpadDefinitionsService(this.apiClient);
         this.settings = getDefaultSettings();

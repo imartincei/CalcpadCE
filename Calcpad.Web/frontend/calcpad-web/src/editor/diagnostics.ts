@@ -4,6 +4,13 @@ import { CalcpadLintService } from 'calcpad-frontend/services/linter';
 import type { CalcpadError, LintDiagnostic } from 'calcpad-frontend/types/api';
 import { expandRunErrors } from 'calcpad-frontend/services/run-errors';
 import type { IncludedLintDiagnostic } from 'calcpad-frontend/services/included-lint';
+import { translate } from 'calcpad-frontend/i18n';
+
+function localized(messageId: string | undefined, params: Record<string, string | number> | undefined, fallback: string): string {
+    if (!messageId) return fallback;
+    const translated = translate(messageId, params);
+    return translated === messageId ? fallback : translated;
+}
 
 export type LintSeverity = 'error' | 'warning' | 'information';
 
@@ -131,7 +138,7 @@ export function setIncludedMarkers(model: monaco.editor.ITextModel, diagnostics:
             const whole = d.column < 0;
             return {
                 severity: mapSeverity(d.severityId),
-                message: `[Linter] ${d.message}`,
+                message: `[Linter] ${localized(d.messageId, d.messageParams, d.message)}`,
                 code: d.code,
                 startLineNumber: line,
                 startColumn: whole ? model.getLineFirstNonWhitespaceColumn(line) || 1 : d.column + 1,
@@ -139,7 +146,7 @@ export function setIncludedMarkers(model: monaco.editor.ITextModel, diagnostics:
                 endColumn: whole ? model.getLineMaxColumn(line) : d.endColumn + 1,
                 relatedInformation: d.related.map(r => ({
                     resource: linkFile?.(d.basePath, r.line + 1, r.column + 1) ?? monaco.Uri.parse(d.base),
-                    message: r.message,
+                    message: localized(r.messageId, r.params, r.message),
                     startLineNumber: r.line + 1,
                     startColumn: r.column + 1,
                     endLineNumber: r.line + 1,
@@ -167,7 +174,7 @@ export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: Calc
         const [endLine, , lastEnd] = last ? span(last.sourceLine, last.startColumn, last.endColumn) : [line, 0, endColumn];
         return {
             severity: monaco.MarkerSeverity.Error,
-            message: `[Runtime] ${err.message}`,
+            message: `[Runtime] ${localized(err.messageId, err.params, err.message)}`,
             code: err.code,
             startLineNumber: line,
             startColumn,
@@ -175,7 +182,7 @@ export function setRunErrorMarkers(model: monaco.editor.ITextModel, errors: Calc
             endColumn: lastEnd,
             relatedInformation: err.related.map(r => ({
                 resource: model.uri,
-                message: r.message,
+                message: localized(r.messageId, r.params, r.message),
                 startLineNumber: lineOf(r.line),
                 startColumn: model.getLineFirstNonWhitespaceColumn(lineOf(r.line)) || 1,
                 endLineNumber: lineOf(r.line),

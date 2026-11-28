@@ -2,9 +2,9 @@
   <header class="desktop-titlebar" :style="{ '--titlebar-leading-width': leadingWidth + 'px' }" data-tauri-drag-region @contextmenu.prevent>
     <div ref="leading" class="titlebar-leading">
       <img class="titlebar-logo" :src="CALCPAD_ICON_URL" alt="CalcpadCE" />
-      <button ref="fileButton" class="titlebar-button" :title="t('File menu (Alt+M)')" :aria-label="t('File menu')" aria-haspopup="menu" :aria-expanded="menuOpen" @mousedown.left="onMenuMouseDown" @click="onMenuClick">
+      <button ref="fileButton" class="titlebar-button" :title="t('desktop.fileMenuAltM')" :aria-label="t('desktop.fileMenu')" aria-haspopup="menu" :aria-expanded="menuOpen" @mousedown.left="onMenuMouseDown" @click="onMenuClick">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
-        <span>{{ t('File') }}</span>
+        <span>{{ t('common.file') }}</span>
       </button>
       <div class="titlebar-actions">
         <button v-for="action in actions" :key="action.id" class="titlebar-button" :title="t(action.title)" :aria-label="t(action.label)" :disabled="action.id === 'save' && !canSave" @click="$emit('command', action.id)">
@@ -27,18 +27,18 @@
       <span data-tauri-drag-region>{{ title }}</span>
     </div>
     <div class="titlebar-window-controls">
-      <button class="titlebar-button" :aria-label="t('Minimize')" @click="desktopWindow.minimize()">
+      <button class="titlebar-button" :aria-label="t('common.minimize')" @click="desktopWindow.minimize()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5h10"/></svg>
       </button>
-      <button class="titlebar-button" :aria-label="maximized ? t('Restore') : t('Maximize')" @click="desktopWindow.toggleMaximize()">
+      <button class="titlebar-button" :aria-label="maximized ? t('common.restore') : t('desktop.maximize')" @click="desktopWindow.toggleMaximize()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path :d="maximized ? 'M5.5 5.5h7v7h-7zM3.5 10V3.5H10' : 'M3.5 3.5h9v9h-9z'"/></svg>
       </button>
-      <button class="titlebar-button titlebar-close" :aria-label="t('Close window')" @click="desktopWindow.close()">
+      <button class="titlebar-button titlebar-close" :aria-label="t('desktop.closeWindow')" @click="desktopWindow.close()">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 3.5 9 9m0-9-9 9"/></svg>
       </button>
     </div>
   </header>
-  <div v-if="linux && menuOpen" ref="fileMenu" class="tab-context-menu desktop-file-menu" :style="{ left: menuLeft + 'px' }" role="menu" :aria-label="t('File')" @mousedown.stop @keydown="onMenuKeyDown">
+  <div v-if="linux && menuOpen" ref="fileMenu" class="tab-context-menu desktop-file-menu" :style="{ left: menuLeft + 'px' }" role="menu" :aria-label="t('common.file')" @mousedown.stop @keydown="onMenuKeyDown">
     <template v-for="entry in menuEntries" :key="entry.id">
       <div v-if="!entry.text" class="tab-context-sep" role="separator"></div>
       <details v-else-if="entry.children.length" class="recent-menu">
@@ -63,7 +63,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { platform } from '@tauri-apps/plugin-os'
 import { CALCPAD_ICON_URL } from 'calcpad-frontend/vue/calcpad-icon'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'calcpad-frontend/i18n'
 
 defineProps<{ title: string; canSave: boolean }>()
 const { t } = useI18n()
@@ -86,10 +86,10 @@ const shortcuts: Record<string, string> = {
   save: 'Ctrl+S', 'save-as': 'Ctrl+Shift+S', 'close-tab': 'Ctrl+W',
 }
 const actions = [
-  { id: 'save', label: 'Save document', title: 'Save document (Ctrl+S)', path: 'M1 1h11l3 3v11H1zM4 1v5h7V1M4 15V9h8v6' },
-  { id: 'open', label: 'Open document', title: 'Open document (Ctrl+O)', path: 'M1 7V2h5l2 2h7v11H1zM1 7h14' },
-  { id: 'export-pdf', label: 'Export to PDF', title: 'Export report to PDF and open (Ctrl+E)', format: 'pdf', path: 'M10 1H3v13h11V5zM10 1v4h4' },
-  { id: 'export-docx', label: 'Export to Word', title: 'Export report to Word and open', format: 'word', path: 'M10 1H4v13h11V5zM10 1v4h5' },
+  { id: 'save', label: 'desktop.saveDocument', title: 'desktop.saveDocumentCtrlS', path: 'M1 1h11l3 3v11H1zM4 1v5h7V1M4 15V9h8v6' },
+  { id: 'open', label: 'desktop.openDocument', title: 'desktop.openDocumentCtrlO', path: 'M1 7V2h5l2 2h7v11H1zM1 7h14' },
+  { id: 'export-pdf', label: 'desktop.exportToPdf', title: 'desktop.exportReportToPdfAndOpenCtrlE', format: 'pdf', path: 'M10 1H3v13h11V5zM10 1v4h4' },
+  { id: 'export-docx', label: 'desktop.exportToWord', title: 'desktop.exportReportToWordAndOpen', format: 'word', path: 'M10 1H4v13h11V5zM10 1v4h5' },
 ]
 let unlistenResize: (() => void) | undefined
 

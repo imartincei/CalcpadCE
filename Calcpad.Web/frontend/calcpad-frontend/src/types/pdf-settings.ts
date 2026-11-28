@@ -19,10 +19,10 @@ export interface PdfSettings {
 }
 
 const PAPER_FORMAT_OPTIONS: SettingOption[] = [
-  { value: 'Letter', label: 'Letter (8.5 × 11 in)' },
-  { value: 'Legal', label: 'Legal (8.5 × 14 in)' },
-  { value: 'Tabloid', label: 'Tabloid (11 × 17 in)' },
-  { value: 'Ledger', label: 'Ledger (17 × 11 in)' },
+  { value: 'Letter', label: 'catalog.letter8511In' },
+  { value: 'Legal', label: 'catalog.legal8514In' },
+  { value: 'Tabloid', label: 'catalog.tabloid1117In' },
+  { value: 'Ledger', label: 'catalog.ledger1711In' },
   { value: 'A0', label: 'A0' },
   { value: 'A1', label: 'A1' },
   { value: 'A2', label: 'A2' },
@@ -50,27 +50,27 @@ const HEX_COLOR = /^#[0-9a-f]{6}$/i;
  * `PdfSettingsDto`/`PdfSettingsDefaults`.
  */
 export const PDF_SETTING_KEYS: MetadataSettingKey[] = [
-  { key: 'format', label: 'Paper size', detail: 'Page size', type: 'enum', def: 'Letter', options: PAPER_FORMAT_OPTIONS },
+  { key: 'format', label: 'catalog.paperSize', detail: 'catalog.pageSize', type: 'enum', def: 'Letter', options: PAPER_FORMAT_OPTIONS },
   {
-    key: 'orientation', label: 'Orientation', detail: 'Page orientation', type: 'enum', def: 'portrait',
-    options: [{ value: 'portrait', label: 'Portrait' }, { value: 'landscape', label: 'Landscape' }],
+    key: 'orientation', label: 'catalog.orientation', detail: 'catalog.pageOrientation', type: 'enum', def: 'portrait',
+    options: [{ value: 'portrait', label: 'catalog.portrait' }, { value: 'landscape', label: 'catalog.landscape' }],
   },
-  { key: 'marginTop', label: 'Top margin', detail: `Top page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
-  { key: 'marginBottom', label: 'Bottom margin', detail: `Bottom page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
-  { key: 'marginLeft', label: 'Left margin', detail: `Left page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
-  { key: 'marginRight', label: 'Right margin', detail: `Right page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
-  { key: 'showPageNumbers', label: 'Page numbers', detail: 'Show "Page n of m" in the footer', type: 'boolean', def: true },
-  { key: 'showDate', label: 'Date', detail: 'Show the timestamp in the header', type: 'boolean', def: true },
-  { key: 'showTitle', label: 'Title', detail: "Show the file's Info title (or the file name) in the header", type: 'boolean', def: true },
-  { key: 'dateTimeFormat', label: 'Timestamp format', detail: '.NET date/time format string, e.g. M/d/yyyy h:mm tt', type: 'string', def: 'M/d/yyyy h:mm tt' },
+  { key: 'marginTop', label: 'catalog.topMargin', detail: `Top page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+  { key: 'marginBottom', label: 'catalog.bottomMargin', detail: `Bottom page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.75in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+  { key: 'marginLeft', label: 'catalog.leftMargin', detail: `Left page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+  { key: 'marginRight', label: 'catalog.rightMargin', detail: `Right page margin — ${CSS_LENGTH_HINT}`, type: 'string', def: '0.5in', pattern: CSS_LENGTH, patternHint: CSS_LENGTH_HINT },
+  { key: 'showPageNumbers', label: 'catalog.pageNumbers', detail: 'catalog.showPageNOfMInTheFooter', type: 'boolean', def: true },
+  { key: 'showDate', label: 'catalog.date', detail: 'catalog.showTheTimestampInTheHeader', type: 'boolean', def: true },
+  { key: 'showTitle', label: 'common.title', detail: "Show the file's Info title (or the file name) in the header", type: 'boolean', def: true },
+  { key: 'dateTimeFormat', label: 'pdfsettings.timestampFormat', detail: '.NET date/time format string, e.g. M/d/yyyy h:mm tt', type: 'string', def: 'M/d/yyyy h:mm tt' },
   {
-    key: 'headerFooterLines', label: 'Show header/footer lines', detail: 'Which separator line(s) to draw', type: 'enum', def: 'both',
+    key: 'headerFooterLines', label: 'pdfsettings.showHeaderFooterLines', detail: 'pdfsettings.whichSeparatorLineSToDraw', type: 'enum', def: 'both',
     options: [
-      { value: 'both', label: 'Both' }, { value: 'header', label: 'Header only' },
-      { value: 'footer', label: 'Footer only' }, { value: 'none', label: 'None' },
+      { value: 'both', label: 'pdfsettings.both' }, { value: 'header', label: 'pdfsettings.headerOnly' },
+      { value: 'footer', label: 'pdfsettings.footerOnly' }, { value: 'none', label: 'common.none' },
     ],
   },
-  { key: 'lineColor', label: 'Header/Footer line color', detail: 'Header/footer separator line color as a hex code, default #b3b3b3', type: 'string', def: '#b3b3b3', pattern: HEX_COLOR, patternHint: 'a hex color, e.g. #b3b3b3' },
+  { key: 'lineColor', label: 'pdfsettings.headerFooterLineColor', detail: 'pdfsettings.headerFooterSeparatorLineColorAsAHex', type: 'string', def: '#b3b3b3', pattern: HEX_COLOR, patternHint: 'a hex color, e.g. #b3b3b3' },
 ];
 
 /** Looks up a `pdf` key's spec. */

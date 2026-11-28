@@ -3,18 +3,18 @@
     <div class="export-container p-3">
       <section class="export-section">
         <h3 class="section-header" @click="toggle('documents')">
-          <span class="expand-icon" :class="{ collapsed: isCollapsed('documents') }">&#x25BC;</span>{{ t('HTML / PDF / Word') }}</h3>
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('documents') }">&#x25BC;</span>{{ t('export.htmlPdfWord') }}</h3>
         <div v-show="!isCollapsed('documents')" class="section-body">
           <div v-for="group in visibleExportGroups" :key="group.variant" class="export-group">
-            <h4 class="export-group-title" :title="group.detail">{{ group.label }}</h4>
+            <h4 class="export-group-title" :title="t(group.detail)">{{ t(group.label) }}</h4>
             <div class="header-actions">
-              <button @click="$emit('savePdf', group.variant)" :title="t('Save this document\'s {variant} as a PDF', { variant: t(group.label).toLowerCase() })">{{ t('Save PDF…') }}</button>
+              <button @click="$emit('savePdf', group.variant)" :title="t('export.saveThisDocumentsVariantAsAPdf', { variant: t(group.label).toLowerCase() })">{{ t('export.savePdfEllipsis') }}</button>
               <button
                 v-if="group.word"
                 @click="$emit('saveDocx', group.variant)"
-                :title="t('Save this document\'s {variant} as a Word .docx file', { variant: t(group.label).toLowerCase() })"
-              >{{ t('Save Word…') }}</button>
-              <button @click="$emit('saveHtml', group.variant)" :title="t('Save this document\'s {variant} as standalone HTML', { variant: t(group.label).toLowerCase() })">{{ t('Save HTML…') }}</button>
+                :title="t('export.saveThisDocumentsVariantAsAWordDocx', { variant: t(group.label).toLowerCase() })"
+              >{{ t('export.saveWordEllipsis') }}</button>
+              <button @click="$emit('saveHtml', group.variant)" :title="t('export.saveThisDocumentsVariantAsStandaloneHtml', { variant: t(group.label).toLowerCase() })">{{ t('export.saveHtmlEllipsis') }}</button>
             </div>
           </div>
         </div>
@@ -22,20 +22,20 @@
 
       <section class="export-section">
         <h3 class="section-header" @click="toggle('write')">
-          <span class="expand-icon" :class="{ collapsed: isCollapsed('write') }">&#x25BC;</span>{{ t('Write / Append') }}</h3>
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('write') }">&#x25BC;</span>{{ t('export.writeAppend') }}</h3>
         <div v-show="!isCollapsed('write')" class="section-body">
           <div class="setting-group">
-            <label for="writeMode">{{ t('Write files:') }}<span class="setting-info" :title="writeModeDetail">ⓘ</span>
+            <label for="writeMode">{{ t('export.writeFilesLabel') }}<span class="setting-info" :title="writeModeDetail">ⓘ</span>
             </label>
             <select id="writeMode" v-model="localWriteMode" @change="$emit('updateWriteMode', localWriteMode)">
-              <option v-for="opt in WRITE_MODE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <option v-for="opt in WRITE_MODE_OPTIONS" :key="opt.value" :value="opt.value">{{ t(opt.label) }}</option>
             </select>
           </div>
           <div class="header-actions">
             <button
               @click="$emit('writeFilesNow')"
-              :title="t('Run this document now and write its #write/#append files to disk')"
-            >{{ t('Write to Disk') }}</button>
+              :title="t('export.runThisDocumentNowAndWriteItsHash')"
+            >{{ t('export.writeToDisk') }}</button>
           </div>
           <p v-if="writeResult" class="write-result" :class="{ bad: !writeResult.ok }">{{ writeResult.message }}</p>
         </div>
@@ -43,24 +43,24 @@
 
       <section class="export-section">
         <h3 class="section-header" @click="toggle('plots')">
-          <span class="expand-icon" :class="{ collapsed: isCollapsed('plots') }">&#x25BC;</span>{{ t('Plots') }}</h3>
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('plots') }">&#x25BC;</span>{{ t('export.plots') }}</h3>
         <div v-show="!isCollapsed('plots')" class="section-body">
           <div class="header-actions">
             <button
               :disabled="loading"
               @click="$emit('refreshPlots')"
-              :title="t('Re-run the current document and list its plots')"
+              :title="t('export.reRunTheCurrentDocumentAndListIts')"
             >
               {{ loading ? 'Loading…' : 'Refresh' }}
             </button>
             <button
               :disabled="loading || plots.length === 0"
               @click="$emit('savePlotsZip')"
-              :title="t('Download every plot as a single ZIP archive')"
-            >{{ t('Download all (ZIP)') }}</button>
+              :title="t('export.downloadEveryPlotAsASingleZipArchive')"
+            >{{ t('export.downloadAllZip') }}</button>
           </div>
 
-          <p v-if="!loading && plots.length === 0" class="empty">{{ t('No plots in the current document.') }}</p>
+          <p v-if="!loading && plots.length === 0" class="empty">{{ t('export.noPlotsInTheCurrentDocument') }}</p>
 
           <ul v-if="plots.length > 0" class="plots-list">
             <li v-for="p in plots" :key="p.index" class="plot-item">
@@ -71,8 +71,8 @@
               </div>
               <button
                 @click="$emit('savePlot', p.index)"
-                :title="t('Download this plot as an image file')"
-              >{{ t('Save…') }}</button>
+                :title="t('export.downloadThisPlotAsAnImageFile')"
+              >{{ t('export.saveEllipsis') }}</button>
             </li>
           </ul>
         </div>
@@ -80,27 +80,27 @@
 
       <section v-if="showPortable" class="export-section">
         <h3 class="section-header" @click="toggle('portable')">
-          <span class="expand-icon" :class="{ collapsed: isCollapsed('portable') }">&#x25BC;</span>{{ t('Portable Exports') }}</h3>
+          <span class="expand-icon" :class="{ collapsed: isCollapsed('portable') }">&#x25BC;</span>{{ t('export.portableExports') }}</h3>
         <div v-show="!isCollapsed('portable')" class="section-body">
           <div v-if="!isCompiled" class="export-group">
-            <h4 class="export-group-title" :title="COMPILED_DETAIL">{{ t('Compiled worksheet') }}</h4>
+            <h4 class="export-group-title" :title="COMPILED_DETAIL">{{ t('export.compiledWorksheet') }}</h4>
             <div class="header-actions">
               <button
                 @click="$emit('saveCompiled')"
-                :title="t('Save this document as a compiled .cpdz worksheet')"
-              >{{ t('Save Compiled…') }}</button>
+                :title="t('export.saveThisDocumentAsACompiledCpdzWorksheet')"
+              >{{ t('export.saveCompiledEllipsis') }}</button>
             </div>
           </div>
 
           <!-- Not in the browser: the references are read from the folder the document is saved
                in, and there is neither in a browser tab. -->
           <div v-if="!versionConfig.isWeb && !isCompiled" class="export-group">
-            <h4 class="export-group-title" :title="PORTABLE_DETAIL">{{ t('Portable package') }}</h4>
+            <h4 class="export-group-title" :title="PORTABLE_DETAIL">{{ t('export.portablePackage') }}</h4>
             <div class="header-actions">
               <button
                 @click="$emit('savePortable')"
-                :title="t('Save this document and everything it references as a ZIP that runs anywhere')"
-              >{{ t('Export Portable…') }}</button>
+                :title="t('export.saveThisDocumentAndEverythingItReferencesAs')"
+              >{{ t('export.exportPortableEllipsis') }}</button>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { computed, reactive, ref, watch } from 'vue'
 import type { ExportVariant } from '../../types/api'
 import type { WriteMode } from '../../types/settings'
@@ -145,13 +145,13 @@ const PORTABLE_DETAIL =
 const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; word: boolean }[] = [
   {
     variant: 'report',
-    label: 'Report',
+    label: 'app.report',
     detail: '#pre hidden, #post shown, entered #UI values applied.',
     word: true,
   },
   {
     variant: 'preview',
-    label: 'Preview',
+    label: 'common.preview',
     detail: 'What the results pane shows: #pre and #post, and the same #UI values it renders.',
     word: true,
   },
@@ -163,7 +163,7 @@ const EXPORT_GROUPS: { variant: ExportVariant; label: string; detail: string; wo
   },
   {
     variant: 'unwrapped',
-    label: 'Unwrapped',
+    label: 'app.unwrapped',
     detail: 'The source listing with macros and includes resolved.',
     word: false,
   },
@@ -199,7 +199,7 @@ const localWriteMode = ref<WriteMode>(props.writeMode)
 watch(() => props.writeMode, v => { localWriteMode.value = v })
 
 const writeModeDetail = computed(() =>
-  WRITE_MODE_OPTIONS.map(o => `${o.label} — ${o.detail}`).join('\n')
+  WRITE_MODE_OPTIONS.map(o => `${t(o.label)} — ${t(o.detail)}`).join('\n')
 )
 
 defineEmits<{

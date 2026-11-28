@@ -1,13 +1,13 @@
 <template>
   <div class="files-tab">
     <div v-if="!anyOpen" class="files-empty">
-      <p class="files-empty-message">{{ t('No folder open.') }}</p>
-      <button class="files-open-btn" @click="$emit('open-folder-request', 0)">{{ t('Open Folder') }}</button>
+      <p class="files-empty-message">{{ t('files.noFolderOpen') }}</p>
+      <button class="files-open-btn" @click="$emit('open-folder-request', 0)">{{ t('common.openFolder') }}</button>
     </div>
     <template v-else>
       <label class="files-show-all">
         <input type="checkbox" v-model="showAll" />
-        <span>{{ t('Show all files') }}</span>
+        <span>{{ t('files.showAllFiles') }}</span>
       </label>
       <div ref="sectionsEl" class="files-sections">
         <template v-for="(folder, slot) in folders" :key="slot">
@@ -36,7 +36,7 @@
         </template>
       </div>
       <button v-if="emptySlot !== null" class="secondary files-add-btn" @click="$emit('open-folder-request', emptySlot)">
-        {{ t('Open Another Folder') }}
+        {{ t('files.openAnotherFolder') }}
       </button>
     </template>
     <!-- Custom right-click menu. Rendered outside .files-tab so it can be
@@ -60,20 +60,20 @@
       </template>
       <div v-if="menuReferenceKinds.length" class="context-menu-separator" />
       <button class="context-menu" @click="onOpenContainingFolder">
-        Open Containing Folder
+        {{ t('common.openContainingFolder') }}
       </button>
       <button class="context-menu" @click="onCopyFullPath">
-        Copy Full Path
+        {{ t('catalog.copyFullPath') }}
       </button>
       <button class="context-menu" @click="onCopyRelativePath">
-        Copy Relative Path
+        {{ t('common.copyRelativePath') }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import type { OpenedFolder } from '../types'
 import FilesFolderSection from './FilesFolderSection.vue'
@@ -186,9 +186,9 @@ const REFERENCE_EXTENSIONS: Record<FileReferenceKind, readonly string[]> = {
 }
 
 const REFERENCE_LABELS: Record<FileReferenceKind, { relative: string; absolute: string }> = {
-  include: { relative: 'Insert #include (Relative Path)', absolute: 'Insert #include (Absolute Path)' },
-  read: { relative: 'Insert #read (Relative Path)', absolute: 'Insert #read (Absolute Path)' },
-  image: { relative: 'Insert Image (Relative Path)', absolute: 'Insert Image (Absolute Path)' },
+  include: { relative: 'files.insertHashIncludeRelativePath', absolute: 'files.insertHashIncludeAbsolutePath' },
+  read: { relative: 'files.insertHashReadRelativePath', absolute: 'files.insertHashReadAbsolutePath' },
+  image: { relative: 'files.insertImageRelativePath', absolute: 'files.insertImageAbsolutePath' },
 }
 
 const menuReferenceKinds = computed(() =>

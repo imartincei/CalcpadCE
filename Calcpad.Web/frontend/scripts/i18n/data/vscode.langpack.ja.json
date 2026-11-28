@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-ja"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "閉じる"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "閉じる"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "コピー"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "閉じる"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "エラー",
+        "Warning": "警告"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "次へ",
+        "previous": "前へ"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "閉じる"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "キャンセル"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "挿入"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "閉じる"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "エラー",
+        "accessibility.signals.positionHasWarning": "警告",
+        "accessibility.signals.save": "保存",
+        "accessibilitySignals.save": "保存"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "ファイル"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "エラー",
+        "sev.warning": "警告"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "エラー",
+        "dialogWarningMessage": "警告"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "閉じる"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "すべて折りたたんで表示します。"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "コピー",
+        "copyAll": "すべてコピー"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "閉じる"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "コピー"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "閉じる"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "エラー",
+        "Warning": "警告"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "次へ",
+        "previous": "前へ"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "閉じる"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "キャンセル"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "挿入"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "閉じる"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "エラー",
+        "accessibility.signals.positionHasWarning": "警告",
+        "accessibility.signals.save": "保存",
+        "accessibilitySignals.save": "保存"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "ファイル"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "キャンセル"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "フォルダーを開く"
+      },
+      "vs/platform/log/common/log": {
+        "error": "エラー",
+        "off": "オフ",
+        "warn": "警告"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "エラー",
+        "sev.warning": "警告"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "キャンセル",
+        "mMinimize": "最小化",
+        "mNewTab": "新しいタブ"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "キャンセル"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "新しいウィンドウ"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "タイトル"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "説明",
+        "settings": "設定"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "削除"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "閉じる"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "コピー",
+        "cut": "切り取り",
+        "paste": "貼り付け",
+        "redo": "やり直し",
+        "undo": "元に戻す"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "新しいウィンドウ"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "開く..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "閉じる",
+        "closeAll": "すべて閉じる",
+        "closeOthers": "その他を閉じる",
+        "newWindow": "新しいウィンドウ"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "閉じる"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "フォルダーを開く",
+        "watermark.openRecent": "最近開いた項目"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "すべて折りたたむ",
+        "refresh": "最新の情報に更新"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "問題"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "キャンセル"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "適用"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "コピー"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "すべてコピー",
+        "interactive.copyItem.label": "コピー"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "取り消す"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "ファイル",
+        "files": "ファイル"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "キャンセル",
+        "save": "保存"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "コピー"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "閉じる",
+        "label.find": "検索",
+        "placeholder.find": "検索"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "折りたたみ"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "すべて折りたたんで表示します。"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "モード",
+        "noTriggerByBreakpoint": "なし"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "すべて折りたたむ"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "変数"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "すべて折りたたむ"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "すべて折りたたんで表示します。",
+        "copy": "コピー",
+        "copyAll": "すべてコピー"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "すべて折りたたむ"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "すべて折りたたむ"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "種類"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "プレビュー"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "なし",
+        "refreshExtension": "最新の情報に更新",
+        "workbench.extensions.action.configure": "設定",
+        "workbench.extensions.action.copyExtension": "コピーする"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "キャンセル",
+        "close": "閉じる",
+        "review": "レビュー"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "エラー"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "フォルダーを開く"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "フォルダーを開く",
+        "openRecent": "最近使ったものを開く"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "コピー"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "閉じる",
+        "closeAll": "すべて閉じる",
+        "closeOthers": "その他を閉じる",
+        "copyRelativePath": "相対パスをコピー"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "保存",
+        "saveAs": "名前を付けて保存..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "ファイル"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "ファイル",
+        "openContainer": "このアイテムのフォルダーを開く"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "書式設定",
+        "null": "なし",
+        "nullFormatterDescription": "なし"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "取り消す"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "キャンセル",
+        "save": "保存"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "説明"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "タイトル"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "このアイテムのフォルダーを開く"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "すべて折りたたんで表示します。",
+        "copyMarker": "コピー",
+        "problems": "問題",
+        "status.problems": "問題"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "問題"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "ファイル"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "問題"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "リセット"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "閉じる"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "書式設定"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "変数"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "出力"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "すべて折りたたんで表示します。"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "出力"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "出力"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "コピー"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "プレビュー"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "ファイル",
+        "formatting": "書式設定",
+        "newWindow": "新しいウィンドウ",
+        "output": "出力",
+        "problems": "問題"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "キャンセル"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "出力"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "閉じる"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "最新の情報に更新"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "閉じる",
+        "scmInputCancelAction": "取り消す"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "すべてコピー",
+        "copyMatchLabel": "コピー"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "すべて折りたたんで表示します。",
+        "RefreshAction.label": "最新の情報に更新"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "フォルダーを開く"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "コピー"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "閉じる",
+        "insert": "挿入"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "コピー"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "ファイル"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "取り消す",
+        "noIconThemeLabel": "なし"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "最新の情報に更新"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "閉じる"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "コピー",
+        "empty profile": "なし",
+        "none": "なし",
+        "settings": "設定"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "キャンセル",
+        "preview": "プレビュー"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "キャンセル"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "復元"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "フォルダーを開く"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "コピー"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "タイトル"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "開く...",
+        "openFolder": "フォルダーを開く"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "ファイル"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "キャンセル"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "リセット",
+        "zoomSettings": "設定"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "タイトル"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "フォルダーを開く"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "キャンセル"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "システム"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "設定"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "キャンセル"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "説明"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "なし"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "設定"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "閉じる"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "保存"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "設定"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "名前を付けて保存..."
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "保存"
+      }
+    }
+  }
+}

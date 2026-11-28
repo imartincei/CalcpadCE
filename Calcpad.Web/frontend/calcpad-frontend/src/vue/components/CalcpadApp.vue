@@ -15,7 +15,7 @@
         :title="tabUnavailable(tab.id) ? INPUT_MODE_NOTE : undefined"
         @click="activateTab(pane, tab.id)"
       >
-        {{ tab.label }}
+        {{ t(tab.label) }}
       </button>
       <!-- Grouped so the pair wraps as a unit rather than splitting across rows at
            the sidebar's minimum width. -->
@@ -32,8 +32,8 @@
         <button
           v-if="(versionConfig.isWeb || versionConfig.isDesktop) && paneIndex === 0"
           class="icon"
-          :title="t('Hide the sidebar (Ctrl+Shift+B)')"
-          :aria-label="t('Hide the sidebar')"
+          :title="t('app.hideTheSidebarCtrlShiftB')"
+          :aria-label="t('app.hideTheSidebar')"
           @click="hideSidebar()"
         ><SidebarIcon /></button>
       </div>
@@ -215,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import CalcpadInsertTab from './CalcpadInsertTab.vue'
 import SidebarIcon from './SidebarIcon.vue'
@@ -346,18 +346,18 @@ const editorSelection = ref<LineRange | null>(null)
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
-    { id: 'insert', label: t('Insert') },
-    { id: 'toc', label: t('TOC') },
-    { id: 'settings', label: t('Settings') },
-    { id: 'variables', label: t('Variables') },
-    { id: 'export', label: t('Export') }
+    { id: 'insert', label: t('common.insert') },
+    { id: 'toc', label: t('app.toc') },
+    { id: 'settings', label: t('common.settings') },
+    { id: 'variables', label: t('app.variables') },
+    { id: 'export', label: t('app.export') }
   ]
-  if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: t('Files') })
+  if (props.versionConfig.isDesktop) base.unshift({ id: 'files', label: t('common.files') })
   // The metadata comment editor is driven by editor cursor tracking, available
   // in the VS Code webview and the desktop app (both host a real editor).
   // File info is stamped on save, which only those two hosts have.
   if (props.versionConfig.isVSCode || props.versionConfig.isDesktop) {
-    base.push({ id: 'metadata', label: t('Properties') })
+    base.push({ id: 'metadata', label: t('app.properties') })
   }
   return base
 })

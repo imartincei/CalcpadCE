@@ -7,8 +7,14 @@ import {
     LintDiagnostic,
     IncludedLintStore,
     includePathKey,
+    en,
+    formatMessage,
 } from 'calcpad-frontend';
 import { CalcpadSettingsManager } from './calcpadSettings';
+
+function localize(messageId: string | undefined, params: Record<string, string | number> | undefined, fallback: string): string {
+    return messageId ? formatMessage(en[messageId] ?? fallback, params) : fallback;
+}
 
 /**
  * VS Code wrapper around CalcpadLintService from calcpad-frontend.
@@ -88,7 +94,7 @@ export class CalcpadServerLinter {
                 .map(d => {
                     const diagnostic = new vscode.Diagnostic(
                         this.includedRange(document, d.line, d.column, d.endColumn),
-                        '[Linter] [' + d.code + '] ' + d.message,
+                        '[Linter] [' + d.code + '] ' + localize(d.messageId, d.messageParams, d.message),
                         this.toSeverity(d.severityId)
                     );
                     diagnostic.code = d.code;
@@ -96,7 +102,7 @@ export class CalcpadServerLinter {
                     const base = vscode.Uri.parse(d.base);
                     diagnostic.relatedInformation = d.related.map(r => new vscode.DiagnosticRelatedInformation(
                         new vscode.Location(base, new vscode.Range(r.line, r.column, r.line, r.endColumn)),
-                        r.message));
+                        localize(r.messageId, r.params, r.message)));
                     return diagnostic;
                 })
                 .filter(d => d.severity <= minSeverity);

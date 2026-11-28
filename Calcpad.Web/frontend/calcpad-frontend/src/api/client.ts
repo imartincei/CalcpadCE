@@ -54,6 +54,7 @@ export class CalcpadApiClient {
     private baseUrl: string;
     private logger?: ILogger;
     private authToken: string | null = null;
+    private localeProvider: (() => string) | null = null;
 
     // Per-key "latest wins" bookkeeping: a caller passes `key` (e.g. an editor group id) to mean
     // "only the newest request for this key still matters", so an older request sharing it is
@@ -115,8 +116,21 @@ export class CalcpadApiClient {
         return { [API_TOKEN_HEADER]: this.authToken };
     }
 
+    /** Sets the locale sent as `Accept-Language` on every request. */
+    public setLocaleProvider(provider: (() => string) | null): void {
+        this.localeProvider = provider;
+    }
+
+    private requestHeaders(): Record<string, string> {
+        const locale = this.localeProvider?.();
+        return {
+            ...(locale ? { 'Accept-Language': locale } : {}),
+            ...this.authHeaders(),
+        };
+    }
+
     private jsonHeaders(): Record<string, string> {
-        return { 'Content-Type': 'application/json', ...this.authHeaders() };
+        return { 'Content-Type': 'application/json', ...this.requestHeaders() };
     }
 
     /**
@@ -495,7 +509,7 @@ export class CalcpadApiClient {
         if (!this.baseUrl) return false;
         try {
             const response = await fetch(this.baseUrl + '/api/calcpad/health', {
-                headers: this.authHeaders(),
+                headers: this.requestHeaders(),
                 signal: AbortSignal.timeout(timeoutMs),
             });
             return response.ok;
@@ -535,7 +549,7 @@ export class CalcpadApiClient {
         try {
             this.logger?.appendLine(`[${tag}] Sending request to server...`, 'verbose');
             const response = await fetch(url, {
-                headers: this.authHeaders(),
+                headers: this.requestHeaders(),
                 signal: AbortSignal.timeout(30000),
             });
             if (!response.ok) {

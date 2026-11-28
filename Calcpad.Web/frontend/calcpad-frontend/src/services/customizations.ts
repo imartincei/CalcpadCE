@@ -321,8 +321,8 @@ export function removeQuickType(quickTypes: Record<string, string>, key: string)
 }
 
 function quickTypeFormatError(value: string): string | null {
-    if (!value || value.length > QUICK_TYPE_MAX_LENGTH) return 'Enter 1 to {max} characters';
-    if (/[\s~]/.test(value)) return 'Spaces and ~ are not allowed';
+    if (!value || value.length > QUICK_TYPE_MAX_LENGTH) return 'catalog.enter1ToMaxCharacters';
+    if (/[\s~]/.test(value)) return 'catalog.spacesAndAreNotAllowed';
     return null;
 }
 
@@ -336,6 +336,6 @@ export function validateQuickType(key: string, quickTypes: Record<string, string
     const formatError = quickTypeFormatError(key);
     if (formatError) return { message: formatError, params: { max: QUICK_TYPE_MAX_LENGTH } };
     const existing = quickTypes[key];
-    if (existing) return { message: '~{key} already inserts {text}', params: { key, text: existing } };
+    if (existing) return { message: 'catalog.keyAlreadyInsertsText', params: { key, text: existing } };
     return null;
 }

@@ -1,0 +1,128 @@
+{
+  "generator": "../../../../scripts/i18n/i18n.mjs",
+  "source": "microsoft/vscode-loc",
+  "tag": "v1.96.2024121109",
+  "commit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+  "license": "MIT",
+  "maps": {
+    "cs.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-cs",
+      "vscodeSource": "vscode-monaco"
+    },
+    "de.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-de",
+      "vscodeSource": "vscode-monaco"
+    },
+    "es.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-es",
+      "vscodeSource": "vscode-monaco"
+    },
+    "fr.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-fr",
+      "vscodeSource": "vscode-monaco"
+    },
+    "it.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-it",
+      "vscodeSource": "vscode-monaco"
+    },
+    "ja.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-ja",
+      "vscodeSource": "vscode-monaco"
+    },
+    "ko.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-ko",
+      "vscodeSource": "vscode-monaco"
+    },
+    "pl.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-pl",
+      "vscodeSource": "vscode-monaco"
+    },
+    "pt-BR.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-pt-BR",
+      "vscodeSource": "vscode-monaco"
+    },
+    "ru.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-ru",
+      "vscodeSource": "vscode-monaco"
+    },
+    "tr.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-tr",
+      "vscodeSource": "vscode-monaco"
+    },
+    "zh.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-zh-hans",
+      "vscodeSource": "vscode-monaco"
+    },
+    "zh-Hant.json": {
+      "source": "vscode",
+      "pack": "vscode-language-pack-zh-hant",
+      "vscodeSource": "vscode-monaco"
+    }
+  },
+  "overrides": {
+    "cs": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "de": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "es": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "fr": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "it": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "ja": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "ko": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "pl": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "pt-BR": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "ru": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "tr": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "zh": {
+      "source": "community",
+      "replaces": "vscode"
+    },
+    "zh-Hant": {
+      "source": "community",
+      "replaces": "vscode"
+    }
+  }
+}

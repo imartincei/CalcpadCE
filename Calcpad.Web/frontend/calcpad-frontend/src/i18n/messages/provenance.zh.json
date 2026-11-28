@@ -1,0 +1,2222 @@
+{
+  "locale": "zh",
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-zh-hans"
+  },
+  "origins": {
+    "18611801": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "Updating \"source file\" language to \"CalcpadCE file\" per previous discussions"
+    },
+    "111083a9": {
+      "author": "bfmomo",
+      "date": "2026-10-30",
+      "subject": "fix: address review feedback"
+    },
+    "1d864bc8": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "Adding calculatePost setting to skip #post blocks in the input form"
+    },
+    "341faa57": {
+      "author": "Isaiah Martin",
+      "date": "2026-10-31",
+      "subject": "Adding undo/redo functionality to input form in desktop app and vs code"
+    },
+    "35cde5eb": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-06",
+      "subject": "- Adding feature to open multiple folders in desktop app - Folder state is synced to all windows. This is a simplification for now, and more complex folder management in different windows can be a future improvement."
+    },
+    "3e486ccf": {
+      "author": "bfmomo",
+      "date": "2026-10-29",
+      "subject": "feat(i18n): add a Chinese interface"
+    },
+    "40fa6871": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-06",
+      "subject": "- Adding run modes for manual, edit automatically, and plan modes - Adding change tracker that does diffs on any changes the AI makes and allows keeping or reverting the changes. - Known bug that plan mode doesn't seem to work, fix in followup commit"
+    },
+    "48fabc32": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "Merge branch 'main' into feat/desktop-claude-code-plugin"
+    },
+    "515a0e74": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-05",
+      "subject": "- Auto-syncing of changes from external programs for desktop app - Adding conflict resolution workflow when an unsaved document is changed externally and the user tries to save."
+    },
+    "6e7ce353": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-07",
+      "subject": "- Fixing animations to respect reduced motion - Removing inline Chinese strings - Fixing tsc error on main.ts - Updating frontend skill with instructions on reduced motion and i18n"
+    },
+    "ae2a07a1": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-21",
+      "subject": "moving claude code logic back into the core application, adding dropdown to switch harnesses. - auto-detects Claude Code, Codex CLI, Gemini CLI, Github Copilot CLI, opencode, and pi. - fixing plan mode to not show raw tool calls - making styling match rest of CalcpadCE theme - updating global.json - making write tool open the file if it is closed and adding it to the change tracker. - adding question cards for various harnesses - support for new external files"
+    },
+    "ae83e4dc": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-05",
+      "subject": "- Adding setting for UIOverride hints above the line it is defined. - Macros, includes, and loops show the number of UIOverrides - All hints give a link to the UIOverrides section in the properties panel - Adding setting to filter UIOverrides in Property tab by selected lines. - Making progress on Issue #333"
+    },
+    "b66ec66e": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "- Editors: Insert and Settings tabs have a Favorites section at the top. Starred items stay in their own section, and starred snippets are listed first in autocomplete with a ★ - Editors: new Keyboard Shortcuts section in Settings. Built-in hotkeys can be rebound, and any setting can get a hotkey that turns it on and off or opens it - Editors: quick-type keys can be added or removed per snippet. Quick typing an item with parameters selects the first parameter like autocomplete - Editors: custom snippets are the last category in the Insert tab and are offered in autocomplete. Like built-ins, they store a type (Text, Function, Macro, Variable or Unit), parameters, return type and example - Editors: \"Save as Custom Snippet\" in the Variables tab and the editor's right-click menu fills in the snippet from a definition and its metadata comment, or from the selected text - Editors: hotkeys and quick-type keys that conflict with existing ones can't be saved - Default keybindings and quick types now live in settings.default.json so they save and reset with presets - VS Code: keybinding changes are mirrored into the user's keybindings.json, which is left alone if it has syntax errors"
+    },
+    "b7fa50dc": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "Desktop Files tab: right-click to insert a #include, #read or image reference with a relative or absolute path"
+    },
+    "c18e7fd9": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-14",
+      "subject": "- Editors: UI Overrides in the Properties tab has \"Override Defaults\", which writes values for #UI lines in this file (outside loops, macros and includes) into the source and removes them from the overrides - Editors: \"Revert to defaults\" removes the listed overrides so those controls use their default values - Editors: new \"Auto-Sync #UI Values\" setting (off by default). For #UI lines in this file outside loops, macros and includes, input form values are written into the #UI line, and editing a line's value removes its override. - Editors: the Properties tab shows how many changes are pending above Apply and Reset, and each section gets its own Apply and Reset buttons. - Desktop: the hidden metadata footer no longer reappears in the editor after saving #UI values - Updating docs"
+    },
+    "e15f5897": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-06",
+      "subject": "Initial prototype for mcp server and chat window"
+    },
+    "e9e35576": {
+      "author": "bfmomo",
+      "date": "2026-10-31",
+      "subject": "Merge upstream main into the Chinese-UI branch"
+    },
+    "fb220284": {
+      "author": "Isaiah Martin",
+      "date": "2026-11-15",
+      "subject": "adding mcp server that is not claude-specific"
+    },
+    "a89ad055": {
+      "author": "Luan Weslley",
+      "date": "2026-11-27",
+      "subject": "Merge origin/main into i18n/monaco-nls"
+    }
+  },
+  "keys": {
+    "agentChat.accepted": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.agent": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.allow": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.allowed": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.allowForThisConversation": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.allowThisActionQuestion": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.appliedAutomatically": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.approvePlan": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.askNameAboutYourOpenWorksheetsItCan": {
+      "source": "community",
+      "origin": "fb220284"
+    },
+    "agentChat.changes": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.changesInOpenConversations": {
+      "source": "community",
+      "origin": "a89ad055"
+    },
+    "agentChat.closed": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.closedRevertingReopensIt": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.conversationHistory": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.default": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.denied": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.deny": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.doneOfTotalDone": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.enterPlanMode": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.enterToSendShiftEnterForANew": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.exitPlanMode": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.foundAutomatically": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.keepAll": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.keepChanges": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.keepPlanning": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.keptPlanning": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.messageNameEllipsis": {
+      "source": "community",
+      "origin": "fb220284"
+    },
+    "agentChat.model": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.nameChat": {
+      "source": "community",
+      "origin": "fb220284"
+    },
+    "agentChat.nameExecutable": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.nameNotFound": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.nameWasNotFoundInstallItHintOr": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.newConversation": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.noLongerPending": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.noOpenConversationHasChangedAWorksheet": {
+      "source": "community",
+      "origin": "a89ad055"
+    },
+    "agentChat.noSavedConversationsYet": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.notFoundInstallItHintOrEnterThe": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.otherAnswerEllipsis": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.permissionMode": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.plan": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.planApproved": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.planModeNameCanReadAndPlanBut": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.proposedEdit": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.question": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.questions": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.rejected": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.revertAll": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.revertToBackup": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.reviewTheDiffToAcceptOrRejectIt": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.runningInAnotherWindow": {
+      "source": "community",
+      "origin": "a89ad055"
+    },
+    "agentChat.runningInAnotherWindowYouCanContinue": {
+      "source": "community",
+      "origin": "a89ad055"
+    },
+    "agentChat.send": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.setPath": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.showChanges": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.skip": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.skipped": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.startingNameEllipsis": {
+      "source": "community",
+      "origin": "fb220284"
+    },
+    "agentChat.stop": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.subagent": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.submit": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.todos": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentChat.untitled": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.untitledConversation": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.viewChanges": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentChat.workingEllipsis": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentChat.yourAnswerEllipsis": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "agentDiff.accept": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "agentDiff.backup": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentDiff.changesSinceBackup": {
+      "source": "community",
+      "origin": "40fa6871"
+    },
+    "agentDiff.current": {
+      "source": "community",
+      "origin": "48fabc32"
+    },
+    "agentDiff.reject": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "api.prettify": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.backToThePreviousHashPause": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.calculatingEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.closeAll": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "app.closeOthers": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "app.continuePastTheNextHashPause": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.copyAll": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "app.export": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.hashUiInputFormHashPostContentIs": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.hideTheReport": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.hideTheResultsPane": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.hideTheSidebar": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.hideTheSidebarCtrlShiftB": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.input": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.mergeEditorGroups": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.noOutputOnThisChannelYet": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.noProblemsDetected": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.openExternalLinkQuestion": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.openFullHtml": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.openThisFileQuestion": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.problems": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "app.properties": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.refreshPreview": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.refreshPreviewCtrlAltX": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.report": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.runPreview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.runPreviewCtrlAltX": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.saveValues": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.showTheReport": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.showTheResultsPane": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.showTheResultsPaneCtrlP": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.showTheSidebar": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.showTheSidebarCtrlShiftB": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.splitEditorDown": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "app.theDocumentAsWrittenHashPreAndHash": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.thePrintLayoutHashPreHiddenEnteredHash": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.theSourceListingWithMacrosAndIncludesResolved": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.toc": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.toggleNameChat": {
+      "source": "community",
+      "origin": "fb220284"
+    },
+    "app.unwrapped": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "app.variables": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "app.writeTheEnteredValuesIntoTheDocumentSo": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "calcpadHoverProvider.function": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.allOpenDocuments": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "catalog.applyEditsToOpenWorksheetsWithoutReviewNo": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.askBeforeRunningCommandsOrEditing": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.autoMode": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.blueRed": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.blues": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.blueYellow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.bottomMargin": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.closeThisEditorGroup": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.closeUnsavedChanges": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "catalog.copyCtrlC": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.copyFullPath": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.cutCtrlX": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.date": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.editAutomatically": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.enter1ToMaxCharacters": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "catalog.exitInputMode": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.exploreAndProposeAPlanWithoutMakingChanges": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.exportTheReportHashPreHiddenEnteredHash": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.findCtrlF": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.grayscale": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.greenYellow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.keyAlreadyInsertsText": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "catalog.landscape": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.ledger1711In": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.leftMargin": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.legal8514In": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.letter8511In": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.manual": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.netDateTimeFormatStringExampleMD": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.nothingWritesUntilYouPressWriteToDisk": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.onlyAReportRenderWritesThePreviewPane": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.orientation": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.pageNumbers": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.pageOrientation": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.pageSize": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.paperSize": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.pasteCtrlV": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.planMode": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.portrait": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.previewAndReport": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.printPdf": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.purpleYellow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.readAndProposeAPlanNoEditsCommands": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "catalog.redoCtrlY": {
+      "source": "community",
+      "origin": "341faa57"
+    },
+    "catalog.reportOnly": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.results": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.returnToTheEditor": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "catalog.rightMargin": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.showPageNOfMInTheFooter": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.showTheReportTheEnteredValuesProduce": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.showTheTimestampInTheHeader": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.spacesAndAreNotAllowed": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "catalog.splitEditorDownCtrl": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "catalog.tabloid1117In": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.terrain": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.thePreviewAndReportViewsBothWriteSo": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.topMargin": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.undoCtrlZ": {
+      "source": "community",
+      "origin": "341faa57"
+    },
+    "catalog.violetYellow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "catalog.workWithoutAskingChangingOnlyOpenWorksheetsEvery": {
+      "source": "community",
+      "origin": "ae2a07a1"
+    },
+    "common.apply": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.cancel": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.close": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.collapse": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "35cde5eb"
+    },
+    "common.collapseAll": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.copy": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.copyRelativePath": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.cut": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.delete": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "common.description": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.error": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.file": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "e9e35576"
+    },
+    "common.files": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.find": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.formatting": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.insert": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.minimize": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "111083a9"
+    },
+    "common.mode": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.newTab": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.newWindow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.next": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.none": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.off": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.open": {
+      "source": "community",
+      "origin": "e15f5897"
+    },
+    "common.openContainingFolder": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.openEllipsis": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.openFolder": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.openRecent": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.output": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.paste": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.preview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "common.previous": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.redo": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.refresh": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.remove": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.reset": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.restore": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "111083a9"
+    },
+    "common.review": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.save": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.saveAsEllipsis": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.settings": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.system": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.title": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.type": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "common.undo": {
+      "source": "vscode",
+      "vscodeSource": "vscode-shared-ui"
+    },
+    "common.warning": {
+      "source": "community",
+      "replaces": "vscode",
+      "origin": "3e486ccf"
+    },
+    "desktop.closeWindow": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.exportReportToPdfAndOpenCtrlE": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.exportReportToWordAndOpen": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.exportToPdf": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.exportToWord": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.fileMenu": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.fileMenuAltM": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.maximize": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.openDocument": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.openDocumentCtrlO": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.saveDocument": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.saveDocumentCtrlS": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "desktop.tab": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "directives.project": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "documentTabStrip.newTab": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "documentTabStrip.newTabCtrlT": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.editInThePropertiesTab": {
+      "source": "community",
+      "origin": "6e7ce353"
+    },
+    "editor.editMetadataProperties": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.fileInfo": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.focusPreviewToLine": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.nUiOverrideNUiOverrides": {
+      "source": "community",
+      "origin": "6e7ce353"
+    },
+    "editor.runPreview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.saveAsCustomSnippet": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "editor.uiOverrideNameValue": {
+      "source": "community",
+      "origin": "6e7ce353"
+    },
+    "editor.uiOverrides": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "editor.unsavedChanges": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "export.compiledWorksheet": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.downloadAllZip": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.downloadEveryPlotAsASingleZipArchive": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.downloadThisPlotAsAnImageFile": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.exportPortableEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.htmlPdfWord": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.noPlotsInTheCurrentDocument": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.plots": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.portableExports": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.portablePackage": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.reRunTheCurrentDocumentAndListIts": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.runThisDocumentNowAndWriteItsHash": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveCompiledEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveHtmlEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.savePdfEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveThisDocumentAndEverythingItReferencesAs": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveThisDocumentAsACompiledCpdzWorksheet": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.saveThisDocumentsVariantAsAPdf": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "export.saveThisDocumentsVariantAsAWordDocx": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "export.saveThisDocumentsVariantAsStandaloneHtml": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "export.saveWordEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.writeAppend": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.writeFilesLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "export.writeToDisk": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileConflict.anotherProgramChangedThisFileWhileYouHad": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.discardYourEditsAndLoadTheFileFrom": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.fileChangedOnDisk": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.keepBoth": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.keepMine": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.keepTheirs": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.keepYourEditsSavingWillOverwriteTheFile": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.onDiskTheirs": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.saveEachVersionAsACopyNextTo": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileConflict.yourEditsMine": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "fileInfo.alsoTheHeaderTitleOfPdfExportsUnless": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.applyToSaveNChangeResetToRevert": {
+      "source": "community",
+      "origin": "c18e7fd9"
+    },
+    "fileInfo.author": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.clearReview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.created": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.fileInfoIsAddedToTheLastLine": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.lastUpdated": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.lastUpdatedBy": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.noDocumentIsOpen": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.none": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.noUserNameIsSetSoSavesAnd": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.programVersion": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.reviewed": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.reviewedBy": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.setAsReviewed": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "fileInfo.setItInSettings": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "files.closeFolder": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "files.expand": {
+      "source": "community",
+      "origin": "35cde5eb"
+    },
+    "files.insertHashIncludeAbsolutePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.insertHashIncludeRelativePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.insertHashReadAbsolutePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.insertHashReadRelativePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.insertImageAbsolutePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.insertImageRelativePath": {
+      "source": "community",
+      "origin": "b7fa50dc"
+    },
+    "files.noFolderOpen": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "files.openAnotherFolder": {
+      "source": "community",
+      "origin": "35cde5eb"
+    },
+    "files.showAllFiles": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.autoIndentsTheActiveDocumentContentIsNot": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.indentStyleLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.prettifyDocument": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.space": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.spacesPerLevelLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.trimTrailingWhitespace": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "formatting.unavailableInInputMode": {
+      "source": "community",
+      "origin": "111083a9"
+    },
+    "hotkeys.keyIsAlreadyUsedByName": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "hotkeys.pressAKeyCombinationEllipsis": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.add": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.addCustomSnippet": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.addParameter": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.addToFavorites": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.customSnippets": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.customUnit": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.editCustomSnippet": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.enterTheTextToInsert": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.example": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.favorites": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.insertAnImageFromFile": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.insertedText": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.insertSearchResults": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.letters": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.loadingInsertItemsEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.macro": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.name": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.newCustomSnippet": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.noInsertDataAvailable": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.noInsertItemsAvailable": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.parameterDescription": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.parameterName": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.parameters": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.parametersFillThePlaceholdersInTheInsertedText": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.parameterType": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.quickType": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.quickTypeForName": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.removeFromFavorites": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.removeKey": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.returnType": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.searchItemsEllipsis": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.searchItemsKey": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.starAnItemToPinItHere": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.symbolPalette": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.symbolsLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "insert.text": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.typeThenTheLettersAndASpaceTo": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.valueType": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "insert.variable": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.clearRecent": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.closeTab": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.noRecentFiles": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.quit": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.restartServer": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.showServerLog": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "menu.stopServer": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.acceptAnyExpressionWrittenToTheDocumentVerbatim": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.allowExpressions": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.columnHeaders": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.columns": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.columnWidths": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.fields": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.goToThisLine": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.gridWidth": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.keepTheUnit": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.offPutsTheUnitInTheControlInstead": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.parameterDescriptions": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.parameterTypes": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.pixelsOrAPercentageOfTheLineSuch": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.placeTheCursorOnALineToEdit": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.reportStyleClass": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.rowHeaders": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.rowHeaderWidth": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.rows": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.searchPropertiesEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.styleClass": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.thisHashUiDirectiveContainsInvalidJsonApplying": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.unsavedChangesApplyOrReset": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "metadata.whatThisDefinitionDoes": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.both": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.footerOnly": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.headerFooterLineColor": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.headerFooterSeparatorLineColorAsAHex": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.headerOnly": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.showHeaderFooterLines": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.timestampFormat": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "pdfsettings.whichSeparatorLineSToDraw": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "search.clearSearch": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "service.aHotkeyNeedsCtrlAltOrMetaOr": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.applyHashUiValuesInPreview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "service.autoRunPreview": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "service.bold": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.bulletedList": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.calculateHashPostInInputForm": {
+      "source": "community",
+      "origin": "1d864bc8"
+    },
+    "service.heading1": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.heading2": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.heading3": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.heading4": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.heading5": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.heading6": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.italic": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.lineBreak": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.numberedList": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.paragraph": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.pasteAsComment": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.searchInsertItems": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.subscript": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.superscript": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.toggleComment": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.uncomment": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "service.underline": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.activeConfigLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.adaptivePlotting": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.addsALinePerRequestOnBothThe": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.addsOneOffEventsStartupTheBoundUrl": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.angleUnit0Degrees1Radians2Gradians": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.angleUnits": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.calculateHashPostBlocksWhileTheInputForm": {
+      "source": "community",
+      "origin": "1d864bc8"
+    },
+    "settings.changeShortcut": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.colorThemeLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.commentFormatLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.completionDelayMsLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.complexNumbers": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.concentratesSamplePointsWhereTheCurveBendsSharply": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.configuration": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.darkModeBackgroundLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.decimalPlacesInOutput0To15": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.decimals": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.degrees": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.displayVerySmallMatrixVectorValuesAs0": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.enable3DPlotShadows": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.enableComplexNumberMode": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.enableFormattingHotkeys": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.enableQuickTyping": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.failuresPlusRecoverableProblemsSuchAsAMissing": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.fontFamilyLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.formatEquations": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.gradians": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.heightOfThePlotAreaInPixelsAt": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.ignoreHashHideSoSuppressedContentIsRendered": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.information": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.keyboardShortcuts": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.language": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.languageLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.lightDirectionLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.linterMinimumSeverityLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.logLevelLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.mathSettings": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.maximumNumberOfRowsColumnsShownForLarge": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.maxOutputCount": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.maxOutputLinesPerChannelLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.maxPreviewConsoleMessagesLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.maxPreviewSizeMbLabel": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.meshSizeForMapSurfacePlottingInPixels": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.nonMetricUnits": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.numericalPrecision": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.on": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.onlyFailuresCrashAndHangReportsAreAlways": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.plotColorScale": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.plotHeight": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.plotMeshStep": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.plotShadows": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.plotWidth": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.professionalCheckedRendersEquationsInStackedMathForm": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.radians": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.rainbow": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.relativePrecisionForNumericalMethodsSuchAsIntegration": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.rendersPlotsAsSvgScalableSharpAtAny": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.searchSettingsEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.selectsUsOrUkDefinitionsForBareUnit": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.setAHotkeyToOpenThisSetting": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.setAHotkeyToToggleThisSetting": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.settingName": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.showHiddenOutput": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.smoothColorScale": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.smoothColorScaleTransitions": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.solverTolerance": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.starASettingToPinItHere": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.substituteVariables": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.substituteVariableValuesIntoExpressions": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.targetToleranceForTheIterativePcgSolverAnd": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.theHotkeyOpensThisSetting": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.theHotkeyTurnsThisSettingOnAndOff": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.unassigned": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "settings.vectorGraphics": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.verbose": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.widthOfThePlotAreaInPixelsAt": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "settings.zeroSmallMatrixElements": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "toc.loadingHeadingsEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "toc.noHeadingsFoundAddHeadingsToYourDocument": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "toc.orMarkdown": {
+      "source": "community",
+      "origin": "e9e35576"
+    },
+    "toc.syntax": {
+      "source": "community",
+      "origin": "515a0e74"
+    },
+    "uiOverrides.checkingWhichControlsStillExistEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "uiOverrides.includesValuesFromHashIncludeLinesAndMacro": {
+      "source": "community",
+      "origin": "ae83e4dc"
+    },
+    "uiOverrides.noSavedHashUiValuesValuesEnteredInto": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "uiOverrides.noValuesForTheSelectedLines": {
+      "source": "community",
+      "origin": "ae83e4dc"
+    },
+    "uiOverrides.overrideDefaults": {
+      "source": "community",
+      "origin": "c18e7fd9"
+    },
+    "uiOverrides.overrideDefaultsN": {
+      "source": "community",
+      "origin": "c18e7fd9"
+    },
+    "uiOverrides.placeTheCursorOnALineToSee": {
+      "source": "community",
+      "origin": "ae83e4dc"
+    },
+    "uiOverrides.purgeUnused": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "uiOverrides.revertsDisplayedHashUiOverridesBackToTheir": {
+      "source": "community",
+      "origin": "c18e7fd9"
+    },
+    "uiOverrides.revertToDefaults": {
+      "source": "community",
+      "origin": "c18e7fd9"
+    },
+    "uiOverrides.selectedLinesOnly": {
+      "source": "community",
+      "origin": "ae83e4dc"
+    },
+    "uiOverrides.valuesEnteredIntoTheInputFormClickA": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "uiOverrides.writeHashUiOverridesIntoTheCalcpadceFile": {
+      "source": "community",
+      "origin": "18611801"
+    },
+    "variables.copyDefinition": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "variables.copyName": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "variables.editCustomSnippet": {
+      "source": "community",
+      "origin": "b66ec66e"
+    },
+    "variables.loadingVariablesEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "variables.noVariablesFoundOpenACalcpadceDocumentTo": {
+      "source": "community",
+      "origin": "3e486ccf"
+    },
+    "variables.searchVariablesMacrosFunctionsCustomUnitsEllipsis": {
+      "source": "community",
+      "origin": "3e486ccf"
+    }
+  }
+}

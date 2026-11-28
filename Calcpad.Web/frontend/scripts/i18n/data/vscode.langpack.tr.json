@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-tr"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Kapat"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Kapat"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Kopyala"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Kapat"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Hata",
+        "Warning": "Uyarı"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Sonraki",
+        "previous": "Önceki"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Kapat"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "İptal"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Ekle"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Kapat"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Hata",
+        "accessibility.signals.positionHasWarning": "Uyarı",
+        "accessibility.signals.save": "Kaydet",
+        "accessibilitySignals.save": "Kaydet"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Dosya"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Hata",
+        "sev.warning": "Uyarı"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "Hata",
+        "dialogWarningMessage": "Uyarı"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "Kapat"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "Tümünü Daralt"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "Kopyala",
+        "copyAll": "Tümünü Kopyala"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "Kapat"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "Kopyala"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "Kapat"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "Hata",
+        "Warning": "Uyarı"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "Sonraki",
+        "previous": "Önceki"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "Kapat"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "İptal"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "Ekle"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "Kapat"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "Hata",
+        "accessibility.signals.positionHasWarning": "Uyarı",
+        "accessibility.signals.save": "Kaydet",
+        "accessibilitySignals.save": "Kaydet"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "Dosya"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "İptal"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "Klasörü Aç"
+      },
+      "vs/platform/log/common/log": {
+        "error": "Hata",
+        "off": "Kapalı",
+        "warn": "Uyarı"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "Hata",
+        "sev.warning": "Uyarı"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "İptal",
+        "mMinimize": "Simge durumuna küçült",
+        "mNewTab": "Yeni Sekme"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "İptal"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "Yeni Pencere"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "Başlık"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "Açıklama",
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "Kaldır"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "Kapat"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "Kopyala",
+        "cut": "Kes",
+        "paste": "Yapıştır",
+        "redo": "Yinele",
+        "undo": "Geri al"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "Yeni Pencere"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "Aç..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "Kapat",
+        "closeAll": "Tümünü Kapat",
+        "closeOthers": "Diğerlerini Kapat",
+        "newWindow": "Yeni Pencere"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "Kapat"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "Klasör Aç",
+        "watermark.openRecent": "Son Kullanılanları Aç"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "Tümünü Daralt",
+        "refresh": "Yenile"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "Sorunlar"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "İptal"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "Uygula"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "Kopyala"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "Tümünü Kopyala",
+        "interactive.copyItem.label": "Kopyala"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "İptal"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "Dosya",
+        "files": "Dosyalar"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "İptal",
+        "save": "Kaydet"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "Kopyala"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "Kapat",
+        "label.find": "Bul",
+        "placeholder.find": "Bul"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "Daralt"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "Mod",
+        "noTriggerByBreakpoint": "Yok"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "Değişkenler"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "Tümünü Daralt",
+        "copy": "Kopyala",
+        "copyAll": "Tümünü Kopyala"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "Tür"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "Önizleme"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "Yok",
+        "refreshExtension": "Yenile",
+        "workbench.extensions.action.configure": "Ayarlar",
+        "workbench.extensions.action.copyExtension": "Kopyala"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "İptal",
+        "close": "Kapat",
+        "review": "Gözden geçir"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "Hata"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "Klasörü Aç"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "Klasörü Aç",
+        "openRecent": "Son Kullanılanları Aç"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "Kopyala"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "Kapat",
+        "closeAll": "Tümünü Kapat",
+        "closeOthers": "Diğerlerini Kapat",
+        "copyRelativePath": "Göreli Yolu Kopyala"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "Kaydet",
+        "saveAs": "Farklı Kaydet..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "Dosyalar"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "Dosya",
+        "openContainer": "İçeren Klasörü Aç"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "Biçimlendirme",
+        "null": "Yok",
+        "nullFormatterDescription": "Yok"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "İptal"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "İptal",
+        "save": "Kaydet"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "Açıklama"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "Başlık"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "İçeren Klasörü Aç"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "Tümünü Daralt",
+        "copyMarker": "Kopyala",
+        "problems": "Sorunlar",
+        "status.problems": "Sorunlar"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "Sorunlar"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "Dosya"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "Sorunlar"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "Sıfırla"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "Kapat"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "Biçimlendirme"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "Değişkenler"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "Çıktı"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "Tümünü Daralt"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "Çıkış"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "Çıkış"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "Kopyala"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "Önizleme"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "Dosyalar",
+        "formatting": "Biçimlendirme",
+        "newWindow": "Yeni Pencere",
+        "output": "Çıkış",
+        "problems": "Sorunlar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "İptal"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "Çıkış"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "Kapat"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "Yenile"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "Kapat",
+        "scmInputCancelAction": "İptal et"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "Tümünü Kopyala",
+        "copyMatchLabel": "Kopyala"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "Tümünü Daralt",
+        "RefreshAction.label": "Yenile"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "Klasör Aç"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "Kopyala"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "Kapat",
+        "insert": "Ekle"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "Kopyala"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "Dosya"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "İptal Et",
+        "noIconThemeLabel": "Yok"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "Yenile"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "Kapat"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "Kopyala",
+        "empty profile": "Yok",
+        "none": "Yok",
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "İptal",
+        "preview": "Önizleme"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "İptal"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "Geri Yükle"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "Klasörü Aç"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "Kopyala"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "Başlık"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "Açma...",
+        "openFolder": "Klasörü Aç"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "Dosya"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "İptal"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "Sıfırla",
+        "zoomSettings": "Ayarlar"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "Başlık"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "Klasör Aç"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "İptal"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "Sistem"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "Ayarlar"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "İptal"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "Açıklama"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "Yok"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "Kapat"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "Kaydet"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "Ayarlar"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "Farklı Kaydet..."
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "Kaydet"
+      }
+    }
+  }
+}

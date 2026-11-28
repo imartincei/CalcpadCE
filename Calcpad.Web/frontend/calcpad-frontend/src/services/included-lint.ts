@@ -14,6 +14,8 @@ export interface IncludedLintDiagnostic {
     endColumn: number;
     code: string;
     message: string;
+    messageId?: string;
+    messageParams?: Record<string, string | number>;
     severityId: number;
     source: string;
     /** Locations in the base file, starting with where it reports the error. */
@@ -47,10 +49,19 @@ export class IncludedLintStore {
                     endColumn: origin.endColumn,
                     code: d.code,
                     message: `From ${baseName}: ${origin.message}`,
+                    messageId: 'lint.fromBase',
+                    messageParams: { base: baseName, message: origin.message },
                     severityId: d.severityId,
                     source: d.source,
                     related: [
-                        { line: d.line, column: d.column, endColumn: d.endColumn, message: `Reported in ${baseName}` },
+                        {
+                            line: d.line,
+                            column: d.column,
+                            endColumn: d.endColumn,
+                            message: `Reported in ${baseName}`,
+                            messageId: 'lint.reportedIn',
+                            params: { base: baseName },
+                        },
                         ...(d.related ?? []),
                     ],
                 });

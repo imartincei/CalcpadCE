@@ -46,59 +46,59 @@
               :class="{ active: resultMode === 'preview' }"
               :aria-pressed="resultMode === 'preview'"
               @click="setResultMode('preview')"
-              :title="t('The document as written — #pre and #post both shown, entered #UI values ignored')"
-            >{{ t('Preview') }}</button>
+              :title="t('app.theDocumentAsWrittenHashPreAndHash')"
+            >{{ t('common.preview') }}</button>
             <button
               v-if="resultModeAvailable('unwrapped')"
               class="toolbar-btn"
               :class="{ active: resultMode === 'unwrapped' }"
               :aria-pressed="resultMode === 'unwrapped'"
               @click="setResultMode('unwrapped')"
-              :title="t('The source listing, with macros and includes resolved')"
-            >{{ t('Unwrapped') }}</button>
+              :title="t('app.theSourceListingWithMacrosAndIncludesResolved')"
+            >{{ t('app.unwrapped') }}</button>
             <button
               class="toolbar-btn"
               :class="{ active: resultMode === 'ui' }"
               :aria-pressed="resultMode === 'ui'"
               @click="setResultMode('ui')"
-              :title="t('#UI input form — #post content is hidden')"
-            >{{ t('Input') }}</button>
+              :title="t('app.hashUiInputFormHashPostContentIs')"
+            >{{ t('app.input') }}</button>
             <button
               v-if="resultModeAvailable('report')"
               class="toolbar-btn"
               :class="{ active: resultMode === 'report' }"
               :aria-pressed="resultMode === 'report'"
               @click="setResultMode('report')"
-              :title="t('The print layout — #pre hidden, entered #UI values applied')"
-            >{{ t('Report') }}</button>
+              :title="t('app.thePrintLayoutHashPreHiddenEnteredHash')"
+            >{{ t('app.report') }}</button>
           </div>
           <span v-if="resultMode === 'ui' && hasPauseSteps(uiPause)" class="preview-mode-group">
             <button
               class="toolbar-btn"
               :disabled="uiPause?.previous == null"
               @click="onUiPauseStep('previous')"
-              :title="t('Back to the previous #pause')"
-            >◀ {{ t('Previous') }}</button>
+              :title="t('app.backToThePreviousHashPause')"
+            >◀ {{ t('common.previous') }}</button>
             <button
               class="toolbar-btn"
               :disabled="uiPause?.next == null"
               @click="onUiPauseStep('next')"
-              :title="t('Continue past the next #pause')"
-            >{{ t('Next') }} ▶</button>
+              :title="t('app.continuePastTheNextHashPause')"
+            >{{ t('common.next') }} ▶</button>
           </span>
           <button
             v-if="resultMode === 'ui' && uiOverridesDirty"
             class="toolbar-btn"
             @click="onSaveUiOverrides"
-            :title="t('Write the entered values into the document so they survive a reload')"
-          >{{ t('Save values') }}</button>
+            :title="t('app.writeTheEnteredValuesIntoTheDocumentSo')"
+          >{{ t('app.saveValues') }}</button>
         </div>
         <div class="tab-actions" role="toolbar" aria-label="Editor actions">
           <button
             class="icon"
             @click="onRunPreview"
-            :title="autoRunEnabled ? t('Refresh preview (Ctrl+Alt+X)') : t('Run preview (Ctrl+Alt+X)')"
-            :aria-label="autoRunEnabled ? t('Refresh preview') : t('Run preview')"
+            :title="autoRunEnabled ? t('app.refreshPreviewCtrlAltX') : t('app.runPreviewCtrlAltX')"
+            :aria-label="autoRunEnabled ? t('app.refreshPreview') : t('app.runPreview')"
           >
             <RefreshIcon v-if="autoRunEnabled" />
             <svg v-else viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
@@ -109,7 +109,7 @@
             :disabled="uiModeFullscreen"
             @click="onToggleSplit"
             :title="isSplit ? 'Merge editor groups' : 'Split editor down (Ctrl+\\)'"
-            :aria-label="isSplit ? t('Merge editor groups') : t('Split editor down')"
+            :aria-label="isSplit ? t('app.mergeEditorGroups') : t('app.splitEditorDown')"
             :aria-pressed="isSplit"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2.5" y="2.5" width="11" height="11" rx="1"/><line x1="2.5" y1="8" x2="13.5" y2="8"/></svg>
@@ -117,8 +117,8 @@
           <button
             class="icon results-sidebar-toggle"
             @click="uiModeFullscreen ? toggleUiPrint() : togglePreview()"
-            :title="uiModeFullscreen ? (uiPrintVisible ? t('Hide the report') : t('Show the report')) : (previewVisible ? t('Hide the results pane (Ctrl+P)') : t('Show the results pane (Ctrl+P)'))"
-            :aria-label="uiModeFullscreen ? (uiPrintVisible ? t('Hide the report') : t('Show the report')) : (previewVisible ? t('Hide the results pane') : t('Show the results pane'))"
+            :title="uiModeFullscreen ? (uiPrintVisible ? t('app.hideTheReport') : t('app.showTheReport')) : (previewVisible ? t('app.hideTheResultsPaneCtrlP') : t('app.showTheResultsPaneCtrlP'))"
+            :aria-label="uiModeFullscreen ? (uiPrintVisible ? t('app.hideTheReport') : t('app.showTheReport')) : (previewVisible ? t('app.hideTheResultsPane') : t('app.showTheResultsPane'))"
           >
             <SidebarIcon side="right" :collapsed="uiModeFullscreen ? !uiPrintVisible : !previewVisible" />
           </button>
@@ -171,8 +171,8 @@
                 v-if="!sidebarVisible && gi === 0"
                 class="editor-sidebar-reveal"
                 @click="toggleSidebar"
-                :title="t('Show the sidebar (Ctrl+Shift+B)')"
-                :aria-label="t('Show the sidebar')"
+                :title="t('app.showTheSidebarCtrlShiftB')"
+                :aria-label="t('app.showTheSidebar')"
               >
                 <SidebarIcon collapsed />
               </button>
@@ -199,12 +199,12 @@
         @mousedown.stop
         @click.stop
       >
-        <button class="context-menu" @click="onContextClose">{{ t('Close') }}</button>
+        <button class="context-menu" @click="onContextClose">{{ t('common.close') }}</button>
         <button
           class="context-menu"
           @click="onContextCloseOthers"
-        >{{ t('Close Others') }}</button>
-        <button class="context-menu" @click="onContextCloseAll">{{ t('Close All') }}</button>
+        >{{ t('app.closeOthers') }}</button>
+        <button class="context-menu" @click="onContextCloseAll">{{ t('app.closeAll') }}</button>
         <template v-if="tabContextMenu.filePath">
           <div class="tab-context-sep" role="separator"></div>
           <button class="context-menu" @click="onContextOpenContainingFolder">
@@ -231,12 +231,12 @@
           v-if="problemsContextMenu.problem"
           class="context-menu"
           @click="onCopyProblem"
-        >{{ t('Copy') }}</button>
+        >{{ t('common.copy') }}</button>
         <button
           class="context-menu"
           :disabled="problems.length === 0"
           @click="onCopyAllProblems"
-        >{{ t('Copy All') }}</button>
+        >{{ t('app.copyAll') }}</button>
       </div>
 
       <!-- Output context menu — same copy mechanism as the Problems panel. -->
@@ -251,12 +251,12 @@
           v-if="outputContextMenu.line"
           class="context-menu"
           @click="onCopyOutputLine"
-        >Copy</button>
+        >{{ t('common.copy') }}</button>
         <button
           class="context-menu"
           :disabled="filteredOutputLines.length === 0"
           @click="onCopyAllOutput"
-        >Copy All</button>
+        >{{ t('app.copyAll') }}</button>
       </div>
 
       <!-- Bottom panel (Problems / Output) — reflects the ACTIVE group. -->
@@ -267,7 +267,7 @@
             :class="{ active: activeBottomTab === 'problems' }"
             @click="activeBottomTab = 'problems'"
           >
-            Problems
+            {{ t('app.problems') }}
             <span v-if="errorCount + warningCount + infoCount > 0" class="problems-badge" :class="errorCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'info'">
               {{ errorCount + warningCount + infoCount }}
             </span>
@@ -277,7 +277,7 @@
             :class="{ active: activeBottomTab === 'output' }"
             @click="activeBottomTab = 'output'"
           >
-            Output
+            {{ t('common.output') }}
           </button>
           <select
             v-if="activeBottomTab === 'output'"
@@ -286,7 +286,7 @@
             title="Output channel"
           >
             <option v-for="ch in (['app', 'preview', 'server', 'html'] as OutputChannel[])" :key="ch" :value="ch">
-              {{ OUTPUT_CHANNEL_LABELS[ch] }}
+              {{ outputChannelLabel(ch) }}
             </option>
           </select>
           <span v-if="isSplit" class="panel-scope" :title="'Showing the active editor group'">
@@ -315,7 +315,7 @@
             <span v-if="problem.code" class="problem-code">{{ problem.code }}</span>
             <span class="problem-location">[Ln {{ problem.startLineNumber }}, Col {{ problem.startColumn }}]</span>
           </div>
-          <div v-if="problems.length === 0" class="problems-empty">{{ t('No problems detected.') }}</div>
+          <div v-if="problems.length === 0" class="problems-empty">{{ t('app.noProblemsDetected') }}</div>
         </div>
         <!-- Output tab -->
         <div
@@ -335,7 +335,7 @@
             <span class="output-level">{{ line.label }}</span>
             <span class="output-message">{{ line.message }}</span>
           </div>
-          <div v-if="filteredOutputLines.length === 0" class="problems-empty">{{ t('No output on this channel yet.') }}</div>
+          <div v-if="filteredOutputLines.length === 0" class="problems-empty">{{ t('app.noOutputOnThisChannelYet') }}</div>
         </div>
       </div>
 
@@ -411,7 +411,7 @@
           :class="{ 'preview-dark': previewTheme === 'dark' }"
         >
           <div class="preview-spinner"></div>
-          <span>{{ t('Calculating…') }}</span>
+          <span>{{ t('app.calculatingEllipsis') }}</span>
         </div>
       </div>
     </div>
@@ -495,30 +495,30 @@
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.undo"
           @click="onPreviewUiHistory('uiUndo')"
-        >{{ t('Undo (Ctrl+Z)') }}</button>
+        >{{ shortcutLabel('common.undo', ' (Ctrl+Z)') }}</button>
         <button
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.redo"
           @click="onPreviewUiHistory('uiRedo')"
-        >{{ t('Redo (Ctrl+Y)') }}</button>
+        >{{ shortcutLabel('common.redo', ' (Ctrl+Y)') }}</button>
       </template>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('cut')"
-      >{{ t('Cut (Ctrl+X)') }}</button>
+      >{{ shortcutLabel('common.cut', ' (Ctrl+X)') }}</button>
       <button
         class="context-menu"
         :disabled="!previewContextMenu.selection && !previewContextMenu.editable"
         @click="onPreviewClipboard('copy')"
-      >{{ t('Copy (Ctrl+C)') }}</button>
+      >{{ shortcutLabel('common.copy', ' (Ctrl+C)') }}</button>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('paste')"
-      >{{ t('Paste (Ctrl+V)') }}</button>
-      <button class="context-menu" @click="onFindInPreview">{{ t('Find… (Ctrl+F)') }}</button>
-      <button v-if="onOpenFullHtmlRequest" class="context-menu" @click="onOpenFullHtml">{{ t('Open Full HTML') }}</button>
+      >{{ shortcutLabel('common.paste', ' (Ctrl+V)') }}</button>
+      <button class="context-menu" @click="onFindInPreview">{{ shortcutLabel('common.find', '… (Ctrl+F)') }}</button>
+      <button v-if="onOpenFullHtmlRequest" class="context-menu" @click="onOpenFullHtml">{{ t('app.openFullHtml') }}</button>
     </div>
 
     <!-- HTML modal rather than a native dialog, for web/desktop consistency. -->
@@ -529,7 +529,7 @@
         <div class="modal-actions">
           <button class="modal-btn" @click="resolveConfirm('yes')">{{ confirmState.yesLabel }}</button>
           <button class="modal-btn secondary" @click="resolveConfirm('no')">{{ confirmState.noLabel }}</button>
-          <button class="modal-btn secondary" @click="resolveConfirm('cancel')">{{ t('Cancel') }}</button>
+          <button class="modal-btn secondary" @click="resolveConfirm('cancel')">{{ t('common.cancel') }}</button>
         </div>
       </div>
     </div>
@@ -538,11 +538,11 @@
     <div v-if="openLinkState" class="modal-backdrop" @click.self="resolveOpenLink(false)">
       <div class="modal-card" role="dialog" aria-modal="true">
         <template v-if="openLinkState.mode === 'file'">
-          <div class="modal-title">{{ t('Open this file?') }}</div>
+          <div class="modal-title">{{ t('app.openThisFileQuestion') }}</div>
           <div class="modal-message">This path comes from the worksheet. Your system will choose the application that opens it.</div>
         </template>
         <template v-else>
-          <div class="modal-title">{{ t('Open external link?') }}</div>
+          <div class="modal-title">{{ t('app.openExternalLinkQuestion') }}</div>
           <div class="modal-message">This link comes from the worksheet and will open in your browser.</div>
         </template>
         <div class="modal-url">{{ openLinkState.url }}</div>
@@ -600,7 +600,7 @@
         <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
       </svg> {{ infoCount }}
     </span>
-    <span class="status-output" @click="openBottomTab('output')">{{ t('Output') }}</span>
+    <span class="status-output" @click="openBottomTab('output')">{{ t('common.output') }}</span>
     <span class="spacer"></span>
     <span v-if="serverStatus !== 'connected'" class="status-server" :class="serverStatus" :title="serverStatusTitle">
       ● {{ serverStatusLabel }}
@@ -609,8 +609,8 @@
       v-if="isDesktop"
       class="status-agent"
       :class="{ active: agentChat.panelOpen }"
-      :title="t('Toggle {name} chat', { name: providerName() })"
-      :aria-label="t('Toggle {name} chat', { name: providerName() })"
+      :title="t('app.toggleNameChat', { name: providerName() })"
+      :aria-label="t('app.toggleNameChat', { name: providerName() })"
       :aria-pressed="agentChat.panelOpen"
       @click.stop="setPanelOpen(!agentChat.panelOpen)"
     >
@@ -622,7 +622,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'calcpad-frontend/i18n'
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import DesktopTitleBar from './components/DesktopTitleBar.vue'
 import DocumentTabStrip from './components/DocumentTabStrip.vue'
@@ -659,6 +659,11 @@ import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
 import { navigationDirection } from './editor/navigation-history'
 
 const { t } = useI18n()
+
+function shortcutLabel(key: string, suffix: string): string {
+  const label = t(key)
+  return label === key ? key : `${label}${suffix}`
+}
 
 const props = withDefaults(defineProps<{ isDesktop?: boolean }>(), { isDesktop: false })
 const autoRunEnabled = ref(true)
@@ -1538,11 +1543,13 @@ export interface OutputLine {
   groupId?: string
 }
 
-const OUTPUT_CHANNEL_LABELS: Record<OutputChannel, string> = {
-  app: 'CalcpadCE',
-  preview: 'Preview Console',
-  server: 'Server',
-  html: 'HTML Preview Output',
+function outputChannelLabel(channel: OutputChannel): string {
+  switch (channel) {
+    case 'preview': return t('app.previewConsole')
+    case 'server': return t('app.server')
+    case 'html': return t('app.htmlPreviewOutput')
+    default: return 'CalcpadCE'
+  }
 }
 
 const outputLines = ref<OutputLine[]>([])

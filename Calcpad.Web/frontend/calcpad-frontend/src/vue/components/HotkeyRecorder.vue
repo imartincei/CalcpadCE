@@ -8,18 +8,18 @@
         data-hotkey-recorder
         readonly
         :value="pending ? formatHotkey(pending) : ''"
-        :placeholder="t('Press a key combination...')"
-        :aria-label="t('Press a key combination...')"
+        :placeholder="t('hotkeys.pressAKeyCombinationEllipsis')"
+        :aria-label="t('hotkeys.pressAKeyCombinationEllipsis')"
         @keydown="onKeydown"
       />
-      <button :disabled="!pending || !!error" @click="emit('save', toPortableHotkey(pending))">{{ t('Save') }}</button>
-      <button v-if="current" @click="emit('save', '')">{{ t('Remove') }}</button>
+      <button :disabled="!pending || !!error" @click="emit('save', toPortableHotkey(pending))">{{ t('common.save') }}</button>
+      <button v-if="current" @click="emit('save', '')">{{ t('common.remove') }}</button>
       <button
         v-if="defaultValue && current !== defaultValue"
         :title="formatHotkey(normalizeHotkey(defaultValue) ?? defaultValue)"
         @click="emit('save', defaultValue)"
-      >{{ t('Reset') }}</button>
-      <button @click="emit('cancel')">{{ t('Cancel') }}</button>
+      >{{ t('common.reset') }}</button>
+      <button @click="emit('cancel')">{{ t('common.cancel') }}</button>
     </div>
     <span v-if="error" class="hotkey-recorder-error">{{ error }}</span>
     <span v-else-if="hint" class="hotkey-recorder-hint">{{ hint }}</span>
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { formatHotkey, hotkeyFromEvent, isMacPlatform, normalizeHotkey, toPortableHotkey, validateHotkey } from '../../services/hotkeys'
 import { findKeybindingConflict } from '../../services/keybindings'
 import type { HotkeyBinding } from '../../services/hotkeys'
@@ -77,7 +77,7 @@ const error = computed(() => {
   const conflict = findKeybindingConflict(pending.value, props.bindingId, props.keybindings, props.extraReserved)
   if (!conflict) return ''
   const name = conflict.kind === 'reserved' ? t(conflict.label) : props.labelFor(conflict.id)
-  return t('{key} is already used by {name}', { key: formatHotkey(pending.value), name })
+  return t('hotkeys.keyIsAlreadyUsedByName', { key: formatHotkey(pending.value), name })
 })
 </script>
 

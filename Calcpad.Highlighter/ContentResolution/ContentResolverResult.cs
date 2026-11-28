@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
 using Calcpad.Core;
 using Calcpad.Highlighter.Linter.Helpers;
 
@@ -423,9 +426,15 @@ namespace Calcpad.Highlighter.ContentResolution
     /// <summary>The check pass for each complex mode the document can start in; #settings may switch it later.</summary>
     public sealed class CoreCheckResults(Func<bool, IReadOnlyList<Calcpad.Core.CalcpadError>> check)
     {
-        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _real = new(() => check(false));
-        private readonly Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>> _complex = new(() => check(true));
+        private readonly ConcurrentDictionary<(bool IsComplex, string Culture), Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>>> _checks = new();
 
-        public IReadOnlyList<Calcpad.Core.CalcpadError> Get(bool isComplex) => (isComplex ? _complex : _real).Value;
+        public IReadOnlyList<Calcpad.Core.CalcpadError> Get(bool isComplex)
+        {
+            var key = (isComplex, CultureInfo.CurrentUICulture.Name);
+            return _checks.GetOrAdd(
+                key,
+                _ => new Lazy<IReadOnlyList<Calcpad.Core.CalcpadError>>(
+                    () => check(isComplex), LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+        }
     }
 }

@@ -3,7 +3,7 @@
     <CalcpadSearchField
       ref="searchField"
       v-model="searchTerm"
-      :placeholder="searchShortcut ? t('Search items... ({key})', { key: searchShortcut }) : t('Search items...')"
+      :placeholder="searchShortcut ? t('insert.searchItemsKey', { key: searchShortcut }) : t('insert.searchItemsEllipsis')"
       class="search-container"
       @submit="focusResult(0)"
       @keydown.down.exact="enterResults($event, 0)"
@@ -12,7 +12,7 @@
 
     <div class="insert-scroll-container">
       <div v-if="!searchQuery" class="insert-actions">
-        <button @click="insertImage" class="icon" :title="t('Insert an image from file')" :aria-label="t('Insert an image from file')">
+        <button @click="insertImage" class="icon" :title="t('insert.insertAnImageFromFile')" :aria-label="t('insert.insertAnImageFromFile')">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
             <rect x="2" y="2" width="12" height="12" rx="1" />
             <circle cx="5.5" cy="5.5" r="1.5" />
@@ -23,27 +23,27 @@
       </div>
 
       <div v-if="!searchQuery" class="favorites-palette">
-        <div class="symbols-palette-header" :title="t('Favorites')" @click="panelState.favoritesOpen = !panelState.favoritesOpen">
+        <div class="symbols-palette-header" :title="t('insert.favorites')" @click="panelState.favoritesOpen = !panelState.favoritesOpen">
           <span class="symbols-palette-arrow" :class="{ open: panelState.favoritesOpen }">&#x25B6;</span>
           <span class="favorite-star active">★</span>
-          <span>{{ t('Favorites') }}</span>
+          <span>{{ t('insert.favorites') }}</span>
           <span v-if="favoriteItems.length" class="favorites-count">{{ favoriteItems.length }}</span>
         </div>
         <div v-show="panelState.favoritesOpen" class="favorites-body">
-          <div v-if="favoriteItems.length === 0" class="favorites-empty">{{ t('Star an item to pin it here.') }}</div>
+          <div v-if="favoriteItems.length === 0" class="favorites-empty">{{ t('insert.starAnItemToPinItHere') }}</div>
           <div v-for="item in favoriteItems" :key="item.key" class="item-row">
             <button class="tree-item" :title="buildTooltip(item)" @click="insertItem(item)">{{ formatDisplayText(item) }}</button>
-            <button class="item-action" :title="t('Quick type')" :aria-label="t('Quick type')" @click="openQuickTypeEditor(item)">~</button>
-            <button class="item-action favorite-star active" :title="t('Remove from Favorites')" :aria-label="t('Remove from Favorites')" @click="toggleFavorite(item)">★</button>
+            <button class="item-action" :title="t('insert.quickType')" :aria-label="t('insert.quickType')" @click="openQuickTypeEditor(item)">~</button>
+            <button class="item-action favorite-star active" :title="t('insert.removeFromFavorites')" :aria-label="t('insert.removeFromFavorites')" @click="toggleFavorite(item)">★</button>
           </div>
         </div>
       </div>
 
       <!-- Symbols Palette -->
       <div v-if="!searchQuery && symbolGroups.length > 0" class="symbols-palette">
-        <div class="symbols-palette-header" :title="t('Symbol Palette')" @click="panelState.symbolsPaletteOpen = !panelState.symbolsPaletteOpen">
+        <div class="symbols-palette-header" :title="t('insert.symbolPalette')" @click="panelState.symbolsPaletteOpen = !panelState.symbolsPaletteOpen">
           <span class="symbols-palette-arrow" :class="{ open: panelState.symbolsPaletteOpen }">&#x25B6;</span>
-          <span class="symbols-palette-title" :aria-label="t('Symbol Palette')">{{ t('Symbols:') }}<span class="symbols-palette-examples">α β π Δ Ω x̄ ẋ °</span>
+          <span class="symbols-palette-title" :aria-label="t('insert.symbolPalette')">{{ t('insert.symbolsLabel') }}<span class="symbols-palette-examples">α β π Δ Ω x̄ ẋ °</span>
           </span>
         </div>
         <div v-show="panelState.symbolsPaletteOpen" class="symbols-palette-body">
@@ -70,13 +70,13 @@
       <div v-if="searchQuery && filteredItems.length === 0" class="no-items">
         No items found for "{{ searchQuery }}"
       </div>
-      <div v-else-if="displayItems.length === 0" class="no-items">{{ t('No insert items available') }}</div>
+      <div v-else-if="displayItems.length === 0" class="no-items">{{ t('insert.noInsertItemsAvailable') }}</div>
       <div
         v-else-if="searchQuery"
         ref="searchResults"
         class="insert-results"
         role="listbox"
-        :aria-label="t('Insert search results')"
+        :aria-label="t('insert.insertSearchResults')"
         @keydown.down.exact.prevent.stop="focusResult(Math.min(selectedResultIndex + 1, filteredItems.length - 1))"
         @keydown.up.exact.prevent.stop="focusResult(Math.max(selectedResultIndex - 1, 0))"
         @keydown.home.exact.prevent.stop="focusResult(0)"
@@ -100,8 +100,8 @@
             class="item-action favorite-star result-star"
             :class="{ active: isFavorite(item) }"
             tabindex="-1"
-            :title="isFavorite(item) ? t('Remove from Favorites') : t('Add to Favorites')"
-            :aria-label="isFavorite(item) ? t('Remove from Favorites') : t('Add to Favorites')"
+            :title="isFavorite(item) ? t('insert.removeFromFavorites') : t('insert.addToFavorites')"
+            :aria-label="isFavorite(item) ? t('insert.removeFromFavorites') : t('insert.addToFavorites')"
             @click.stop="toggleFavorite(item)"
             @dblclick.stop
           >{{ isFavorite(item) ? '★' : '☆' }}</button>
@@ -113,7 +113,7 @@
       <div v-else>
         <div id="tree-container">
           <!-- Tree structure will be built here -->
-          <div class="tree-placeholder">{{ t('Loading insert items...') }}</div>
+          <div class="tree-placeholder">{{ t('insert.loadingInsertItemsEllipsis') }}</div>
         </div>
       </div>
     </div>
@@ -124,40 +124,40 @@
 
         <template v-if="editor.mode === 'snippet'">
           <label class="snippet-editor-field">
-            <span>{{ t('Name') }}</span>
+            <span>{{ t('insert.name') }}</span>
             <input ref="firstField" v-model="editor.label" type="text" />
           </label>
           <label class="snippet-editor-field">
-            <span>{{ t('Type') }}</span>
+            <span>{{ t('common.type') }}</span>
             <select v-model="editor.keywordType">
-              <option value="">{{ t('Text') }}</option>
+              <option value="">{{ t('insert.text') }}</option>
               <option v-for="type in CUSTOM_SNIPPET_TYPES" :key="type" :value="type">{{ t(SNIPPET_TYPE_LABELS[type]) }}</option>
             </select>
           </label>
           <label class="snippet-editor-field">
-            <span>{{ t('Inserted text') }}</span>
+            <span>{{ t('insert.insertedText') }}</span>
             <textarea v-model="editor.insert" rows="4" spellcheck="false"></textarea>
           </label>
           <label class="snippet-editor-field">
-            <span>{{ t('Description') }}</span>
+            <span>{{ t('common.description') }}</span>
             <input v-model="editor.description" type="text" />
           </label>
           <div v-if="editorHasParameters" class="snippet-editor-field">
-            <span>{{ t('Parameters') }}</span>
+            <span>{{ t('insert.parameters') }}</span>
             <div v-for="(param, index) in editor.parameters" :key="index" class="snippet-param-row">
-              <input v-model="param.name" type="text" :placeholder="t('Name')" :aria-label="t('Parameter name')" />
+              <input v-model="param.name" type="text" :placeholder="t('insert.name')" :aria-label="t('insert.parameterName')" />
               <input
                 v-model="param.type"
                 type="text"
                 :list="editor.keywordType === 'Macro' ? 'calcpad-macro-param-types' : 'calcpad-function-param-types'"
-                :placeholder="t('Type')"
-                :aria-label="t('Parameter type')"
+                :placeholder="t('common.type')"
+                :aria-label="t('insert.parameterType')"
               />
-              <input v-model="param.description" type="text" :placeholder="t('Description')" :aria-label="t('Parameter description')" />
-              <button :title="t('Remove')" :aria-label="t('Remove')" @click="editor.parameters.splice(index, 1)">✕</button>
+              <input v-model="param.description" type="text" :placeholder="t('common.description')" :aria-label="t('insert.parameterDescription')" />
+              <button :title="t('common.remove')" :aria-label="t('common.remove')" @click="editor.parameters.splice(index, 1)">✕</button>
             </div>
-            <button class="snippet-param-add" @click="editor.parameters.push({ name: '', type: '', description: '' })">{{ t('+ Add parameter') }}</button>
-            <span class="snippet-editor-hint">{{ t('Parameters fill the § placeholders in the inserted text, in order.') }}</span>
+            <button class="snippet-param-add" @click="editor.parameters.push({ name: '', type: '', description: '' })">{{ t('insert.addParameter') }}</button>
+            <span class="snippet-editor-hint">{{ t('insert.parametersFillThePlaceholdersInTheInsertedText') }}</span>
             <datalist id="calcpad-function-param-types">
               <option v-for="type in FUNCTION_PARAM_TYPES" :key="type" :value="type" />
             </datalist>
@@ -166,24 +166,24 @@
             </datalist>
           </div>
           <label v-if="editor.keywordType === 'Function' || editor.keywordType === 'Variable'" class="snippet-editor-field">
-            <span>{{ editor.keywordType === 'Function' ? t('Return type') : t('Value type') }}</span>
+            <span>{{ editor.keywordType === 'Function' ? t('insert.returnType') : t('insert.valueType') }}</span>
             <input v-model="editor.returnType" type="text" list="calcpad-function-param-types" />
           </label>
           <label v-if="editor.keywordType" class="snippet-editor-field">
-            <span>{{ t('Example') }}</span>
+            <span>{{ t('insert.example') }}</span>
             <textarea v-model="editor.example" rows="2" spellcheck="false"></textarea>
           </label>
         </template>
         <div v-else class="snippet-editor-preview">{{ editor.insert }}</div>
 
         <div class="snippet-editor-field">
-          <span>{{ t('Quick type') }}</span>
+          <span>{{ t('insert.quickType') }}</span>
           <div class="quick-type-chips">
             <span v-for="key in editor.quickTypes" :key="key" class="quick-type-chip">
               ~{{ key }}
-              <button :title="t('Remove')" :aria-label="t('Remove ~{key}', { key })" @click="removeEditorQuickType(key)">✕</button>
+              <button :title="t('common.remove')" :aria-label="t('insert.removeKey', { key })" @click="removeEditorQuickType(key)">✕</button>
             </span>
-            <span v-if="editor.quickTypes.length === 0" class="quick-type-none">{{ t('None') }}</span>
+            <span v-if="editor.quickTypes.length === 0" class="quick-type-none">{{ t('common.none') }}</span>
           </div>
           <div class="quick-type-add">
             <span class="quick-type-tilde">~</span>
@@ -193,21 +193,21 @@
               type="text"
               :maxlength="QUICK_TYPE_MAX_LENGTH"
               :class="{ 'input-invalid': !!quickTypeError }"
-              :placeholder="t('letters')"
+              :placeholder="t('insert.letters')"
               @keydown.enter.prevent="addEditorQuickType"
             />
-            <button :disabled="!editor.newQuickType || !!quickTypeError" @click="addEditorQuickType">{{ t('Add') }}</button>
+            <button :disabled="!editor.newQuickType || !!quickTypeError" @click="addEditorQuickType">{{ t('insert.add') }}</button>
           </div>
           <span v-if="quickTypeError" class="snippet-editor-error">{{ quickTypeError }}</span>
-          <span v-else class="snippet-editor-hint">{{ t('Type ~ then the letters and a space to insert this item.') }}</span>
+          <span v-else class="snippet-editor-hint">{{ t('insert.typeThenTheLettersAndASpaceTo') }}</span>
         </div>
 
         <span v-if="snippetError" class="snippet-editor-error">{{ snippetError }}</span>
         <div class="snippet-editor-actions">
-          <button v-if="editor.mode === 'snippet' && editor.id" class="danger" @click="deleteCustomSnippet">{{ t('Delete') }}</button>
+          <button v-if="editor.mode === 'snippet' && editor.id" class="danger" @click="deleteCustomSnippet">{{ t('common.delete') }}</button>
           <span class="spacer"></span>
-          <button @click="editor = null">{{ t('Cancel') }}</button>
-          <button :disabled="!!snippetError" @click="saveEditor">{{ t('Save') }}</button>
+          <button @click="editor = null">{{ t('common.cancel') }}</button>
+          <button :disabled="!!snippetError" @click="saveEditor">{{ t('common.save') }}</button>
         </div>
       </div>
     </div>
@@ -215,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'
@@ -271,7 +271,7 @@ const toggleFavorite = (item: InsertItem) => {
 
 // Quick type and custom snippet editor
 const SNIPPET_TYPE_LABELS: Record<CustomSnippetType, string> = {
-  Function: 'Function', Macro: 'Macro', Variable: 'Variable', Unit: 'Custom Unit',
+  Function: 'calcpadHoverProvider.function', Macro: 'insert.macro', Variable: 'insert.variable', Unit: 'insert.customUnit',
 }
 const FUNCTION_PARAM_TYPES = ['value', 'vector', 'matrix', 'any']
 const MACRO_PARAM_TYPES = ['Const', 'Variable', 'Function', 'Macro', 'Units', 'Operator', 'Input', 'Keyword', 'Command']
@@ -343,8 +343,8 @@ const openSnippetDraft = (draft: Omit<CustomSnippet, 'id'>) => {
 
 const editorTitle = computed(() => {
   if (!editor.value) return ''
-  if (editor.value.mode === 'quickType') return t('Quick type for {name}', { name: editor.value.name })
-  return editor.value.id ? t('Edit custom snippet') : t('New custom snippet')
+  if (editor.value.mode === 'quickType') return t('insert.quickTypeForName', { name: editor.value.name })
+  return editor.value.id ? t('insert.editCustomSnippet') : t('insert.newCustomSnippet')
 })
 
 // The quick-type map as it would be with the editor's changes applied.
@@ -379,7 +379,7 @@ const removeEditorQuickType = (key: string) => {
 const snippetError = computed(() => {
   const state = editor.value
   if (state?.mode !== 'snippet') return ''
-  return state.insert.trim() ? '' : t('Enter the text to insert')
+  return state.insert.trim() ? '' : t('insert.enterTheTextToInsert')
 })
 
 const saveEditor = () => {
@@ -743,7 +743,7 @@ const buildTreeStructure = () => {
   if (props.insertItems.length === 0) {
     const placeholder = document.createElement('div')
     placeholder.className = 'tree-placeholder'
-    placeholder.textContent = t('No insert data available')
+    placeholder.textContent = t('insert.noInsertDataAvailable')
     treeContainer.appendChild(placeholder)
   }
   treeContainer.appendChild(treeRoot)
@@ -752,14 +752,14 @@ const buildTreeStructure = () => {
   buildTreeStructureRecursive(buildTreeFromItems(builtins), treeRoot, 0)
 
   // Custom Snippets always shows last, with its add button, even when empty.
-  const { li, ul } = createTreeSection(CUSTOM_SNIPPETS_CATEGORY, 0, [CUSTOM_SNIPPETS_CATEGORY], t('Custom Snippets'))
+  const { li, ul } = createTreeSection(CUSTOM_SNIPPETS_CATEGORY, 0, [CUSTOM_SNIPPETS_CATEGORY], t('insert.customSnippets'))
   for (const item of allItems.value) {
     if (item.customId) ul.appendChild(createTreeItem(item))
   }
   const addLi = document.createElement('li')
   const addButton = document.createElement('button')
   addButton.className = 'tree-item add-snippet'
-  addButton.textContent = '+ ' + t('Add custom snippet')
+  addButton.textContent = '+ ' + t('insert.addCustomSnippet')
   addButton.addEventListener('click', () => openSnippetEditor())
   addLi.appendChild(addButton)
   ul.appendChild(addLi)
@@ -850,12 +850,12 @@ const createTreeItem = (item: InsertItem) => {
   li.appendChild(button)
 
   li.appendChild(item.customId
-    ? createActionButton('✎', t('Edit custom snippet'), () => openSnippetEditor(item.customId))
-    : createActionButton('~', t('Quick type'), () => openQuickTypeEditor(item)))
+    ? createActionButton('✎', t('insert.editCustomSnippet'), () => openSnippetEditor(item.customId))
+    : createActionButton('~', t('insert.quickType'), () => openQuickTypeEditor(item)))
   const favorite = isFavorite(item)
   li.appendChild(createActionButton(
     favorite ? '★' : '☆',
-    favorite ? t('Remove from Favorites') : t('Add to Favorites'),
+    favorite ? t('insert.removeFromFavorites') : t('insert.addToFavorites'),
     () => toggleFavorite(item),
     'favorite-star' + (favorite ? ' active' : ''),
   ))

@@ -3,12 +3,12 @@
     <div class="search-container">
       <CalcpadSearchField
         v-model="searchTerm"
-        :placeholder="t('Search variables, macros, functions, custom units...')"
+        :placeholder="t('variables.searchVariablesMacrosFunctionsCustomUnitsEllipsis')"
       />
     </div>
     <div class="variables-container p-3">
-      <div v-if="loading" class="loading">{{ t('Loading variables...') }}</div>
-      <div v-else-if="!hasVariables" class="no-variables">{{ t('No variables found. Open a CalcpadCE document to see variables, macros, and functions.') }}</div>
+      <div v-if="loading" class="loading">{{ t('variables.loadingVariablesEllipsis') }}</div>
+      <div v-else-if="!hasVariables" class="no-variables">{{ t('variables.noVariablesFoundOpenACalcpadceDocumentTo') }}</div>
       <div v-else-if="searchTerm && !hasFilteredResults" class="no-variables">
         No results found for "{{ searchTerm }}"
       </div>
@@ -38,7 +38,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="macro.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">{{ t('Macro') }}</div>
+              <div class="variable-type">{{ t('insert.macro') }}</div>
               <div v-if="macro.definition" class="variable-content">{{ macro.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(macro.source) }}</div>
             </div>
@@ -70,7 +70,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="variable.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">{{ t('Variable') }}</div>
+              <div class="variable-type">{{ t('insert.variable') }}</div>
               <div v-if="variable.definition" class="variable-content">{{ variable.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(variable.source) }}</div>
             </div>
@@ -102,7 +102,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="func.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">{{ t('Function') }}</div>
+              <div class="variable-type">{{ t('calcpadHoverProvider.function') }}</div>
               <div v-if="func.params" class="variable-content">Parameters: {{ func.params }}</div>
               <div v-if="func.definition" class="variable-content">{{ func.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(func.source) }}</div>
@@ -135,7 +135,7 @@
               <div class="variable-name">
                 <CalcpadSearchHighlight :text="'.' + unit.name" :query="searchTerm" />
               </div>
-              <div class="variable-type">{{ t('Custom Unit') }}</div>
+              <div class="variable-type">{{ t('insert.customUnit') }}</div>
               <div v-if="unit.definition" class="variable-content">{{ unit.definition }}</div>
               <div class="variable-source source-local">{{ getSourceLabel(unit.source) }}</div>
             </div>
@@ -150,22 +150,22 @@
       @mousedown.stop
       @click.stop
     >
-      <button class="context-menu" @click="onCopyName">{{ t('Copy Name') }}</button>
+      <button class="context-menu" @click="onCopyName">{{ t('variables.copyName') }}</button>
       <button
         v-if="contextMenu.definition"
         class="context-menu"
         @click="onCopyDefinition"
-      >{{ t('Copy Definition') }}</button>
+      >{{ t('variables.copyDefinition') }}</button>
       <button
         class="context-menu"
         @click="onSaveCustomSnippet"
-      >{{ contextMenuSaved ? t('Edit Custom Snippet') : t('Save as Custom Snippet') }}</button>
+      >{{ contextMenuSaved ? t('variables.editCustomSnippet') : t('editor.saveAsCustomSnippet') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
+import { useI18n } from '../../i18n'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import CalcpadSearchField from './CalcpadSearchField.vue'
 import CalcpadSearchHighlight from './CalcpadSearchHighlight.vue'

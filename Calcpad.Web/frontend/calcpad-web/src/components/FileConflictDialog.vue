@@ -1,18 +1,18 @@
 <template>
   <div class="modal-backdrop" @click.self="emit('resolve', null)">
-    <div class="modal-card file-conflict-card" role="dialog" aria-modal="true" :aria-label="t('File changed on disk')">
-      <div class="modal-title">{{ t('File changed on disk') }}: {{ title }}</div>
-      <div class="modal-message">{{ t('Another program changed this file while you had unsaved edits. Choose which version to keep.') }}</div>
+    <div class="modal-card file-conflict-card" role="dialog" aria-modal="true" :aria-label="t('fileConflict.fileChangedOnDisk')">
+      <div class="modal-title">{{ t('fileConflict.fileChangedOnDisk') }}: {{ title }}</div>
+      <div class="modal-message">{{ t('fileConflict.anotherProgramChangedThisFileWhileYouHad') }}</div>
       <div class="file-conflict-path">{{ filePath }}</div>
       <div class="file-conflict-labels">
-        <span>{{ t('On disk (theirs)') }}</span>
-        <span>{{ t('Your edits (mine)') }}</span>
+        <span>{{ t('fileConflict.onDiskTheirs') }}</span>
+        <span>{{ t('fileConflict.yourEditsMine') }}</span>
       </div>
       <div ref="diffHost" class="file-conflict-diff"></div>
       <div class="modal-actions">
-        <button ref="mineButton" class="modal-btn" :title="t('Keep your edits; saving will overwrite the file on disk')" @click="emit('resolve', 'mine')">{{ t('Keep Mine') }}</button>
-        <button class="modal-btn secondary" :title="t('Discard your edits and load the file from disk')" @click="emit('resolve', 'theirs')">{{ t('Keep Theirs') }}</button>
-        <button class="modal-btn secondary" :title="t('Save each version as a copy next to the file')" @click="emit('resolve', 'both')">{{ t('Keep Both') }}</button>
+        <button ref="mineButton" class="modal-btn" :title="t('fileConflict.keepYourEditsSavingWillOverwriteTheFile')" @click="emit('resolve', 'mine')">{{ t('fileConflict.keepMine') }}</button>
+        <button class="modal-btn secondary" :title="t('fileConflict.discardYourEditsAndLoadTheFileFrom')" @click="emit('resolve', 'theirs')">{{ t('fileConflict.keepTheirs') }}</button>
+        <button class="modal-btn secondary" :title="t('fileConflict.saveEachVersionAsACopyNextTo')" @click="emit('resolve', 'both')">{{ t('fileConflict.keepBoth') }}</button>
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import * as monaco from 'monaco-editor'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'calcpad-frontend/i18n'
 import type { FileConflictChoice } from '../services/file-change-tracker'
 
 const props = defineProps<{

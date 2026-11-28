@@ -1,0 +1,535 @@
+{
+  "vscode": {
+    "tag": "1.96.2",
+    "locTag": "v1.96.2024121109",
+    "locCommit": "110df563b65cd2a1f9d8b58e3bdcadce90427f6d",
+    "pack": "vscode-language-pack-ko"
+  },
+  "contents": {
+    "vscode-monaco": {
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "닫기"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "닫기"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "복사"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "닫기"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "오류",
+        "Warning": "경고"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "다음",
+        "previous": "이전"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "닫기"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "취소"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "삽입"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "닫기"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "오류",
+        "accessibility.signals.positionHasWarning": "경고",
+        "accessibility.signals.save": "저장",
+        "accessibilitySignals.save": "저장"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "파일"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "오류",
+        "sev.warning": "경고"
+      }
+    },
+    "vscode-shared-ui": {
+      "vs/base/browser/ui/dialog/dialog": {
+        "dialogErrorMessage": "오류",
+        "dialogWarningMessage": "경고"
+      },
+      "vs/base/browser/ui/tree/abstractTree": {
+        "close": "닫기"
+      },
+      "vs/base/browser/ui/tree/treeDefaults": {
+        "collapse all": "모두 축소"
+      },
+      "vs/code/electron-sandbox/processExplorer/processExplorerMain": {
+        "copy": "복사",
+        "copyAll": "모두 복사"
+      },
+      "vs/editor/browser/widget/diffEditor/components/accessibleDiffViewer": {
+        "label.close": "닫기"
+      },
+      "vs/editor/contrib/clipboard/browser/clipboard": {
+        "actions.clipboard.copyLabel": "복사"
+      },
+      "vs/editor/contrib/find/browser/findWidget": {
+        "label.closeButton": "닫기"
+      },
+      "vs/editor/contrib/gotoError/browser/gotoErrorWidget": {
+        "Error": "오류",
+        "Warning": "경고"
+      },
+      "vs/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget": {
+        "next": "다음",
+        "previous": "이전"
+      },
+      "vs/editor/contrib/peekView/browser/peekView": {
+        "label.close": "닫기"
+      },
+      "vs/editor/contrib/rename/browser/renameWidget": {
+        "cancelRenameSuggestionsButton": "취소"
+      },
+      "vs/editor/contrib/suggest/browser/suggestController": {
+        "accept.insert": "삽입"
+      },
+      "vs/editor/contrib/suggest/browser/suggestWidgetDetails": {
+        "details.close": "닫기"
+      },
+      "vs/platform/accessibilitySignal/browser/accessibilitySignalService": {
+        "accessibility.signals.positionHasError": "오류",
+        "accessibility.signals.positionHasWarning": "경고",
+        "accessibility.signals.save": "저장",
+        "accessibilitySignals.save": "저장"
+      },
+      "vs/platform/action/common/actionCommonCategories": {
+        "file": "파일"
+      },
+      "vs/platform/dialogs/common/dialogs": {
+        "cancelButton": "취소"
+      },
+      "vs/platform/dialogs/electron-main/dialogMainService": {
+        "openFolder": "폴더 열기"
+      },
+      "vs/platform/log/common/log": {
+        "error": "오류",
+        "off": "끄기",
+        "warn": "경고"
+      },
+      "vs/platform/markers/common/markers": {
+        "sev.error": "오류",
+        "sev.warning": "경고"
+      },
+      "vs/platform/menubar/electron-main/menubar": {
+        "cancel": "취소",
+        "mMinimize": "최소화",
+        "mNewTab": "새 탭"
+      },
+      "vs/platform/native/electron-main/nativeHostMainService": {
+        "cancel": "취소"
+      },
+      "vs/platform/workspaces/electron-main/workspacesHistoryMainService": {
+        "newWindow": "새 창"
+      },
+      "vs/workbench/api/browser/mainThreadMessageService": {
+        "cancel": "취소"
+      },
+      "vs/workbench/api/browser/viewsExtensionPoint": {
+        "view container title": "제목"
+      },
+      "vs/workbench/api/common/configurationExtensionPoint": {
+        "description": "설명",
+        "settings": "설정"
+      },
+      "vs/workbench/browser/actions/developerActions": {
+        "removeLargeStorageEntriesPickerButton": "제거"
+      },
+      "vs/workbench/browser/actions/layoutActions": {
+        "close": "닫기"
+      },
+      "vs/workbench/browser/actions/textInputActions": {
+        "copy": "복사",
+        "cut": "잘라내기",
+        "paste": "붙여넣기",
+        "redo": "다시 실행",
+        "undo": "실행 취소"
+      },
+      "vs/workbench/browser/actions/windowActions": {
+        "newWindow": "새 창"
+      },
+      "vs/workbench/browser/actions/workspaceActions": {
+        "openFileFolder": "열기..."
+      },
+      "vs/workbench/browser/parts/editor/editor.contribution": {
+        "close": "닫기",
+        "closeAll": "모두 닫기",
+        "closeOthers": "기타 항목 닫기",
+        "newWindow": "새 창"
+      },
+      "vs/workbench/browser/parts/editor/editorActions": {
+        "closeOneEditor": "닫기"
+      },
+      "vs/workbench/browser/parts/editor/editorGroupWatermark": {
+        "watermark.openFolder": "폴더 열기",
+        "watermark.openRecent": "최근 파일 열기"
+      },
+      "vs/workbench/browser/parts/views/treeView": {
+        "collapseAll": "모두 축소",
+        "refresh": "새로 고침"
+      },
+      "vs/workbench/common/configuration": {
+        "problemsConfigurationTitle": "문제"
+      },
+      "vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction": {
+        "manageTrustedExtensions.cancel": "취소"
+      },
+      "vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane": {
+        "ok": "적용"
+      },
+      "vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCodeblockActions": {
+        "interactive.copyCodeBlock.label": "복사"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatCopyActions": {
+        "interactive.copyAll.label": "모두 복사",
+        "interactive.copyItem.label": "복사"
+      },
+      "vs/workbench/contrib/chat/browser/actions/chatExecuteActions": {
+        "interactive.cancel.label": "취소"
+      },
+      "vs/workbench/contrib/chat/browser/chatContentParts/chatToolInvocationPart": {
+        "cancel": "취소"
+      },
+      "vs/workbench/contrib/chat/browser/chatDragAndDrop": {
+        "file": "파일",
+        "files": "파일"
+      },
+      "vs/workbench/contrib/chat/browser/chatEditorSaving": {
+        "discard": "취소",
+        "save": "저장"
+      },
+      "vs/workbench/contrib/chat/browser/chatInlineAnchorWidget": {
+        "actions.copy.label": "복사"
+      },
+      "vs/workbench/contrib/codeEditor/browser/find/simpleFindWidget": {
+        "label.closeButton": "닫기",
+        "label.find": "찾기",
+        "placeholder.find": "찾기"
+      },
+      "vs/workbench/contrib/comments/browser/commentThreadHeader": {
+        "label.collapse": "Collapse"
+      },
+      "vs/workbench/contrib/comments/browser/comments.contribution": {
+        "collapseAll": "모두 축소"
+      },
+      "vs/workbench/contrib/debug/browser/breakpointWidget": {
+        "bpMode": "모드",
+        "noTriggerByBreakpoint": "없음"
+      },
+      "vs/workbench/contrib/debug/browser/callStackView": {
+        "collapse": "모두 축소"
+      },
+      "vs/workbench/contrib/debug/browser/debug.contribution": {
+        "variables": "변수"
+      },
+      "vs/workbench/contrib/debug/browser/exceptionWidget": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/debug/browser/loadedScriptsView": {
+        "collapse": "모두 접기"
+      },
+      "vs/workbench/contrib/debug/browser/repl": {
+        "collapse": "모두 축소",
+        "copy": "복사",
+        "copyAll": "모두 복사"
+      },
+      "vs/workbench/contrib/debug/browser/variablesView": {
+        "collapse": "모두 축소"
+      },
+      "vs/workbench/contrib/debug/browser/watchExpressionsView": {
+        "collapse": "모두 축소"
+      },
+      "vs/workbench/contrib/debug/common/debugSchemas": {
+        "debugger type": "형식"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionEditor": {
+        "preview": "미리 보기"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionFeaturesTab": {
+        "cancel": "취소"
+      },
+      "vs/workbench/contrib/extensions/browser/extensions.contribution": {
+        "none": "없음",
+        "refreshExtension": "새로 고침",
+        "workbench.extensions.action.configure": "설정",
+        "workbench.extensions.action.copyExtension": "복사"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsActions": {
+        "cancel": "취소",
+        "close": "닫기",
+        "review": "검토"
+      },
+      "vs/workbench/contrib/extensions/browser/extensionsViewer": {
+        "error": "오류"
+      },
+      "vs/workbench/contrib/files/browser/editors/textFileEditor": {
+        "openFolder": "폴더 열기"
+      },
+      "vs/workbench/contrib/files/browser/explorerViewlet": {
+        "openFolder": "폴더 열기",
+        "openRecent": "최근 파일 열기"
+      },
+      "vs/workbench/contrib/files/browser/fileActions": {
+        "copyFile": "복사"
+      },
+      "vs/workbench/contrib/files/browser/fileActions.contribution": {
+        "close": "닫기",
+        "closeAll": "모두 닫기",
+        "closeOthers": "기타 항목 닫기",
+        "copyRelativePath": "상대 경로 복사"
+      },
+      "vs/workbench/contrib/files/browser/fileConstants": {
+        "save": "저장",
+        "saveAs": "다른 이름으로 저장..."
+      },
+      "vs/workbench/contrib/files/browser/files.contribution": {
+        "filesConfigurationTitle": "파일"
+      },
+      "vs/workbench/contrib/files/electron-sandbox/fileActions.contribution": {
+        "filesCategory": "파일",
+        "openContainer": "상위 폴더 열기"
+      },
+      "vs/workbench/contrib/format/browser/formatActionsMultiple": {
+        "formatter": "서식",
+        "null": "없음",
+        "nullFormatterDescription": "None"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChat.contribution": {
+        "cancelShort": "취소"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatActions": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/inlineChat/browser/inlineChatSavingServiceImpl": {
+        "discard": "취소",
+        "save": "저장"
+      },
+      "vs/workbench/contrib/issue/browser/baseIssueReporterService": {
+        "description": "설명"
+      },
+      "vs/workbench/contrib/issue/browser/issueFormService": {
+        "cancel": "취소"
+      },
+      "vs/workbench/contrib/issue/browser/issueReporterPage": {
+        "issueTitleLabel": "제목"
+      },
+      "vs/workbench/contrib/localHistory/electron-sandbox/localHistoryCommands": {
+        "openContainer": "상위 폴더 열기"
+      },
+      "vs/workbench/contrib/markers/browser/markers.contribution": {
+        "collapseAll": "모두 축소",
+        "copyMarker": "복사",
+        "problems": "문제",
+        "status.problems": "문제"
+      },
+      "vs/workbench/contrib/markers/browser/markersFileDecorations": {
+        "label": "문제"
+      },
+      "vs/workbench/contrib/markers/browser/markersTable": {
+        "fileColumnLabel": "파일"
+      },
+      "vs/workbench/contrib/markers/browser/messages": {
+        "markers.panel.title.problems": "문제"
+      },
+      "vs/workbench/contrib/mergeEditor/browser/commands/commands": {
+        "mergeEditor.resetResultToBaseAndAutoMerge.short": "재설정"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/find/notebookFindReplaceWidget": {
+        "label.closeButton": "닫기"
+      },
+      "vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants": {
+        "notebookFormatSave.formatting": "서식"
+      },
+      "vs/workbench/contrib/notebook/browser/controller/variablesActions": {
+        "notebookActions.openVariablesView": "변수"
+      },
+      "vs/workbench/contrib/notebook/browser/diff/notebookMultiDiffEditor": {
+        "notebookCellOutputLabel": "출력"
+      },
+      "vs/workbench/contrib/outline/browser/outlineActions": {
+        "collapse": "모두 축소"
+      },
+      "vs/workbench/contrib/output/browser/output.contribution": {
+        "output": "출력"
+      },
+      "vs/workbench/contrib/output/browser/outputView": {
+        "output": "출력"
+      },
+      "vs/workbench/contrib/preferences/browser/keybindingsEditor": {
+        "copyLabel": "복사"
+      },
+      "vs/workbench/contrib/preferences/browser/preferences.contribution": {
+        "settings": "설정"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditor2": {
+        "settings": "설정"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsEditorSettingIndicators": {
+        "previewLabel": "미리 보기"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsLayout": {
+        "files": "파일",
+        "formatting": "서식",
+        "newWindow": "새 창",
+        "output": "출력",
+        "problems": "문제"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsTree": {
+        "settings": "설정"
+      },
+      "vs/workbench/contrib/preferences/browser/settingsWidgets": {
+        "cancelButton": "취소"
+      },
+      "vs/workbench/contrib/quickaccess/browser/viewQuickAccess": {
+        "channels": "출력"
+      },
+      "vs/workbench/contrib/scm/browser/dirtydiffDecorator": {
+        "label.close": "닫기"
+      },
+      "vs/workbench/contrib/scm/browser/scmHistoryViewPane": {
+        "refreshGraph": "새로 고침"
+      },
+      "vs/workbench/contrib/scm/browser/scmViewPane": {
+        "label.close": "닫기",
+        "scmInputCancelAction": "취소"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsCopy": {
+        "copyAllLabel": "모두 복사",
+        "copyMatchLabel": "복사"
+      },
+      "vs/workbench/contrib/search/browser/searchActionsTopBar": {
+        "CollapseDeepestExpandedLevelAction.label": "모두 축소",
+        "RefreshAction.label": "새로 고침"
+      },
+      "vs/workbench/contrib/search/browser/searchView": {
+        "openFolder": "폴더 열기"
+      },
+      "vs/workbench/contrib/share/browser/share.contribution": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalMenus": {
+        "workbench.action.terminal.copySelection.short": "복사"
+      },
+      "vs/workbench/contrib/terminal/browser/terminalProfileQuickpick": {
+        "cancel": "취소"
+      },
+      "vs/workbench/contrib/terminalContrib/chat/browser/terminalChatActions": {
+        "closeChat": "닫기",
+        "insert": "삽입"
+      },
+      "vs/workbench/contrib/terminalContrib/find/browser/textInputContextMenu": {
+        "copy": "복사"
+      },
+      "vs/workbench/contrib/terminalContrib/links/browser/terminalLinkQuickpick": {
+        "terminal.integrated.localFileLinks": "파일"
+      },
+      "vs/workbench/contrib/testing/browser/testingOutputPeek": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/themes/browser/themes.contribution": {
+        "button.cancel": "취소",
+        "noIconThemeLabel": "None"
+      },
+      "vs/workbench/contrib/timeline/browser/timelinePane": {
+        "refresh": "새로 고침"
+      },
+      "vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution": {
+        "close": "닫기"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditor": {
+        "copy description": "복사",
+        "empty profile": "없음",
+        "none": "없음",
+        "settings": "설정"
+      },
+      "vs/workbench/contrib/userDataProfile/browser/userDataProfilesEditorModel": {
+        "cancel": "취소",
+        "preview": "미리 보기"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSync": {
+        "cancel turning on sync": "취소"
+      },
+      "vs/workbench/contrib/userDataSync/browser/userDataSyncViews": {
+        "workbench.actions.sync.replaceCurrent": "복원"
+      },
+      "vs/workbench/contrib/userDataSync/electron-sandbox/userDataSync.contribution": {
+        "open": "폴더 열기"
+      },
+      "vs/workbench/contrib/webview/browser/webview.contribution": {
+        "copy": "복사"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint": {
+        "title": "제목"
+      },
+      "vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent": {
+        "gettingStarted.openMac.title": "열기...",
+        "openFolder": "폴더 열기"
+      },
+      "vs/workbench/contrib/welcomeViews/common/newFile.contribution": {
+        "file": "파일"
+      },
+      "vs/workbench/contrib/workspace/browser/workspace.contribution": {
+        "cancelWorkspaceTrustButton": "취소"
+      },
+      "vs/workbench/electron-sandbox/window": {
+        "zoomReset": "초기화",
+        "zoomSettings": "설정"
+      },
+      "vs/workbench/services/actions/common/menusExtensionPoint": {
+        "command title": "타이틀"
+      },
+      "vs/workbench/services/dialogs/browser/abstractFileDialogService": {
+        "openFolder.title": "폴더 열기"
+      },
+      "vs/workbench/services/dialogs/browser/simpleFileDialog": {
+        "remoteFileDialog.cancel": "취소"
+      },
+      "vs/workbench/services/preferences/browser/keybindingsEditorModel": {
+        "default": "시스템"
+      },
+      "vs/workbench/services/preferences/common/preferencesEditorInput": {
+        "settingsEditor2InputName": "설정"
+      },
+      "vs/workbench/services/progress/browser/progressService": {
+        "cancel": "취소"
+      },
+      "vs/workbench/services/themes/common/colorExtensionPoint": {
+        "description": "설명"
+      },
+      "vs/workbench/services/themes/common/themeConfiguration": {
+        "noIconThemeLabel": "없음"
+      },
+      "vs/workbench/services/userDataProfile/browser/settingsResource": {
+        "settings": "설정"
+      },
+      "vs/workbench/services/userDataProfile/browser/userDataProfileImportExportService": {
+        "close": "닫기"
+      },
+      "vs/workbench/services/userDataSync/browser/userDataSyncWorkbenchService": {
+        "download sync activity dialog open label": "저장"
+      },
+      "vs/workbench/services/userDataSync/common/userDataSync": {
+        "settings": "설정"
+      },
+      "vs/workbench/services/workingCopy/common/storedFileWorkingCopy": {
+        "saveAs": "다른 이름으로 저장..."
+      },
+      "vs/workbench/services/workspaces/browser/abstractWorkspaceEditingService": {
+        "save": "저장"
+      }
+    }
+  }
+}

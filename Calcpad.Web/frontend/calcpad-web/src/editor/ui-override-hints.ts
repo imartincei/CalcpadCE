@@ -18,8 +18,8 @@ export interface UiOverrideHintsHost {
 /** CodeLens above each line whose `#UI` controls take a saved value, linking to the Properties tab. */
 export function registerUiOverrideHints(host: UiOverrideHintsHost): monaco.IDisposable & { refresh(): void } {
     const labels: UiOverrideHintLabels = {
-        value: (name, value) => host.t('UI override: {name} = {value}', { name, value }),
-        count: n => host.t('{n} UI override | {n} UI overrides', { n }, n),
+        value: (name, value) => host.t('editor.uiOverrideNameValue', { name, value }),
+        count: n => host.t('editor.nUiOverrideNUiOverrides', { n }, n),
     };
     const changed = new monaco.Emitter<monaco.languages.CodeLensProvider>();
     const provider: monaco.languages.CodeLensProvider = {
@@ -43,7 +43,7 @@ export function registerUiOverrideHints(host: UiOverrideHintsHost): monaco.IDisp
                     command: {
                         id: REVEAL_COMMAND,
                         title: uiOverrideHintTitle(h, labels),
-                        tooltip: host.t('Edit in the Properties tab'),
+                        tooltip: host.t('editor.editInThePropertiesTab'),
                         arguments: [model.uri.toString(), h.line, h.keys],
                     },
                 })),
