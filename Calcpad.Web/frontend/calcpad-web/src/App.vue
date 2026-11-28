@@ -495,29 +495,29 @@
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.undo"
           @click="onPreviewUiHistory('uiUndo')"
-        >{{ t('catalog.undoCtrlZ') }}</button>
+        >{{ shortcutLabel('common.undo', ' (Ctrl+Z)') }}</button>
         <button
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.redo"
           @click="onPreviewUiHistory('uiRedo')"
-        >{{ t('catalog.redoCtrlY') }}</button>
+        >{{ shortcutLabel('common.redo', ' (Ctrl+Y)') }}</button>
       </template>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('cut')"
-      >{{ t('catalog.cutCtrlX') }}</button>
+      >{{ shortcutLabel('common.cut', ' (Ctrl+X)') }}</button>
       <button
         class="context-menu"
         :disabled="!previewContextMenu.selection && !previewContextMenu.editable"
         @click="onPreviewClipboard('copy')"
-      >{{ t('catalog.copyCtrlC') }}</button>
+      >{{ shortcutLabel('common.copy', ' (Ctrl+C)') }}</button>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('paste')"
-      >{{ t('catalog.pasteCtrlV') }}</button>
-      <button class="context-menu" @click="onFindInPreview">{{ t('catalog.findCtrlF') }}</button>
+      >{{ shortcutLabel('common.paste', ' (Ctrl+V)') }}</button>
+      <button class="context-menu" @click="onFindInPreview">{{ shortcutLabel('common.find', '… (Ctrl+F)') }}</button>
       <button v-if="onOpenFullHtmlRequest" class="context-menu" @click="onOpenFullHtml">{{ t('app.openFullHtml') }}</button>
     </div>
 
@@ -659,6 +659,11 @@ import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
 import { navigationDirection } from './editor/navigation-history'
 
 const { t } = useI18n()
+
+function shortcutLabel(key: string, suffix: string): string {
+  const label = t(key)
+  return label === key ? key : `${label}${suffix}`
+}
 
 const props = withDefaults(defineProps<{ isDesktop?: boolean }>(), { isDesktop: false })
 const autoRunEnabled = ref(true)

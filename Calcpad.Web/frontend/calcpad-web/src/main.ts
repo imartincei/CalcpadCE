@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 import { createApp, nextTick, watch, type Ref } from 'vue';
 import type { Composer } from 'vue-i18n';
 import App from './App.vue';
-import { createCalcpadI18n, readLocaleSetting, menuLabels, LOCALE_CHANGED_EVENT, setCurrentCulture, translate } from 'calcpad-frontend/i18n';
+import { createCalcpadI18n, getActiveLocale, readLocaleSetting, menuLabels, LOCALE_CHANGED_EVENT, setCurrentCulture, translate } from 'calcpad-frontend/i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { locale as osLocale } from '@tauri-apps/plugin-os';
 import CalcpadAppVue from 'calcpad-frontend/vue/components/CalcpadApp.vue';
@@ -72,6 +72,7 @@ import { registerFormatDocumentProvider } from './editor/format-document';
 import { setActiveDocumentKeyResolver, getActiveDocumentKey, type EditorBridge } from './editor/bridge';
 import { EditorGroup } from './editor/editor-group';
 import { navigationDirection, type NavigationLocation } from './editor/navigation-history';
+import { applyMonacoLocale } from './editor/monaco-locale';
 import { createBrowserNavigationHistory, createDesktopNavigationHistory, type NavigationHistoryClient } from './services/navigation-history';
 import { UNTITLED_TITLE, documentMatches, reloadDocument, type TabManager } from './tabs/tab-manager';
 import { joinDocument, noteDocumentSaved, startDocSync } from './services/doc-sync';
@@ -2429,6 +2430,18 @@ async function bootstrap(): Promise<void> {
         },
     });
 
+    // Monaco resolves most labels at startup, so rewrite the registry labels in
+    // place and refresh the surfaces that render translated server text.
+    window.addEventListener(LOCALE_CHANGED_EVENT, () => {
+        applyMonacoLocale(getActiveLocale());
+        uiOverrideHints?.refresh();
+        for (const g of groups.values()) {
+            void g.diagnostics?.refresh();
+            void refreshDefinitionsFor(g);
+        }
+        refreshAllPreviews();
+    });
+
     // Tauri-specific: native menu clicks + file operations
     if (isTauri && tauriBridge) {
         const [
@@ -2673,31 +2686,6 @@ async function bootstrap(): Promise<void> {
             }
             workspace.update({ openFiles, activeFile: activeGroup.tabs.activeTab?.filePath ?? '' });
         }
-
-        // Monaco freezes its NLS strings and the editor actions at startup, so a
-        // locale change needs a fresh webview. Preserve drafts and the session first.
-        let localeReloadPending = false;
-        window.addEventListener(LOCALE_CHANGED_EVENT, () => {
-            if (localeReloadPending) return;
-            localeReloadPending = true;
-            void (async () => {
-                try {
-                    captureSession();
-                    const dirty: string[] = [];
-                    for (const g of groups.values())
-                        for (const t of g.tabs.all)
-                            if (g.tabs.isDirty(t.id)) dirty.push(t.id);
-                    for (const id of dirty) await writeDraft(id, true);
-                    await workspace.flush();
-                } catch (err) {
-                    localeReloadPending = false;
-                    appInstance.appendOutput('warn',
-                        `Could not preserve the session before reloading: ${err instanceof Error ? err.message : String(err)}`);
-                    return;
-                }
-                window.location.reload();
-            })();
-        });
 
         /**
          * Reopens last launch's files into the primary group. Deliberately not routed

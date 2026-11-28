@@ -69,6 +69,9 @@ const MONACO_NLS_MODULE = `const __calcpadMaps = ${JSON.stringify(monacoNls)};
 const __calcpadLocales = ${JSON.stringify(localeMatches)};
 const __calcpadTraditional = /(?:^|-)hant(?:-|$)|(?:^|-)(?:tw|hk|mo)(?:-|$)/;
 let __calcpadResolved;
+const __calcpadEnglishById = Object.create(null);
+const __calcpadEnglishIndex = new Map();
+let __calcpadReverse;
 function __calcpadMatch(tag) {
     if (!tag) return null;
     const n = String(tag).replace('_', '-').toLowerCase();
@@ -100,7 +103,50 @@ function __calcpadLocale() {
     }
     return __calcpadResolved || (__calcpadResolved = 'en');
 }
+function __calcpadAddReverse(text, id) {
+    let ids = __calcpadReverse.get(text);
+    if (!ids) __calcpadReverse.set(text, ids = new Set());
+    ids.add(id);
+}
+function __calcpadReverseIndex() {
+    if (__calcpadReverse) return __calcpadReverse;
+    __calcpadReverse = new Map();
+    for (const map of Object.values(__calcpadMaps)) {
+        for (const [module, entries] of Object.entries(map)) {
+            for (const [key, value] of Object.entries(entries))
+                __calcpadAddReverse(value, module + '::' + key);
+        }
+    }
+    for (const [english, ids] of __calcpadEnglishIndex) {
+        for (const id of ids) __calcpadAddReverse(english, id);
+    }
+    return __calcpadReverse;
+}
+export function __calcpadSetLocale(tag) {
+    __calcpadResolved = __calcpadMatch(tag) || 'en';
+}
+export function __calcpadTranslate(text, target) {
+    const ids = __calcpadReverseIndex().get(text);
+    if (!ids) return undefined;
+    const values = new Set();
+    for (const id of ids) {
+        const cut = id.indexOf('::');
+        const module = id.slice(0, cut);
+        const key = id.slice(cut + 2);
+        const translated = __calcpadMaps[target]?.[module]?.[key] ?? __calcpadEnglishById[id];
+        if (typeof translated === 'string' && translated) values.add(translated);
+    }
+    return values.size === 1 ? [...values][0] : undefined;
+}
 export function __calcpadTr(module, key, english) {
+    const id = module + '::' + key;
+    if (!(id in __calcpadEnglishById)) __calcpadEnglishById[id] = english;
+    let ids = __calcpadEnglishIndex.get(english);
+    if (!ids) __calcpadEnglishIndex.set(english, ids = new Set());
+    if (!ids.has(id)) {
+        ids.add(id);
+        if (__calcpadReverse) __calcpadAddReverse(english, id);
+    }
     const map = __calcpadMaps[__calcpadLocale()];
     return map?.[module]?.[key] || english;
 }
@@ -142,6 +188,16 @@ function translateMonacoLiterals(code: string, module: string): string {
     return changed ? `import { __calcpadTr } from ${JSON.stringify(MONACO_NLS_ID)};\n${out}` : code;
 }
 
+function monacoTransform(code: string, id: string) {
+    const cleanId = id.split('?')[0].split('#')[0];
+    if (!cleanId.includes('monaco-editor/esm/') || !cleanId.endsWith('.js')) return null;
+    if (!code.includes('localize(') && !code.includes('localize2(')) return null;
+    const module = monacoModule(cleanId);
+    if (!module) return null;
+    const out = translateMonacoLiterals(code, module);
+    return out === code ? null : { code: out, map: null };
+}
+
 function monacoLanguagePacks() {
     return {
         name: 'monaco-language-packs',
@@ -152,15 +208,21 @@ function monacoLanguagePacks() {
         load(id: string) {
             return id === MONACO_NLS_RESOLVED ? MONACO_NLS_MODULE : null;
         },
-        transform(code: string, id: string) {
-            const cleanId = id.split('?')[0].split('#')[0];
-            if (!cleanId.includes('monaco-editor/esm/') || !cleanId.endsWith('.js')) return null;
-            if (!code.includes('localize(') && !code.includes('localize2(')) return null;
-            const module = monacoModule(cleanId);
-            if (!module) return null;
-            const out = translateMonacoLiterals(code, module);
-            return out === code ? null : { code: out, map: null };
+        transform: monacoTransform,
+    };
+}
+
+/** The dev dep optimizer serves Monaco pre-bundled, bypassing the Vite transform. */
+function monacoPrebundle() {
+    return {
+        name: 'calcpad-monaco-nls-prebundle',
+        resolveId(id: string) {
+            return id === MONACO_NLS_ID ? MONACO_NLS_RESOLVED : null;
         },
+        load(id: string) {
+            return id === MONACO_NLS_RESOLVED ? MONACO_NLS_MODULE : null;
+        },
+        transform: monacoTransform,
     };
 }
 
@@ -204,6 +266,9 @@ export default defineConfig(() => ({
             'monaco-editor/esm/vs/language/css/css.worker',
             'vue',
         ],
+        rolldownOptions: {
+            plugins: [monacoPrebundle()],
+        },
     },
     // Tauri consumes JS on the same port during `tauri dev`; keep the port
     // stable so vite.config's port matches tauri.conf.json's devUrl.
