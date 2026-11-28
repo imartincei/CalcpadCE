@@ -42,19 +42,8 @@ namespace Calcpad.Core
             "bu",
             "tonf"
         ];
-        // These 12 names (plus the "ton_f" alias) are the only ones that differ between the US
-        // and UK unit systems — resolved per-lookup from isUs rather than baked into Units, so
-        // the table itself can stay immutable and safe for concurrent readers.
-        private static readonly HashSet<string> AmbiguousUnitNames = new(UnitNames, StringComparer.Ordinal) { "ton_f" };
-
-        private static string ResolveKey(string text, bool isUs)
-        {
-            if (!AmbiguousUnitNames.Contains(text))
-                return text;
-
-            var baseName = text == "ton_f" ? "tonf" : text;
-            return baseName + (isUs ? "_US" : "_UK");
-        }
+        // US/UK-dependent names, resolved per lookup and keeping the typed name.
+        private static readonly FrozenDictionary<string, Unit> AmbiguousUnits_US, AmbiguousUnits_UK;
 
         internal Field GetField()
         {
@@ -301,10 +290,12 @@ namespace Calcpad.Core
             _factors = u._factors;
         }
 
-        internal static Unit Get(string text, bool isUs) => Units[ResolveKey(text, isUs)];
+        internal static Unit Get(string text, bool isUs) =>
+            TryGet(text, isUs, out var u) ? u : throw new KeyNotFoundException(text);
 
         internal static bool TryGet(string text, bool isUs, out Unit u) =>
-            Units.TryGetValue(ResolveKey(text, isUs), out u);
+            Units.TryGetValue(text, out u) ||
+            (isUs ? AmbiguousUnits_US : AmbiguousUnits_UK).TryGetValue(text, out u);
 
         private static string TemperatureToDelta(string s)
         {
@@ -317,7 +308,8 @@ namespace Calcpad.Core
             };
         }
 
-        internal static bool Exists(string unit) => Units.ContainsKey(unit);
+        internal static bool Exists(string unit) =>
+            Units.ContainsKey(unit) || AmbiguousUnits_UK.ContainsKey(unit);
         public override string ToString() => _text;
         internal static string GetText(Unit u) => u is null ? "unitless" : u.Text;
 
@@ -857,11 +849,17 @@ namespace Calcpad.Core
             units["°F"]._tempChar = 'F';
             units["Δ°F"]._tempChar = 'F';
             units["°R"]._tempChar = 'R';
-            for (var i = 0; i < UnitNames.Length; ++i)
+            var us = new Dictionary<string, Unit>(StringComparer.Ordinal);
+            var uk = new Dictionary<string, Unit>(StringComparer.Ordinal);
+            foreach (var name in UnitNames)
             {
-                ref var name = ref UnitNames[i];
-                units.Add(name, new(units[name + "_UK"], name));
+                us.Add(name, new(units[name + "_US"], name));
+                uk.Add(name, new(units[name + "_UK"], name));
             }
+            us.Add("ton_f", new(units["tonf_US"], "ton_f"));
+            uk.Add("ton_f", new(units["tonf_UK"], "ton_f"));
+            AmbiguousUnits_US = us.ToFrozenDictionary();
+            AmbiguousUnits_UK = uk.ToFrozenDictionary();
             Units = units.ToFrozenDictionary();
         }
 

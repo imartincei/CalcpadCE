@@ -1824,6 +1824,24 @@
             await Task.WhenAll(tasks);
         }
 
+        [Theory]
+        [Trait("Category", "Mechanical Formulas")]
+        [InlineData("1gal", "1gal")]
+        [InlineData("1gal_US", "1gal_US")]
+        [InlineData("1gal_UK", "1gal_UK")]
+        [InlineData("2ton", "2ton")]
+        public void AmbiguousUnit_KeepsTypedName(string expr, string expected) => Test(expr, expected);
+
+        [Fact]
+        [Trait("Category", "Mechanical Formulas")]
+        public void AmbiguousUnit_KeepsTypedName_UK()
+        {
+            var parser = new ExpressionParser { Settings = new Settings() };
+            parser.Parse("#settings {\"isUs\": false}\nv = 1gal|L", true, false);
+            Assert.Contains("4.55", parser.HtmlResult);
+            Assert.DoesNotContain("gal_UK", parser.HtmlResult);
+        }
+
         [Fact]
         [Trait("Category", "Mechanical Formulas")]
         public void Test_MPa_cm2() => Test("10MPa*1cm^2", "1kN");
