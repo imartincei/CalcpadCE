@@ -48,7 +48,6 @@ CI runs this check; no English source file is committed.
 scripts/i18n/
 ├── i18n.mjs
 ├── check-vscode-english.mjs
-├── MESSAGE-IDS.md
 ├── README.md
 └── data/
     ├── vscode.index.json        English -> VS Code module/key
@@ -60,13 +59,14 @@ The registry lives in
 The script writes `calcpad-frontend/src/i18n/locales.generated.ts` and the
 locale catalogs next to it.
 
-## Message-ID migration
+## Message IDs
 
-The catalogs now use stable message IDs.
-Some data sources still hold English labels; those labels stay English until
-the source returns an ID.
-See [`MESSAGE-IDS.md`](MESSAGE-IDS.md) for the convention and the community
-file format.
+The catalogs use stable message IDs; English lives in
+`calcpad-frontend/src/i18n/messages/en.ts`.
+Missing IDs fall back to English.
+See
+[`messages/README.md`](../../calcpad-frontend/src/i18n/messages/README.md)
+for the catalog, community and ID conventions.
 
 ## Rules
 

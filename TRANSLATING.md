@@ -1,11 +1,5 @@
 # Translation sources
 
-> The migration from English-text keys to stable message IDs is in progress.
-> Catalogs and call sites use IDs.
-> Some data sources still hold English labels; those labels stay English until
-> the source returns an ID.
-> See `Calcpad.Web/frontend/scripts/i18n/MESSAGE-IDS.md`.
-
 CalcpadCE records where every translation came from.
 Provenance is part of the review, not an afterthought.
 

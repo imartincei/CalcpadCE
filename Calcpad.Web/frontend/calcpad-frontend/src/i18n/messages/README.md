@@ -26,3 +26,24 @@
   It resolves the current culture first, then the host language, then the
   browser list; a culture without a catalog falls back to English.
 - Do not edit generated catalogs, provenance, or Monaco maps by hand.
+
+## ID convention
+
+IDs are lowercase, dot-separated and ASCII: `<area>.<component>.<element>`,
+for example `menu.openRecent`.
+Reuse one ID when meaning and translation are the same; split IDs when context
+changes the translation.
+The English text is not part of the key, so rewriting English does not rename
+IDs.
+IDs are not translated.
+Use `Label`, `Question` and `Ellipsis` suffixes for trailing punctuation.
+
+Monaco keys keep their `module::key` form; they are already context-specific
+and do not use UI message IDs.
+
+## Adding a message
+
+Add the English text with a new ID to `en.ts`.
+Add the translation to `community/<locale>.ts` when one exists.
+Then run `node scripts/i18n/i18n.mjs --locale=<locale>` and
+`node scripts/i18n/i18n.mjs --check`.

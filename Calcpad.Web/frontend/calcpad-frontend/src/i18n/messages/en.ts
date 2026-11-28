@@ -1,4 +1,4 @@
-// English source. IDs are stable; see scripts/i18n/MESSAGE-IDS.md.
+// English source. IDs are stable; see README.md.
 const en: Record<string, string> = {
     "agentChat.accepted": "Accepted",
     "agentChat.agent": "Agent",
