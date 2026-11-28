@@ -1,4 +1,6 @@
 import { reactive } from 'vue';
+import { translate } from 'calcpad-frontend/i18n';
+import en from 'calcpad-frontend/i18n/messages/en';
 import { applyEdit, findDoc, materialize, prepareEdit, runEditorTool, STALE_NOTE, type AgentEditorContext, type DocRef, type PreparedEdit, type ProposedEdit, type ReadLog } from './agent-tools';
 
 export type ApprovalState = 'pending' | 'allowed' | 'denied' | 'expired';
@@ -746,7 +748,7 @@ async function onToolRequest(request: ToolRequest): Promise<void> {
     if (tool === 'propose_edit') {
         const mode = modeInfo(conversation.permissionMode, harnessInfo(conversation.provider));
         if (mode.edits === 'blocked') {
-            await respond(id, { error: `${mode.label} is on, so worksheets cannot be edited. Present your plan instead.` });
+            await respond(id, { error: `${en[mode.label] ?? mode.label} is on, so worksheets cannot be edited. Present your plan instead.` });
             return;
         }
         try {
@@ -1128,7 +1130,7 @@ export async function setModel(model: string): Promise<void> {
 async function restartForMode(conversation: Conversation): Promise<void> {
     conversation.restartPending = false;
     await stopProcess(conversation);
-    notice(conversation, `${modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).label} applies from your next message.`);
+    notice(conversation, `${translate(modeInfo(conversation.permissionMode, harnessInfo(conversation.provider)).label)} applies from your next message.`);
     touch(conversation);
 }
 

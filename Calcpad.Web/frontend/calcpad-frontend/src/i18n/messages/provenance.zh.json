@@ -96,6 +96,11 @@
       "author": "Isaiah Martin",
       "date": "2026-11-15",
       "subject": "adding mcp server that is not claude-specific"
+    },
+    "a89ad055": {
+      "author": "Luan Weslley",
+      "date": "2026-11-27",
+      "subject": "Merge origin/main into i18n/monaco-nls"
     }
   },
   "keys": {
@@ -139,9 +144,9 @@
       "source": "community",
       "origin": "40fa6871"
     },
-    "agentChat.changesInThisConversation": {
+    "agentChat.changesInOpenConversations": {
       "source": "community",
-      "origin": "40fa6871"
+      "origin": "a89ad055"
     },
     "agentChat.closed": {
       "source": "community",
@@ -219,10 +224,6 @@
       "source": "community",
       "origin": "ae2a07a1"
     },
-    "agentChat.nameHasNotChangedAnyWorksheetsInThis": {
-      "source": "community",
-      "origin": "fb220284"
-    },
     "agentChat.nameNotFound": {
       "source": "community",
       "origin": "ae2a07a1"
@@ -238,6 +239,10 @@
     "agentChat.noLongerPending": {
       "source": "community",
       "origin": "40fa6871"
+    },
+    "agentChat.noOpenConversationHasChangedAWorksheet": {
+      "source": "community",
+      "origin": "a89ad055"
     },
     "agentChat.noSavedConversationsYet": {
       "source": "community",
@@ -294,6 +299,14 @@
     "agentChat.reviewTheDiffToAcceptOrRejectIt": {
       "source": "community",
       "origin": "e15f5897"
+    },
+    "agentChat.runningInAnotherWindow": {
+      "source": "community",
+      "origin": "a89ad055"
+    },
+    "agentChat.runningInAnotherWindowYouCanContinue": {
+      "source": "community",
+      "origin": "a89ad055"
     },
     "agentChat.send": {
       "source": "community",

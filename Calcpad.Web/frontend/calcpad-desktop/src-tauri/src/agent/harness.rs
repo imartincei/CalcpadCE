@@ -45,16 +45,16 @@ pub struct Mode {
 
 const MANUAL: Mode = Mode {
     value: "default",
-    label: "Manual",
-    hint: "Ask before running commands or editing",
+    label: "catalog.manual",
+    hint: "catalog.askBeforeRunningCommandsOrEditing",
     edits: Edits::Review,
     profile: None,
 };
 
 const AUTO: Mode = Mode {
     value: "auto",
-    label: "Auto mode",
-    hint: "Work without asking, changing only open worksheets; every change is backed up",
+    label: "catalog.autoMode",
+    hint: "catalog.workWithoutAskingChangingOnlyOpenWorksheetsEvery",
     edits: Edits::Auto,
     profile: Some("restricted"),
 };
@@ -63,15 +63,15 @@ const CLAUDE_MODES: &[Mode] = &[
     MANUAL,
     Mode {
         value: "acceptEdits",
-        label: "Edit automatically",
-        hint: "Apply edits to open worksheets without review; no commands or file writes",
+        label: "catalog.editAutomatically",
+        hint: "catalog.applyEditsToOpenWorksheetsWithoutReviewNo",
         edits: Edits::Auto,
         profile: Some("restricted"),
     },
     Mode {
         value: "plan",
-        label: "Plan mode",
-        hint: "Explore and propose a plan without making changes",
+        label: "catalog.planMode",
+        hint: "catalog.exploreAndProposeAPlanWithoutMakingChanges",
         edits: Edits::Blocked,
         profile: None,
     },
@@ -83,15 +83,15 @@ const fn standard_modes(profile: Option<&'static str>) -> [Mode; 3] {
         MANUAL,
         Mode {
             value: "acceptEdits",
-            label: "Edit automatically",
-            hint: "Apply edits to open worksheets without review; no commands or file writes",
+            label: "catalog.editAutomatically",
+            hint: "catalog.applyEditsToOpenWorksheetsWithoutReviewNo",
             edits: Edits::Auto,
             profile,
         },
         Mode {
             value: "plan",
-            label: "Plan mode",
-            hint: "Read and propose a plan; no edits, commands or file writes",
+            label: "catalog.planMode",
+            hint: "catalog.readAndProposeAPlanNoEditsCommands",
             edits: Edits::Blocked,
             profile,
         },

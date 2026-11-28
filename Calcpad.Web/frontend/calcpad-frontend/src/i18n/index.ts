@@ -1,9 +1,9 @@
 /**
  * UI translations for the shared CalcpadCE frontend.
  *
- * Keys are the English source strings, so a missing translation falls back to the
- * English text. "auto" follows the current culture, then the host language; a
- * manual choice overrides both.
+ * Keys are stable message IDs; English lives in messages/en.ts, so a missing
+ * translation falls back to English. "auto" follows the current culture, then
+ * the host language; a manual choice overrides both.
  */
 import { createI18n, type I18n } from 'vue-i18n'
 import cs from './messages/cs'
@@ -20,13 +20,11 @@ import ru from './messages/ru'
 import tr from './messages/tr'
 import zh from './messages/zh'
 import zhHant from './messages/zh-Hant'
-import { resolveMessageKey } from './keys'
 import { LOCALES, LOCALE_LABELS, SUPPORTED_LOCALES, type CalcpadLocale } from './locales.generated'
 
 export { menuLabels, MENU_KEYS } from './menu'
 export { LOCALE_LABELS, SUPPORTED_LOCALES }
 export { formatMessage } from './format'
-export { resolveMessageKey }
 export { useCalcpadI18n as useI18n } from './use-calcpad-i18n'
 export type { CalcpadLocale }
 
@@ -37,7 +35,7 @@ export const LOCALE_STORAGE_KEY = 'calcpad.locale'
 export const LOCALE_CHANGED_EVENT = 'calcpad:locale-changed'
 
 export const LOCALE_OPTIONS: { value: LocaleSetting; label: string; translatable: boolean }[] = [
-    { value: 'auto', label: 'Auto', translatable: true },
+    { value: 'auto', label: 'common.auto', translatable: true },
     ...SUPPORTED_LOCALES.map(value => ({ value, label: LOCALE_LABELS[value], translatable: false })),
 ]
 
@@ -125,7 +123,7 @@ export function translate(key: string, named?: Record<string, unknown>): string 
     const composer = activeI18n.global as unknown as {
         t: (key: string, named?: Record<string, unknown>) => string
     }
-    return composer.t(resolveMessageKey(key), named)
+    return composer.t(key, named)
 }
 
 function notifyLocaleChanged(setting: LocaleSetting, locale: CalcpadLocale): void {

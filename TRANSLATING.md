@@ -1,15 +1,17 @@
 # Translation sources
 
 > The migration from English-text keys to stable message IDs is in progress.
-> Catalogs and literal call sites already use IDs; a temporary bridge still
-> covers data-driven labels and error messages.
+> Catalogs and call sites use IDs.
+> Some data sources still hold English labels; those labels stay English until
+> the source returns an ID.
 > See `Calcpad.Web/frontend/scripts/i18n/MESSAGE-IDS.md`.
 
 CalcpadCE records where every translation came from.
 Provenance is part of the review, not an afterthought.
 
-The English keys are the canonical source.
-A translated key has one of three sources.
+Message IDs are the canonical keys; English lives in
+`calcpad-frontend/src/i18n/messages/en.ts`.
+A translated key has one of two sources.
 
 ## Source labels
 
@@ -41,30 +43,27 @@ A `vscode` entry also records `vscodeSource`: `vscode-monaco` or `vscode-shared-
 
 ```json
 "keys": {
-  "Files": {
+  "common.open": {
     "source": "community",
     "origin": "3e486ccf"
   },
-  "Find": {
+  "common.find": {
     "source": "vscode",
     "vscodeSource": "vscode-shared-ui"
   },
-  "Copy": {
+  "common.copy": {
     "source": "community",
-    "origin": "3e486ccf",
-    "vscodeMatch": true
+    "origin": "3e486ccf"
   }
 }
 ```
 
 `origin` for a community key is the short commit that last changed the line, as reported by `git blame`.
 A `vscode` entry uses the pack pin in `sources`, records `vscodeSource`, and does not need a commit origin.
-`vscodeMatch: true` means the English key and the Chinese value exactly match a pinned VS Code pack.
-It is an observation, not proof that the translator copied the pack, so the source stays `community` unless a contributor confirms it.
 
 ## Automatic locale
 
-`Auto` uses the current culture first: the OS locale on desktop, the extension
+`common.auto` uses the current culture first: the OS locale on desktop, the extension
 host's locale in VS Code, and the browser language list on the web. If that
 culture has no catalog, it falls back to English. The host language and browser
 list are only used when the current culture is unavailable.
@@ -73,9 +72,12 @@ list are only used when the current culture is unavailable.
 
 A catalog may contain only the keys that have been translated.
 Missing keys fall back to English; every key that is present must have explicit provenance.
-Generated catalogs contain the strings verified against the pinned VS Code packs, marked `vscode`.
-`zh.ts` is the community-authored catalog; the others are generated.
-Community translations are added as new entries with `source: "community"` and an `origin`.
+Generated catalogs contain strings verified against the pinned VS Code packs,
+marked `vscode`.
+Every catalog is generated: `zh.ts` comes from `community/zh.ts`, and the other
+locales come from their pack plus their community file.
+Community translations live in `community/<locale>.ts`; the generator records
+`source: "community"` and derives the `origin` with `git blame`.
 
 ## Shared UI from VS Code
 
@@ -90,13 +92,20 @@ Run `node scripts/i18n/i18n.mjs` to process every registered langpack, or
 `--locale=<tag>` for one. It extracts the pinned subset, writes
 `messages/<locale>.ts` and `provenance.<locale>.json`, and regenerates the
 Monaco maps.
-`--check` verifies the committed output.
-No network access or VS Code source checkout is needed at build time.
+`--check` verifies the committed catalogs, provenance, and Monaco override
+keys.
+It compares the Monaco cache only when that cache exists; the maps and
+overrides are build output.
+Packs are pinned and downloaded on first use, then cached under
+`node_modules/.cache`; no VS Code source checkout is needed.
 The script includes only keys with one unique translation; keys with multiple variants stay English until the community decides.
 When a key exists in both sources the script uses Monaco first and records `vscode-monaco`; otherwise it records `vscode-shared-ui`.
-Community entries live in the same catalog and manifest; the script preserves entries whose provenance says `community` and rewrites only generated `vscode` entries.
-Do not edit generated `vscode` entries by hand.
-The human review workflow is still being defined, but the mechanical path is: add the key and its `community` provenance, then run the script.
+Community entries live in `community/<locale>.ts`; the script merges them,
+derives missing origins with `git blame`, and rewrites the generated catalog and
+provenance.
+Do not edit generated catalogs or provenance by hand.
+The mechanical path is: add the ID and translation to
+`community/<locale>.ts`, commit that file, then run the script.
 Community overrides of a generated key also set `replaces: "vscode"`.
 
 ### Adding a shared UI term
@@ -148,23 +157,25 @@ In a shared UI catalog, a per-key entry becomes an object:
 
 ```json
 "keys": {
-  "Find": {
+  "common.find": {
     "source": "community",
     "replaces": "vscode",
-    "note": "Calcpad uses its own wording here."
+    "origin": "3e486ccf"
   }
 }
 ```
 
-In Monaco, put the replacement in `monaco-nls/overrides/<locale>.json`.
-`SOURCES.json` declares the override file and its `replaces`:
+In Monaco, put the replacement in the `monaco` section of
+`community/<locale>.ts`.
+The generator writes it to
+`calcpad-web/node_modules/.cache/calcpad-monaco-nls/overrides/<locale>.json`.
+`SOURCES.json` declares the override metadata; the cache is not committed.
 
 ```json
 "overrides": {
   "zh": {
     "source": "community",
-    "replaces": "vscode",
-    "path": "overrides/zh.json"
+    "replaces": "vscode"
   }
 }
 ```
@@ -178,13 +189,12 @@ The Vite plugin merges the overrides at build time.
 2. Every shared UI key has an explicit entry; there is no default source.
 3. Every `community` shared UI key records its `origin` commit.
 4. `vscode` entries record `vscodeSource` plus the pack, tag, commit and license.
-5. `vscodeMatch` does not change the source by itself.
-6. Do not edit generated Monaco maps by hand; regenerate them.
-7. Do not copy VS Code wording blindly; check context and terminology.
-8. Machine translation is not a source.
+5. Do not edit generated Monaco maps by hand; regenerate them.
+6. Do not copy VS Code wording blindly; check context and terminology.
+7. Machine translation is not a source.
    A machine draft must be reworked and reviewed as a community contribution before merging.
-9. Language names are endonyms; never translate them.
-10. A catalog may omit keys; missing keys fall back to English. Do not fill gaps with unreviewed text.
-11. Run the provenance check before merging.
+8. Language names are endonyms; never translate them.
+9. A catalog may omit keys; missing keys fall back to English. Do not fill gaps with unreviewed text.
+10. Run the provenance check before merging.
 
 The check lives at `Calcpad.Web/frontend/scripts/i18n/i18n.mjs --check`.

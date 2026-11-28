@@ -74,68 +74,55 @@
   "overrides": {
     "cs": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/cs.json"
+      "replaces": "vscode"
     },
     "de": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/de.json"
+      "replaces": "vscode"
     },
     "es": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/es.json"
+      "replaces": "vscode"
     },
     "fr": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/fr.json"
+      "replaces": "vscode"
     },
     "it": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/it.json"
+      "replaces": "vscode"
     },
     "ja": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/ja.json"
+      "replaces": "vscode"
     },
     "ko": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/ko.json"
+      "replaces": "vscode"
     },
     "pl": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/pl.json"
+      "replaces": "vscode"
     },
     "pt-BR": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/pt-BR.json"
+      "replaces": "vscode"
     },
     "ru": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/ru.json"
+      "replaces": "vscode"
     },
     "tr": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/tr.json"
+      "replaces": "vscode"
     },
     "zh": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/zh.json"
+      "replaces": "vscode"
     },
     "zh-Hant": {
       "source": "community",
-      "replaces": "vscode",
-      "path": "overrides/zh-Hant.json"
+      "replaces": "vscode"
     }
   }
 }

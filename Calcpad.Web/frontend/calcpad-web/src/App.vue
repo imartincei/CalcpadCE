@@ -495,29 +495,29 @@
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.undo"
           @click="onPreviewUiHistory('uiUndo')"
-        >{{ shortcutLabel('Undo', ' (Ctrl+Z)') }}</button>
+        >{{ t('catalog.undoCtrlZ') }}</button>
         <button
           class="context-menu"
           :disabled="!previewContextMenu.uiHistory.redo"
           @click="onPreviewUiHistory('uiRedo')"
-        >{{ shortcutLabel('Redo', ' (Ctrl+Y)') }}</button>
+        >{{ t('catalog.redoCtrlY') }}</button>
       </template>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('cut')"
-      >{{ shortcutLabel('Cut', ' (Ctrl+X)') }}</button>
+      >{{ t('catalog.cutCtrlX') }}</button>
       <button
         class="context-menu"
         :disabled="!previewContextMenu.selection && !previewContextMenu.editable"
         @click="onPreviewClipboard('copy')"
-      >{{ shortcutLabel('Copy', ' (Ctrl+C)') }}</button>
+      >{{ t('catalog.copyCtrlC') }}</button>
       <button
         v-if="previewContextMenu.editable"
         class="context-menu"
         @click="onPreviewClipboard('paste')"
-      >{{ shortcutLabel('Paste', ' (Ctrl+V)') }}</button>
-      <button class="context-menu" @click="onFindInPreview">{{ shortcutLabel('Find', '… (Ctrl+F)') }}</button>
+      >{{ t('catalog.pasteCtrlV') }}</button>
+      <button class="context-menu" @click="onFindInPreview">{{ t('catalog.findCtrlF') }}</button>
       <button v-if="onOpenFullHtmlRequest" class="context-menu" @click="onOpenFullHtml">{{ t('app.openFullHtml') }}</button>
     </div>
 
@@ -659,15 +659,6 @@ import type { ResultMode, WorkspaceLayout } from './services/workspace-state'
 import { navigationDirection } from './editor/navigation-history'
 
 const { t } = useI18n()
-
-/** Prefer an exact key with the shortcut; otherwise append it to the shared-UI term. */
-function shortcutLabel(key: string, suffix: string): string {
-  const full = `${key}${suffix}`
-  const translated = t(full)
-  if (translated !== full) return translated
-  const plain = t(key)
-  return plain !== key ? `${plain}${suffix}` : full
-}
 
 const props = withDefaults(defineProps<{ isDesktop?: boolean }>(), { isDesktop: false })
 const autoRunEnabled = ref(true)
