@@ -2,8 +2,8 @@
 
 ## Internal Implementation and Types of Matrices
 
-CalcpadCE includes different types of matrices: general (rectangular) and special (column, symmetric, diagonal.
-upper/lower triangular). Internally, each type is implemented in a different way that benefits from the specific structure for better efficiency.
+CalcpadCE includes different types of matrices: general (rectangular) and special (column, symmetric, diagonal, upper/lower triangular).
+Internally, each type is implemented in a different way that benefits from the specific structure for better efficiency.
 Externally, all of them behave in a similar way, except for a few cases.
 
 Each matrix type is implemented as an array of vectors, as displayed on the figure below.
@@ -2359,7 +2359,8 @@ For example:
 \end{bmatrix}`$
 
 The only exception is multiplication operator "\*" which represents the standard matrix multiplication.
-The elementwise (Hadamard or Schur) product is implemented in CalcpadCE as a function: **hprod**. Matrix multiplication *C*m×p = *A*m×n *B*n×p is defined so that each element *c*i j is obtained as the dot product of the *i*-th row of *A* and the *j*-th column of *B*:
+The elementwise (Hadamard or Schur) product is implemented in CalcpadCE as a function: **hprod**.
+Matrix multiplication *C*m×p = *A*m×n *B*n×p is defined so that each element *c*i j is obtained as the dot product of the *i*-th row of *A* and the *j*-th column of *B*:
 
 ``` math
 c_{ij} = \sum_{k = 1}^{n}{a_{ik}b_{kj}}

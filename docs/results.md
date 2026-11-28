@@ -1,16 +1,15 @@
 ﻿# Results
 
-You can run the solution by pressing **F5** or clicking the <img src="./media/image6.png" alt="" height="20"> button.
-The results will appear in the "**Output**" box.
-You cannot edit the output content, but you can select, copy and print it.
-For that purpose, you can use the toolbar above the "**Output**" box on the right.
-You can also use additional commands from the context menu, that is displayed If you right-click inside the "**Output**" box, you will see a pop-up menu with additional commands.
-Detailed description is provided further in this manual.
+The results appear in the results pane beside the editor.
+Open it with the **CalcpadCE Preview** button in VS Code, or toggle it with **Ctrl+P** in the desktop app.
+You cannot edit the output content, but you can select and copy it.
 
-Since version 6.5.3, you can use the "☑ **AutoRun**" mode.
-While it is checked, the results will refresh each time you change the code and move to another line.
-If you need to synchronize the results manually, you can press "**Ctrl + Enter**". Additionally, the output window will scroll to match the current position in the source code.
-You can do the same by double clicking into the input window.
+By default, the results refresh each time you change the code.
+For large documents, you can turn off **Auto-Run Preview** in the [Settings](new-settings.md#editor-features) tab and run the calculation manually with **Ctrl+Alt+X** or the **▶ Run** button.
+Turn on **Sync Preview to Cursor Line** to have the results scroll to match the current position in the source code.
+
+The results pane can show the document in **Preview**, **Input**, **Report** and **Unwrapped** modes.
+See [How It Works](how-it-works.md).
 
 ## Substitution
 
@@ -18,17 +17,16 @@ CalcpadCE can substitute the values of variables in all formulas in the output, 
 
 <img src="./media/image39.png" style="width:2.27778in;height:0.43056in" alt="Картина, която съдържа Шрифт, линия, номер, текст Описанието е генерирано автоматично" />
 
-For that purpose, you need to check the "**Substitution**" checkbox at the bottom of the program window.
+For that purpose, you need to turn on **Substitute Variables** in the [Settings](new-settings.md#math) tab.
+It is on by default, and a document can change it with `#settings {"substitute": false}`.
 That makes the results easy to review and check.
 This is important when calculations have to be checked by supervisors, teachers etc.
 This is also an advantage over the spreadsheet software where the actual formulas are hidden in the cells.
 
-If you do not need the substitution, you can uncheck this option.
+If you do not need the substitution, you can turn this option off.
 Then the answers will follow directly the calculation formulas:
 
 <img src="./media/image40.png" style="width:1.52083in;height:0.45833in" alt="Картина, която съдържа Шрифт, линия, номер, текст Описанието е генерирано автоматично" />
-
-After that, if you position the mouse over a variable, you will see a tooltip with the respective value.
 
 There is also an option to control the variable substitution behavior inside worksheets.
 You can use the following switches for that purpose:
@@ -45,9 +43,9 @@ If an equation gets too long and does not fit on a single line, you can choose t
 ## Rounding
 
 Rounding is specified by the number of digits *n* after the decimal point.
-It is entered into the "**Rounding**" input box at the bottom of the program window.
-The value of *n* can be between "0" and "15". If you enter "0", all results will be rounded to integers.
-If the value is less than "0" or greater than "15", the respective limit will be taken.
+It is set with **Decimals** in the [Settings](new-settings.md#math) tab.
+The value of *n* can be between "0" and "15".
+If you enter "0", all results will be rounded to integers.
 
 However, rounding can come across some potential problems.
 If the result is less than 10-*n* and you round it to *n* digits after the decimal point, the result will contain only zeros.
@@ -72,15 +70,19 @@ Internally, all numbers are stored with the maximum possible precision.
 That is why, if you print the output and try to repeat the calculations with the numbers from the report, you probably will get some little differences.
 This is because you use the rounded values instead of the actual ones.
 
-You can override the global rounding inside a worksheet by using the `#Round n` keyword, where *n* is the number of digits after the decimal point (from "0" to "15"). To restore the global rounding, enter `#Round` default.
+You can override the global rounding inside a worksheet by using the `#Round n` keyword, where *n* is the number of digits after the decimal point (from "0" to "15").
+To restore the global rounding, enter `#Round default`.
+You can also set it with `#settings {"decimals": n}`, which `#end settings` reverts.
+See [Settings → In a document](new-settings.md#in-a-document).
 
 ## Formatting
 
 CalcpadCE does not simply calculate formulas.
 It also builds a professionally looking report out of your source code.
-It uses Html to format the output.
+It uses HTML to format the output.
 It is widely recognized and allows you to publish your calculations on the web.
-You can select between two different styles for equation formatting: "**professional**" and "**inline**". The professional style uses division bar, large and small brackets, radical, etc.
+You can select between two different styles for equation formatting: "**professional**" and "**inline**", with the **Format Equations** setting.
+The professional style uses division bar, large and small brackets, radical, etc.
 Numerator and denominator are displayed one above the other.
 The inline style uses slash for displaying division and all symbols are arranged in a single line.
 The following formatting rules apply:
@@ -110,12 +112,10 @@ Several examples of formatting in different cases are provided in the table belo
 | `x_1^3` | $x_1^3$ |
 | `sin(x)` | **sin**(*x*) |
 
-Html formatting makes the report easier to read and check than the respective plain text.
-You can also insert additional Html code inside the comments that will affect the final appearance.
-In this way, you can use CalcpadCE code to build professional Web applications.
-You will also need the cloud version of CalcpadCE for that purpose.
+HTML formatting makes the report easier to read and check than the respective plain text.
+You can also insert additional HTML code inside the comments that will affect the final appearance.
 
-CalcpadCE uses for decimal separator the symbol defined in the Windows' Regional Settings.
+CalcpadCE uses for decimal separator the symbol defined in the regional settings of your operating system.
 
 ## Custom Format Strings
 
@@ -192,7 +192,7 @@ Fixed point with digit grouping: `Nn` or `nn`
 `n` range: 0-17  
 `n` default value: 2
 
-The symbols defined in Windows' Regional Settings are used for thousands and decimal separators.
+The symbols defined in the regional settings of your operating system are used for thousands and decimal separators.
 
 | Code | Output |
 | ---- | ------ |
@@ -207,7 +207,7 @@ Fixed point with currency symbol and digit grouping: `Cn` or `en`
 `n` range: 0-17  
 `n` default value: 2
 
-The currency symbol defined in Windows' Regional Settings is used.
+The currency symbol defined in the regional settings of your operating system is used.
 
 | Code | Output |
 | ---- | ------ |
@@ -237,65 +237,16 @@ The following characters can be used to compose a custom formatting:
 | `0.01234:#.##e-000` | $1.23\mathrm{e}{-}002$ |
 | `0.12:0.000e-00` | $1.200\mathrm{e}{-}0$ |
 
-## Scaling
+## Exporting and Printing
 
-You can scale up and down the text size in the output window.
-Hold the "**Ctrl**" button and rotate the mouse wheel.
-The forward rotation will scale up and the backward will scale down.
+The report can be exported to **PDF**, **Word** (\*.docx) or **HTML** from the **Export** tab of the [CalcpadCE panel](new-calcpad-panel.md#export).
+PDF export lets you set the paper size, orientation, margins and the header and footer, and a document can carry its own page setup.
+Word export writes the equations as native Word equations, which can be edited inside Word.
+An HTML file can be opened on any computer with a web browser, without CalcpadCE.
+To print the report, export it to PDF and print the PDF.
 
-## Saving the Output
+See [Exports](new-exports.md) for the details of each format, and for exporting plots and portable copies of a document.
 
-You can save the output to an **Html** file . Unlike the input file, it cannot be modified with CalcpadCE.
-On the other hand, everyone will be able to view and print your calculations without CalcpadCE.
-Html files can be opened on any computer using web browser or office program like Word.
-
-You can save the file by clicking the <img src="./media/image9.png" alt="" height="20"> button above the output box.
-Then select a file name and click "**Save**".
-
-## Printing
-
-You can print the output by clicking the <img src="./media/image7.png" alt="" height="20"> button.
-Normally, printing is performed after calculations.
-When you click the button, the print preview dialog will be displayed:
-
-<img src="./media/image41.png" style="width:6.71902in;height:3.23821in" alt="Картина, която съдържа текст, екранна снимка, софтуер, Мултимедиен софтуер Генерираното от ИИ съдържание може да е неправилно." />
-
-It allows you to set the paper layout, margins, size, type, etc.
-Printing in CalcpadCE uses the built-in functionality of Windows and Edge.
-The above screenshots may look different on your computer, depending on the versions you use.
-
-## Copying
-
-You can copy the entire output at once by clicking the <img src="./media/image8.png" alt="" height="20"> button above the output window.
-Then, you can paste it in any other program.
-If the target program supports Html, like Word, the formatting will be preserved.
+To copy part of the output, select it and press **Ctrl+C**.
+If the target program supports HTML, like Word, the formatting will be preserved.
 Otherwise, the content will be pasted as plain text.
-
-## Export to Word
-
-You can open the results directly with **MS Word** by clicking <img src="./media/image11.png" alt="" height="20">. It must be installed on the computer, but it is not necessary to be preliminary open.
-This approach is easier than copy-paste and provides some additional benefits.
-If the output is obtained with the professional equation formatting option, CalcpadCE will use the "**\*.docx**" file format for export.
-This is the native format for the latest versions of **MS Word** and will open automatically.
-If you have **Open Office** or **Libre office**, the respective program will be used instead.
-If you do not have any text editor currently installed, the file will be saved to the disk but not open.
-You can go to the respective folder later and open it manually.
-Formulas are exported as **MathType** objects and can be modified inside Word.
-However, it is possible to lose part of the Html formatting.
-Images, tables and most common tags are supported.
-If you have selected inline equation formatting, CalcpadCE will use an **Html** file for the export.
-It will preserve most of the formatting, but formulas will be part of the document text.
-
-## Export to PDF
-
-A good alternative to **Html** is to save the report as **pdf** file.
-It is another way to make a hard copy of your calculations.
-Click the <img src="./media/image10.png" alt="" height="20"> button and select the name and the location of the file.
-The program will save the output to the specified file and open it with the default viewer.
-The pdf is always generated in A4 page size.
-
-Alternatively, you can use a pdf printer.
-There are a lot of free pdf printers over the Internet.
-Just download and install one.
-After that, the process of printing is not much different than any other printer.
-Detailed description of printing from CalcpadCE is provided above.

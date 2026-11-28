@@ -9,7 +9,10 @@ Unlike numerical methods, they can work with complex numbers.
 $Sum{f(k) @ k = a : b}
 ```
 
-It sums the values of f(*k*) for all integer *k* between *a* and *b*. The values of *k* can only grow, so it should be satisfied that *a* \< *b*. Instead of f(*k*) you can put any valid expression that includes *k*. Otherwise, it will simply sum the same value *k* times.
+It sums the values of f(*k*) for all integer *k* between *a* and *b*.
+The values of *k* can only grow, so it should be satisfied that *a* \< *b*.
+Instead of f(*k*) you can put any valid expression that includes *k*.
+Otherwise, it will simply sum the same value *k* times.
 For example, you can use series to calculate constants.
 Such is the Leibniz formula for calculation of π:
 
@@ -26,7 +29,9 @@ The following pattern can be applied to approximate a function with Fourier seri
 f(x) = a_0/2 + $Sum{a(k)*cos(k*x*π/l) @ k=1:n} + $Sum{b(k)*sin(k*x*π*l) @ k=1:n}
 ```
 
-As an example, we can take a straight line within the interval (0; 2\**l*), withs equation: f(*x*) = *x*/(2\**l*). The integration constants are *a*(*k*) = 0 and *b*(*k*) = -1/(*k*\*π). If we plot the Fourier approximation for *n* = 5, we will get the following result:
+As an example, we can take a straight line within the interval (0; 2\**l*), withs equation: f(*x*) = *x*/(2\**l*).
+The integration constants are *a*(*k*) = 0 and *b*(*k*) = -1/(*k*\*π).
+If we plot the Fourier approximation for *n* = 5, we will get the following result:
 
 <img src="./media/image26.png" style="width:4.33057in;height:2.80665in" alt="Fourier" />
 
@@ -43,7 +48,8 @@ For example, you can define your own factorial function:
 F(n) = $Product{k @ k = 1 : n}
 ```
 
-You can use it further to calculate binomial coefficients by the well-known formula: C(*n*; *k*) = F(*n*)/(F (*k*)\*F(*n* - *k*)). However, it is much more efficient to define a special procedure that computes the coefficient directly without using factorials:
+You can use it further to calculate binomial coefficients by the well-known formula: C(*n*; *k*) = F(*n*)/(F (*k*)\*F(*n* - *k*)).
+However, it is much more efficient to define a special procedure that computes the coefficient directly without using factorials:
 
 ```calcpad
 $Product{(i + n - k)/i @ i = 1:k}
@@ -57,7 +63,8 @@ Also, the latter will not overflow together with the factorials for greater valu
 $Repeat{f(k) @ k = a : b}
 ```
 
-This is a general inline iterative procedure that repeatedly calculates **f**(*k*). It can be used for sums and products instead of the respective procedures, but it is not so efficient.
+This is a general inline iterative procedure that repeatedly calculates **f**(*k*).
+It can be used for sums and products instead of the respective procedures, but it is not so efficient.
 However, there are expressions that can be calculated only by the "**Repeat**" command.
 Normally, such expressions will make sense if you assign the result to a variable to be used in the next iteration.
 So, the following pattern is more likely to be applied in practice:
@@ -144,6 +151,7 @@ All global and outer scope variables and functions are visible inside the curren
 
 In general, this is considered a good language design because there are no unpredictable side effects like accidentally changing some global variables just because the names are coincident.
 However, in certain scenarios, we may need to update global variables deliberately, mostly inside loops.
-For that purpose, you have to use a special operator "**←**". Unlike "**=**", it does not create a local variable.
+For that purpose, you have to use a special operator "**←**".
+Unlike "**=**", it does not create a local variable.
 Instead, it searches for the innermost existing variable in the current or outer scopes and updates its value.
 If the variable does not exist, an error is reported.

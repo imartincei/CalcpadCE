@@ -37,12 +37,12 @@ On Linux, the app will tell you which package to install if none is found — se
 2. Type a calculation, for example:
 
    ```calcpad
-   "Cantilever tip deflection
+   "Cantilever end deflection
    P = 5kN
    L = 3m
    E = 200GPa
-   I = 8.5e-5m^4
-   δ = P·L^3/(3·E·I)
+   I = 8500cm^4
+   δ = P*L^3/(3*E*I)|mm
    ```
 
 3. The **preview pane** renders your report live as you type. Toggle it with **Ctrl+P** or the results-pane button beside the tabs.
@@ -74,6 +74,7 @@ There are several ways to open documents:
 
 - **File → Open…** — native file picker.
 - **Files tab** in the sidebar — open a folder and browse its tree.
+  Right-click a file to insert an `#include`, `#read`, or image reference to it at the cursor, with a relative or absolute path.
 - **Recent files** — tracked automatically and available from the File menu.
 
 Compiled **`.cpdz`** worksheets open the same way and are registered as their own file type.

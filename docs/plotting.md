@@ -3,7 +3,8 @@
 Besides functions, CalcpadCE provides special commands for advanced operations.
 They accept functions and expressions as arguments and perform plotting, iterative solutions and numerical methods.
 Their names start with "\$" to be distinguished from normal functions.
-Their parameters must be enclosed in curly brackets: "{" and "}". Such is the plotting command \$Plot.
+Their parameters must be enclosed in curly brackets: "{" and "}".
+Such is the plotting command \$Plot.
 It can plot a function of one variable in the specified interval.
 It has the following format:
 
@@ -62,10 +63,12 @@ Plotting supports only real numbers.
 You can use it in complex mode, only if *x* and *y* are real and the function returns real result along the plotting interval.
 
 You can specify the size of the plot area by defining two variables: *PlotWidth* and *PlotHeight* in pixels.
-The default values are *PlotWidth* = 400 and *PlotHeight* = 250. Plots can be in either in raster (PNG) or vector (SVG) format.
+The default values are *PlotWidth* = 400 and *PlotHeight* = 250.
+They can also be set with **Plot Width / Height** in the [Settings](new-settings.md#plot) tab.
+Plots can be in either in raster (PNG) or vector (SVG) format.
 The vector format is usually smaller and faster than the raster one.
 However, you may have problems with export to older version of Word or other software that does not support SVG.
-You can turn this option on and off by setting the *PlotSVG* variable to 1 and 0, respectively.
+You can turn this option on and off with the **Vector Graphics** setting, or by setting the *PlotSVG* variable to 1 and 0, respectively.
 Any nonzero value is equivalent to setting it to one.
 
 Plotting a function requires multiple evaluations.
@@ -74,17 +77,17 @@ However, if evaluations are computationally expensive, this approach can be very
 In such cases, you can use adaptive plotting.
 It starts with a coarse mesh and condenses it adaptively to the curvature.
 Where the function is smoother, the mesh remains coarser, so that the total number of points is optimal and much less than for uniform mesh.
-You can switch adaptive plotting on and off by clicking the "**Adaptive**" checkbox or setting the *PlotAdaptive* variable to 1 and 0, respectively.
+You can switch adaptive plotting on and off with the **Adaptive Plotting** setting or by setting the *PlotAdaptive* variable to 1 and 0, respectively.
 Adaptive potting will work for relatively smooth plots with limited number of breaks and jumps.
 If you have rapidly oscillating functions, it is possible to miss some peaks, so it is recommended to turn it off.
 
 The `$Map` function can work with different color palettes.
-Select the preferred one from the "**Palette**" combo box on the bottom of the program window.
-If you check the "**Smooth**" checkbox, the coloring will be displayed as a smooth gradient.
+Select the preferred one with **Color Scale** in the [Settings](new-settings.md#plot) tab.
+If you turn on **Smooth Scale**, the coloring will be displayed as a smooth gradient.
 Otherwise, the program will display strips.
-You can also add 3D effects to the graph by selecting the "**Shadows**" checkbox.
-You can also specify light direction by the respective combo.
-Besides UI controls, you can specify these options by using variables at worksheet level, as follows:
+You can also add 3D effects to the graph by turning on **Shadows**.
+You can also specify light direction with the **Light Direction** setting.
+Besides the settings, you can specify these options by using variables at worksheet level, as follows:
 
 | Parameter Name | Description |
 | -------------- | ----------- |
@@ -95,7 +98,8 @@ Besides UI controls, you can specify these options by using variables at workshe
 
 ## Examples
 
-Examples of different plotting methods are provided below. Set Angles to "R" (icon bar).
+Examples of different plotting methods are provided below.
+Set **Angle Units** to **Radians** in the Settings tab, or add `#rad` above them.
 
 ### Parametric
 
@@ -138,3 +142,9 @@ $Map{f(x; y) @ x = -15:15 & y = -15:15}
 
 Result: 2D waves  
 ![2D waves](./media/image24.png){ width="300" }
+
+## Saving Plots
+
+The **Plots** section of the **Export** tab lists every plot in the document.
+You can save each one as a PNG or SVG file, or download all of them at once as a ZIP archive.
+See [Exports → Plots](new-exports.md#plots).

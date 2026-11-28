@@ -14,12 +14,17 @@ For example, "3 + a / 5" is a correct expression and "3 a + / 5" is not.
 For that purpose, the standard mathematical notation is represented by a formal language with context-free grammar and syntax analysis is used.
 
 Arithmetic expressions are usually written in infix notation.
-It means that each operator is located between the respective operands (e.g. "5\*3 + 2"). The problem is that, unlike humans, computers are difficult to understand such expressions.
+It means that each operator is located between the respective operands (e.g. "5\*3 + 2").
+The problem is that, unlike humans, computers are difficult to understand such expressions.
 The main problems are the operator precedence and the use of brackets.
-For example, the above expression makes "17", while "5\*(3 + 2)" makes "25". That is why, the expression is converted into different type of notation, called "postfix" or Reverse Polish Notation (RPN). It is very easy for a computer to read this one.
-For example, the expression "5\*(3 + 2)" is written in RPN as "5 3 2 + \*". The main advantage is that the order of operations can be clearly specified without the need for brackets.
+For example, the above expression makes "17", while "5\*(3 + 2)" makes "25".
+That is why, the expression is converted into different type of notation, called "postfix" or Reverse Polish Notation (RPN).
+It is very easy for a computer to read this one.
+For example, the expression "5\*(3 + 2)" is written in RPN as "5 3 2 + \*".
+The main advantage is that the order of operations can be clearly specified without the need for brackets.
 
-There is a simple and powerful algorithm for evaluation of expressions written in reverse polish notation (RPN). It is used by almost all calculators.
+There is a simple and powerful algorithm for evaluation of expressions written in reverse polish notation (RPN).
+It is used by almost all calculators.
 However, CalcpadCE includes additional functionality for processing parameters, functions, macros, conditional execution, loops, etc.
 
 This was a brief and simple explanation.

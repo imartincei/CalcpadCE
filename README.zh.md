@@ -32,7 +32,7 @@ CalcpadCE 是一款开源的数学与工程计算工具。用简单、可读的�
 * **富文档**：可在代码旁直接嵌入 Markdown、HTML、CSS 和参数化 SVG 图形。
 * **专业报表**：自动生成交互式 HTML 输入表单，导出带 Word <img src="docs/media/image11.png" alt="" height="20"> 公式或 PDF <img src="docs/media/image10.png" alt="" height="20"> 的精排版报告。
 
-![CalcpadCE 界面截图](docs/media/Sample.avif)
+![CalcpadCE 界面截图](docs/media/CalcpadCE-Editor.png)
 
 ## 🚀 下载与安装
 

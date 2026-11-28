@@ -34,8 +34,7 @@ This is a fork of the now [closed-source](#️-project-status--history) Calcpad 
 * **Rich Documentation:** Seamlessly embed Markdown, HTML, CSS, and parametric SVG drawings directly alongside your code.
 * **Professional Reporting:** Automatically generate interactive HTML input forms and export polished, heavily formatted reports to native Word <img src="docs/media/image11.png" alt="" height="20"> formulas or PDF <img src="docs/media/image10.png" alt="" height="20">.
 
-![CalcpadCE Screenshot](docs/media/Sample.avif)
-
+![CalcpadCE Screenshot](docs/media/CalcpadCE-Editor.png)
 ## 🚀 Downloads & Installation
 
 You can download the latest version of the CalcpadCE desktop application directly from our GitHub Releases page.

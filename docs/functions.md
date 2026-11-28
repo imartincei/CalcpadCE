@@ -133,29 +133,38 @@ Vector and Matrix functions are described in their sections.
 
 Arguments must be enclosed by round brackets.
 They can be constants, variables or any valid expression.
-Multiple arguments must be separated by semicolons ";". When arguments are out of range, the function returns "Undefined". Exceptions from this rule are "**cot**(0)" and "**coth**(0)", which return "+∞".
+Multiple arguments must be separated by semicolons ";".
+When arguments are out of range, the function returns "Undefined".
+Exceptions from this rule are "**cot**(0)" and "**coth**(0)", which return "+∞".
 
-Arguments of trigonometric functions can be in **degrees**, **radians** or **grades**. The units for angles can be specified in three different ways:
+Arguments of trigonometric functions can be in **degrees**, **radians** or **grades**.
+The units for angles can be specified in three different ways:
 
-1. By the radio buttons above the output window (🔘**D**, 🔘**R**, 🔘**G**).
-2. By compiler switches inside the code.
+1. By the **Angle Units** option in the [Settings](new-settings.md#math) tab or #settings keyword.
+2. By keywords inside the code.
   You have to insert a separate line containing: `#deg` for degrees, `#rad` for radians or `#gra` for grades.
   This will affect all expressions after the current line to the end or until an alternative directive is found.
 3. By attaching native units to the value itself: *deg*, *°*, ′, ″, *rad*, *grad*, *rev* (see the “Units” section, further in this manual).
 
-Native units are of highest priority, followed by compiler switches in source code.
-Both override radio buttons settings, which are of lowest priority.
+Native units are of highest priority, followed by keywords in the CalcpadCE file.
+Both override the **Angle Units** setting, which is the lowest priority.
+
+Inverse trigonometric functions and `phase` return their result with the current angle unit attached, e.g. `atan(1) = 45°` in degrees.
+To return unitless numbers instead, turn off **Return Angle Units** in the [Settings](new-settings.md#math) tab or define a variable: *ReturnAngleUnits* = 0.
 
 All functions are also defined in the complex domain, except for **mod**(*x*; *y*), **gcd**(*x*; *y*), **lcm**(*x*; *y*), **min**(*x*; *y*) and **max**(*x*; *y*).
 
 Logical functions accept numerical values and return “**0**” for “**false**” and “**1**” for “**true**”.
 
-Any numerical value, different from 0, is treated as 1 (true). Multiple arguments are evaluated sequentially from left to right, according to the above tables.
+Any numerical value, different from 0, is treated as 1 (true).
+Multiple arguments are evaluated sequentially from left to right, according to the above tables.
 We start with the first and the second.
 Then, the obtained result and the next value are evaluated in turn, and so on.
 
 Rounding of midpoint values with **round**() evaluates to the nearest integer away from zero.
-The **floor**() function rounds to the smaller value (towards -∞). The **ceiling**() function rounds in the opposite direction to the larger value (towards +∞). Unlike **floor**(), **trunc**() rounds towards zero, which is equivalent to simply truncating the fractional part.
+The **floor**() function rounds to the smaller value (towards -∞).
+The **ceiling**() function rounds in the opposite direction to the larger value (towards +∞).
+Unlike **floor**(), **trunc**() rounds towards zero, which is equivalent to simply truncating the fractional part.
 Some examples for rounding of negative and positive numbers are provided in the tables below:
 
 ### Positive
@@ -182,7 +191,8 @@ Rounding of complex numbers affects both real and imaginary parts.
 
 You can define your own functions and use them further in the calculations.
 Custom functions can have unlimited number of parameters.
-They are specified after the function name, enclosed in brackets "(" … ")" and separated by semicolons ";". Each function is defined, using the following format: "**f** ( *x*; *y*; *z*; … ) = **expression**", where "**f**" is the function name and "**x**", "**y**" and "**z**" are function parameters.
+They are specified after the function name, enclosed in brackets "(" … ")" and separated by semicolons ";".
+Each function is defined, using the following format: "**f** ( *x*; *y*; *z*; … ) = **expression**", where "**f**" is the function name and "**x**", "**y**" and "**z**" are function parameters.
 On the right side you can have any valid expression including constants, operators, variables and even other functions, e.g.:
 
 ```calcpad
@@ -191,9 +201,10 @@ g(x; y) = f(x)/(y - 4)
 ```
 
 Once defined, you can use a function in any expression by inserting a function call.
-Just write the function name and then specify the arguments in brackets, e. g. *b* = **g**(*a* + 2; 3) + 3. Function names must conform to the same rules as variable names.
+Just write the function name and then specify the arguments in brackets, e. g. *b* = **g**(*a* + 2; 3) + 3.
+Function names must conform to the same rules as variable names.
 Arguments can be any valid expressions.
-You have to provide as many arguments as the number of function parameters.
+You have to provide as many arguments as the number of function parameters, unless a parameter has a default value.
 The life cycle of a function is from the place of definition to the end of the code.
 If you define a new function with the same name, the old one will be replaced.
 You cannot redefine a library function.
@@ -212,3 +223,27 @@ For example:
 > If you call $x^2$ after that, it will return $x^2 = 4^2 = 16$, because global *x* remains 4.
 
 User defined functions support both real and complex numbers.
+
+### Optional Parameters and Keyword Arguments
+
+A parameter can have a default value, which is used when the argument is left out of the call.
+Arguments can also be given by name, in any order:
+
+```calcpad
+f(x; y = 0; z = 1) = x*y + z
+f(5; z = 2)
+```
+
+Required parameters must come before optional ones.
+See [Keyword Arguments](new-keyword-arguments.md).
+
+### Documenting a Function
+
+A [metadata comment](new-metadata-comments.md) on the line above a function can give it a description, parameter descriptions, and the types of its parameters and result:
+
+```calcpad
+'<!--{"desc": "Second moment of area of a rectangle", "paramTypes": ["value", "value"], "paramDesc": ["width", "height"], "returnType": "value"}-->
+I(b; h) = b*h^3/12
+```
+
+The editor shows them when you hover over the function's name, and the [linter](new-linter.md) uses the types to flag calls with the wrong kind of value.

@@ -1,7 +1,8 @@
 ﻿# Brackets
 
 Brackets are used in two cases: to change the order of calculations and to enclose arguments of functions.
-Only round brackets are allowed: "**(**" and "**)**". The software checks if the following rules are satisfied for each expression:
+Only round brackets are allowed: "**(**" and "**)**".
+The software checks if the following rules are satisfied for each expression:
 
 - The first bracket in an expression must be a left one;
 - The count of left and right brackets must be equal;

@@ -72,7 +72,8 @@ You can achieve such structure and minimize the bandwidth by providing appropria
 Iterative methods like PCG are approximate and the solution continues until a certain precision is achieved.
 In CalcpadCE, it is specified by setting the variable `Tol`. Its default value is `Tol` $= 10^{-6}$ just like in MATLAB.
 If the required precision is not reached for under 1000 iterations, no convergence is assumed, so the solution is stopped with an error message.
-Preconditioning can often improve convergence by reducing the condition number *k*. In CalcpadCE, a simple Jacoby preconditioner is used for that purpose.
+Preconditioning can often improve convergence by reducing the condition number *k*.
+In CalcpadCE, a simple Jacoby preconditioner is used for that purpose.
 
 ### Symmetric Lanczos Eigensolver
 

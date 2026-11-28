@@ -1,12 +1,10 @@
 # How It Works
 
-1. **Enter** text and formulas into the "**Code**" box on the left.
+1. **Enter** text and formulas into the editor.
+2. The results pane renders them as a professionally formatted HTML **report** as you type.
+3. **Export** the report to **PDF**, **Word** or **HTML** from the **Export** tab.
 
-2. Press **F5** or click <img src="./media/image6.png" alt="" height="20"> to calculate.
-Results will appear in the "**Output**" box on the right as a professionally formatted Html **report**.
-
-3. Click <img src="./media/image7.png" alt="" height="20"> to **print** or <img src="./media/image8.png" alt="" height="20"> to **copy** the output.  
-    You can also **export** it to **Html** <img src="./media/image9.png" alt="" height="20">, **PDF** <img src="./media/image10.png" alt="" height="20"> or **MS Word** <img src="./media/image11.png" alt="" height="20"> document.
+See [How It Works](how-it-works.md).
 
 ## The Language
 
@@ -24,7 +22,10 @@ Results will appear in the "**Output**" box on the right as a professionally for
   - subscripts: **₀** , **₁** , **₂** , **₃** , **₄** , **₅** , **₆** , **₇** , **₈** , **₉** , **₊** , **₋** , **₌** , **₍** , **₎**
   - **\_** (underscore) for subscript
   - Any variable name must start with a letter. Names are case sensitive.
+  - A dot after a name is element access (`v.2`), not part of the name.
 - Custom functions type *f* (*x*; *y*; *z*; …)
+  - Optional parameters: *f* (*x*; *y* = 0) = …
+  - Keyword arguments: *f* (5; *y* = 2)
 - Constants:  
   *π*, *e*, *φ*, *γ*, *g*, *G*, $M_E$, $M_S$, *c*, *h*, $μ_0$, $ε_0$, $k_e$, *e*, $m_e$, $m_p$, $m_n$, $N_A$, *σ*, $k_B$, *R*, *F*, $γ_c$, $γ_s$, $γ_a$, $γ_g$, $γ_w$
 - `#const`: declares a constant (readonly) variable or function
@@ -415,7 +416,8 @@ Results will appear in the "**Output**" box on the right as a professionally for
       - Modules
         - `#include *filename*` - include external file (module)
         - `#local` - start local section (not to be included)
-        - `#global` - start global section (to be included)
+        - `#global` - start global section (to be included)
+        - `#ProjectPath *folder*`, `#LibraryPath *folder*` - declare path roots, used as `{project}` and `{library}` in a path. `{user}` is the home folder
       - Inline string variable: `#def variable_name$ = *content*`
       - Multiline string variable
         ```code
@@ -425,7 +427,8 @@ Results will appear in the "**Output**" box on the right as a professionally for
             …
         #end def
         ```
-      - Inline macro: `#def macro_name$(param1$; param2$; …) = *content*`
+      - Inline macro: `#def macro_name$(param1$; param2$; …) = *content*`
+      - Optional parameters: `#def macro_name$(param1$; param2$ = *default*) = *content*`
       - Multiline macro:
               ```code
         #def macro_name$(param1$; param2$; …)  
@@ -434,11 +437,14 @@ Results will appear in the "**Output**" box on the right as a professionally for
             …
         #end def
         ```
-
-    - **Breakpoints for step-by-step execution**
-      - `#pause` - calculates down to the current line and waits for the user to resume manually
-      - `#input` - renders an input form to the current line and waits for user input.  
-      - Each of the above commands is effective after the current line until the end of the report or another command that overwrites it.
+    - **Input forms**
+      - `#UI *name* = *value*` - declares an input
+      - `#UI {"type": "dropdown", "keys": […], "values": […]} *name* = *value*` - input with JSON properties.
+        Types: `entry`, `dropdown`, `radio`, `checkbox`, `datagrid`
+      - `#pause` - splits the input form into steps. The form calculates down to the current line and waits for the user to press **Next**
+    - **Settings**
+      - `#settings {"decimals": 4}` - overrides settings from the current line on
+      - `#end settings` - restores the settings changed by the matching `#settings`
 
 ??? info "Import/Export of External Data"
 
@@ -459,8 +465,8 @@ Results will appear in the "**Output**" box on the right as a professionally for
 
     - `#hide` - hide the report contents
     - `#show` - always show the contents (default)
-    - `#pre` - show the next contents only before calculations
-    - `#post` - show the next contents only after calculations
+    - `#pre` - show the next contents only in the input form
+    - `#post` - show the next contents only in the report
     - `#val` - show only the result, without the equation
     - `#equ` - show complete equations and results (default)
     - `#noc` - show only equations without results (no calculations)
@@ -471,8 +477,15 @@ Results will appear in the "**Output**" box on the right as a professionally for
     - `#round default` - restores rounding to the default settings
     - `#format *FFFF*` - specifies custom format string
     - `#format default` - restores the default formatting
+    - `#end hide`, `#end val`, `#end nosub`, etc. - restore the state before the matching directive
+    - `#hide *condition*`, `#val *condition*`, etc. - apply the directive only if the condition is true
+    - `#split` - split long equations after the "=" symbol
+    - `#wrap` - wrap long equations at the end of the line (default)
     - `#md on` - enables markdown in comments
     - `#md off` - disables markdown in comments
+    - `#html` … `#end html` - lines are output as raw HTML
+    - `#markdown` … `#end markdown` - lines are rendered as Markdown
+    - `#cpd` … `#end cpd` - lines are parsed as CalcpadCE code again
     - `#phasor` - sets output format of complex numbers to polar phasor: A∠φ
     - `#complex` - sets output format of complex numbers to cartesian algebraic: a + ib.
 

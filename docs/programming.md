@@ -4,110 +4,57 @@
 
 If you have a long and complicated problem or you want to share your solution with others, it is a good idea to create an input form.
 It is very easy to do that with CalcpadCE.
-Just replace the values that need to be entered with question marks "**?**", e.g. "*a* = ?". Please note that after that, you will not be able to calculate the results directly by clicking <img src="./media/image6.png" alt="" height="20">. You must compile it first to an input form.
-For that purpose, click the <img src="./media/image34.png" alt="" height="20"> button or press **F4** from the keyboard.
+Just put the `#UI` keyword in front of the definitions that need to be entered:
 
-The code will hide, and the form will be loaded into the "**Input**" box at the full width of the main window.
-All texts and formulas will be rendered in Html format, protected from modification.
-Input boxes will be generated at every occurrence of the "**?**" symbol except those in comments.
-The ready-to-use input form will look as follows:
+```calcpad
+#UI 'Span -'L = 6m
+#UI 'Load -'q = 25kN/m
+M = q*L^2/8
+```
 
-<img src="./media/image35.png" style="width:6.65977in;height:4.40945in" alt="Sample3" />
+The default values stay in the document, so it still calculates as an ordinary worksheet.
+When you switch the results pane to **Input** mode, every `#UI` line is rendered as a control and the rest of the document is shown below it.
+Change a value, and the whole document recalculates.
+**Report** mode shows the printable report with the values you entered.
+A document that declares `#UI` inputs opens as its input form, so the user can fill it in straight away.
 
-Now you have to fill in the input boxes and click <img src="./media/image6.png" alt="" height="20"> to calculate the results.
-They are displayed in the "**Output**" box.
-
-<img src="./media/image36.png" style="width:6.65977in;height:4.40945in" alt="Sample4" />
-
-In order to return to input mode, click again <img src="./media/image6.png" alt="" height="20"> to switch the button off.
-Input data will remain unchanged from the last input.
-If you need to modify the source code, you have to unlock it by clicking the <img src="./media/image34.png" alt="" height="20"> button.
-The "**Code**" box will show again at the left side of the main window.
-Input data will be attached to the question marks.
-If you hover the mouse over one of them, you will see the respective value.
-Click on the question mark to change it.
-When you finish editing the code, you can compile it back to input form.
-The input values will be filled in the respective fields.
-Finally, you can save the document as a "**\*.cpd**" file.
-When you open such a file, it will be displayed directly into input form mode.
-This format is more convenient to use than a simple text file due to the following advantages:
+This approach has the following advantages:
 
 - The user can see clearly which parameters should be entered.
-You can also provide pictures and additional explanations.
-This is more comprehensible for the user, especially if the program is developed by someone else;
+    You can also provide pictures and additional explanations.
+    This is more comprehensible for the user, especially if the program is developed by someone else;
+- The person filling in the form never edits the source code.
+    This prevents an inexperienced user from accidentally damaging the calculation formulas.
 
-- The rest of the source code is protected from modification, unless you unlock it on purpose.
-This prevents an inexperienced user from accidentally damaging the calculation formulas.
+Entered values are saved at the end of the file, separately from the defaults in the code.
+See [Saving what was entered](new-ui-mode.md#saving-what-was-entered).
 
-If you save the document as a "**\*.cpdz**" file, you will make the source code completely inaccessible.
-It will not be possible to unlock it inside CalcpadCE anymore.
-Also, no one could edit the file in external text editor, because it is encoded.
+If you save the document as a compiled "**\*.cpdz**" worksheet, the source code becomes completely inaccessible.
+The worksheet opens as its input form and cannot be unlocked.
 That is how you can protect your source code from unauthorized copying, viewing and modification.
+See [Save As Compiled Worksheet](new-exports.md#save-as-compiled-worksheet).
 
-You can put question marks "**?**" not only in variable definitions, but at any place in the code e.g.:
+!!! note
+    The `?` input fields of earlier versions, such as `a = ?{2}`, are deprecated and no longer create input fields.
+    See the [Migration Guide](migration-guide.md#input-syntax-is-deprecated) for how to convert them to `#UI`.
 
-```calcpad
-2 + ?
-```
+## Advanced UI Controls
 
-2 +
-![input field](media/Image%201.png){style="height: 32px; vertical-align: text-bottom; margin-bottom: -5px;"}
-
-Then, you can enter a value and calculate the result.
-This approach is not recommended for complicated problems, because the program logic gets unclear and difficult to understand.
-
-## Advanced UI with Html and CSS
-
-Besides simple input boxes, you can use some advanced UI elements like "**select**" (combo box), "**radio**" buttons and "**checkboxes**" in your worksheets.
-Since all the output from CalcpadCE is rendered as an Html document, you can use Html and CSS for that purpose.
-However, CalcpadCE accepts input only from text boxes.
-That is why, it is required to map every other UI element to some text box.
-This is performed by enclosing the text box into an outer html element (paragraph or div) with a certain **id**. The same id must be assigned as a **name** or **data-target** attribute of the source UI element.
-Then, the content of the source element's value attribute will be automatically filled in the target text box.
-You can use the following sample code:
-
-### Selection Box
+Besides simple input boxes, you can use drop-downs, radio buttons, checkboxes and editable grids in your worksheets.
+Set the control type and its options in a JSON block after `#UI`:
 
 ```calcpad
-'Select an option: <select name="**target1**">
-'<option value="11;12">x1; y1</option>
-'<option value="21;22">x2; y2</option>
-'<option value="31;32">x3; y3</option>
-'</select>
-'...
-'<p id="**target1**"> Values:'x = ? {21}','y = ? {22}'</p>
+#UI {"type": "dropdown", "keys": ["Low", "Medium", "High"], "values": ["1", "2", "3"]} grade = 1
+#UI {"type": "radio", "keys": ["Steel", "Concrete"], "values": ["200GPa", "25GPa"]} E = 200GPa
+#UI {"type": "checkbox"} useSteel = 1
+#UI M = [1; 2; 3 | 4; 5; 6]
 ```
 
-![Dropdown and two input field](media/Image%2045.png){style="width: 300px"}
+`keys` are the labels shown to the user, and `values` are substituted into the calculation, one per key.
+A vector or matrix becomes an editable grid.
+You don't have to write the JSON by hand: the [Properties tab](new-calcpad-panel.md#properties) has a form for it.
 
-### Radio Buttons
-
-```calcpad
-'<p>Select:
-'<input name="target2" type="radio" id="opt1" value="1"/>
-'<label for="opt1">option 1</label>
-'<input name="target2" type="radio" id="opt2" value="2"/>
-'<label for="opt2">option 2</label>
-'...
-'<p id="target2">Value -'opt = ? {2}'</p>
-```
-
-![Two radio buttons and an input field](media/Image%2046.png){style="width: 250px"}
-
-### Check Box
-
-```calcpad
-'<p><input name="target3" type="checkbox" id="chk1" value="3"/>
-'<label for="chk1">Checkbox 1</label></p>
-'...
-'<p id="target3">Value -'chk = ? {3}'</p>
-```
-
-![Checkbox and an input field](media/Image%2047.png){style="width: 120px"}
-
-As you can see from the first example, one "value" attribute can contain multiple values, separated by semicolons ";". In this case, you have to provide the respective number of text boxes in the target paragraph.
-You can copy the above code, add as many options as you like and write your own labels and values.
-You can also change names and ids, but make sure that all source names match exactly the target ids, and no duplicate ids exist.
+See [UI Mode](new-ui-mode.md) for every control type and property, and for styling the controls with CSS.
 
 ## Output Control
 
@@ -117,13 +64,15 @@ It is just not displayed.
 The following keywords can be used for that purpose:
 
 - `#Hide` hides the contents after the current line;
-- `#Pre` shows the contents in "input" mode only (see [Input forms](#input-forms) below);
-- `#Post` shows the contents in "output" mode and hides it in "input" mode;
+- `#Pre` shows the contents in the input form and hides it in the report (see [Input Forms](#input-forms) above);
+- `#Post` shows the contents in the report and hides it in the input form;
 - `#Show` always shows the contents (revoke all other keywords);
 
 Each of the above keywords affects the content after the current line and overrides the previous one.
 You can use them to hide long and repetitive calculations that should not be visible.
 You can use the `#Pre` command to add some directions about filling the input data and `#Post` to hide the calculation algorithm during data input.
+The **Preview** mode shows both `#Pre` and `#Post` content.
+See [`#pre` and `#post`](new-ui-mode.md#pre-and-post).
 
 You can also modify the display of the equations as follows:
 
@@ -133,6 +82,26 @@ You can also modify the display of the equations as follows:
 
 Each of the above keywords overrides the other.
 You can use `#Val` to create a table with values, but without the formulas, like in Excel.
+
+Each of these keywords can be closed with its `#end` form, such as `#end hide` or `#end val`, which restores the state that was in effect before it.
+They also accept an optional condition, e.g. `#hide x == 5`, which applies them only when the condition is true.
+See [Visibility Directives](new-visibility-directives.md).
+
+## HTML and Markdown Blocks
+
+By default, every line is parsed as math or a comment.
+`#html` and `#markdown` switch the lines that follow to raw HTML or Markdown, until the matching `#end html` or `#end markdown`:
+
+```calcpad
+#markdown
+| Case | Load |
+|------|------|
+| Dead | 5 kN |
+| Live | 3 kN |
+#end markdown
+```
+
+See [Parsing Modes](new-parsing-modes.md).
 
 ## Conditional Execution
 
@@ -222,42 +191,45 @@ The program will skip the remaining lines, return to the top of the loop block a
 You can omit the number of repetitions *n* only if you are sure that the condition will be satisfied, and you will leave the loop sooner or later.
 However, to avoid infinite loops, the number of iterations is limited internally to 10 000 000.
 
-Besides repetitive calculations, you can use loops to generate repetitive report content (like table rows). If you want to hide the iteration details, you can use output control directives (see the previous section). For example, you can enclose the "repeat-loop" block with `#Hide` and `#Show` statements.
+Besides repetitive calculations, you can use loops to generate repetitive report content (like table rows).
+If you want to hide the iteration details, you can use output control directives (see the previous section).
+For example, you can enclose the "repeat-loop" block with `#Hide` and `#Show` statements.
 
 Since version VM 7.0, two new iteration blocks were added: "for-loop" and "while-loop", as follows:
 
 ```calcpad
-#For counter = start : end
+#For counter = start : end
     code to be executed repeatedly
-    #Loop
-#While condition
+#Loop
+#While condition
     code to be executed repeatedly
 #Loop
 ```
 
 ## Interactive (Step-by-Step) Execution
 
-You can make a CalcpadCE worksheet to execute interactively (step-by-step) by defining "breakpoints" at certain lines.
-It will allow the user to review the intermediate results and enter some additional input data if needed.
-There are two special keywords you can use for that purpose:
+You can split an input form into steps with the `#Pause` keyword.
+The form calculates down to the first `#Pause` and stops there.
+The user can review the intermediate results, change the inputs above, and press **Next** to continue to the following step.
+**Previous** steps back.
 
-- `#Pause` calculates down to the current line, displays the results and waits for the user to resume;
-- `#Input` renders an input form to the current line and waits the user to enter data and resume.
+```calcpad
+#UI x = 2
+#UI n = 1000000
+#pause
+s = 0
+#for i = 1 : n
+    s = s + x/i^2
+#loop
+```
 
-When the execution is paused, the program renders a message at the bottom of the report:
+This is especially useful before slow parts of the calculation, so editing the earlier inputs stays responsive.
+Outside the input form, `#Pause` is ignored and the whole document is calculated.
+See [`#pause` in UI mode](new-ui-mode.md#pause-in-ui-mode).
 
-<span style="color: red";">Paused!</span>
-Press **F5** to continue or **Esc** to cancel.
-
-You can resume the execution by pressing **F5**, clicking the link or the <img src="./media/image6.png" alt="" height="20"> button again.
-You can have several breakpoints in a single worksheet.
-When you use the \#Input keyword, the previous section is calculated before the current input form is displayed.
-In this way, the stages of calculation overlap as shown in the following example:
-
-<img src="./media/image38.png" style="width:3.86746in;height:3.68349in" alt="Interactive" />
-
-Additionally, the user can press "**Pause/Break**" or "**Ctrl + Alt + P**" any time from the keyboard to pause the execution.
-The execution will pause at the current line as if `#Pause` is detected.
+!!! note
+    The `#Input` keyword is deprecated and has no effect.
+    Declare the inputs with `#UI` and use `#Pause` instead.
 
 ## Modules (Include)
 
@@ -270,15 +242,18 @@ Then, you can include them into the main file by using the following statement:
 #include filename
 ```
 
-The "*filename*" must contain the full path to a local file.
+The "*filename*" can be a full path to a local file, or a path relative to the folder of the current file.
 If the file is the same folder as the current one, you can specify only the filename.
+A path can also start with `{project}`, `{library}` or `{user}`, and environment variables such as `%APPDATA%` are expanded.
+See [Path root tokens](new-includes.md#path-root-tokens-project-and-library).
 
 By default, CalcpadCE will include the whole contents of the external module.
 However, you can prevent some parts from inclusion by making them local.
 To start a "local" section in a module, add a new line, containing the `#local` keyword.
 To end a "local" section (or start a "global" one), add a new line with the `#global` keyword.
 CalcpadCE supports multiple levels of inclusions.
-That means that the included file, in its turn, can reference other files and so on.
+That means that the included file, in its turn, can reference other files and so on, up to 20 levels deep.
+See [Includes and File Reads](new-includes.md).
 
 ## Macros and String Variables
 
@@ -306,7 +281,7 @@ Multiline string variable:
 Inline string macro:
 
 ```calcpad
-#def *macro_name$(param1$; param2$;...) = content
+#def macro_name$(param1$; param2$;...) = content
 ```
 
 Multiline string macro:  
@@ -319,25 +294,30 @@ Multiline string macro:
 #end def
 ```
 
-Names of string variables, macros, and their parameters can contain small and capital Latin letters and underscore "\_". They must end with the "\$" symbol.
+Names of string variables, macros, and their parameters can contain small and capital Latin letters, digits and underscore "\_".
+They cannot start with a digit and must end with the "\$" symbol.
 The contents can be virtually any string.
 It is not necessary to be a valid CalcpadCE expression, since it is not processed by the parser at this stage.
 However, other macro/string variable definitions are not allowed inside.
 You can insert only references to previously defined ones.
-Also, input fields "?" are not supported in macros yet.
-This feature will be developed in the next versions.
 You can use `#include` inside macros, but only if the included file does not contain other macros.
 
-After a string variable is defined, you can use it anywhere in the code by writing its name (with the ending "\$"). The same is for macros, but you also need to specify values for parameters.
+After a string variable is defined, you can use it anywhere in the code by writing its name (with the ending "\$").
+The same is for macros, but you also need to specify values for parameters.
+Macro parameters can have default values, and macros can be called with keyword arguments such as `calc$(1; c$ = 7)`.
+See [Keyword Arguments](new-keyword-arguments.md).
+When a name ending in "\$" is treated as a macro call is controlled by the **Macro Calls** setting.
+See [Settings → In a document](new-settings.md#in-a-document).
+
 Macros and string variables are preprocessed and rewritten before the actual parsing is performed.
 As a result, intermediate (unwrapped) code is generated.
-You can review it by checking the "**Unwrapped code**" checkbox below the "**Output**" window.
+You can review it by switching the results pane to **Unwrapped** mode.
 
+The [linter](new-linter.md) checks a macro body with the arguments of each call.
+An error in the body is marked on the call, and on the line in the body that caused it, each linked to the other.
+See [Errors inside macros and functions](new-linter.md#errors-inside-macros-and-functions).
 If a macro call or an `#include` fails during preprocessing, that line is shown as an error in the output, and the rest of the code is still calculated.
-Line numbers in these errors refer to your initial code.
-Errors in the unwrapped code are displayed in the output as well.
-Line numbers in error descriptions refer to the unwrapped code.
-You can go to the respective line by clicking the link on the line number.
+Errors are also listed in the **Problems** panel, where you can click one to go to the respective line in your code.
 
 ## Import/Export of External Data
 
@@ -345,11 +325,15 @@ You can import and export numerical data from/to text, CSV and Excel files.
 Inside CalcpadCE, data should be stored in a matrix/vector variable.
 You can also read and write partial data by specifying the desired range.
 Structured storage of special matrices is supported for saving space.
+File paths can start with `{project}`, `{library}` or `{user}`, the same as for `#include`.
+When `#write` and `#append` are allowed to write their files is set by the **Write files** option on the **Export** tab.
+See [Exports → Write / append files](new-exports.md#write-append-files).
 The following commands are available:
 
 ### Text/CSV Files
 
-Reads data from the specified text/CSV file into the matrix/vector *M*. The file must exist:
+Reads data from the specified text/CSV file into the matrix/vector *M*.
+The file must exist:
 
 ```calcpad
 #read M from filename.txt@R1C1:R2C2 TYPE=R SEP=','
@@ -439,7 +423,8 @@ The minimum allowed syntax for the above commands if all optional keywords are s
 
 ### Excel Files
 
-Reads the data from the specified Excel file into the matrix/vector *M*. The file must exist as well as the specified worksheet:
+Reads the data from the specified Excel file into the matrix/vector *M*.
+The file must exist as well as the specified worksheet:
 
 ```calcpad
 #read M from filename.xlsx@Sheet1!A1:B2 TYPE=R

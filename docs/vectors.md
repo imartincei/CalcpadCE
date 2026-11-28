@@ -8,7 +8,8 @@ Complex vectors are not supported in this version.
 A single vector can contain different types of units, even if not consistent.
 However, some vector functions or operators may fail due to units’ inconsistency between separate elements.
 
-Vectors with length that is greater than 100 are created as "large". Externally they behave just as regular vectors, so the user cannot make any difference.
+Vectors with length that is greater than 100 are created as "large".
+Externally they behave just as regular vectors, so the user cannot make any difference.
 But internally, they operate quite differently.
 The structure of a large vector is displayed on the figure below:
 
@@ -23,7 +24,8 @@ Instead, it returns directly zero, if such an element is accessed.
 
 This allows the software to work efficiently with vectors that are not entirely filled.
 Such vectors are very common in engineering as is the load vector in finite element analyses.
-However, CalcpadCE reserves a little bit more memory above the size, that is called "capacity". This is because resizing a vector is computationally expensive.
+However, CalcpadCE reserves a little bit more memory above the size, that is called "capacity".
+This is because resizing a vector is computationally expensive.
 Since we normally assign elements in a loop, in this way we avoid resizing the vector on each iteration.
 
 ## Definition
@@ -72,7 +74,8 @@ For example:
 `a.(2*k - 1)` $= \vec{a}_{5} = 10$
 
 If an index value is less than 1 or greater than the vector length **len**($\vec{a}$), the program will return an error: Index out of range.
-You can use indexing to initialize vectors inside loops (block or inline). For that purpose, you must include the loop counter into the index.
+You can use indexing to initialize vectors inside loops (block or inline).
+For that purpose, you must include the loop counter into the index.
 For example:
 
 ```calcpad
@@ -616,7 +619,8 @@ For example:
 `[2; 4; 5]*[2; 3; 4]` $= [4\ 12\ 20]$
 
 If the lengths of both vectors are different, the shorter vector is padded with zeros to the length of the longer one.
-Dot and cross products in CalcpadCE are implemented as functions (see above). All binary operators are supported for vector-scalar and scalar-vector operands in a similar way.
+Dot and cross products in CalcpadCE are implemented as functions (see above).
+All binary operators are supported for vector-scalar and scalar-vector operands in a similar way.
 For example:
 
 `[2; 4; 5]*2` $= [4\ 8\ 10]$

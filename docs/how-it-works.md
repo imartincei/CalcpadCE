@@ -3,29 +3,25 @@
 The software is quick and easy to use.
 Just follow these simple steps:
 
-1. **Enter** text and formulas into the "**Code**" box on the left.
+1. **Enter** text and formulas into the editor.
+2. The **results pane** beside it renders a professionally formatted HTML **report** as you type.
+   Open it with the **CalcpadCE Preview** button in VS Code, or toggle it with **Ctrl+P** in the desktop app.
+3. **Export** the report to **PDF**, **Word** or **HTML** from the panel's **Export** tab.
+   See [Exports](new-exports.md).
 
-2. Press **F5** or click <img src="./media/image6.png" alt="" height="20"> to calculate.
-Results will appear in the "**Output**" box on the right as a professionally formatted Html **report**.
+The [linter](new-linter.md) checks the document while you write, and marks problems in the editor before the report is calculated.
 
-3. Click <img src="./media/image7.png" alt="" height="20"> to **print** or <img src="./media/image8.png" alt="" height="20"> to **copy** the output.  
-    You can also **export** it to **Html** <img src="./media/image9.png" alt="" height="20">, **PDF** <img src="./media/image10.png" alt="" height="20"> or **MS Word** <img src="./media/image11.png" alt="" height="20"> document.
+The results pane can show the same document in several modes:
 
-The program can be used in two different modes:
+- **Preview** - the whole document, calculated with the default values written in it.
+  This is the recommended mode to write a CalcpadCE file in.
+- **Input** - an input form.
+  Inputs declared with the `#UI` keyword are rendered as text boxes, drop-downs, radio buttons, checkboxes, or editable grids.
+  Change a value and the document recalculates.
+  This mode is helpful to simplify inputs and for users who are not comfortable editing the CalcpadCE file.
+  It makes clear which are the required input parameters, and the person filling in the form never edits the CalcpadCE file.
+- **Report** - the printable report, calculated with the values entered into the input form.
+- **Unwrapped** - the CalcpadCE file with macros and `#include` files expanded, for debugging.
 
-- **Calculator** - the source code is available for editing in the left box.
-After calculations, the results are displayed into the right box.
-This mode is suitable for short and simple problems without complex formatting.
-
-- **Input Form** - the source code is not accessible.
-Instead, an Html input form is displayed.
-It contains input fields for all parameters, required for the calculations.
-The remaining content is locked for editing.
-This mode is more convenient for complex problems with rich formatting, that are frequently used.
-It makes clear which are the required input parameters and protects the source code from accidental damage.
-
-In "**Input Form**" mode, you need to fill the input data and click the <img src="./media/image6.png" alt="" height="20"> button.
-You can create such a from very easy, directly out of the source code.
-Just put the "**?**" symbol wherever you need to enter a value.
-Then save the problem as "\*.cpd" file.
-You can find additional information about forms further in this manual.
+See [UI mode](new-ui-mode.md) for how to build input forms.
+See [the CalcpadCE editor](new-calcpadce-editor.md) and [the CalcpadCE panel](new-calcpad-panel.md) for a tour of the interface.

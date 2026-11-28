@@ -36,6 +36,43 @@ For example `~a` + space → `α`, `~p` + space → `π`, `~S` + space → `Σ`.
 The full set is shown in the **Insert** tab's Symbol Palette.
 Toggle this with the `quickTyping` setting in the CalcpadCE **Settings** tab.
 
+| Name | Lowercase | Key | Uppercase | Key |
+| ---- | --------- | --- | --------- | --- |
+| alpha | α | `~a` | Α | `~A` |
+| beta | β | `~b` | Β | `~B` |
+| gamma | γ | `~g` | Γ | `~G` |
+| delta | δ | `~d` | Δ | `~D` |
+| epsilon | ε | `~e` | Ε | `~E` |
+| zeta | ζ | `~z` | Ζ | `~Z` |
+| eta | η | `~h` | Η | `~H` |
+| theta | θ | `~q` | Θ | `~Q` |
+| iota | ι | `~i` | Ι | `~I` |
+| kappa | κ | `~k` | Κ | `~K` |
+| lambda | λ | `~l` | Λ | `~L` |
+| mu | μ | `~m` | Μ | `~M` |
+| nu | ν | `~n` | Ν | `~N` |
+| xi | ξ | `~x` | Ξ | `~X` |
+| omicron | ο | `~o` | Ο | `~O` |
+| pi | π | `~p` | Π | `~P` |
+| rho | ρ | `~r` | Ρ | `~R` |
+| sigma | σ | `~s` | Σ | `~S` |
+| final sigma | ς | `~j` | | |
+| tau | τ | `~t` | Τ | `~T` |
+| upsilon | υ | `~u` | Υ | `~U` |
+| phi | φ | `~f` | Φ | `~F` |
+| chi | χ | `~c` | Χ | `~C` |
+| psi | ψ | `~y` | Ψ | `~Y` |
+| omega | ω | `~w` | Ω | `~W` |
+
+| Symbol | Key |
+| ------ | --- |
+| ° | `~0` |
+| ′ ″ ‴ ⁗ | `~'` `~"` `~'''` `~''''` |
+| ø Ø | `~/o` `~/O` |
+| ϕ | `~ff` |
+| ‰ ‱ | `~%` `~%%` |
+| ℓ | `~len` |
+
 Any Insert tab item can have quick-type keys: click the **~** beside it to add or remove them.
 
 ## Custom Snippets
@@ -54,21 +91,24 @@ Block keywords indent automatically: `#if` / `#else` / `#end if`, `#for` / `#end
 When the cursor is in a `.cpd` file, these hotkeys wrap the selection in HTML or Markdown markup.
 Whether HTML or Markdown is emitted depends on the `commentFormat` setting (`auto` / `html` / `markdown`).
 
-| Keybinding | Effect |
-| ---------- | ------ |
-| **Ctrl+B** | Bold |
-| **Ctrl+I** | Italic |
-| **Ctrl+U** | Underline |
-| **Ctrl+=** | Subscript |
-| **Ctrl+Shift+=** | Superscript |
-| **Ctrl+1** … **Ctrl+6** | Headings 1–6 |
-| **Ctrl+L** | Paragraph |
-| **Ctrl+R** | Line break |
-| **Ctrl+Shift+L** | Bulleted list |
-| **Ctrl+Shift+N** | Numbered list |
-| **Ctrl+Q** | Toggle `'` comment prefix |
-| **Ctrl+Shift+Q** | Uncomment |
-| **Ctrl+Shift+V** | Paste as comment (each line prefixed with `'`) |
+| Keybinding | Effect | HTML | Markdown |
+| ---------- | ------ | ---- | -------- |
+| **Ctrl+B** | Bold | `<strong>…</strong>` | `**…**` |
+| **Ctrl+I** | Italic | `<em>…</em>` | `*…*` |
+| **Ctrl+U** | Underline | `<ins>…</ins>` | `++…++` |
+| **Ctrl+=** | Subscript | `<sub>…</sub>` | `~…~` |
+| **Ctrl+Shift+=** | Superscript | `<sup>…</sup>` | `^…^` |
+| **Ctrl+1** … **Ctrl+6** | Headings 1–6 | `<h1>…</h1>` … `<h6>…</h6>` | `# …` … `###### …` |
+| **Ctrl+L** | Paragraph | `<p>…</p>` | `<p>…</p>` |
+| **Ctrl+R** | Line break | `<br/>` | `<br/>` |
+| **Ctrl+Shift+L** | Bulleted list | `<ul><li>…</li></ul>` | `- …` |
+| **Ctrl+Shift+N** | Numbered list | `<ol><li>…</li></ol>` | `1. …` |
+| **Ctrl+Q** | Toggle `'` comment prefix | | |
+| **Ctrl+Shift+Q** | Uncomment | | |
+| **Ctrl+Shift+V** | Paste as comment (each line prefixed with `'`) | | |
+
+Select some text and press a hotkey to wrap it.
+Pressing a heading hotkey on a line that is already a heading changes its level.
 
 On macOS use **Cmd** instead of **Ctrl**.
 Rebind any of them in **Settings → [Keyboard Shortcuts](new-settings.md#keyboard-shortcuts)**, or turn the whole set off with the `enableFormattingHotkeys` setting if it conflicts with your other bindings.

@@ -13,7 +13,8 @@ There are seven basic units that correspond to the seven physical dimensions:
 - luminous intensity - candela (cd)
 
 All other units are derivative and they are obtained by the respective laws of physics.
-For example, force = mass·acceleration, so Newton is obtained by N = kg·m/s2. Multiples of units are also supported by including the respective prefixes before their names.
+For example, force = mass·acceleration, so Newton is obtained by N = kg·m/s2.
+Multiples of units are also supported by including the respective prefixes before their names.
 For example, kN = 103 N, MN = 106 N and so on.
 Additionally, there are some "dimensionless" units like percents, permilles and angles (degrees, radians, etc.) that do not include physical dimensions.
 However, angles exist in a special 8-th non-physical dimension, in order not to cancel with or convert to percents when mixed (which would be weird).
@@ -32,7 +33,8 @@ If you want to use particular units, write a vertical bar "\|" followed by the t
 1.23 m + 35 cm + 12 mm | cm
 ```
 
-The above expression will be evaluated to 159.2 *cm*. If you simply want to convert units, just write the source and the target units, separated by a vertical bar, like: mm \| cm or 10 m/s \| km/h.
+The above expression will be evaluated to 159.2 *cm*.
+If you simply want to convert units, just write the source and the target units, separated by a vertical bar, like: mm \| cm or 10 m/s \| km/h.
 
 Unit consistency is also verified automatically.
 For example, you cannot add *m* and *s* (e.g. `6 m + 2 s`), but you can multiply and divide them: `6 m / 2 s = 3 m/s`.
@@ -117,13 +119,19 @@ CalcpadCE includes a large collection of predefined units as follows:
 - Force: ozf (or oz_f), lbf (or lb_f), kip (or kipf, kip_f), tonf (or ton_f), pdl;
 - Pressure: osi, osf, psi, psf, ksi, ksf, tsi, tsf, inHg;
 - Energy/work: BTU, therm (or therm_UK, therm_US), quad;
-- Power: hp, hpE, hpS.
+- Power: hp, hpE, hpS.
+
+Some unit names, such as `gal`, `ton`, `cwt`, `pt`, `qt`, `bbl`, `tonf` and `therm`, have different definitions in the UK (Imperial) and US systems.
+The bare names follow the **Non-Metric Units** option in the [Settings](new-settings.md#units) tab, which defaults to **US Customary**.
+Where a unit lists `_UK` and `_US` variants above, use one of them to choose a system regardless of the setting.
 
 Angle units are accepted by trigonometric functions, and they override all other settings.
 Inverse trigonometric functions and `phase` return the result in the current angle units by default.
 To return unitless values instead, turn off **Return Angle Units** in the [Settings](new-settings.md#math) or define a variable: *ReturnAngleUnits* = 0.
 
-Literals that follow numbers immediately are parsed as units, e.g. "2 m". Standalone literals can be either units or variables, e.g. "N\*m". The rules for parsing are as follows: If a literal has not been defined as a variable, it is parsed as a unit.
+Literals that follow numbers immediately are parsed as units, e.g. "2 m".
+Standalone literals can be either units or variables, e.g. "N\*m".
+The rules for parsing are as follows: If a literal has not been defined as a variable, it is parsed as a unit.
 Otherwise, it is parsed as a variable, even if a unit with the same name exists.
 If you put a dot before the literal, you will force it to be parsed as a unit, even if a variable with the same name exists, e.g. ".N\*.m".
 

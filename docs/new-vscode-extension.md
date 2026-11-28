@@ -30,12 +30,12 @@ Alternatively, from a terminal: `code --install-extension <path>/vscode-calcpad-
 2. Type a calculation, for example:
 
    ```calcpad
-   "Cantilever tip deflection
+   "Cantilever end deflection
    P = 5kN
    L = 3m
    E = 200GPa
-   I = 8.5e-5m^4
-   δ = P·L^3/(3·E·I)
+   I = 8500cm^4
+   δ = P*L^3/(3*E*I)|mm
    ```
 
 3. Click the **CalcpadCE Preview** button in the editor's top-right toolbar, or run **CalcpadCE Preview** from the Command Palette (**Ctrl+Shift+P**).
